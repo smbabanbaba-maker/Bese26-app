@@ -168,7 +168,7 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
       <section className="browse-section">
         <div className="browse-heading"><div><div className="eyebrow">BROWSE BY NEED</div><h2>What are you looking for?</h2></div><button className="text-button" onClick={() => onNavigate('search')}>See all <ArrowRight size={15} /></button></div>
         <div className="category-strip">
-          {['All', 'Phones', 'Electronics', 'Vehicles', 'Property', 'Fashion', 'Services'].map((label, index) => <button key={label} className={`category-filter ${index === 0 ? 'active' : ''}`} onClick={() => onSearch(label === 'All' ? '' : label)}>{label}</button>)}
+          {['All', 'Phones', 'Electronics', 'Vehicles', 'Property', 'Fashion', 'Services', 'Home & Garden', 'Agriculture', 'Food & Groceries', 'Beauty', 'Sports & Leisure', 'Jobs', 'Machinery', 'Spare Parts', 'Baby & Kids', 'Health & Wellness', 'Books & Media', 'Business & Industry', 'Other'].map((label, index) => <button key={label} className={`category-filter ${index === 0 ? 'active' : ''}`} onClick={() => onSearch(label === 'All' ? '' : label)}>{label}</button>)}
         </div>
       </section>
 
