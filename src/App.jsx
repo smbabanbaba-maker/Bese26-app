@@ -296,10 +296,11 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [toast, setToast] = useState('');
+  const [profileReset, setProfileReset] = useState(0);
 
   const showToast = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
   const toggleSave = (id) => { setSavedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]); showToast(savedIds.includes(id) ? 'Removed from saved' : 'Saved for later'); };
-  const navigate = (page) => { setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const navigate = (page) => { if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const goSearch = (value) => { setSearch(value); navigate('search'); };
 
   const renderView = () => {
@@ -310,7 +311,7 @@ export default function App() {
     if (activeNav === 'sell') return <SellView onDemoAction={showToast} />;
     if (activeNav === 'messages') return <MessagesView onDemoAction={showToast} />;
     if (activeNav === 'ai') return <AiView onNavigate={navigate} />;
-    return <ProfileView onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} isActive={activeNav === 'profile'} />;
+    return <ProfileView key={profileReset} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} isActive={activeNav === 'profile'} />;
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
