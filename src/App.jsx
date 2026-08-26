@@ -157,17 +157,18 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
 
       <section className="search-section">
         <div className="search-box home-search">
-          <Search size={20} />
-          <input aria-label="Search listings" placeholder="Search for products, services and more" onFocus={() => onSearch('')} />
-          <button className="search-submit" onClick={() => onSearch('')}>Search</button>
+          <Search size={18} />
+          <input aria-label="Search listings" placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(event.currentTarget.value)} />
+          <button className="camera-button" aria-label="Add a photo to search" onClick={() => onSearch('')}><Camera size={21} /></button>
+          <button className="search-submit" aria-label="Search" onClick={() => onSearch('')}><Search size={20} /></button>
         </div>
-        <div className="location-row"><MapPin size={14} /> Showing listings around <strong>Kano, Nigeria</strong><ChevronDown size={14} /></div>
+        <div className="location-row"><MapPin size={14} /><span>Showing listings around</span><strong>Kano, Nigeria</strong><ChevronDown size={14} /></div>
       </section>
 
-      <section>
-        <SectionHeading eyebrow="BROWSE BY NEED" title="What are you looking for?" action="See all" onAction={() => onNavigate('search')} />
-        <div className="category-grid category-grid-compact">
-          {categories.slice(0, 2).map((category) => <CategoryTile key={category.name} category={category} onClick={() => onSearch(category.name)} />)}
+      <section className="browse-section">
+        <div className="browse-heading"><div><div className="eyebrow">BROWSE BY NEED</div><h2>What are you looking for?</h2></div><button className="text-button" onClick={() => onNavigate('search')}>See all <ArrowRight size={15} /></button></div>
+        <div className="category-strip">
+          {['All', 'Phones', 'Electronics', 'Vehicles', 'Property', 'Fashion', 'Services'].map((label, index) => <button key={label} className={`category-filter ${index === 0 ? 'active' : ''}`} onClick={() => onSearch(label === 'All' ? '' : label)}>{label}</button>)}
         </div>
       </section>
 
