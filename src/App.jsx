@@ -201,7 +201,6 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
 function SearchView({ search, setSearch, onOpenListing, savedIds, onToggleSave, onBack }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sort, setSort] = useState('Recommended');
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     let result = listings.filter((listing) => !term || `${listing.title} ${listing.location} ${listing.category}`.toLowerCase().includes(term));
@@ -216,8 +215,8 @@ function SearchView({ search, setSearch, onOpenListing, savedIds, onToggleSave, 
       <div className="back-row"><button className="icon-button" onClick={onBack}><ArrowLeft size={18} /></button><span>Discover listings</span></div>
       <div className="page-title-row"><div><div className="eyebrow">SEARCH & DISCOVER</div><h1>Find something great.</h1></div><div className="results-count">{filtered.length} results</div></div>
       <div className="search-box large-search"><Search size={19} /><input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Try “phones in Kano”" /><button className="search-clear" onClick={() => setSearch('')}><X size={16} /></button></div>
-      <div className="filter-toolbar"><div className="filter-scroll"><button className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All listings</button>{categories.slice(0, 6).map((category) => <button key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}</div><button className="filter-button" onClick={() => setFiltersOpen(!filtersOpen)}><SlidersIcon /> Filters</button></div>
-      {filtersOpen && <div className="filter-drawer"><div><span>Location</span><button>Kano <ChevronDown size={14} /></button></div><div><span>Condition</span><button>Any condition <ChevronDown size={14} /></button></div><div><span>Sort by</span><select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recommended</option><option>Newest</option><option>Price low → high</option><option>Price high → low</option></select></div></div>}
+      <div className="filter-toolbar"><div className="filter-scroll"><button className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All listings</button>{categories.slice(0, 6).map((category) => <button key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}</div></div>
+
       <div className="search-result-head"><span>Recommended for you</span><select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recommended</option><option>Newest</option><option>Price low → high</option><option>Price high → low</option></select></div>
       {filtered.length ? <div className="product-grid search-grid">{filtered.map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Search size={25} /><h3>No listings found</h3><p>Try a different search term or browse all categories.</p><button className="primary-button" onClick={() => { setSearch(''); setActiveCategory('All'); }}>Clear search</button></div>}
     </div>
@@ -230,7 +229,6 @@ function WalletView({ onDemoAction }) {
     <section className="wallet-card"><div className="wallet-top"><span>Available balance</span><span className="balance-label">AVAILABLE BALANCE</span></div><div className="wallet-balance">₦125,000<span>.00</span></div><div className="wallet-bottom"><span>Ready when you are.</span><div className="wallet-dots"><i /><i /><i /></div></div></section>
     <div className="wallet-actions"><button onClick={() => onDemoAction('Add money will be available with your marketplace balance.')}><Plus size={18} /> Add money</button><button onClick={() => onDemoAction('Withdraw will be available with your marketplace balance.')}><ArrowRight size={18} /> Withdraw</button></div>
     <section><SectionHeading eyebrow="RECENT ACTIVITY" title="Transactions" action="See all" /><div className="transaction-list">{transactions.map((item) => <div className="transaction-row" key={item.label}><div className={`transaction-icon ${item.type}`}><WalletCards size={16} /></div><div className="transaction-copy"><strong>{item.label}</strong><span>{item.date}</span></div><strong className={item.type === 'in' ? 'amount-in' : ''}>{item.amount}</strong></div>)}</div></section>
-    <section className="wallet-promo"><div className="wallet-promo-icon"><Sparkles size={20} /></div><div><div className="eyebrow">SELL MORE, SMARTER</div><h3>Boost your best listing.</h3><p>Reach more people around Kano with a promotion.</p></div><button className="icon-button" onClick={() => onDemoAction('Promotion preview opened.')}><ChevronRight size={18} /></button></section>
   </div>;
 }
 
@@ -272,7 +270,6 @@ function NotificationPanel({ onClose }) {
   return <div className="notification-panel"><div className="panel-header"><div><div className="eyebrow">STAY IN THE LOOP</div><h2>Notifications</h2></div><button className="icon-button" onClick={onClose}><X size={17} /></button></div><div className="notification-list">{notifications.map((item) => <div className={`notification-row ${item.unread ? 'unread' : ''}`} key={item.title}><div className="notification-icon"><Bell size={16} /></div><div><strong>{item.title}</strong><p>{item.detail}</p><span>{item.time}</span></div></div>)}</div><button className="panel-footer-button" onClick={onClose}>Mark all as read</button></div>;
 }
 
-function SlidersIcon() { return <span className="sliders-icon"><span /><span /><span /></span>; }
 
 export default function App() {
   const [activeNav, setActiveNav] = useState('home');
