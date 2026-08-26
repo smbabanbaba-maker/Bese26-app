@@ -145,14 +145,17 @@ function CategoryTile({ category, onClick }) {
 function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   return (
     <div className="page-stack home-page">
-      <section className="hero-panel">
-        <div className="hero-copy">
-          <div className="eyebrow light">THE BETTER WAY TO BUY & SELL</div>
-          <h1>Find good things.<br /><span>Meet good people.</span></h1>
-          <p>Explore trusted listings from people and businesses across Nigeria.</p>
-          <button className="hero-cta" onClick={() => onSearch('')}>Start exploring <ArrowRight size={17} /></button>
+      <section className="discovery-banner">
+        <div className="discovery-copy">
+          <div className="eyebrow light">WELCOME TO BESE26</div>
+          <h1>Shop smarter.<br /><span>Sell with confidence.</span></h1>
+          <p>Discover everyday essentials from people and businesses near you.</p>
         </div>
-        <div className="hero-stamp"><ShieldCheck size={16} /> Better marketplace</div>
+        <div className="discovery-actions">
+          <div className="discovery-stat"><strong>4.9</strong><span><Star size={12} fill="currentColor" /> trusted sellers</span></div>
+          <button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button>
+        </div>
+        <div className="discovery-accent"><Sparkles size={18} /></div>
       </section>
 
       <section className="search-section">
