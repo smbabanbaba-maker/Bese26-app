@@ -142,12 +142,16 @@ function CategoryTile({ category, onClick }) {
   );
 }
 
+function QuickAction({ icon: Icon, label, note, tone, onClick }) {
+  return <button className={`quick-action quick-action-${tone}`} onClick={onClick}><span className="quick-action-icon"><Icon size={17} /></span><span><strong>{label}</strong><small>{note}</small></span><ChevronRight size={14} className="quick-action-arrow" /></button>;
+}
+
 function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   return (
     <div className="page-stack home-page">
       <section className="discovery-banner">
         <div className="discovery-copy">
-          <div className="eyebrow light">WELCOME TO BESE26</div>
+          <div className="eyebrow light">GOOD AFTERNOON, MUSA · KANO</div>
           <h1>Shop smarter.<br /><span>Sell with confidence.</span></h1>
           <p>Discover everyday essentials from people and businesses near you.</p>
         </div>
@@ -175,10 +179,38 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
         </div>
       </section>
 
+      <section className="quick-actions-section">
+        <div className="quick-actions-heading"><div className="eyebrow">MAKE IT EASY</div><span>Shortcuts for you</span></div>
+        <div className="quick-actions-grid">
+          <QuickAction icon={Search} label="Browse" note="Find something" tone="coral" onClick={() => onNavigate('search')} />
+          <QuickAction icon={Plus} label="Sell" note="List an item" tone="lavender" onClick={() => onNavigate('sell')} />
+          <QuickAction icon={Bookmark} label="Saved" note={`${savedIds.length} items`} tone="gold" onClick={() => onNavigate('saved')} />
+          <QuickAction icon={MessageCircle} label="Messages" note="Keep in touch" tone="mint" onClick={() => onNavigate('messages')} />
+        </div>
+      </section>
+
+      <section className="trending-section">
+        <div className="trending-label"><Sparkles size={15} /><span>Trending now</span></div>
+        <div className="trending-pills">{['iPhone 13', 'Laptops', 'Cars in Kano', 'Apartments', 'Sofas'].map((term) => <button key={term} onClick={() => onSearch(term)}>{term}<ArrowRight size={12} /></button>)}</div>
+      </section>
+
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action="View all" onAction={() => onNavigate('search')} />
         <div className="product-grid">
           {listings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
+        </div>
+      </section>
+
+      <section className="trust-strip">
+        <div className="trust-strip-item"><span className="trust-strip-icon"><ShieldCheck size={16} /></span><span><strong>Verified sellers</strong><small>Trade with more confidence</small></span></div>
+        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-blue"><MessageCircle size={16} /></span><span><strong>Safe conversations</strong><small>Chat before you meet</small></span></div>
+        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-gold"><MapPin size={16} /></span><span><strong>Near you</strong><small>Discover locally</small></span></div>
+      </section>
+
+      <section className="recent-section">
+        <SectionHeading eyebrow="PICK UP WHERE YOU LEFT OFF" title="Recently viewed" action="See history" onAction={() => onNavigate('search')} />
+        <div className="mini-list recent-list">
+          {listings.slice(1, 4).map((listing) => <ProductCard key={listing.id} listing={listing} compact onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
         </div>
       </section>
 
