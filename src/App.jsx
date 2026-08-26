@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { categories, demoAiReplies, listings, messages, notifications, sellers, transactions } from './data';
 import ProfileView from './components/ProfileView';
+import SellView from './components/SellView';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -242,22 +243,7 @@ function SavedView({ savedIds, onOpenListing, onToggleSave, onDemoAction }) {
   </div>;
 }
 
-function SellView({ onDemoAction }) {
-  const [form, setForm] = useState({ title: '', price: '', description: '', category: 'Phones & Tablets', condition: 'Used — Excellent', location: 'Kano, Nigeria' });
-  const [generated, setGenerated] = useState(false);
-  const update = (key, value) => setForm((old) => ({ ...old, [key]: value }));
-  const generate = () => { setGenerated(false); window.setTimeout(() => { setForm({ title: 'Clean iPhone 13 Pro 256GB', price: '485000', description: 'Carefully used iPhone 13 Pro with strong battery health, original box and cable. Available for inspection in Kano.', category: 'Phones & Tablets', condition: 'Used — Excellent', location: 'Kano, Nigeria' }); setGenerated(true); }, 700); };
-  const publish = () => { onDemoAction('Listing Published Successfully — your listing is ready.'); setForm({ title: '', price: '', description: '', category: 'Phones & Tablets', condition: 'Used — Excellent', location: 'Kano, Nigeria' }); setGenerated(false); };
-  return <div className="page-stack sell-page premium-sell-page">
-    <section className="sell-hero"><div className="sell-hero-copy"><div className="eyebrow">SELL ON BESE26</div><h1>Turn what you have<br /><span>into extra value.</span></h1><p>Reach buyers near you with a listing that looks as good as the item itself.</p></div><div className="sell-hero-badge"><Camera size={18} /><span>Trusted by local buyers</span></div></section>
-    <div className="sell-progress"><div className="sell-progress-step active"><b>01</b><span>Photos</span></div><i /><div className="sell-progress-step"><b>02</b><span>Details</span></div><i /><div className="sell-progress-step"><b>03</b><span>Publish</span></div></div>
-    <section className="sell-card photo-card"><div className="sell-card-heading"><span className="sell-card-icon coral"><Camera size={19} /></span><div><div className="eyebrow">MAKE IT LOOK GOOD</div><h2>Add photos</h2><p>Listings with clear photos get noticed faster.</p></div><span className="required-note">At least 1 photo</span></div><div className="photo-upload-row premium-photo-row"><button className="upload-tile"><span className="upload-tile-icon"><Plus size={24} /></span><strong>Add photos</strong><small>JPG, PNG up to 10MB</small></button><div className="photo-thumb"><img src="/images/iphone-13-pro.jpg" alt="Listing photo" /><span>Cover</span></div><div className="photo-thumb"><img src="/images/macbook-air.jpg" alt="Listing photo" /><button className="photo-remove">×</button></div></div></section>
-    <section className="sell-card details-card"><div className="sell-card-heading"><span className="sell-card-icon lavender"><Tag size={19} /></span><div><div className="eyebrow">THE DETAILS</div><h2>Tell buyers about it</h2><p>A few details help the right buyer find you.</p></div><button className="ai-assist-button" onClick={generate}><Sparkles size={15} /> Generate with AI</button></div>{generated && <div className="ai-generated"><CheckCircle2 size={17} /><span>Draft generated. Feel free to edit it.</span></div>}<div className="form-grid premium-form-grid"><label><span className="field-label"><Package size={14} /> Title</span><input value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="e.g. iPhone 13 Pro 256GB" /></label><label><span className="field-label"><Tag size={14} /> Category</span><select value={form.category} onChange={(e) => update('category', e.target.value)}>{categories.slice(0, 8).map((item) => <option key={item.name}>{item.name}</option>)}</select></label><label><span className="field-label"><WalletCards size={14} /> Price</span><input value={form.price} onChange={(e) => update('price', e.target.value)} inputMode="numeric" placeholder="e.g. 485000" /></label><label><span className="field-label"><CheckCircle2 size={14} /> Condition</span><select value={form.condition} onChange={(e) => update('condition', e.target.value)}><option>Used — Excellent</option><option>Used — Good</option><option>New</option></select></label><label className="full-field"><span className="field-label"><MessageCircle size={14} /> Description</span><textarea value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="Describe what makes this listing special..." /></label></div></section>
-    <section className="sell-card location-card"><div className="sell-card-heading"><span className="sell-card-icon mint"><MapPin size={19} /></span><div><div className="eyebrow">MEET LOCALLY</div><h2>Where is it?</h2><p>Show buyers where they can inspect the item.</p></div></div><button className="location-input premium-location-input" onClick={() => onDemoAction('Location selector opened.')}><MapPin size={17} /><span>{form.location}</span><ChevronRight size={16} /></button></section>
-    <section className="listing-preview premium-listing-preview"><div className="preview-label"><span><Sparkles size={12} /> LISTING PREVIEW</span><span>Live preview</span></div><div className="preview-inner"><img src="/images/iphone-13-pro.jpg" alt="Preview" /><div><div className="product-price">{form.price ? formatNaira(form.price) : '₦0'}</div><h3>{form.title || 'Your product title'}</h3><div className="product-meta"><MapPin size={13} /> {form.location}</div><span className="preview-condition">{form.condition}</span></div></div></section>
-    <div className="sell-submit-wrap"><button className="publish-button" onClick={publish}><CheckCircle2 size={17} /> Publish listing <ArrowRight size={17} /></button><span><ShieldCheck size={14} /> Your listing will be reviewed before it goes live.</span></div>
-  </div>;
-}
+
 
 function MessagesView({ onDemoAction }) {
   const [activeMessage, setActiveMessage] = useState(messages[0]);
