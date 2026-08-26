@@ -8,13 +8,13 @@ The current build uses local React state and realistic marketplace data while se
 
 ## Included experiences
 
-- Home discovery with featured listings, categories, near-you content, recommendations, and verified sellers.
-- Search with local filtering, category chips, sorting, and an expandable filter panel.
-- Product detail modal with gallery-style hero image, seller details, save, share, report, call, and chat actions.
-- Saved listings, saved searches, and saved sellers.
-- Sell flow with photo gallery, editable listing fields, AI-assisted draft generation, preview, and publish success toast.
-- Wallet UI with available balance, transactions, promotion card, and account controls.
-- Messages UI with conversations and send-message state.
+- Home discovery with featured listings, near-you content, recommendations, and verified sellers.
+- Search with local text search, category chips, and one clear sort control.
+- Product detail modal with a three-image gallery, key-detail chips, seller details, save, share, report, call, and chat actions.
+- Saved listings, an active saved search summary, and saved sellers.
+- Single-page vertical Sell flow with photo gallery, category-aware fields, pricing, location, delivery, contact preferences, validation, and publish confirmation.
+- Wallet UI with available balance, Add money, Withdraw, and recent transactions.
+- Messages UI with seller conversations, listing context, per-thread message state, and send-message behavior.
 - Bese AI assistant with suggested prompts, loading animation, and marketplace responses.
 - Profile, seller statistics, settings, theme switching, notification panel, and responsive bottom navigation.
 
@@ -31,7 +31,7 @@ npm run preview
 
 ## Vercel deployment
 
-Import `smbabanbaba-maker/Bese26-app` into Vercel. The project is already configured for a static Vite build, so use these settings if Vercel asks:
+Import `smbabanbaba-maker/Bese26-app` into Vercel and connect the production branch (`main`) for automatic deployments on push. The repository is configured as a static Vite build, so use these settings if Vercel asks:
 
 | Setting | Value |
 | --- | --- |
@@ -43,7 +43,7 @@ Import `smbabanbaba-maker/Bese26-app` into Vercel. The project is already config
 
 ## Future Firebase architecture
 
-The UI and local data layers are intentionally separated so production services can be connected without rebuilding the screens. The service layer can add Firebase Authentication for accounts, Cloud Firestore for users/listings/messages/saved items/reviews/notifications, Firebase Storage for product and profile images, Cloud Functions for AI/notifications/payments/moderation, Firebase Cloud Messaging for push notifications, Firebase Analytics for product insights, and Crashlytics for mobile monitoring.
+The UI and local data layers are intentionally separated so production services can be connected without rebuilding the screens. The current Vercel deployment serves the static frontend; it does not yet provide real authentication, database persistence, cloud uploads, or server-side publishing. The service layer can add Firebase Authentication for accounts, Cloud Firestore for users/listings/messages/saved items/reviews/notifications, Firebase Storage for product and profile images, Cloud Functions for AI/notifications/payments/moderation, Firebase Cloud Messaging for push notifications, Firebase Analytics for product insights, and Crashlytics for mobile monitoring.
 
 ## Roadmap
 
