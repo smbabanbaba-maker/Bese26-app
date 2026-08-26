@@ -45,6 +45,7 @@ import {
   X,
 } from 'lucide-react';
 import { categories, demoAiReplies, listings, messages, notifications, sellers, transactions } from './data';
+import ProfileView from './components/ProfileView';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -295,14 +296,7 @@ function AiView({ onNavigate }) {
   return <div className="page-stack ai-page"><div className="ai-hero"><div className="ai-sparkle"><Sparkles size={26} /></div><div className="eyebrow">YOUR MARKETPLACE COMPANION</div><h1>Ask Bese.</h1><p>Search naturally, compare options, or get help creating a listing.</p></div><div className="ai-suggestions"><span>Try asking</span><button onClick={() => ask('Find phones under ₦300,000')}>Find phones under ₦300,000 <ArrowRight size={14} /></button><button onClick={() => ask('Help me sell my product')}>Help me sell my product <ArrowRight size={14} /></button><button onClick={() => ask('Find cars around Kano')}>Find cars around Kano <ArrowRight size={14} /></button></div>{reply && <div className="ai-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>Bese AI</span><p>{reply}</p>{reply.includes('phones') && <button className="inline-link" onClick={() => onNavigate('search')}>Show matching listings <ArrowRight size={14} /></button>}</div></div>}{loading && <div className="ai-reply loading-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>Bese AI</span><div className="typing"><i /><i /><i /></div></div></div>}<div className="ai-composer"><textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="What are you looking for today?" /><div className="ai-composer-footer"><span><Sparkles size={14} /> Demo assistant — no live AI connected</span><button className="send-button" onClick={() => ask()}><ArrowRight size={17} /></button></div></div><div className="ai-note"><ShieldCheck size={16} /><span>Your conversations are only demo data in this prototype.</span></div></div>;
 }
 
-function ProfileView({ onDemoAction, isDark, onToggleTheme }) {
-  return <div className="page-stack profile-page"><div className="profile-cover"><div className="profile-cover-shape" /><button className="cover-menu icon-button"><MoreHorizontal size={19} /></button><div className="profile-heading"><Avatar initials="MA" tone="navy" size="xl" /><div><div className="profile-name-row"><h1>Musa Abdullahi</h1><VerifiedBadge /></div><div className="product-meta"><MapPin size={13} /> Kano, Nigeria <span>•</span> Member since 2024</div><div className="seller-stats"><Star size={13} fill="currentColor" /> 4.9 rating <span>•</span> 24 reviews</div></div><button className="outline-button" onClick={() => onDemoAction('Edit profile is available in the next prototype phase.')}>Edit profile</button></div></div>
-    <div className="profile-stats"><div><strong>12</strong><span>Active listings</span></div><div><strong>38</strong><span>Sold</span></div><div><strong>26</strong><span>Saved</span></div><div><strong>24</strong><span>Reviews</span></div></div>
-    <section className="profile-menu-section"><SectionHeading eyebrow="YOUR SPACE" title="My marketplace" /><div className="profile-menu-grid">{['My listings', 'Active listings', 'Sold items', 'Saved', 'Reviews', 'Seller analytics'].map((item, i) => <button key={item} onClick={() => onDemoAction(`${item} opened.`)}><span className={`menu-icon menu-icon-${i}`}><Package size={17} /></span><span>{item}</span><ChevronRight size={15} /></button>)}</div></section>
-    <section className="settings-section"><SectionHeading eyebrow="MAKE IT YOURS" title="Settings" /><div className="settings-list"><button onClick={onToggleTheme}><span><span className="setting-icon"><Moon size={17} /></span>Appearance</span><small>{isDark ? 'Dark mode' : 'Light mode'}</small><ChevronRight size={15} /></button><button onClick={() => onDemoAction('Notifications settings opened.')}><span><span className="setting-icon"><Bell size={17} /></span>Notifications</span><small>On</small><ChevronRight size={15} /></button><button onClick={() => onDemoAction('Language selection opened.')}><span><span className="setting-icon"><Sparkles size={17} /></span>Language</span><small>English</small><ChevronRight size={15} /></button></div></section>
-    <section className="profile-footer-card"><ShieldCheck size={20} /><div><strong>Built for confident exchanges.</strong><span>Read our Safety Center before meeting someone.</span></div><ChevronRight size={16} /></section>
-  </div>;
-}
+
 
 function ListingModal({ listing, onClose, isSaved, onToggleSave, onDemoAction }) {
   if (!listing) return null;
@@ -337,7 +331,7 @@ export default function App() {
     if (activeNav === 'sell') return <SellView onDemoAction={showToast} />;
     if (activeNav === 'messages') return <MessagesView onDemoAction={showToast} />;
     if (activeNav === 'ai') return <AiView onNavigate={navigate} />;
-    return <ProfileView onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} />;
+    return <ProfileView onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} isActive={activeNav === 'profile'} />;
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
