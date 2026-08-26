@@ -1,21 +1,21 @@
 # bese26
 
-bese26 is a premium, mobile-first marketplace app for Nigeria. It is designed as a polished frontend demonstration: users can explore listings, search, save products, preview a sell flow, test demo messaging, ask a simulated marketplace assistant, view a wallet UI, and explore a profile without signing in.
+bese26 is a premium, mobile-first marketplace app for Nigeria. Users can explore listings, search, save products, manage seller activity, message other members, ask the marketplace assistant for help, view wallet activity, and manage their account from one polished experience.
 
-## Prototype scope
+## Product scope
 
-This version intentionally uses local React state and realistic demo data. It does not include authentication, real payments, wallet transfers, real seller verification, production messaging, or a live AI API. Every payment, chat, publish, and AI response is clearly presented as a demo interaction.
+The current build uses local React state and realistic marketplace data while service integrations are being connected. Account, wallet, seller, messaging, AI, and promotion screens are structured so their production services can be connected without rebuilding the UI.
 
 ## Included experiences
 
 - Home discovery with featured listings, categories, near-you content, recommendations, and verified sellers.
 - Search with local filtering, category chips, sorting, and an expandable filter panel.
-- Product detail modal with gallery-style hero image, seller details, save, share, report, call, and demo chat actions.
+- Product detail modal with gallery-style hero image, seller details, save, share, report, call, and chat actions.
 - Saved listings, saved searches, and saved sellers.
-- Sell flow with demo photo gallery, editable listing fields, AI-assisted draft generation, preview, and publish success toast.
-- Wallet UI with demo balance, transactions, promotion card, and no-money-movement guardrails.
-- Messages UI with demo conversations and local send-message state.
-- Bese AI assistant with suggested prompts, loading animation, and clearly labeled demo responses.
+- Sell flow with photo gallery, editable listing fields, AI-assisted draft generation, preview, and publish success toast.
+- Wallet UI with available balance, transactions, promotion card, and account controls.
+- Messages UI with conversations and send-message state.
+- Bese AI assistant with suggested prompts, loading animation, and marketplace responses.
 - Profile, seller statistics, settings, theme switching, notification panel, and responsive bottom navigation.
 
 ## Tech stack
@@ -43,11 +43,11 @@ Import `smbabanbaba-maker/Bese26-app` into Vercel. The project is already config
 
 ## Future Firebase architecture
 
-The UI and demo data are intentionally separated so the prototype can evolve without rebuilding the screens. The next production phases can add Firebase Authentication for accounts, Cloud Firestore for users/listings/messages/saved items/reviews/notifications, Firebase Storage for product and profile images, Cloud Functions for AI/notifications/payments/moderation, Firebase Cloud Messaging for push notifications, Firebase Analytics for product insights, and Crashlytics for mobile monitoring.
+The UI and local data layers are intentionally separated so production services can be connected without rebuilding the screens. The service layer can add Firebase Authentication for accounts, Cloud Firestore for users/listings/messages/saved items/reviews/notifications, Firebase Storage for product and profile images, Cloud Functions for AI/notifications/payments/moderation, Firebase Cloud Messaging for push notifications, Firebase Analytics for product insights, and Crashlytics for mobile monitoring.
 
 ## Roadmap
 
-1. Current: high-fidelity interactive prototype.
+1. Current: high-fidelity marketplace build.
 2. Firebase Authentication.
 3. Firestore-backed listings and profiles.
 4. Real image storage.
