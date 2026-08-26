@@ -173,28 +173,6 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
         <div className="location-row"><MapPin size={14} /><span>Showing listings around</span><strong>Kano, Nigeria</strong><ChevronDown size={14} /></div>
       </section>
 
-      <section className="browse-section">
-        <div className="browse-heading"><div><div className="eyebrow">BROWSE BY NEED</div><h2>What are you looking for?</h2></div><button className="text-button" onClick={() => onNavigate('search')}>See all <ArrowRight size={15} /></button></div>
-        <div className="category-strip">
-          {['All', 'Phones', 'Electronics', 'Vehicles', 'Property', 'Fashion', 'Services', 'Home & Garden', 'Agriculture', 'Food & Groceries', 'Beauty', 'Sports & Leisure', 'Jobs', 'Machinery', 'Spare Parts', 'Baby & Kids', 'Health & Wellness', 'Books & Media', 'Business & Industry', 'Other'].map((label, index) => <button key={label} className={`category-filter ${index === 0 ? 'active' : ''}`} onClick={() => onSearch(label === 'All' ? '' : label)}>{label}</button>)}
-        </div>
-      </section>
-
-      <section className="quick-actions-section">
-        <div className="quick-actions-heading"><div className="eyebrow">MAKE IT EASY</div><span>Shortcuts for you</span></div>
-        <div className="quick-actions-grid">
-          <QuickAction icon={Search} label="Browse" note="Find something" tone="coral" onClick={() => onNavigate('search')} />
-          <QuickAction icon={Plus} label="Sell" note="List an item" tone="lavender" onClick={() => onNavigate('sell')} />
-          <QuickAction icon={Bookmark} label="Saved" note={`${savedIds.length} items`} tone="gold" onClick={() => onNavigate('saved')} />
-          <QuickAction icon={MessageCircle} label="Messages" note="Keep in touch" tone="mint" onClick={() => onNavigate('messages')} />
-        </div>
-      </section>
-
-      <section className="trending-section">
-        <div className="trending-label"><Sparkles size={15} /><span>Trending now</span></div>
-        <div className="trending-pills">{['iPhone 13', 'Laptops', 'Cars in Kano', 'Apartments', 'Sofas'].map((term) => <button key={term} onClick={() => onSearch(term)}>{term}<ArrowRight size={12} /></button>)}</div>
-      </section>
-
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action="View all" onAction={() => onNavigate('search')} />
         <div className="product-grid">
@@ -293,7 +271,7 @@ function AiView({ onNavigate }) {
   const [reply, setReply] = useState('');
   const [loading, setLoading] = useState(false);
   const ask = (value = input) => { if (!value.trim()) return; setInput(value); setLoading(true); window.setTimeout(() => { const key = value.toLowerCase().includes('phone') ? 'phones' : value.toLowerCase().includes('sell') ? 'sell' : 'default'; setReply(demoAiReplies[key]); setLoading(false); }, 650); };
-  return <div className="page-stack ai-page"><div className="ai-hero"><div className="ai-sparkle"><Sparkles size={26} /></div><div className="eyebrow">YOUR MARKETPLACE COMPANION</div><h1>Ask Bese.</h1><p>Search naturally, compare options, or get help creating a listing.</p></div><div className="ai-suggestions"><span>Try asking</span><button onClick={() => ask('Find phones under ₦300,000')}>Find phones under ₦300,000 <ArrowRight size={14} /></button><button onClick={() => ask('Help me sell my product')}>Help me sell my product <ArrowRight size={14} /></button><button onClick={() => ask('Find cars around Kano')}>Find cars around Kano <ArrowRight size={14} /></button></div>{reply && <div className="ai-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>Bese AI</span><p>{reply}</p>{reply.includes('phones') && <button className="inline-link" onClick={() => onNavigate('search')}>Show matching listings <ArrowRight size={14} /></button>}</div></div>}{loading && <div className="ai-reply loading-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>Bese AI</span><div className="typing"><i /><i /><i /></div></div></div>}<div className="ai-composer"><textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="What are you looking for today?" /><div className="ai-composer-footer"><span><Sparkles size={14} /> Bese AI marketplace assistant</span><button className="send-button" onClick={() => ask()}><ArrowRight size={17} /></button></div></div><div className="ai-note"><ShieldCheck size={16} /><span>Keep your marketplace conversations clear and safe.</span></div></div>;
+  return <div className="page-stack ai-page premium-ai-page"><section className="ai-hero"><div className="ai-hero-top"><div className="ai-brand-mark"><Sparkles size={20} /></div><strong>bese26 AI</strong><span className="ai-live-pill">SMART SEARCH</span></div><div className="ai-hero-body"><div className="eyebrow">YOUR MARKETPLACE COMPANION</div><h1>Find it faster.<br /><span>Buy with confidence.</span></h1><p>Tell bese26 what you need. Compare products, discover trusted sellers, and make your next move with clarity.</p></div><div className="ai-hero-footer"><span><ShieldCheck size={14} /> Built for better decisions</span><span>Ask about products, sellers, or selling</span></div></section><section className="ai-workspace"><div className="ai-section-heading"><div><div className="eyebrow">START WITH A PROMPT</div><h2>How can bese26 help?</h2></div><span>Always ready</span></div><div className="ai-suggestions"><button onClick={() => ask('Find phones under ₦300,000')}><Search size={15} /> Find phones under ₦300,000 <ArrowRight size={14} /></button><button onClick={() => ask('Help me sell my product')}><Sparkles size={15} /> Help me sell my product <ArrowRight size={14} /></button><button onClick={() => ask('Find cars around Kano')}><MapPin size={15} /> Find cars around Kano <ArrowRight size={14} /></button></div>{reply && <div className="ai-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>bese26 AI</span><p>{reply}</p>{reply.includes('phones') && <button className="inline-link" onClick={() => onNavigate('search')}>Show matching listings <ArrowRight size={14} /></button>}</div></div>}{loading && <div className="ai-reply loading-reply"><div className="ai-reply-avatar"><Sparkles size={15} /></div><div><span>bese26 AI</span><div className="typing"><i /><i /><i /></div></div></div>}<div className="ai-composer"><textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask anything about products, prices, or selling..." /><div className="ai-composer-footer"><span><Sparkles size={14} /> bese26 marketplace assistant</span><button className="send-button" onClick={() => ask()}><ArrowRight size={17} /></button></div></div></section><section className="ai-confidence-strip"><div><span className="confidence-icon"><ShieldCheck size={16} /></span><span><strong>Seller-aware</strong><small>Use context before you buy</small></span></div><div><span className="confidence-icon purple"><MessageCircle size={16} /></span><span><strong>Conversation-ready</strong><small>Move from answer to chat</small></span></div><div><span className="confidence-icon gold"><Sparkles size={16} /></span><span><strong>Market-smart</strong><small>Make better decisions</small></span></div></section></div>;
 }
 
 
