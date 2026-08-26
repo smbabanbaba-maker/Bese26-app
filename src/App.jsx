@@ -77,10 +77,10 @@ function formatNaira(value) {
 
 function Logo() {
   return (
-    <div className="brand-lockup" aria-label="Bese home">
+    <div className="brand-lockup" aria-label="bese26 home">
       <div className="brand-mark">B</div>
       <div>
-        <div className="brand-name">bese</div>
+        <div className="brand-name">bese26</div>
         <div className="brand-tagline">marketplace</div>
       </div>
     </div>
@@ -152,8 +152,6 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
           <p>Explore trusted listings from people and businesses across Nigeria.</p>
           <button className="hero-cta" onClick={() => onSearch('')}>Start exploring <ArrowRight size={17} /></button>
         </div>
-        <div className="hero-orb orb-one" />
-        <div className="hero-orb orb-two" />
         <div className="hero-stamp"><ShieldCheck size={16} /> Better marketplace</div>
       </section>
 
@@ -168,8 +166,8 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
 
       <section>
         <SectionHeading eyebrow="BROWSE BY NEED" title="What are you looking for?" action="See all" onAction={() => onNavigate('search')} />
-        <div className="category-grid">
-          {categories.slice(0, 8).map((category) => <CategoryTile key={category.name} category={category} onClick={() => onSearch(category.name)} />)}
+        <div className="category-grid category-grid-compact">
+          {categories.slice(0, 2).map((category) => <CategoryTile key={category.name} category={category} onClick={() => onSearch(category.name)} />)}
         </div>
       </section>
 
@@ -180,37 +178,6 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
         </div>
       </section>
 
-      <section className="split-section">
-        <div>
-          <SectionHeading eyebrow="NEAR YOU" title="Popular in Kano" action="Explore" onAction={() => onSearch('Kano')} />
-          <div className="mini-list">
-            {listings.slice(0, 2).map((listing) => <ProductCard key={listing.id} listing={listing} compact onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
-          </div>
-        </div>
-        <div className="trust-card">
-          <div className="trust-card-icon"><ShieldCheck size={23} /></div>
-          <div className="eyebrow">BUY WITH CONFIDENCE</div>
-          <h3>People-first commerce.</h3>
-          <p>Every listing is designed to give you the context you need before you make a move.</p>
-          <button className="inline-link" onClick={() => onNavigate('profile')}>How Bese works <ArrowRight size={15} /></button>
-        </div>
-      </section>
-
-      <section className="seller-section">
-        <SectionHeading eyebrow="PEOPLE TO KNOW" title="Verified sellers" action="Meet more sellers" onAction={() => onNavigate('profile')} />
-        <div className="seller-grid">
-          {sellers.map((seller) => <button className="seller-card" key={seller.name} onClick={() => onNavigate('profile')}>
-            <Avatar initials={seller.initials} tone={seller.tone} size="lg" />
-            <div className="seller-card-copy"><h3>{seller.name}</h3><div className="product-meta"><MapPin size={13} /> {seller.location}</div><div className="seller-stats"><Star size={13} fill="currentColor" /> {seller.rating} <span>•</span> {seller.listings} listings</div></div>
-            {seller.verified && <BadgeCheck size={18} className="seller-check" />}
-          </button>)}
-        </div>
-      </section>
-
-      <section className="recommendation-banner">
-        <div><div className="eyebrow">A LITTLE HELP, WHEN YOU NEED IT</div><h2>Let Bese help you find your next favourite thing.</h2><p>Tell our assistant what you have in mind, in your own words.</p></div>
-        <button className="dark-button" onClick={() => onNavigate('ai')}>Ask Bese AI <Sparkles size={16} /></button>
-      </section>
     </div>
   );
 }

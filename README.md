@@ -1,6 +1,6 @@
-# Bese26-app
+# bese26
 
-Bese is a premium, mobile-first marketplace prototype for Nigeria. It is designed as a polished frontend demonstration: users can explore listings, search, save products, preview a sell flow, test demo messaging, ask a simulated marketplace assistant, view a wallet UI, and explore a profile without signing in.
+bese26 is a premium, mobile-first marketplace app for Nigeria. It is designed as a polished frontend demonstration: users can explore listings, search, save products, preview a sell flow, test demo messaging, ask a simulated marketplace assistant, view a wallet UI, and explore a profile without signing in.
 
 ## Prototype scope
 
