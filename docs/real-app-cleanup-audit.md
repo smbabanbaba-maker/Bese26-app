@@ -30,3 +30,12 @@ The cleanup should prefer empty, truthful states over invented listings, balance
 The first production cleanup slice will keep Home, Search, listing details, Auth, Sell, Profile, My Listings, Saved listings, and real buyer-seller chat. These surfaces already have Supabase tables or client helpers and can be made truthful with empty/loading/error states.
 
 Wallet, AI, notification feed, seller analytics, promotion packages, saved sellers, and saved searches will not display fabricated balances, counts, replies, or activity. They will be removed from primary navigation or replaced with a clear unavailable state until their corresponding backend records and workflows exist. Payments and subscription mechanics remain deferred by request.
+
+
+## Live verification after real-only cleanup
+
+The public build at `https://bese26-app.vercel.app/?v=f6f145a` served the latest bundle fingerprint. Home showed `0 live listings` and a truthful approved-listings empty state, with no demo cards. Profile showed zero Listings/Sold/Saved counters, no hardcoded seller identity, and only real account, marketplace, preferences, help, safety, and legal actions; Wallet, AI, analytics, promotions, fake notifications, and demo seller tools were absent from the visible screen.
+
+The live Sell screen now starts with `0/12` media and no starter demo photos or hardcoded seller name; it shows the real listing form and publish boundary. The live Saved screen showed `0` and `Your shortlist is empty`, with no fake saved items.
+
+The live Messages screen showed `No conversations yet` and `Select a listing to start a real conversation`, with no fabricated thread or message. Returning to Home remained stable and showed `0 live listings` with the same approved-listings empty state.
