@@ -54,4 +54,4 @@ The frontend adds a profile-only entry at **Profile → Admin Moderation**. It l
 
 Local verification passed with `npm run build` and `git diff --check`. In a signed-out browser session, both the admin-status RPC and moderation RPC returned permission-denied, confirming unauthenticated clients cannot invoke them. The Supabase security advisor no longer reports the unnecessary SECURITY DEFINER admin-status helper; it retains one intentional warning for the exposed moderation RPC because that privileged RPC is required to enforce the admin-only state transition, plus the separate Auth warning that leaked-password protection is disabled.
 
-An authenticated admin has not yet completed a live browser session in this audit, so no approve/reject state change or production queue result is claimed until the owner signs in through the normal Bese26 email/password flow and explicitly authorizes one real test action.
+An authenticated admin session has now completed the live queue check. No approve/reject state change was made; the owner must explicitly authorize one real test action before a seller listing’s public state is changed.
