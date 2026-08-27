@@ -5,3 +5,5 @@ The cache-busted production URL `https://bese26-app.vercel.app/?v=33afa22` serve
 The current visible screens still contain demo/local marketplace data in several areas, and SMTP/Email OTP delivery remains intentionally paused for later. No claim is made here that an authenticated session, real email delivery, listing publishing, or two-account chat has been completed end-to-end.
 
 The AI screen rendered with prompt suggestions and a composer. The Wallet screen rendered with the existing demo balance/activity and correctly exposed its current demo actions. These screens did not blank or produce a visible runtime error during navigation.
+
+The password-auth revert was deployed and verified at `https://bese26-app.vercel.app/?v=d033681`. The live authentication panel now shows Email, Password, Sign in, and the Create account switch, with no OTP-only controls. Production build and `git diff --check` passed before the push.
