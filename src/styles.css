@@ -618,3 +618,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .auth-inline-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: -3px; }
 .auth-link-button { color: var(--red); font-size: 11px; font-weight: 700; }
 .auth-link-button:hover { text-decoration: underline; }
+
+.product-image-placeholder { width:100%; height:100%; display:grid; place-items:center; color:#b9a9a2; background:linear-gradient(135deg,#f3eee9,#e7ded7); }
+.saved-row-media { width:78px; height:65px; display:grid; place-items:center; flex:none; border-radius:10px; overflow:hidden; background:var(--soft); color:var(--muted); cursor:pointer; }
+.saved-row-media img { width:100%; height:100%; object-fit:cover; }

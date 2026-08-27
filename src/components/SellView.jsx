@@ -60,14 +60,9 @@ const dynamicFields = {
 const initialForm = {
   category: 'Electronics', subcategory: 'Phones', title: '', description: '', condition: 'Used — Excellent',
   priceMode: 'Fixed price', currency: '₦ NGN', price: '', negotiable: true, quantity: '1', unit: 'item', minimumOrder: '1',
-  state: 'Kano', city: 'Kano Municipal', area: 'Hotoro', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
-  contactChat: true, contactPhone: false, contactWhatsApp: false, sellerName: 'Sayyeed Muhd Baba', sellerHandle: '@sayyeed', sellerLocation: 'Kano, Nigeria',
+  state: 'Kano', city: 'Kano Municipal', area: '', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
+  contactChat: true, contactPhone: false, contactWhatsApp: false, sellerName: '', sellerHandle: '', sellerLocation: 'Nigeria',
 };
-
-const starterMedia = [
-  { id: 'iphone-cover', src: '/images/iphone-13-pro.jpg', name: 'iphone-13-pro.jpg', type: 'image', cover: true },
-  { id: 'macbook-detail', src: '/images/macbook-air.jpg', name: 'macbook-air.jpg', type: 'image', cover: false },
-];
 
 function Field({ label, value, onChange, placeholder, options, type = 'text', wide = false }) {
   return <label className={wide ? 'sell-field wide' : 'sell-field'}><span>{label}</span>{options ? <select value={value || options[0]} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select> : type === 'textarea' ? <textarea value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /> : <input type={type} value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />}</label>;
@@ -79,7 +74,7 @@ function Toggle({ checked, onChange, label }) {
 
 export default function SellView({ user, onAuthRequired, onDemoAction }) {
   const [form, setForm] = useState(() => { try { return { ...initialForm, ...JSON.parse(window.localStorage.getItem('bese26-sell-draft') || '{}') }; } catch { return initialForm; } });
-  const [media, setMedia] = useState(() => isSupabaseConfigured ? [] : starterMedia);
+  const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
   const [draftSaved, setDraftSaved] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -92,6 +87,13 @@ export default function SellView({ user, onAuthRequired, onDemoAction }) {
   const fields = dynamicFields[form.category] || [];
   const priceDisplay = form.price ? `${form.currency} ${Number(form.price).toLocaleString()}` : `${form.currency} 0`;
   const categoryNeedsCondition = !['Property', 'Jobs & Services'].includes(form.category);
+
+  useEffect(() => {
+    if (user && !form.sellerName) {
+      update('sellerName', user.user_metadata?.display_name || user.email?.split('@')[0] || 'bese26 seller');
+      update('sellerHandle', user.user_metadata?.username ? `@${user.user_metadata.username}` : '');
+    }
+  }, [user, form.sellerName]);
 
   useEffect(() => {
     const timeout = window.setTimeout(async () => {
@@ -161,7 +163,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction }) {
     if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (isSupabaseConfigured && !user) { onAuthRequired?.(); return; }
     if (isSupabaseConfigured && !media.some((item) => item.file)) { setErrors(['Choose at least one photo from your device before publishing.']); document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if (!isSupabaseConfigured) { setPublishState('success'); setDraftSaved(false); window.localStorage.removeItem('bese26-sell-draft'); onDemoAction('Your listing is ready to publish.'); return; }
+    if (!isSupabaseConfigured) { setErrors(['Marketplace publishing is not available in demo mode.']); return; }
     setPublishState('publishing');
     try {
       const categoryRows = await fetchCategories();
@@ -182,7 +184,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction }) {
       document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
-  const reset = () => { setForm(initialForm); setMedia(isSupabaseConfigured ? [] : starterMedia); setDraftId(null); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.localStorage.removeItem('bese26-sell-draft'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const reset = () => { setForm(initialForm); setMedia([]); setDraftId(null); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.localStorage.removeItem('bese26-sell-draft'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   const renderMedia = () => <section id="sell-media" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><Camera size={19} /></span><div><div className="eyebrow">PHOTOS & VIDEO</div><h2>Add at least 1 photo</h2><p>Up to 12 photos + 1 video. The first photo becomes the cover.</p></div><span className="media-count">{media.filter((item) => item.type === 'image').length}/12</span></div><div className="sell-upload-grid"><button type="button" className="sell-upload-tile" onClick={() => mediaInput.current?.click()}><span><Plus size={23} /></span><strong>Gallery upload</strong><small>JPG, PNG, HEIC or WEBP</small></button><button type="button" className="sell-upload-tile camera-tile" onClick={() => cameraInput.current?.click()}><span><Camera size={21} /></span><strong>Use camera</strong><small>Take a clear cover photo</small></button>{media.map((item) => <div className={`sell-media-thumb ${item.cover ? 'is-cover' : ''}`} key={item.id}>{item.type === 'video' ? <div className="sell-video-thumb"><Video size={25} /><small>Video</small></div> : <img src={item.src} alt={item.name} />}<div className="media-overlay"><button type="button" onClick={() => setCover(item.id)} aria-label={`Set ${item.name} as cover`}><Check size={13} /></button><button type="button" onClick={() => removeMedia(item.id)} aria-label={`Remove ${item.name}`}><Trash2 size={13} /></button></div>{item.cover && <span className="cover-label">Cover photo</span>}</div>)}</div><input ref={mediaInput} className="hidden-file-input" type="file" accept="image/*,video/*" multiple onChange={handleFiles} /><input ref={cameraInput} className="hidden-file-input" type="file" accept="image/*" capture="environment" onChange={handleFiles} /><div className="sell-helper"><ShieldCheck size={14} /><span>First picture becomes the title picture. Tap the check icon to change it.</span></div></section>;
   const renderDetails = () => <section id="sell-details" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon lavender"><Package size={19} /></span><div><div className="eyebrow">ITEM DETAILS</div><h2>Tell buyers about it</h2><p>Choose a category and only the relevant details will appear below.</p></div></div><div className="sell-form-grid"><Field label="Title*" value={form.title} onChange={(value) => update('title', value)} placeholder="e.g. iPhone 15 Pro Max 256GB" wide /><div className="sell-field"><span>Category*</span><select value={form.category} onChange={(event) => { const category = event.target.value; update('category', category); update('subcategory', categoryGroups[category][0]); }}>{Object.keys(categoryGroups).map((category) => <option key={category}>{category}</option>)}</select></div><div className="sell-field"><span>Subcategory</span><select value={form.subcategory} onChange={(event) => update('subcategory', event.target.value)}>{subcategories.map((item) => <option key={item}>{item}</option>)}</select></div>{categoryNeedsCondition && <div className="sell-field"><span>Condition*</span><select value={form.condition} onChange={(event) => update('condition', event.target.value)}>{['New', 'Like New', 'Used — Excellent', 'Used — Good', 'Used — Fair', 'Refurbished', 'For Parts / Repair', 'Not Applicable'].map((item) => <option key={item}>{item}</option>)}</select></div>}{fields.map(([key, label, placeholder, options]) => <Field key={key} label={label} value={form[key]} onChange={(value) => update(key, value)} placeholder={placeholder} options={options} />)}<Field label="Description*" value={form.description} onChange={(value) => update('description', value)} placeholder="Please provide a detailed description of your item or service..." type="textarea" wide /></div></section>;

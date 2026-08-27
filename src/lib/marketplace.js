@@ -102,6 +102,20 @@ export async function updateProfile(userId, values) {
   return data;
 }
 
+export async function getProfileContacts(userId) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('profile_contacts').select('profile_id,phone,whatsapp,allow_calls,allow_whatsapp').eq('profile_id', userId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateProfileContacts(userId, values) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('profile_contacts').upsert({ profile_id: userId, ...values }, { onConflict: 'profile_id' }).select().single();
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchActiveListings({ search = '', category = '' } = {}) {
   if (!supabase) return [];
   let query = supabase
@@ -229,6 +243,25 @@ export async function getOrCreateConversation({ listingId, buyerId, sellerId }) 
   const { data, error } = await supabase.from('conversations').insert({ listing_id: listingId, buyer_id: buyerId, seller_id: sellerId }).select().single();
   if (error) throw error;
   return data;
+}
+
+export async function fetchConversations(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data: rows, error } = await supabase.from('conversations').select('id,listing_id,buyer_id,seller_id,last_message_at,updated_at,created_at').or(`buyer_id.eq.${userId},seller_id.eq.${userId}`).order('updated_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  const conversations = rows || [];
+  const listingIds = [...new Set(conversations.map((row) => row.listing_id).filter(Boolean))];
+  const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
+  const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }] = await Promise.all([
+    listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
+    profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (listingError) throw listingError;
+  if (profileError) throw profileError;
+  const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
+  const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, row]));
+  return conversations.map((row) => ({ ...row, listing: listingMap[row.listing_id] || null, buyer: profileMap[row.buyer_id] || null, seller: profileMap[row.seller_id] || null }));
 }
 
 export async function fetchMessages(conversationId) {

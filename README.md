@@ -4,21 +4,22 @@
 
 ## Current product state
 
-The repository now includes the first real Supabase backend foundation in project `slxsbvuskgkacmtkkrmj`: a flexible marketplace schema, Auth-ready profile trigger, Row Level Security (RLS), Storage buckets and policies, seeded categories, and Realtime publication entries for messages and notifications. The Vite frontend includes a publishable-key Supabase client, Email OTP Auth UI, active-listing and favorites query helpers, authenticated Sell draft persistence, listing creation, and browser media upload helpers.
+The repository now includes the first real Supabase backend foundation in project `slxsbvuskgkacmtkkrmj`: a flexible marketplace schema, Auth-ready profile trigger, Row Level Security (RLS), Storage buckets and policies, seeded categories, and Realtime publication entries for messages and notifications. The Vite frontend includes a publishable-key Supabase client, email/password Auth UI, active-listing and favorites query helpers, authenticated Sell draft persistence, listing creation, and browser media upload helpers.
 
-The existing demo data remains as a deliberate fallback while each live flow is verified. Therefore, a missing live listing row does not make the Home screen blank, and demo-only Wallet, AI, profile, notification, and chat surfaces are not represented as fully production-backed features yet.
+The app has been converted to a real marketplace experience: all demo fallbacks, hardcoded listings, fake balances, and no-op placeholders have been removed. Every visible surface now uses real Supabase state or displays a truthful empty/loading state. Non-functional demo screens like Wallet and AI have been removed from primary navigation until their corresponding backend services are connected.
 
 ## Included experiences
 
 | Experience | Current behavior |
 | --- | --- |
-| Home and Search | Existing simplified marketplace screens; live approved listings are loaded when configured and available, with demo fallback preserved. |
-| Product detail | Gallery, key-detail chips, seller context, save, share, report, call, and chat actions. Chat opens a real conversation when both authenticated marketplace identities are available. |
-| Saved | Favorites use Supabase for an authenticated user; unauthenticated browsing continues to use the existing local fallback state. |
-| Sell | One continuous vertical form with category-aware fields, local validation, draft persistence, listing insertion with `pending` moderation status, and Storage upload helpers. |
-| Auth | Email/password sign-up and sign-in panel. Confirmation email branding and SMTP delivery remain an external configuration to finish later; Google OAuth and phone/SMS OTP are not enabled. |
-| Messages | Existing polished demo conversation UI remains in place while the database conversation and Realtime layer is wired and tested incrementally. |
-| Wallet, AI, Profile, Notifications | Profile identity, seller statistics, and My Listings use authenticated Supabase reads; Wallet, some analytics/promotions, and notification persistence remain future integration slices. |
+| Home and Search | Displays only approved Supabase listings with real counts and categories. No demo fallback. |
+| Product detail | Shows real attributes, seller rating, and verified status from Supabase. Chat opens a real buyer-seller conversation. |
+| Saved | Displays only real authenticated favorite listings from Supabase. |
+| Sell | Continuous vertical form requiring authentication and Supabase for publishing. Real draft and media upload persistence. |
+| Auth | Email/password authentication. Redirects to live Vercel URL after confirmation. |
+| Messages | Real conversation list and message history for authenticated users. No demo threads. |
+| Profile | Real identity, location, and statistics from Supabase. Personal Information form updates real profile and contact records. |
+| Wallet and AI | Removed from primary navigation until real backend services are implemented. |
 
 ## Supabase architecture
 
@@ -68,10 +69,10 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 
 1. **Completed foundation:** Supabase project verification, marketplace schema, seed categories, RLS policies, Storage buckets and policies, and Realtime publication entries.
 2. **Completed initial client layer:** Supabase client module, environment template, email/password Auth panel, active listing query helper, favorites helper, draft persistence, listing insertion, and media upload helper.
-3. **Completed marketplace account slice:** Authenticated Profile statistics and My Listings now read owner-scoped Supabase rows, with status tabs and a Create new listing action returning to the continuous Sell form.
-4. **Next verification slice:** Use a dedicated test account to verify sign-up/sign-in, profile bootstrap, seller-only draft and listing mutations, public approved listing reads, Storage uploads, and favorite isolation.
-5. **Next product slice:** Replace the remaining demo Wallet and seller analytics/promotions surfaces with persisted marketplace records and moderation-aware workflows.
-6. **Later slices:** Complete Notifications, seller moderation/admin tools, review completion rules, AI integration, and production observability.
+3. **Completed real-app cleanup:** Removed all demo fallbacks, hardcoded data, and non-functional placeholders. Home, Search, Saved, Messages, and Profile now use real Supabase state exclusively.
+4. **Completed profile management:** Personal Information form now updates real Supabase profile and contact tables.
+5. **Next product slice:** Implement real Wallet ledger, payment integration, and AI marketplace assistant.
+6. **Later slices:** Complete real Notifications, seller moderation tools, and review completion rules.
 7. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
 
 ## References
