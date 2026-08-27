@@ -10,12 +10,11 @@
     "check": "vite build"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
     "vite": "latest"
-  },
-  "devDependencies": {}
+  }
 }
-

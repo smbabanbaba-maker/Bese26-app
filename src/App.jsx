@@ -47,6 +47,9 @@ import {
 import { categories, demoAiReplies, listings, messages, notifications, sellers, transactions } from './data';
 import ProfileView from './components/ProfileView';
 import SellView from './components/SellView';
+import AuthPanel from './components/AuthPanel';
+import { isSupabaseConfigured, supabase } from './lib/supabase';
+import { fetchActiveListings, fetchSavedIds, fetchMessages, getOrCreateConversation, sendMessage, subscribeToMessages, toggleFavorite } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -148,7 +151,7 @@ function QuickAction({ icon: Icon, label, note, tone, onClick }) {
   return <button className={`quick-action quick-action-${tone}`} onClick={onClick}><span className="quick-action-icon"><Icon size={17} /></span><span><strong>{label}</strong><small>{note}</small></span><ChevronRight size={14} className="quick-action-arrow" /></button>;
 }
 
-function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   return (
     <div className="page-stack home-page">
       <section className="discovery-banner">
@@ -176,7 +179,7 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action="View all" onAction={() => onNavigate('search')} />
         <div className="product-grid">
-          {listings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
+          {marketListings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
         </div>
       </section>
 
@@ -189,7 +192,7 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
       <section className="recent-section">
         <SectionHeading eyebrow="PICK UP WHERE YOU LEFT OFF" title="Recently viewed" action="See history" onAction={() => onNavigate('search')} />
         <div className="mini-list recent-list">
-          {listings.slice(1, 4).map((listing) => <ProductCard key={listing.id} listing={listing} compact onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
+          {marketListings.slice(1, 4).map((listing) => <ProductCard key={listing.id} listing={listing} compact onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
         </div>
       </section>
 
@@ -197,12 +200,12 @@ function HomeView({ onOpenListing, savedIds, onToggleSave, onSearch, onNavigate,
   );
 }
 
-function SearchView({ search, setSearch, onOpenListing, savedIds, onToggleSave, onBack }) {
+function SearchView({ marketListings, search, setSearch, onOpenListing, savedIds, onToggleSave, onBack }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sort, setSort] = useState('Recommended');
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let result = listings.filter((listing) => !term || `${listing.title} ${listing.location} ${listing.category}`.toLowerCase().includes(term));
+    let result = marketListings.filter((listing) => !term || `${listing.title} ${listing.location} ${listing.category}`.toLowerCase().includes(term));
     if (activeCategory !== 'All') result = result.filter((listing) => listing.category === activeCategory);
     if (sort === 'Price low → high') result = [...result].sort((a, b) => a.numericPrice - b.numericPrice);
     if (sort === 'Price high → low') result = [...result].sort((a, b) => b.numericPrice - a.numericPrice);
@@ -231,8 +234,8 @@ function WalletView({ onDemoAction }) {
   </div>;
 }
 
-function SavedView({ savedIds, onOpenListing, onToggleSave, onDemoAction }) {
-  const saved = listings.filter((listing) => savedIds.includes(listing.id));
+function SavedView({ marketListings, savedIds, onOpenListing, onToggleSave, onDemoAction }) {
+  const saved = marketListings.filter((listing) => savedIds.includes(listing.id));
   return <div className="page-stack"><div className="page-title-row"><div><div className="eyebrow">KEEP AN EYE ON IT</div><h1>Saved</h1></div><span className="count-bubble">{saved.length}</span></div>
     <section><SectionHeading title="Saved listings" />{saved.length ? <div className="saved-list">{saved.map((listing) => <div className="saved-row" key={listing.id}><img src={listing.image} alt="" onClick={() => onOpenListing(listing)} /><div className="saved-row-copy" onClick={() => onOpenListing(listing)}><strong>{listing.title}</strong><span>{listing.location}</span><b>{listing.price}</b></div><button className="save-button saved" onClick={() => onToggleSave(listing.id)}><Heart size={17} fill="currentColor" /></button></div>)}</div> : <div className="empty-state compact-empty"><Bookmark size={24} /><h3>Your shortlist is empty</h3><p>Tap the heart on any listing to save it for later.</p></div>}</section>
     <section className="saved-search-card"><div className="saved-search-top"><div className="saved-search-icon"><Search size={17} /></div><div><div className="eyebrow">SAVED SEARCH</div><h3>Phones under ₦300,000</h3></div><span className="toggle on" role="status" aria-label="Saved search active"><span /></span></div><p>Notify me when matching listings appear</p><div className="saved-search-bottom"><span>Updated 12 min ago</span><span className="saved-search-active">Active</span></div></section>
@@ -242,13 +245,41 @@ function SavedView({ savedIds, onOpenListing, onToggleSave, onDemoAction }) {
 
 
 
-function MessagesView({ onDemoAction, initialMessageId }) {
+function MessagesView({ user, liveListing, onDemoAction, initialMessageId }) {
+  const liveMode = Boolean(isSupabaseConfigured && user && typeof initialMessageId === 'string' && initialMessageId.length > 20);
   const [activeMessage, setActiveMessage] = useState(() => messages.find((item) => item.id === initialMessageId) || messages[0]);
   const [text, setText] = useState('');
   const [sentByMessage, setSentByMessage] = useState({});
+  const [liveMessages, setLiveMessages] = useState([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+
   useEffect(() => { const next = messages.find((item) => item.id === initialMessageId); if (next) { setActiveMessage(next); setText(''); } }, [initialMessageId]);
-  const send = () => { if (!text.trim()) return; setSentByMessage((threads) => ({ ...threads, [activeMessage.id]: [...(threads[activeMessage.id] || []), text.trim()] })); setText(''); };
-  return <div className="page-stack messages-page"><div className="page-title-row"><div><div className="eyebrow">KEEP IT MOVING</div><h1>Messages</h1></div><span className="unread-pill">2 unread</span></div><div className="message-layout"><div className="conversation-list">{messages.map((message) => <button key={message.id} className={`conversation-row ${activeMessage.id === message.id ? 'active' : ''}`} onClick={() => setActiveMessage(message)}><Avatar initials={message.initials} tone={message.tone} /><div className="conversation-copy"><strong>{message.name}</strong><span>{message.preview}</span></div><div className="conversation-meta"><small>{message.time}</small>{message.unread > 0 && <b>{message.unread}</b>}</div></button>)}</div><div className="chat-panel"><div className="chat-header"><div className="chat-person"><Avatar initials={activeMessage.initials} tone={activeMessage.tone} /><div><strong>{activeMessage.name}</strong><span><span className="online-dot" /> Usually replies quickly</span></div></div></div><div className="chat-context"><img src={activeMessage.image} alt="" /><div><span>About this listing</span><strong>{activeMessage.listing}</strong></div></div><div className="chat-messages"><div className="message-bubble other">Hi, I’m interested in this listing. Is it still available?<small>09:36</small></div><div className="message-bubble mine">Yes, it is available for inspection today.<small>09:39 <Check size={12} /></small></div><div className="message-bubble other">{activeMessage.preview}<small>09:42</small></div>{(sentByMessage[activeMessage.id] || []).map((item, i) => <div className="message-bubble mine" key={`${item}-${i}`}>{item}<small>now <Check size={12} /></small></div>)}</div><div className="chat-composer"><button className="icon-button" aria-label="Attach image" onClick={() => onDemoAction('Image attachments will be available after storage is connected.')}><ImageIcon size={18} /></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Write a message..." /><button className="send-button" onClick={send}><Send size={16} /></button></div></div></div></div>;
+  useEffect(() => {
+    if (!liveMode) { setLiveMessages([]); return undefined; }
+    let mounted = true;
+    setLiveLoading(true);
+    fetchMessages(initialMessageId).then((items) => { if (mounted) setLiveMessages(items); }).catch((error) => onDemoAction(error.message || 'Could not load messages.')).finally(() => mounted && setLiveLoading(false));
+    const unsubscribe = subscribeToMessages(initialMessageId, (incoming) => setLiveMessages((items) => items.some((item) => item.id === incoming.id) ? items : [...items, incoming]));
+    return () => { mounted = false; unsubscribe(); };
+  }, [initialMessageId, liveMode, onDemoAction]);
+
+  const send = async () => {
+    if (!text.trim()) return;
+    const body = text.trim();
+    if (liveMode) {
+      try { await sendMessage({ conversationId: initialMessageId, senderId: user.id, body }); setText(''); }
+      catch (error) { onDemoAction(error.message || 'Could not send this message.'); }
+      return;
+    }
+    setSentByMessage((threads) => ({ ...threads, [activeMessage.id]: [...(threads[activeMessage.id] || []), body] }));
+    setText('');
+  };
+  const personName = liveMode ? (liveListing?.seller || 'Seller') : activeMessage.name;
+  const listingTitle = liveMode ? (liveListing?.title || 'Marketplace listing') : activeMessage.listing;
+  const listingImage = liveMode ? liveListing?.image : activeMessage.image;
+  const personInitials = liveMode ? (liveListing?.sellerInitials || 'SE') : activeMessage.initials;
+  const liveBody = liveMessages.length ? liveMessages : [];
+  return <div className="page-stack messages-page"><div className="page-title-row"><div><div className="eyebrow">KEEP IT MOVING</div><h1>Messages</h1></div><span className="unread-pill">{liveMode ? 'Live chat' : '2 unread'}</span></div><div className="message-layout"><div className="conversation-list">{liveMode ? <button className="conversation-row active" type="button"><Avatar initials={personInitials} tone="rose" /><div className="conversation-copy"><strong>{personName}</strong><span>{liveLoading ? 'Loading messages…' : 'Secure conversation'}</span></div><div className="conversation-meta"><small>Live</small></div></button> : messages.map((message) => <button key={message.id} className={`conversation-row ${activeMessage.id === message.id ? 'active' : ''}`} onClick={() => setActiveMessage(message)}><Avatar initials={message.initials} tone={message.tone} /><div className="conversation-copy"><strong>{message.name}</strong><span>{message.preview}</span></div><div className="conversation-meta"><small>{message.time}</small>{message.unread > 0 && <b>{message.unread}</b>}</div></button>)}</div><div className="chat-panel"><div className="chat-header"><div className="chat-person"><Avatar initials={personInitials} tone="rose" /><div><strong>{personName}</strong><span><span className="online-dot" /> {liveMode ? 'Messages are protected by your account' : 'Usually replies quickly'}</span></div></div></div><div className="chat-context">{listingImage ? <img src={listingImage} alt="" /> : <div className="chat-context-placeholder"><Package size={17} /></div>}<div><span>About this listing</span><strong>{listingTitle}</strong></div></div><div className="chat-messages">{liveMode ? (liveBody.length ? liveBody.map((item) => <div className={`message-bubble ${item.sender_id === user.id ? 'mine' : 'other'}`} key={item.id}>{item.body || 'Attachment'}<small>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {item.sender_id === user.id && <Check size={12} />}</small></div>) : <div className="chat-empty-note">Start the conversation with a clear question about the listing.</div>) : <><div className="message-bubble other">Hi, I’m interested in this listing. Is it still available?<small>09:36</small></div><div className="message-bubble mine">Yes, it is available for inspection today.<small>09:39 <Check size={12} /></small></div><div className="message-bubble other">{activeMessage.preview}<small>09:42</small></div>{(sentByMessage[activeMessage.id] || []).map((item, i) => <div className="message-bubble mine" key={`${item}-${i}`}>{item}<small>now <Check size={12} /></small></div>)}</>}</div><div className="chat-composer"><button className="icon-button" aria-label="Attach image" onClick={() => onDemoAction(liveMode ? 'Image attachments will be added after media upload is enabled for chat.' : 'Image attachments will be available after storage is connected.')}><ImageIcon size={18} /></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Write a message..." /><button className="send-button" onClick={send}><Send size={16} /></button></div></div></div></div>;
 }
 
 function AiView({ onNavigate }) {
@@ -294,29 +325,86 @@ export default function App() {
   const [toast, setToast] = useState('');
   const [profileReset, setProfileReset] = useState(0);
   const [chatTargetId, setChatTargetId] = useState(messages[0].id);
+  const [marketListings, setMarketListings] = useState(listings);
+  const [sessionUser, setSessionUser] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [chatListing, setChatListing] = useState(null);
 
   const showToast = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
-  const toggleSave = (id) => { setSavedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]); showToast(savedIds.includes(id) ? 'Removed from saved' : 'Saved for later'); };
+  const requireAuth = (message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); };
+  const toggleSave = (id) => {
+    const wasSaved = savedIds.includes(id);
+    if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to save listings for later.'); return; }
+    setSavedIds((ids) => wasSaved ? ids.filter((item) => item !== id) : [...ids, id]);
+    showToast(wasSaved ? 'Removed from saved' : 'Saved for later');
+    if (isSupabaseConfigured && sessionUser) toggleFavorite(sessionUser.id, id, !wasSaved).catch(() => {
+      setSavedIds((ids) => wasSaved ? [...ids, id] : ids.filter((item) => item !== id));
+      showToast('Could not update saved listings. Try again.');
+    });
+  };
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return undefined;
+    let mounted = true;
+    const loadBackend = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const remoteListings = await fetchActiveListings();
+        if (mounted && remoteListings.length) setMarketListings(remoteListings);
+        if (session?.user) {
+          const remoteSaved = await fetchSavedIds(session.user.id);
+          if (mounted) setSavedIds(remoteSaved);
+        }
+        if (mounted) setSessionUser(session?.user || null);
+      } catch (error) {
+        if (mounted) showToast(error.message || 'Could not load live marketplace data.');
+      }
+    };
+    loadBackend();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      setSessionUser(session?.user || null);
+      if (event === 'SIGNED_IN' && session?.user) fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
+      if (event === 'SIGNED_OUT') setSavedIds([]);
+    });
+    return () => { mounted = false; subscription.unsubscribe(); };
+  }, []);
   const navigate = (page) => { if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const goSearch = (value) => { setSearch(value); navigate('search'); };
-  const openChat = (listing) => { const thread = messages.find((item) => item.name === listing.seller || item.listing === listing.title) || messages[0]; setChatTargetId(thread.id); setSelectedListing(null); navigate('messages'); };
+  const openChat = async (listing) => {
+    if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Sign in to chat with this seller.'); return; }
+    if (isSupabaseConfigured && sessionUser && listing.sellerId && listing.sellerId !== sessionUser.id) {
+      try {
+        const conversation = await getOrCreateConversation({ listingId: listing.id, buyerId: sessionUser.id, sellerId: listing.sellerId });
+        setSelectedListing(null);
+        setChatListing(listing);
+        showToast(`Chat opened for ${listing.title}`);
+        setChatTargetId(conversation.id);
+        navigate('messages');
+        return;
+      } catch (error) { showToast(error.message || 'Could not open the seller chat.'); return; }
+    }
+    const thread = messages.find((item) => item.name === listing.seller || item.listing === listing.title) || messages[0];
+    setChatTargetId(thread.id); setChatListing(null); setSelectedListing(null); navigate('messages');
+  };
 
   const renderView = () => {
-    if (activeNav === 'home') return <HomeView onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} onShowNotifications={() => setShowNotifications(true)} />;
-    if (activeNav === 'search') return <SearchView search={search} setSearch={setSearch} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
+    if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} onShowNotifications={() => setShowNotifications(true)} />;
+    if (activeNav === 'search') return <SearchView marketListings={marketListings} search={search} setSearch={setSearch} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'wallet') return <WalletView onDemoAction={showToast} />;
-    if (activeNav === 'saved') return <SavedView savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} onDemoAction={showToast} />;
-    if (activeNav === 'sell') return <SellView onDemoAction={showToast} />;
-    if (activeNav === 'messages') return <MessagesView onDemoAction={showToast} initialMessageId={chatTargetId} />;
+    if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} onDemoAction={showToast} />;
+    if (activeNav === 'sell') return <SellView user={sessionUser} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
+    if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} />;
     if (activeNav === 'ai') return <AiView onNavigate={navigate} />;
     return <ProfileView key={profileReset} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} isActive={activeNav === 'profile'} />;
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <header className="topbar"><div className="topbar-inner"><button className="mobile-menu icon-button"><Menu size={20} /></button><Logo /><div className="desktop-location"><MapPin size={15} /><span>Delivering around</span><strong>Kano</strong><ChevronDown size={14} /></div><div className="topbar-actions"><button className="topbar-search" onClick={() => navigate('search')}><Search size={17} /><span>Search listings</span><kbd>⌘ K</kbd></button><button className="notification-button icon-button" aria-label="Notifications" onClick={() => setShowNotifications(true)}><Bell size={19} /><span className="notification-dot" /></button><Avatar initials="MA" tone="navy" /></div></div></header>
+    <header className="topbar"><div className="topbar-inner"><button className="mobile-menu icon-button"><Menu size={20} /></button><Logo /><div className="desktop-location"><MapPin size={15} /><span>Delivering around</span><strong>Kano</strong><ChevronDown size={14} /></div><div className="topbar-actions"><button className="topbar-search" onClick={() => navigate('search')}><Search size={17} /><span>Search listings</span><kbd>⌘ K</kbd></button><button className="notification-button icon-button" aria-label="Notifications" onClick={() => setShowNotifications(true)}><Bell size={19} /><span className="notification-dot" /></button><button type="button" className="topbar-avatar-button" onClick={() => sessionUser ? navigate('profile') : setShowAuth(true)} aria-label={sessionUser ? 'Open profile' : 'Sign in'}><Avatar initials={sessionUser ? (sessionUser.user_metadata?.display_name || sessionUser.email || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'MA'} tone="navy" /></button></div></div></header>
     <main className="main-container">{renderView()}</main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
     {showNotifications && <NotificationPanel onClose={() => setShowNotifications(false)} />}
+    {showAuth && <AuthPanel onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); showToast('Signed in to bese26.'); }} />}
     <ListingModal listing={selectedListing} onClose={() => setSelectedListing(null)} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} />
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
   </div>;

@@ -17,6 +17,8 @@ import {
   WalletCards,
   X,
 } from 'lucide-react';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { createListing, fetchCategories, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
 
 const categoryGroups = {
   Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories'],
@@ -75,9 +77,10 @@ function Toggle({ checked, onChange, label }) {
   return <button type="button" className={`sell-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button>;
 }
 
-export default function SellView({ onDemoAction }) {
+export default function SellView({ user, onAuthRequired, onDemoAction }) {
   const [form, setForm] = useState(() => { try { return { ...initialForm, ...JSON.parse(window.localStorage.getItem('bese26-sell-draft') || '{}') }; } catch { return initialForm; } });
-  const [media, setMedia] = useState(starterMedia);
+  const [media, setMedia] = useState(() => isSupabaseConfigured ? [] : starterMedia);
+  const [draftId, setDraftId] = useState(null);
   const [draftSaved, setDraftSaved] = useState(false);
   const [errors, setErrors] = useState([]);
   const [publishState, setPublishState] = useState('idle');
@@ -91,9 +94,22 @@ export default function SellView({ onDemoAction }) {
   const categoryNeedsCondition = !['Property', 'Jobs & Services'].includes(form.category);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form)); setDraftSaved(true); }, 700);
+    const timeout = window.setTimeout(async () => {
+      window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form));
+      if (isSupabaseConfigured && user) {
+        try {
+          const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
+          setDraftId(row.id);
+          setDraftSaved(true);
+        } catch {
+          setDraftSaved(false);
+        }
+      } else {
+        setDraftSaved(true);
+      }
+    }, 700);
     return () => window.clearTimeout(timeout);
-  }, [form]);
+  }, [form, media, user, draftId]);
 
   const handleFiles = (event) => {
     const incoming = Array.from(event.target.files || []);
@@ -107,7 +123,7 @@ export default function SellView({ onDemoAction }) {
       if (isVideo && nextVideoCount >= 1) return;
       if (!isVideo && nextPhotoCount >= 12) return;
       if (isVideo) nextVideoCount += 1; else nextPhotoCount += 1;
-      accepted.push({ id: `${file.name}-${file.lastModified}-${index}`, src: URL.createObjectURL(file), name: file.name, type: isVideo ? 'video' : 'image', cover: media.length === 0 && accepted.length === 0 });
+      accepted.push({ id: `${file.name}-${file.lastModified}-${index}`, src: URL.createObjectURL(file), file, name: file.name, type: isVideo ? 'video' : 'image', cover: media.length === 0 && accepted.length === 0 });
     });
     if (accepted.length) setMedia((current) => [...current, ...accepted]);
     event.target.value = '';
@@ -115,7 +131,21 @@ export default function SellView({ onDemoAction }) {
 
   const removeMedia = (id) => setMedia((current) => current.filter((item) => item.id !== id).map((item, index) => ({ ...item, cover: index === 0 ? true : item.cover })));
   const setCover = (id) => setMedia((current) => current.map((item) => ({ ...item, cover: item.id === id })));
-  const saveDraft = () => { window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form)); setDraftSaved(true); onDemoAction('Draft saved on this device.'); };
+  const saveDraft = async () => {
+    window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form));
+    if (isSupabaseConfigured) {
+      if (!user) { onAuthRequired?.(); return; }
+      try {
+        const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
+        setDraftId(row.id);
+        setDraftSaved(true);
+        onDemoAction('Draft saved to your bese26 account.');
+      } catch (error) { onDemoAction(error.message || 'Could not save the draft.'); }
+      return;
+    }
+    setDraftSaved(true);
+    onDemoAction('Draft saved on this device.');
+  };
   const validate = () => {
     const nextErrors = [];
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
@@ -127,21 +157,45 @@ export default function SellView({ onDemoAction }) {
     setErrors(nextErrors);
     return nextErrors;
   };
-  const publish = () => { if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; } setPublishState('success'); setDraftSaved(false); window.localStorage.removeItem('bese26-sell-draft'); onDemoAction('Your listing is ready to publish.'); };
-  const reset = () => { setForm(initialForm); setMedia(starterMedia); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.localStorage.removeItem('bese26-sell-draft'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const publish = async () => {
+    if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (isSupabaseConfigured && !user) { onAuthRequired?.(); return; }
+    if (isSupabaseConfigured && !media.some((item) => item.file)) { setErrors(['Choose at least one photo from your device before publishing.']); document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    if (!isSupabaseConfigured) { setPublishState('success'); setDraftSaved(false); window.localStorage.removeItem('bese26-sell-draft'); onDemoAction('Your listing is ready to publish.'); return; }
+    setPublishState('publishing');
+    try {
+      const categoryRows = await fetchCategories();
+      const categoryRow = categoryRows.find((item) => item.parent_id == null && item.name === form.category);
+      const subcategoryRow = categoryRows.find((item) => item.parent_id === categoryRow?.id && item.name === form.subcategory);
+      if (!categoryRow) throw new Error('This category is not available yet. Please choose another category.');
+      const attributes = Object.fromEntries((dynamicFields[form.category] || []).map(([key]) => [key, form[key] || null]).filter(([, value]) => value !== null && value !== ''));
+      const listing = await createListing({ sellerId: user.id, values: { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: 'NGN', pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: form.city, state: form.state, country: 'Nigeria', delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes } });
+      const uploadableMedia = media.filter((item) => item.file);
+      await Promise.all(uploadableMedia.map((item, index) => uploadListingMedia({ userId: user.id, listingId: listing.id, file: item.file, sortOrder: item.cover ? 0 : index + 1 })));
+      setPublishState('success');
+      setDraftSaved(false);
+      window.localStorage.removeItem('bese26-sell-draft');
+      onDemoAction('Listing submitted for bese26 moderation.');
+    } catch (error) {
+      setPublishState('idle');
+      setErrors([error.message || 'Could not publish this listing. Please try again.']);
+      document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+  const reset = () => { setForm(initialForm); setMedia(isSupabaseConfigured ? [] : starterMedia); setDraftId(null); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.localStorage.removeItem('bese26-sell-draft'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   const renderMedia = () => <section id="sell-media" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><Camera size={19} /></span><div><div className="eyebrow">PHOTOS & VIDEO</div><h2>Add at least 1 photo</h2><p>Up to 12 photos + 1 video. The first photo becomes the cover.</p></div><span className="media-count">{media.filter((item) => item.type === 'image').length}/12</span></div><div className="sell-upload-grid"><button type="button" className="sell-upload-tile" onClick={() => mediaInput.current?.click()}><span><Plus size={23} /></span><strong>Gallery upload</strong><small>JPG, PNG, HEIC or WEBP</small></button><button type="button" className="sell-upload-tile camera-tile" onClick={() => cameraInput.current?.click()}><span><Camera size={21} /></span><strong>Use camera</strong><small>Take a clear cover photo</small></button>{media.map((item) => <div className={`sell-media-thumb ${item.cover ? 'is-cover' : ''}`} key={item.id}>{item.type === 'video' ? <div className="sell-video-thumb"><Video size={25} /><small>Video</small></div> : <img src={item.src} alt={item.name} />}<div className="media-overlay"><button type="button" onClick={() => setCover(item.id)} aria-label={`Set ${item.name} as cover`}><Check size={13} /></button><button type="button" onClick={() => removeMedia(item.id)} aria-label={`Remove ${item.name}`}><Trash2 size={13} /></button></div>{item.cover && <span className="cover-label">Cover photo</span>}</div>)}</div><input ref={mediaInput} className="hidden-file-input" type="file" accept="image/*,video/*" multiple onChange={handleFiles} /><input ref={cameraInput} className="hidden-file-input" type="file" accept="image/*" capture="environment" onChange={handleFiles} /><div className="sell-helper"><ShieldCheck size={14} /><span>First picture becomes the title picture. Tap the check icon to change it.</span></div></section>;
   const renderDetails = () => <section id="sell-details" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon lavender"><Package size={19} /></span><div><div className="eyebrow">ITEM DETAILS</div><h2>Tell buyers about it</h2><p>Choose a category and only the relevant details will appear below.</p></div></div><div className="sell-form-grid"><Field label="Title*" value={form.title} onChange={(value) => update('title', value)} placeholder="e.g. iPhone 15 Pro Max 256GB" wide /><div className="sell-field"><span>Category*</span><select value={form.category} onChange={(event) => { const category = event.target.value; update('category', category); update('subcategory', categoryGroups[category][0]); }}>{Object.keys(categoryGroups).map((category) => <option key={category}>{category}</option>)}</select></div><div className="sell-field"><span>Subcategory</span><select value={form.subcategory} onChange={(event) => update('subcategory', event.target.value)}>{subcategories.map((item) => <option key={item}>{item}</option>)}</select></div>{categoryNeedsCondition && <div className="sell-field"><span>Condition*</span><select value={form.condition} onChange={(event) => update('condition', event.target.value)}>{['New', 'Like New', 'Used — Excellent', 'Used — Good', 'Used — Fair', 'Refurbished', 'For Parts / Repair', 'Not Applicable'].map((item) => <option key={item}>{item}</option>)}</select></div>}{fields.map(([key, label, placeholder, options]) => <Field key={key} label={label} value={form[key]} onChange={(value) => update(key, value)} placeholder={placeholder} options={options} />)}<Field label="Description*" value={form.description} onChange={(value) => update('description', value)} placeholder="Please provide a detailed description of your item or service..." type="textarea" wide /></div></section>;
   const renderPricing = () => {
     const quantityRelevant = ['Food & Beverages', 'Business & Industrial', 'Home & Garden', 'Fashion'].includes(form.category);
-    return <section id="sell-pricing" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon gold"><WalletCards size={19} /></span><div><div className="eyebrow">PRICE</div><h2>Set your price</h2><p>Keep the price clear and easy for buyers to understand.</p></div></div><div className="sell-form-grid pricing-fields"><Field label="Price" value={form.price} onChange={(value) => update('price', value)} placeholder="e.g. 485000" type="number" /><Field label="Currency" value={form.currency} onChange={(value) => update('currency', value)} options={['₦ NGN', '$ USD', '£ GBP', '€ EUR']} />{quantityRelevant && <><Field label="Quantity available" value={form.quantity} onChange={(value) => update('quantity', value)} placeholder="1" type="number" /><Field label="Unit" value={form.unit} onChange={(value) => update('unit', value)} options={['item', 'kg', 'bag', 'crate', 'ton', 'hour', 'day', 'project']} /><Field label="Minimum order" value={form.minimumOrder} onChange={(value) => update('minimumOrder', value)} placeholder="1" type="number" /></>}<div className="sell-inline-setting"><div><strong>Open to negotiation?</strong><small>Allow buyers to make a reasonable offer</small></div><Toggle label="Negotiable" checked={form.negotiable} onChange={(value) => update('negotiable', value)} /></div></div></section>;
+    return <section id="sell-pricing" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon gold"><WalletCards size={19} /></span><div><div className="eyebrow">PRICE</div><h2>Set your price</h2><p>Keep the price clear and easy for buyers to understand.</p></div></div><div className="sell-form-grid pricing-fields"><Field label="Price" value={form.price} onChange={(value) => update('price', value)} placeholder="e.g. 485000" type="number" /><Field label="Currency" value={form.currency} onChange={(value) => update('currency', value)} options={['₦ NGN']} />{quantityRelevant && <><Field label="Quantity available" value={form.quantity} onChange={(value) => update('quantity', value)} placeholder="1" type="number" /><Field label="Unit" value={form.unit} onChange={(value) => update('unit', value)} options={['item', 'kg', 'bag', 'crate', 'ton', 'hour', 'day', 'project']} /><Field label="Minimum order" value={form.minimumOrder} onChange={(value) => update('minimumOrder', value)} placeholder="1" type="number" /></>}<div className="sell-inline-setting"><div><strong>Open to negotiation?</strong><small>Allow buyers to make a reasonable offer</small></div><Toggle label="Negotiable" checked={form.negotiable} onChange={(value) => update('negotiable', value)} /></div></div></section>;
   };
   const renderLocation = () => {
     const serviceListing = form.category === 'Jobs & Services';
     const deliveryOptions = serviceListing ? ['At buyer location', 'At seller location', 'Online service'] : ['Buyer pickup', 'Seller delivery', 'Shipping'];
     return <section id="sell-location" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon mint"><MapPin size={19} /></span><div><div className="eyebrow">LOCATION & DELIVERY</div><h2>Where is it located?</h2><p>Your profile location is already filled in.</p></div></div><div className="profile-location-card"><div className="profile-location-icon"><MapPin size={18} /></div><div><strong>{form.sellerLocation}</strong><span>From your seller profile</span></div></div><div className="sell-form-grid location-fields"><Field label="State*" value={form.state} onChange={(value) => update('state', value)} options={['Kano', 'Kaduna', 'Abuja (FCT)', 'Lagos', 'Plateau', 'Other']} /><Field label="City*" value={form.city} onChange={(value) => update('city', value)} options={['Kano Municipal', 'Nassarawa', 'Fagge', 'Gwale', 'Tarauni', 'Other']} /><Field label="Area" value={form.area} onChange={(value) => update('area', value)} placeholder="e.g. Hotoro" /></div><div className="privacy-location-row"><div><strong>Show approximate location publicly</strong><small>Your exact address stays private.</small></div><Toggle label="Approximate location" checked={form.approximate} onChange={(value) => update('approximate', value)} /></div><div className="sell-subheading"><MapPin size={15} /> {serviceListing ? 'How will you provide it?' : 'Delivery'}</div><div className="choice-pill-grid">{deliveryOptions.map((item) => <button type="button" key={item} className={form.delivery === item ? 'selected' : ''} onClick={() => update('delivery', item)}>{item}</button>)}</div>{!serviceListing && <div className="delivery-fee-row"><strong>Delivery fee</strong><select value={form.deliveryFee} onChange={(event) => update('deliveryFee', event.target.value)}><option>Free</option><option>Fixed fee</option><option>Calculated separately</option><option>Negotiable</option></select></div>}<div className="sell-subheading"><MessageCircle size={15} /> Contact</div><div className="contact-preferences"><label><input type="checkbox" checked={form.contactChat} onChange={(event) => update('contactChat', event.target.checked)} /> <MessageCircle size={14} /> Bese26 Chat</label><label><input type="checkbox" checked={form.contactPhone} onChange={(event) => update('contactPhone', event.target.checked)} /> <Phone size={14} /> Phone</label><label><input type="checkbox" checked={form.contactWhatsApp} onChange={(event) => update('contactWhatsApp', event.target.checked)} /> WhatsApp</label></div></section>;
   };
-  const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">READY FOR THE MARKETPLACE</div><h2>Your listing is ready</h2><p>Your listing details passed the checks. In the connected marketplace, it will now be sent to moderation before going live.</p><div className="publish-success-actions"><button type="button" className="primary-button" onClick={() => onDemoAction('Listing preview opened.')}>View listing <ArrowRight size={16} /></button><button type="button" className="secondary-button" onClick={() => onDemoAction('Share listing options opened.')}>Share listing</button><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>Ready to post?</h2><p>Check your details above, then publish your listing.</p></div></div><div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish}><CheckCircle2 size={17} /> Publish listing <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
+  const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">READY FOR THE MARKETPLACE</div><h2>Your listing is ready</h2><p>Your listing details passed the checks. In the connected marketplace, it will now be sent to moderation before going live.</p><div className="publish-success-actions"><button type="button" className="primary-button" onClick={() => onDemoAction('Listing preview opened.')}>View listing <ArrowRight size={16} /></button><button type="button" className="secondary-button" onClick={() => onDemoAction('Share listing options opened.')}>Share listing</button><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>Ready to post?</h2><p>Check your details above, then publish your listing.</p></div></div><div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
 
   return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => onDemoAction('Back to marketplace opened.')}><ArrowLeft size={22} /></button><strong>Post new ad</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved on this device</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{renderMedia()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div></>}</div>;
 }
