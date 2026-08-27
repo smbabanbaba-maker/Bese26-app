@@ -203,7 +203,7 @@ export async function fetchModerationHistory() {
   failIfUnavailable();
   const { data, error } = await supabase
     .from('listing_moderation_events')
-    .select('id,action,rejection_reason,created_at,listing:listings!listing_id(id,title,price,currency,location_city,location_state,status,moderation_status)')
+    .select('id,action,rejection_reason,created_at,listing:listings!listing_id(id,title,price,currency,city,state,status,moderation_status)')
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) throw error;
