@@ -37,3 +37,8 @@ Messages now loads real participant-scoped conversations and persisted messages 
 [2]: https://supabase.com/docs/guides/storage/security/access-control "Supabase: Storage access control"
 [3]: https://supabase.com/docs/guides/auth "Supabase: Auth documentation"
 [4]: https://supabase.com/docs/guides/auth/auth-email-passwordless "Supabase: Passwordless email logins"
+
+
+## Jiji-style moderation follow-up
+
+The moderation center now presents Pending, Approved, and Rejected tabs backed by `listing_moderation_events`. After the location-field query fix, the authenticated production admin session loaded Pending 0, Approved 5, and Rejected 0 without errors; the Approved tab displayed five reviewed listings, and Home displayed five approved live listings. This check did not perform a new state-changing action. The workflow mirrors the documented Jiji lifecycle—submission stays out of public search until review—while keeping Bese26’s admin authorization and audit trail under its own implementation.

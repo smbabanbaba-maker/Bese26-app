@@ -55,3 +55,8 @@ The frontend adds a profile-only entry at **Profile → Admin Moderation**. It l
 Local verification passed with `npm run build` and `git diff --check`. In a signed-out browser session, both the admin-status RPC and moderation RPC returned permission-denied, confirming unauthenticated clients cannot invoke them. The Supabase security advisor no longer reports the unnecessary SECURITY DEFINER admin-status helper; it retains one intentional warning for the exposed moderation RPC because that privileged RPC is required to enforce the admin-only state transition, plus the separate Auth warning that leaked-password protection is disabled.
 
 An authenticated admin session has now completed the live queue check. No approve/reject state change was made; the owner must explicitly authorize one real test action before a seller listing’s public state is changed.
+
+
+## Jiji-style moderation follow-up
+
+The admin experience was refined to mirror the public Jiji lifecycle: sellers submit into review, reviewed items are tracked by status, and only approved items appear on Home. The live authenticated admin session verified **Pending 0**, **Approved 5**, and **Rejected 0** tabs; Approved displayed five reviewed listings and Rejected displayed a truthful empty state. Home showed five approved listings. No new approve/reject action was performed during this refinement check.

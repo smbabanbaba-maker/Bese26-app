@@ -9,3 +9,13 @@ No listing was approved or rejected during this check. The first row’s rejecti
 A prior signed-out check returned permission-denied for both the admin-status and moderation RPC calls. The Supabase database role check returned `app_role = admin` for the authorized account. The separate migration `20260827193000_admin_policy_grants.sql` was applied after the first live session exposed a missing execute grant for RLS helper functions; the authenticated admin page then loaded successfully.
 
 The first production approval/rejection remains pending explicit owner authorization because it changes a seller’s listing state and public visibility.
+
+
+## Follow-up after status-history push
+
+The latest production session still authenticated as the admin. Home showed five live listings and Admin Moderation showed no pending listings. The status tabs were not yet visible in that browser response, which indicates Vercel was still serving the prior `index-iNNPlLpc.js` bundle from the previous commit rather than the new local `index-CVgpLgYQ.js` build. The deployment was not treated as complete until the new fingerprint appears.
+
+
+## Final Jiji-style production check
+
+After deployment of commit `725f473`, the authenticated admin opened **Profile → Admin Moderation**. The live page displayed the three status tabs: **Pending 0**, **Approved 5**, and **Rejected 0**. The Approved tab showed five reviewed listings with their review timestamps and Kano locations. The Rejected tab loaded its truthful empty state. Home simultaneously showed five approved live listings. No new state-changing action was performed during this check.
