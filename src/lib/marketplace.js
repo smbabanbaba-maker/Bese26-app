@@ -64,22 +64,20 @@ export async function getCurrentSession() {
   return { session: data.session, user: data.session?.user || null };
 }
 
-export async function requestEmailOtp({ email, displayName, username }) {
+export async function signUp({ email, password, displayName, username }) {
   failIfUnavailable();
-  const { data, error } = await supabase.auth.signInWithOtp({
+  const { data, error } = await supabase.auth.signUp({
     email,
-    options: {
-      shouldCreateUser: true,
-      data: { display_name: displayName || null, username: username || null },
-    },
+    password,
+    options: { data: { display_name: displayName, username } },
   });
   if (error) throw error;
   return data;
 }
 
-export async function verifyEmailOtp({ email, token }) {
+export async function signIn({ email, password }) {
   failIfUnavailable();
-  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
