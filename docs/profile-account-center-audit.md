@@ -44,3 +44,11 @@ Returning from Help Center to Profile restored the full account-center view and 
 ## Backend changes
 
 Applied to the authorized Supabase project `slxsbvuskgkacmtkkrmj`: `profile_preferences` with RLS and self-service grants, plus `profiles.account_type` with an allowlisted set of account types. No unrelated project was changed.
+
+
+## Production verification
+
+Commit `1b81cc4` is on GitHub `main`. Vercel served HTTP 200 with the new assets `index-CDo9pRnp.js` and `index-CTMfmZtE.css`. The deployed Profile route rendered the expanded Marketplace, Seller Tools, Account, Preferences, Payments & Services, Trust & Safety, Support & Legal, and Account Actions groups, with the fixed seven-item navigation still visible. The live session was unauthenticated, so it correctly showed zero counters and a sign-in prompt rather than private or fabricated data.
+
+
+The production console check returned no output and no runtime error after loading the expanded Profile route.
