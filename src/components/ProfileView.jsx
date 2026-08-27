@@ -246,7 +246,7 @@ const pageDefinitions = {
   communication: { title: 'Communication', eyebrow: 'PREFERENCES' },
   appearance: { title: 'Appearance', eyebrow: 'PREFERENCES' },
   wallet: { title: 'Wallet', eyebrow: 'PAYMENTS & SERVICES', description: 'Wallet, payments, and transaction records are not connected yet. No balance is shown.' },
-  subscription: { title: 'Subscription', eyebrow: 'PAYMENTS & SERVICES', description: 'Subscriptions and posting limits are not connected yet. No plan or payment status is shown.' },
+  subscription: { title: 'Subscription', eyebrow: 'PAYMENTS & SERVICES', description: 'View seller plans and your free-post allowance.' },
   boosting: { title: 'Boosting', eyebrow: 'PAYMENTS & SERVICES', description: 'Listing promotion and boost payments are not connected yet. No advertising data is shown.' },
   'payment-history': { title: 'Payment History', eyebrow: 'PAYMENTS & SERVICES', description: 'Payment history is not connected yet. No transaction records are shown.' },
   safety: { title: 'Safety Center', eyebrow: 'TRUST & SAFETY' },
