@@ -39,3 +39,8 @@ The public build at `https://bese26-app.vercel.app/?v=f6f145a` served the latest
 The live Sell screen now starts with `0/12` media and no starter demo photos or hardcoded seller name; it shows the real listing form and publish boundary. The live Saved screen showed `0` and `Your shortlist is empty`, with no fake saved items.
 
 The live Messages screen showed `No conversations yet` and `Select a listing to start a real conversation`, with no fabricated thread or message. Returning to Home remained stable and showed `0 live listings` with the same approved-listings empty state.
+
+
+## Listing publish verification
+
+A read-only Supabase query confirmed that recent Sell submissions are present in `public.listings` with `status = pending` and `moderation_status = pending`. A second query confirmed real `public.listing_media` rows with image MIME types and non-zero file sizes for recent submissions. The upload path is therefore working; public Home intentionally excludes these rows until moderation changes them to active/approved. The Sell success copy and My Listings Pending tab now explain this boundary.
