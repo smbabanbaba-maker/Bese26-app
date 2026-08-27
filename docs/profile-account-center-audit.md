@@ -69,3 +69,8 @@ The Profile menu now exposes real Saved Searches, Business Profile, Followers & 
 A second secure migration added RLS-protected `profile_follows`, `saved_searches`, `business_profiles`, `profile_blocks`, and `user_reports` tables. It also added an authenticated `users_are_blocked` security-definer function and updated conversation read/insert policies so blocked pairs cannot open or read conversations. The frontend now provides real pages for saved-search create/delete, business profile save/read, password update through Supabase Auth, follower/following read, block/unblock, report submission/history, and verification-status read. The local unauthenticated check correctly opens the sign-in modal for private workflows.
 
 The build after this expansion passed with initial JS `452.82 kB` (`129.11 kB gzip`), Profile route chunk `65.10 kB` (`16.65 kB gzip`), and CSS `107.98 kB` (`20.46 kB gzip`).
+
+
+## Real workflow production verification
+
+Vercel served the new build with HTTP 200 and asset fingerprints `index-LFmaZNMl.js` and `index-CBbtih16.css`. Production Profile now shows real Saved Searches, Business Profile, Followers & Following, Blocked Users, and Reports entries. The live browser session remains unauthenticated, so private actions correctly show a sign-in prompt rather than attempting a database write.
