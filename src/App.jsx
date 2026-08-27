@@ -182,19 +182,6 @@ function QuickAction({ icon: Icon, label, note, tone, onClick }) {
 function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   return (
     <div className="page-stack home-page">
-      <section className="discovery-banner">
-        <div className="discovery-copy">
-          <div className="eyebrow light">WELCOME TO BESE26</div>
-          <h1>Shop smarter.<br /><span>Sell with confidence.</span></h1>
-          <p>Discover everyday essentials from people and businesses near you.</p>
-        </div>
-        <div className="discovery-actions">
-          <div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div>
-          <button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button>
-        </div>
-        <div className="discovery-accent"><Sparkles size={18} /></div>
-      </section>
-
       <section className="search-section">
         <div className="search-box home-search">
           <Search size={18} />
