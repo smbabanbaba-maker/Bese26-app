@@ -90,7 +90,11 @@ export async function signOut() {
 
 export async function getProfile(userId) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
+    .eq('id', userId)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -114,6 +118,42 @@ export async function updateProfileContacts(userId, values) {
   const { data, error } = await supabase.from('profile_contacts').upsert({ profile_id: userId, ...values }, { onConflict: 'profile_id' }).select().single();
   if (error) throw error;
   return data;
+}
+
+export async function getProfilePreferences(userId) {
+  failIfUnavailable();
+  if (!userId) return null;
+  const { data, error } = await supabase.from('profile_preferences').select('*').eq('profile_id', userId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateProfilePreferences(userId, values) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('profile_preferences').upsert({ profile_id: userId, ...values }, { onConflict: 'profile_id' }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function uploadAvatar({ userId, file, previousPath = null }) {
+  failIfUnavailable();
+  if (!userId || !file) throw new Error('Choose a profile photo first.');
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const path = `${userId}/${crypto.randomUUID()}-${safeName || 'profile-photo.jpg'}`;
+  const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/jpeg' });
+  if (uploadError) throw uploadError;
+  const profile = await updateProfile(userId, { avatar_path: path });
+  if (previousPath && previousPath !== path) await supabase.storage.from('avatars').remove([previousPath]);
+  return { profile, path, url: getAvatarUrl(path) };
+}
+
+export async function removeAvatar({ userId, path }) {
+  failIfUnavailable();
+  if (path) {
+    const { error: removeError } = await supabase.storage.from('avatars').remove([path]);
+    if (removeError) throw removeError;
+  }
+  return updateProfile(userId, { avatar_path: null });
 }
 
 export async function fetchActiveListings({ search = '', category = '' } = {}) {
@@ -266,23 +306,60 @@ export function subscribeToNotifications(userId, onInsert) {
 
 export async function fetchSellerStats(userId) {
   failIfUnavailable();
-  if (!userId) return { listings: 0, sold: 0, saved: 0, reviews: 0, rating: 0, views: 0 };
-  const [{ data: listingRows, error: listingError }, savedIds, { data: profile, error: profileError }] = await Promise.all([
+  if (!userId) return { listings: 0, active: 0, sold: 0, pending: 0, saved: 0, reviews: 0, rating: 0, views: 0, inquiries: 0 };
+  const [{ data: listingRows, error: listingError }, savedIds, { data: profile, error: profileError }, { count: inquiryCount, error: inquiryError }] = await Promise.all([
     supabase.from('listings').select('id,status,views_count').eq('seller_id', userId).limit(1000),
     fetchSavedIds(userId),
     supabase.from('profiles').select('seller_rating,seller_rating_count').eq('id', userId).maybeSingle(),
+    supabase.from('conversations').select('id', { count: 'exact', head: true }).eq('seller_id', userId),
   ]);
   if (listingError) throw listingError;
   if (profileError) throw profileError;
+  if (inquiryError) throw inquiryError;
   const rows = listingRows || [];
   return {
     listings: rows.length,
+    active: rows.filter((row) => row.status === 'active').length,
     sold: rows.filter((row) => row.status === 'sold').length,
+    pending: rows.filter((row) => row.status === 'pending').length,
     saved: savedIds.length,
     reviews: Number(profile?.seller_rating_count || 0),
     rating: Number(profile?.seller_rating || 0),
     views: rows.reduce((total, row) => total + Number(row.views_count || 0), 0),
+    inquiries: inquiryCount || 0,
   };
+}
+
+export async function fetchSavedListings(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const savedIds = await fetchSavedIds(userId);
+  if (!savedIds.length) return [];
+  const { data, error } = await supabase.from('listings').select(listingSelect).in('id', savedIds).limit(200);
+  if (error) throw error;
+  return hydrateListingRows(data || [], { firstMediaOnly: true });
+}
+
+export async function fetchMyDrafts(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('listing_drafts').select('id,title,payload,last_saved_at,created_at,updated_at').eq('seller_id', userId).order('updated_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchProfileReviews(userId, mode = 'about') {
+  failIfUnavailable();
+  if (!userId) return [];
+  const column = mode === 'mine' ? 'reviewer_id' : 'reviewee_id';
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id,listing_id,reviewer_id,reviewee_id,rating,body,status,created_at,listing:listings!listing_id(id,title),reviewer:profiles!reviews_reviewer_id_fkey(id,display_name,avatar_path),reviewee:profiles!reviews_reviewee_id_fkey(id,display_name,avatar_path)')
+    .eq(column, userId)
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return data || [];
 }
 
 export async function toggleFavorite(userId, listingId, shouldSave) {

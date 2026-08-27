@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { createListing, fetchCategories, reviseRejectedListing, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
+import { createListing, fetchCategories, getProfile, reviseRejectedListing, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
 
 const categoryGroups = {
   Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories'],
@@ -129,6 +129,23 @@ export default function SellView({ user, onAuthRequired, onDemoAction, initialLi
       update('sellerHandle', user.user_metadata?.username ? `@${user.user_metadata.username}` : '');
     }
   }, [user, form.sellerName]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!user || editMode) return undefined;
+    getProfile(user.id).then((profile) => {
+      if (!mounted || !profile) return;
+      setForm((current) => ({
+        ...current,
+        sellerName: profile.display_name || current.sellerName,
+        sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle,
+        state: profile.state || current.state,
+        city: profile.city || current.city,
+        sellerLocation: profile.country || current.sellerLocation,
+      }));
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, [user, editMode]);
 
   useEffect(() => {
     if (editMode) return undefined;

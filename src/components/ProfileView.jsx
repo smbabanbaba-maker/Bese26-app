@@ -1,28 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
   BarChart3,
+  Bell,
   BookOpen,
   Check,
   ChevronRight,
   CircleHelp,
+  Clock3,
   Eye,
   FileText,
   Globe2,
   Heart,
+  Info,
+  Languages,
   LockKeyhole,
   LogOut,
   MapPin,
   MessageCircle,
-  MoreHorizontal,
   Moon,
   Package,
   Pencil,
   Phone,
   Plus,
+  RefreshCw,
+  Save,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
   Star,
   Store,
@@ -30,146 +37,271 @@ import {
   Trash2,
   UserRound,
   Users,
+  WalletCards,
 } from 'lucide-react';
-import { fetchMyListings, fetchSellerStats, getProfile, getProfileContacts, updateProfile, updateProfileContacts } from '../lib/marketplace';
+import { getAvatarUrl } from '../lib/supabase';
+import {
+  fetchMyDrafts,
+  fetchMyListings,
+  fetchNotifications,
+  fetchProfileReviews,
+  fetchSavedListings,
+  fetchSellerStats,
+  getProfile,
+  getProfileContacts,
+  getProfilePreferences,
+  markNotificationRead,
+  removeAvatar,
+  updateProfile,
+  updateProfileContacts,
+  updateProfilePreferences,
+  uploadAvatar,
+} from '../lib/marketplace';
 
-function Avatar({ initials, tone = 'navy', size = 'md' }) {
-  return <div className={`avatar avatar-${tone} avatar-${size}`}>{initials}</div>;
+function initials(value = 'bese26 user') {
+  return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
 }
 
-function VerifiedBadge({ text = 'Verified Seller' }) {
-  return <span className="verified-badge"><BadgeCheck size={13} strokeWidth={2.6} /> {text}</span>;
+function Avatar({ name, path, size = 'md', tone = 'navy' }) {
+  return path ? <img className={`avatar avatar-${size} profile-avatar-image`} src={getAvatarUrl(path)} alt={`${name || 'Profile'} profile`} /> : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${name || 'Profile'} initials`}>{initials(name)}</div>;
 }
 
-const marketplaceItems = [
-  { label: 'My Listings', description: 'Manage your real marketplace listings', icon: Package, page: 'listings', tone: 'coral' },
-  { label: 'Saved Items', description: 'Listings you saved from the marketplace', icon: Heart, page: 'saved', tone: 'lavender' },
-  { label: 'Sold Items', description: 'Listings marked as sold', icon: Tag, page: 'sold', tone: 'gold' },
-];
-
-function ProfileMenuCard({ item, onOpen }) {
-  const Icon = item.icon;
-  return <button className="profile-menu-card" onClick={() => onOpen(item.page)}><span className={`profile-menu-card-icon ${item.tone}`}><Icon size={17} /></span><span className="profile-menu-card-copy"><strong>{item.label}</strong><small>{item.description}</small></span><ChevronRight size={16} /></button>;
-}
-
-function ToggleRow({ icon: Icon, label, description, checked, onChange }) {
-  return <div className="profile-toggle-row"><span className="profile-toggle-icon"><Icon size={16} /></span><span className="profile-toggle-copy"><strong>{label}</strong><small>{description}</small></span><button className={`profile-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button></div>;
+function VerifiedBadge({ verified }) {
+  return verified ? <span className="verified-badge"><BadgeCheck size={13} strokeWidth={2.6} /> Verified</span> : <span className="profile-unverified"><Info size={13} /> Not verified</span>;
 }
 
 function SubpageHeader({ title, eyebrow, onBack }) {
-  return <div className="profile-subpage-header"><button className="icon-button" onClick={onBack} aria-label={`Back from ${title}`}><ArrowLeft size={18} /></button><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1></div></div>;
+  return <div className="profile-subpage-header"><button className="icon-button" type="button" onClick={onBack} aria-label={`Back from ${title}`}><ArrowLeft size={18} /></button><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1></div></div>;
 }
 
-function ListingManager({ user, onBack, tab, setTab, onDemoAction, onCreateListing, onEditListing }) {
-  const tabs = ['Active', 'Pending', 'Sold', 'Rejected'];
-  const statusByTab = { Active: 'active', Pending: 'pending', Sold: 'sold', Rejected: 'archived' };
+function SectionLabel({ eyebrow, title }) {
+  return <div className="profile-section-label"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div></div>;
+}
+
+function ProfileMenuCard({ item, onOpen }) {
+  const Icon = item.icon;
+  return <button type="button" className="profile-menu-card" onClick={() => onOpen(item.page)}><span className={`profile-menu-card-icon ${item.tone || ''}`}><Icon size={17} /></span><span className="profile-menu-card-copy"><strong>{item.label}</strong><small>{item.description}</small></span><ChevronRight size={16} /></button>;
+}
+
+function ToggleRow({ icon: Icon, label, description, checked, onChange, disabled = false }) {
+  return <div className={`profile-toggle-row ${disabled ? 'is-disabled' : ''}`}><span className="profile-toggle-icon"><Icon size={16} /></span><span className="profile-toggle-copy"><strong>{label}</strong><small>{description}</small></span><button type="button" className={`profile-toggle ${checked ? 'on' : ''}`} disabled={disabled} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`} aria-pressed={checked}><span /></button></div>;
+}
+
+async function prepareAvatarFile(file, rotation = 0) {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error('The selected photo could not be read.'));
+      element.src = objectUrl;
+    });
+    const cropSize = Math.min(image.naturalWidth, image.naturalHeight);
+    const canvas = document.createElement('canvas');
+    canvas.width = cropSize;
+    canvas.height = cropSize;
+    const context = canvas.getContext('2d');
+    context.translate(cropSize / 2, cropSize / 2);
+    context.rotate((rotation * Math.PI) / 180);
+    context.drawImage(image, -image.naturalWidth / 2, -image.naturalHeight / 2);
+    const blob = await new Promise((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error('The photo could not be prepared.')), 'image/jpeg', 0.9));
+    return new File([blob], 'bese26-profile-photo.jpg', { type: 'image/jpeg' });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+function EmptyState({ icon: Icon = Package, title, description, action, onAction }) {
+  return <div className="empty-state compact-empty"><Icon size={24} /><h3>{title}</h3><p>{description}</p>{action && <button type="button" className="primary-button" onClick={onAction}>{action}<ArrowRight size={16} /></button>}</div>;
+}
+
+function UnavailablePage({ page, onBack }) {
+  return <div className="profile-subpage"><SubpageHeader title={page.title} eyebrow={page.eyebrow || 'BESE26'} onBack={onBack} /><div className="future-card"><Info size={22} /><div><strong>{page.title} is not connected yet</strong><p>{page.description || 'This feature will appear here after its real marketplace service and secure backend are ready. No fake data is shown.'}</p></div></div></div>;
+}
+
+function ListingManager({ user, onBack, tab, setTab, onCreateListing, onEditListing, onOpenListing }) {
+  const tabs = ['Active', 'Drafts', 'Pending', 'Sold', 'Paused', 'Expired', 'Rejected'];
+  const statusByTab = { Active: 'active', Pending: 'pending', Sold: 'sold', Paused: 'paused', Expired: 'expired', Rejected: 'archived' };
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const isDraftTab = tab === 'Drafts';
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     setError('');
-    fetchMyListings({ sellerId: user.id, status: statusByTab[tab] }).then((rows) => mounted && setItems(rows)).catch((requestError) => mounted && setError(requestError.message || 'Could not load your listings.')).finally(() => mounted && setLoading(false));
+    const request = isDraftTab ? fetchMyDrafts(user.id) : fetchMyListings({ sellerId: user.id, status: statusByTab[tab] });
+    request.then((rows) => mounted && setItems(rows)).catch((requestError) => mounted && setError(requestError.message || 'Could not load your listings.')).finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
-  }, [tab, user.id]);
-  return <div className="profile-subpage"><SubpageHeader title="My Listings" eyebrow="SELLER CENTER" onBack={onBack} /><div className="profile-tabs">{tabs.map((name) => <button className={tab === name ? 'active' : ''} key={name} onClick={() => setTab(name)}>{name}{tab === name && !loading && <b>{items.length}</b>}</button>)}</div>{tab === 'Pending' && <div className="marketplace-note listing-review-note">Pending listings are visible only to you until they pass marketplace review.</div>}{error && <div className="auth-status error">{error}</div>}{loading ? <div className="empty-state compact-empty"><Package size={24} /><h3>Loading your listings</h3><p>Getting the latest listings from your account.</p></div> : items.length ? <div className="managed-listings">{items.map((listing) => <div className="managed-listing" key={listing.id}>{listing.image ? <img src={listing.image} alt="" /> : <div className="managed-listing-placeholder"><Package size={20} /></div>}<div className="managed-listing-copy"><div className="managed-listing-top"><span className={`status-pill ${tab.toLowerCase()}`}>{listing.raw?.status || tab.toLowerCase()}</span><span className="managed-listing-category">{listing.category}</span></div><strong>{listing.title}</strong><b>{listing.price}</b><span><MapPin size={12} /> {listing.location}</span><div className="managed-meta"><span><Eye size={12} /> {Number(listing.raw?.views_count || 0).toLocaleString()} views</span><span>{listing.subcategory || listing.condition || 'Marketplace listing'}</span></div>{listing.raw?.status === 'rejected' && <div className="managed-rejection"><strong>Review feedback</strong><span>{listing.raw.rejection_reason || 'Please update the listing details and resubmit it.'}</span><button type="button" className="secondary-button" onClick={() => onEditListing?.(listing)}>Edit & resubmit</button></div>}</div></div>)}</div> : <div className="empty-state compact-empty"><Package size={24} /><h3>No {tab.toLowerCase()} listings yet</h3><p>When you post a listing, it will appear here with its current status.</p></div>}<button className="primary-button full-width" onClick={onCreateListing}><Plus size={16} /> Create new listing</button></div>;
+  }, [isDraftTab, tab, user.id]);
+  return <div className="profile-subpage"><SubpageHeader title="My Listings" eyebrow="SELLER CENTER" onBack={onBack} /><div className="profile-tabs profile-tabs-scroll">{tabs.map((name) => <button type="button" className={tab === name ? 'active' : ''} key={name} onClick={() => setTab(name)}>{name}{tab === name && !loading && <b>{items.length}</b>}</button>)}</div>{tab === 'Pending' && <div className="marketplace-note listing-review-note">Pending listings are visible only to you until they pass marketplace review.</div>}{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading your listings" description="Getting the latest account data from Bese26." /> : items.length ? <div className="managed-listings">{isDraftTab ? items.map((draft) => <div className="managed-listing" key={draft.id}><div className="managed-listing-placeholder"><FileText size={20} /></div><div className="managed-listing-copy"><span className="status-pill pending">draft</span><strong>{draft.title || 'Untitled draft'}</strong><span><Clock3 size={12} /> Saved {new Date(draft.updated_at || draft.last_saved_at).toLocaleDateString()}</span><small className="profile-muted-note">Open Sell to continue editing this draft.</small></div></div>) : items.map((listing) => <div className="managed-listing" key={listing.id}>{listing.image ? <img src={listing.image} alt={listing.title} loading="lazy" decoding="async" /> : <div className="managed-listing-placeholder"><Package size={20} /></div>}<div className="managed-listing-copy"><div className="managed-listing-top"><span className={`status-pill ${listing.raw?.status || tab.toLowerCase()}`}>{listing.raw?.status || tab.toLowerCase()}</span><span className="managed-listing-category">{listing.category}</span></div><strong>{listing.title}</strong><b>{listing.price}</b><span><MapPin size={12} /> {listing.location}</span><div className="managed-meta"><span><Eye size={12} /> {Number(listing.raw?.views_count || 0).toLocaleString()} views</span><span>{listing.subcategory || listing.condition || 'Marketplace listing'}</span></div><div className="profile-inline-actions"><button type="button" className="text-action" onClick={() => onOpenListing?.(listing)}>View</button>{listing.raw?.status === 'rejected' && <button type="button" className="secondary-button" onClick={() => onEditListing?.(listing)}>Edit & resubmit</button>}</div>{listing.raw?.status === 'rejected' && <div className="managed-rejection"><strong>Review feedback</strong><span>{listing.raw.rejection_reason || 'Please update the listing details and resubmit it.'}</span></div>}</div></div>)}</div> : <EmptyState title={`No ${tab.toLowerCase()} listings yet`} description={isDraftTab ? 'Drafts saved from Sell will appear here.' : 'Listings from your account will appear here with their current status.'} action={tab === 'Active' || tab === 'Drafts' ? 'Create new listing' : undefined} onAction={onCreateListing} />}<button type="button" className="primary-button full-width" onClick={onCreateListing}><Plus size={16} /> Create new listing</button></div>;
 }
 
-function SimpleInfoPage({ page, onBack, onDemoAction, isDark, onToggleTheme, user, onAuthRequired, onSignOut }) {
-  const [toggles, setToggles] = useState({ messages: true, listing: true, saved: true, promotions: false, recommendations: true, announcements: false, visibility: true, showLocation: true, online: true, contact: true, personalization: true });
-  const [language, setLanguage] = useState('English');
-  const [location, setLocation] = useState('Kano, Nigeria');
-  const [faqOpen, setFaqOpen] = useState(null);
-  const [profileForm, setProfileForm] = useState({ displayName: user?.user_metadata?.display_name || '', username: user?.user_metadata?.username || '', phone: '', whatsapp: '', city: 'Kano', state: 'Kano', bio: '' });
-  const [profileSaving, setProfileSaving] = useState(false);
-  useEffect(() => {
-    let mounted = true;
-    if (!user || page.key !== 'personal') return undefined;
-    Promise.all([getProfile(user.id), getProfileContacts(user.id)]).then(([profile, contacts]) => mounted && setProfileForm({ displayName: profile?.display_name || user.user_metadata?.display_name || '', username: profile?.username || user.user_metadata?.username || '', phone: contacts?.phone || '', whatsapp: contacts?.whatsapp || '', city: profile?.city || '', state: profile?.state || '', bio: profile?.bio || '' })).catch((error) => mounted && onDemoAction(error.message || 'Could not load your profile.'));
-    return () => { mounted = false; };
-  }, [page.key, user, onDemoAction]);
-  const flip = (key) => setToggles((old) => ({ ...old, [key]: !old[key] }));
-  const updateProfileField = (key, value) => setProfileForm((old) => ({ ...old, [key]: value }));
-  const saveProfile = async () => {
-    if (!user) { onAuthRequired?.(); return; }
-    setProfileSaving(true);
-    try {
-      await updateProfile(user.id, { display_name: profileForm.displayName.trim() || 'bese26 user', username: profileForm.username.trim().replace(/^@/, '') || null, city: profileForm.city.trim() || null, state: profileForm.state.trim() || null, bio: profileForm.bio.trim() || null });
-      await updateProfileContacts(user.id, { phone: profileForm.phone.trim() || null, whatsapp: profileForm.whatsapp.trim() || null });
-      onDemoAction('Personal information saved.');
-    } catch (error) { onDemoAction(error.message || 'Could not save your profile.'); }
-    finally { setProfileSaving(false); }
-  };
-  const back = <SubpageHeader title={page.title} eyebrow={page.eyebrow} onBack={onBack} />;
-  if (page.key === 'personal') return <div className="profile-subpage">{back}<div className="personal-photo"><Avatar initials={(profileForm.displayName || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()} tone="navy" size="xl" /></div><div className="personal-fields"><label>Full name<input value={profileForm.displayName} onChange={(event) => updateProfileField('displayName', event.target.value)} /></label><label>Username<input value={profileForm.username ? `@${profileForm.username.replace(/^@/, '')}` : ''} onChange={(event) => updateProfileField('username', event.target.value.replace(/^@/, ''))} /></label><label>Phone number<input value={profileForm.phone} onChange={(event) => updateProfileField('phone', event.target.value)} placeholder="e.g. +234 800 000 0000" /></label><label>WhatsApp number<input value={profileForm.whatsapp} onChange={(event) => updateProfileField('whatsapp', event.target.value)} placeholder="Optional" /></label><label>State<input value={profileForm.state} onChange={(event) => updateProfileField('state', event.target.value)} placeholder="e.g. Kano" /></label><label>City<input value={profileForm.city} onChange={(event) => updateProfileField('city', event.target.value)} placeholder="e.g. Kano Municipal" /></label><label>Bio<textarea value={profileForm.bio} onChange={(event) => updateProfileField('bio', event.target.value)} placeholder="Tell buyers a little about you" /></label><label>Email<input value={user?.email || ''} readOnly /></label></div><button className="primary-button full-width" disabled={profileSaving} onClick={saveProfile}>{profileSaving ? 'Saving…' : 'Save changes'} <Check size={16} /></button></div>;
-  if (page.key === 'language') return <div className="profile-subpage">{back}<div className="language-list">{['English', 'Hausa', 'Yoruba', 'Igbo', 'Kanuri'].map((item) => <button key={item} className={language === item ? 'selected' : ''} onClick={() => { setLanguage(item); onDemoAction(`${item} selected.`); }}><span><Globe2 size={16} />{item}</span>{language === item && <Check size={17} />}</button>)}</div><p className="profile-help-note">Your language preference is ready for the marketplace experience.</p></div>;
-  if (page.key === 'location') return <div className="profile-subpage">{back}<div className="location-choice-list">{['Kano, Nigeria', 'Abuja, Nigeria', 'Kaduna, Nigeria', 'Katsina, Nigeria', 'Lagos, Nigeria', 'Other Nigerian locations'].map((item) => <button key={item} className={location === item ? 'selected' : ''} onClick={() => { setLocation(item); onDemoAction(`${item} selected.`); }}><span><MapPin size={16} />{item}</span>{location === item && <Check size={17} />}</button>)}</div></div>;
-  if (page.key === 'appearance') return <div className="profile-subpage">{back}<div className="appearance-options">{[['Light', SunIcon], ['Dark', Moon], ['System', MonitorIcon]].map(([name, Icon]) => <button key={name} className={name === (isDark ? 'Dark' : 'Light') ? 'selected' : ''} onClick={() => { if (name === 'Dark' && !isDark) onToggleTheme(); if (name === 'Light' && isDark) onToggleTheme(); if (name === 'System') onDemoAction('System appearance selected.'); }}><span><Icon size={17} />{name}</span>{name === (isDark ? 'Dark' : 'Light') && <Check size={17} />}</button>)}</div></div>;
-  if (page.key === 'privacy') return <div className="profile-subpage">{back}<div className="settings-card">{[['visibility','Profile visibility','Allow people to discover your seller profile',Eye],['showLocation','Show location','Display your city on listings',MapPin],['online','Show online status','Let buyers know when you are active',Users],['contact','Allow seller contact','Allow buyers to start a conversation',MessageCircle],['personalization','Personalized recommendations','Use activity to improve suggestions',Sparkles]].map(([key, label, description, Icon]) => <ToggleRow key={key} icon={Icon} label={label} description={description} checked={toggles[key]} onChange={() => flip(key)} />)}</div><p className="profile-help-note">Your privacy preferences are saved on this device.</p></div>;
-  if (page.key === 'security') return <div className="profile-subpage">{back}<div className="future-card"><LockKeyhole size={22} /><div><strong>Email and password sign-in is enabled.</strong><p>Keep your password private and use the sign-out action on shared devices.</p></div></div></div>;
-  if (page.key === 'help') { const faqs = [['How do I find products?', 'Use the search bar or browse approved listings on Home and Search.'], ['How do I post a listing?', 'Open Sell, add your photos and details, then submit the listing for moderation.'], ['How do I save a listing?', 'Open a listing and tap the heart icon. Saved listings require an account.'], ['How do I contact a seller?', 'Open an approved listing and tap Chat with seller to start a real conversation.']]; return <div className="profile-subpage">{back}<div className="faq-list">{faqs.map(([question, answer], index) => <div className={`faq-item ${faqOpen === index ? 'open' : ''}`} key={question}><button onClick={() => setFaqOpen(faqOpen === index ? null : index)}><span><CircleHelp size={16} />{question}</span><ChevronDownIcon open={faqOpen === index} /></button>{faqOpen === index && <p>{answer}</p>}</div>)}</div></div>; }
-  if (page.key === 'safety') return <div className="profile-subpage">{back}<div className="safety-hero"><ShieldCheck size={22} /><div><h2>Protect yourself</h2><p>Good habits make every exchange more comfortable.</p></div></div><div className="safety-list">{['Avoid suspicious offers or pressure to pay quickly.', 'Meet in safe, public places and tell someone where you are going.', 'Inspect products before paying or sharing sensitive details.', 'Keep communication inside bese26 when possible.'].map((tip) => <div key={tip}><Check size={16} />{tip}</div>)}</div><p className="profile-help-note">Always use your judgment when buying or selling.</p></div>;
-  if (page.key === 'terms' || page.key === 'privacy-policy' || page.key === 'prohibited') {
-    const policy = page.key === 'terms' ? { title: 'Terms & Conditions', intro: 'These terms explain the rules for using the bese26 marketplace in a safe and honest way.', sections: [['Using bese26', 'You must provide accurate account and listing information, keep your sign-in details private, and use the marketplace only for lawful buying and selling.'], ['Listings and review', 'Every seller listing is reviewed before it becomes public. bese26 may reject, remove, or restrict listings that are misleading, unsafe, duplicated, or against these rules.'], ['Buyer and seller responsibility', 'Discuss important details in chat, inspect items before paying, and choose a safe public meeting place. bese26 is a marketplace platform and does not take possession of items or guarantee a private transaction.'], ['Reporting and enforcement', 'Use the safety and reporting channels when something looks suspicious. We may limit accounts or listings when there is credible evidence of abuse or fraud.']] } : page.key === 'privacy-policy' ? { title: 'Privacy Policy', intro: 'This page explains the account and marketplace data bese26 uses to provide the service.', sections: [['Information we use', 'We use account details, profile information, listing content, saved items, and conversations to provide marketplace features and keep the service secure.'], ['Listings and messages', 'Approved listing details are public to marketplace visitors. Private listing media stays protected until the listing is approved. Conversations are available only to their participants.'], ['Location and preferences', 'We use the city and state you provide to show approximate marketplace location. Do not put your exact home address or other private information in a public listing.'], ['Your choices', 'You can update your profile details, remove saved items, mark notifications as read, and sign out. Contact bese26 support for account or privacy questions.']] } : { title: 'Prohibited Items', intro: 'Do not post, request, or promote items and services that are illegal, dangerous, deceptive, or restricted.', sections: [['Illegal or harmful goods', 'Weapons, controlled drugs, stolen goods, counterfeit documents, and products intended to harm people are not allowed.'], ['Fraud and deception', 'Do not post fake offers, misleading prices, impersonation, pyramid schemes, phishing links, or requests for passwords, OTPs, or private financial details.'], ['Restricted services and content', 'Adult sexual services, exploitative content, unsafe medical claims, and services that require a licence you do not have are not allowed.'], ['If your listing is rejected', 'Read the review feedback in My Listings, correct the issue, and use Edit & resubmit. Repeated attempts to bypass moderation may lead to account restrictions.']] };
-    return <div className="profile-subpage">{back}<article className="legal-card"><div className="legal-updated">Marketplace policy · Last updated Aug 2026</div><h2>{policy.title}</h2><p>{policy.intro}</p>{policy.sections.map(([heading, copy]) => <section key={heading}><h3>{heading}</h3><p>{copy}</p></section>)}</article></div>;
-  }
-  if (page.key === 'logout') return <div className="profile-subpage">{back}<div className="future-card"><LogOut size={22} /><div><strong>{user ? 'Sign out of bese26?' : 'Sign in to manage your account.'}</strong><p>{user ? 'You can sign back in at any time with your email and password.' : 'Create listings, save items, and chat with sellers after signing in.'}</p></div></div><button className="primary-button full-width" onClick={() => user ? onSignOut?.() : onAuthRequired?.()}>{user ? 'Sign out' : 'Sign in'} <ArrowRight size={16} /></button></div>;
+function SavedItemsPage({ user, onBack, onOpenListing, onToggleSave }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const load = () => { setLoading(true); fetchSavedListings(user.id).then(setItems).catch((requestError) => setError(requestError.message || 'Could not load your saved items.')).finally(() => setLoading(false)); };
+  useEffect(load, [user.id]);
+  return <div className="profile-subpage"><SubpageHeader title="Saved Items" eyebrow="MY MARKETPLACE" onBack={onBack} />{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading saved items" description="Getting your saved listings from Bese26." /> : items.length ? <div className="saved-list profile-saved-list">{items.map((listing) => <div className="saved-row" key={listing.id}><button type="button" className="saved-row-media" onClick={() => onOpenListing?.(listing)} aria-label={`Open ${listing.title}`}>{listing.image ? <img src={listing.image} alt={listing.title} loading="lazy" decoding="async" /> : <Package size={20} />}</button><button type="button" className="saved-row-copy" onClick={() => onOpenListing?.(listing)}><strong>{listing.title}</strong><span>{listing.seller} · {listing.location}</span><b>{listing.price}</b></button><button type="button" className="save-button saved" aria-label={`Remove ${listing.title} from saved`} onClick={() => { onToggleSave(listing.id); setItems((current) => current.filter((item) => item.id !== listing.id)); }}><Heart size={17} fill="currentColor" /></button></div>)}</div> : <EmptyState icon={Heart} title="No saved items yet" description="Listings you save from the marketplace will appear here." action="Explore marketplace" onAction={onBack} />}<button type="button" className="secondary-button full-width" onClick={load}><RefreshCw size={15} /> Refresh saved items</button></div>;
 }
 
-function SunIcon(props) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" {...props}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>; }
-function MonitorIcon(props) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></svg>; }
-function ChevronDownIcon({ open }) { return <ChevronRight size={16} className={open ? 'rotate-90' : ''} />; }
-function SectionLabel({ eyebrow, title }) { return <div className="profile-section-label"><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div>; }
+function ReviewsPage({ user, onBack }) {
+  const [mode, setMode] = useState('about');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; setLoading(true); fetchProfileReviews(user.id, mode).then((rows) => mounted && setItems(rows)).catch((requestError) => mounted && setError(requestError.message || 'Could not load reviews.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [mode, user.id]);
+  return <div className="profile-subpage"><SubpageHeader title="Reviews" eyebrow="TRUST & REPUTATION" onBack={onBack} /><div className="profile-tabs"><button type="button" className={mode === 'about' ? 'active' : ''} onClick={() => setMode('about')}>About me</button><button type="button" className={mode === 'mine' ? 'active' : ''} onClick={() => setMode('mine')}>My reviews</button></div>{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading reviews" description="Getting reviews from the marketplace." /> : items.length ? <div className="history-list">{items.map((review) => { const person = mode === 'about' ? review.reviewer : review.reviewee; return <div key={review.id}><Avatar name={person?.display_name} path={person?.avatar_path} /><span><strong>{person?.display_name || 'Bese26 member'}</strong><small><Star size={11} fill="currentColor" /> {review.rating}/5 · {review.listing?.title || 'Marketplace listing'}</small><small>{review.body || 'No written comment.'}</small></span><b>{new Date(review.created_at).toLocaleDateString()}</b></div>; })}</div> : <EmptyState icon={Star} title={mode === 'about' ? 'No reviews yet' : 'You have not reviewed anyone yet'} description={mode === 'about' ? 'Published reviews from real marketplace interactions will appear here.' : 'Reviews you write after eligible interactions will appear here.'} />}</div>;
+}
 
-const subpages = {
+function AnalyticsPage({ user, onBack }) {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { let mounted = true; fetchSellerStats(user.id).then((data) => mounted && setStats(data)).catch(() => mounted && setStats(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
+  const values = stats || {};
+  return <div className="profile-subpage"><SubpageHeader title="Seller Analytics" eyebrow="SELLER TOOLS" onBack={onBack} />{loading ? <EmptyState title="Loading analytics" description="Calculating your real seller activity." /> : <><div className="analytics-stats"><div><Eye size={17} /><strong>{Number(values.views || 0).toLocaleString()}</strong><span>Total views</span></div><div><MessageCircle size={17} /><strong>{values.inquiries || 0}</strong><span>Buyer inquiries</span></div><div><ShoppingBag size={17} /><strong>{values.sold || 0}</strong><span>Sold listings</span></div><div><Package size={17} /><strong>{values.active || 0}</strong><span>Active listings</span></div></div><div className="analytics-card"><div className="analytics-card-head"><div><div className="eyebrow">LISTING PERFORMANCE</div><h2>Account overview</h2></div><BarChart3 size={20} /></div><p className="profile-help-note">Views and inquiry totals are read from your current marketplace records. Historical charts are not shown because no time-series analytics table exists yet.</p></div><div className="future-card"><Info size={20} /><div><strong>Not enough historical data yet</strong><p>Per-listing trends, conversion rates, and performance-over-time reports will appear after Bese26 adds an analytics event ledger.</p></div></div></>}</div>;
+}
+
+function NotificationPage({ user, onBack }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; fetchNotifications(user.id).then((rows) => mounted && setItems(rows)).catch((requestError) => mounted && setError(requestError.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
+  const markRead = async (item) => { if (item.read_at) return; try { await markNotificationRead(item.id, user.id); setItems((current) => current.map((row) => row.id === item.id ? { ...row, read_at: new Date().toISOString() } : row)); } catch (requestError) { setError(requestError.message || 'Could not mark notification as read.'); } };
+  return <div className="profile-subpage"><SubpageHeader title="Notifications" eyebrow="ACCOUNT UPDATES" onBack={onBack} />{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading notifications" description="Getting your account and marketplace updates." /> : items.length ? <div className="notification-list">{items.map((item) => <button type="button" key={item.id} className={`notification-row ${item.read_at ? '' : 'unread'}`} onClick={() => markRead(item)}><span className="notification-row-icon"><Bell size={16} /></span><span><strong>{item.title}</strong><small>{item.body || 'Bese26 account update'}</small><small>{new Date(item.created_at).toLocaleString()}</small></span>{!item.read_at && <i aria-label="Unread" />}</button>)}</div> : <EmptyState icon={Bell} title="No notifications yet" description="Important account, listing, and message updates will appear here." />}</div>;
+}
+
+function PersonalPage({ user, profile, onBack, onSaved, onAuthRequired }) {
+  const [form, setForm] = useState({ displayName: profile?.display_name || '', username: profile?.username || '', phone: '', whatsapp: '', city: profile?.city || '', state: profile?.state || '', country: profile?.country || 'Nigeria', bio: profile?.bio || '', accountType: profile?.account_type || 'Individual' });
+  const [contacts, setContacts] = useState(null);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(profile?.avatar_path ? getAvatarUrl(profile.avatar_path) : '');
+  const [rotation, setRotation] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; getProfileContacts(user.id).then((data) => mounted && (setContacts(data), setForm((current) => ({ ...current, phone: data?.phone || '', whatsapp: data?.whatsapp || '' })))).catch((requestError) => mounted && setError(requestError.message || 'Could not load your contact details.')); return () => { mounted = false; }; }, [user.id]);
+  useEffect(() => () => { if (photoPreview && photoFile) URL.revokeObjectURL(photoPreview); }, [photoPreview, photoFile]);
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const choosePhoto = (event) => { const file = event.target.files?.[0]; if (!file) return; if (!file.type.startsWith('image/')) { setError('Choose a JPG, PNG, or WEBP image.'); return; } setPhotoFile(file); setRotation(0); setPhotoPreview(URL.createObjectURL(file)); setError(''); event.target.value = ''; };
+  const save = async () => { setSaving(true); setError(''); try { const savedProfile = await updateProfile(user.id, { display_name: form.displayName.trim() || 'bese26 user', username: form.username.trim().replace(/^@/, '') || null, bio: form.bio.trim() || null, city: form.city.trim() || null, state: form.state.trim() || null, country: form.country.trim() || 'Nigeria', account_type: form.accountType }); await updateProfileContacts(user.id, { phone: form.phone.trim() || null, whatsapp: form.whatsapp.trim() || null, allow_calls: contacts?.allow_calls ?? true, allow_whatsapp: contacts?.allow_whatsapp ?? true }); onSaved(savedProfile); } catch (requestError) { setError(requestError.message || 'Your profile could not be saved.'); } finally { setSaving(false); } };
+  const uploadPhoto = async () => { if (!photoFile) return; setPhotoBusy(true); setError(''); try { const processedFile = await prepareAvatarFile(photoFile, rotation); const result = await uploadAvatar({ userId: user.id, file: processedFile, previousPath: profile?.avatar_path }); onSaved(result.profile); setPhotoFile(null); setRotation(0); setPhotoPreview(result.url); } catch (requestError) { setError(requestError.message || 'Your photo could not be uploaded. Please try again.'); } finally { setPhotoBusy(false); } };
+  const deletePhoto = async () => { if (!profile?.avatar_path) return; setPhotoBusy(true); setError(''); try { const savedProfile = await removeAvatar({ userId: user.id, path: profile.avatar_path }); onSaved(savedProfile); setPhotoPreview(''); } catch (requestError) { setError(requestError.message || 'Your photo could not be removed. Please try again.'); } finally { setPhotoBusy(false); } };
+  return <div className="profile-subpage"><SubpageHeader title="Personal Information" eyebrow="ACCOUNT" onBack={onBack} />{error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}<div className="personal-photo"><div className="profile-photo-editor">{photoPreview ? <img className="avatar avatar-xl profile-avatar-image" src={photoPreview} alt="Profile preview" style={{ transform: `rotate(${rotation}deg)` }} /> : <Avatar name={form.displayName} size="xl" />}<div className="photo-editor-actions"><label className="secondary-button">Choose photo<input className="hidden-file-input" type="file" accept="image/png,image/jpeg,image/webp" onChange={choosePhoto} /></label>{photoFile && <><button type="button" className="secondary-button" onClick={() => setRotation((value) => (value + 90) % 360)} disabled={photoBusy}>Rotate</button><button type="button" className="primary-button" onClick={uploadPhoto} disabled={photoBusy}>{photoBusy ? 'Uploading…' : 'Crop & upload'}</button></>}{profile?.avatar_path && !photoFile && <button type="button" className="text-action danger-action" onClick={deletePhoto} disabled={photoBusy}><Trash2 size={14} /> Remove photo</button>}</div><p className="profile-help-note">Use a clear image. It is stored in Bese26 persistent storage and reused across your listings.</p></div></div><div className="personal-fields"><label>Full name<input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} /></label><label>Username<input value={form.username ? `@${form.username.replace(/^@/, '')}` : ''} onChange={(event) => update('username', event.target.value.replace(/^@/, ''))} placeholder="Choose a username" /></label><label>Phone number<input value={form.phone} onChange={(event) => update('phone', event.target.value)} placeholder="e.g. +234 800 000 0000" /></label><label>WhatsApp number<input value={form.whatsapp} onChange={(event) => update('whatsapp', event.target.value)} placeholder="Optional" /></label><label>Country<input value={form.country} onChange={(event) => update('country', event.target.value)} /></label><label>State<input value={form.state} onChange={(event) => update('state', event.target.value)} placeholder="e.g. Kano" /></label><label>City<input value={form.city} onChange={(event) => update('city', event.target.value)} placeholder="e.g. Kano Municipal" /></label><label>Account type<select value={form.accountType} onChange={(event) => update('accountType', event.target.value)}>{['Individual', 'Farmer', 'Seller', 'Business', 'Professional', 'Organization'].map((item) => <option key={item}>{item}</option>)}</select></label><label className="full-field">Bio<textarea value={form.bio} onChange={(event) => update('bio', event.target.value)} placeholder="Tell buyers a little about you" /></label><label className="full-field">Email<input value={user.email || ''} readOnly /></label></div><button type="button" className="primary-button full-width" disabled={saving} onClick={save}>{saving ? 'Saving…' : 'Save changes'} <Check size={16} /></button></div>;
+}
+
+function SettingsPage({ page, user, onBack, isDark, onToggleTheme, onNotice }) {
+  const [preferences, setPreferences] = useState(null);
+  const [contacts, setContacts] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; const request = page.key === 'communication' ? getProfileContacts(user.id) : getProfilePreferences(user.id); request.then((data) => mounted && (page.key === 'communication' ? setContacts(data || {}) : setPreferences(data || {}))).catch((requestError) => mounted && setError(requestError.message || 'Could not load your preferences.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [page.key, user.id]);
+  const current = page.key === 'communication' ? contacts || {} : preferences || {};
+  const update = async (values) => { setSaving(true); setError(''); try { const next = page.key === 'communication' ? await updateProfileContacts(user.id, values) : await updateProfilePreferences(user.id, values); page.key === 'communication' ? setContacts(next) : setPreferences(next); if (values.theme) onToggleTheme(values.theme === 'dark'); onNotice('Preference saved.'); } catch (requestError) { setError(requestError.message || 'Your preference could not be saved.'); } finally { setSaving(false); } };
+  if (loading) return <div className="profile-subpage"><SubpageHeader title={page.title} eyebrow={page.eyebrow} onBack={onBack} /><EmptyState title="Loading settings" description="Getting your saved preferences." /></div>;
+  if (error) return <div className="profile-subpage"><SubpageHeader title={page.title} eyebrow={page.eyebrow} onBack={onBack} /><div className="auth-status error">{error}</div><button type="button" className="secondary-button" onClick={onBack}>Back</button></div>;
+  if (page.key === 'language') return <div className="profile-subpage"><SubpageHeader title="Language & Region" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><label className="settings-select-row"><span><Languages size={16} /> Interface language</span><select value={current.language || 'English'} disabled={saving} onChange={(event) => update({ language: event.target.value })}>{['English', 'Hausa', 'Yoruba', 'Igbo', 'Kanuri'].map((item) => <option key={item}>{item}</option>)}</select></label><label className="settings-select-row"><span><WalletCards size={16} /> Currency</span><select value={current.currency || 'NGN'} disabled><option>NGN / ₦</option></select></label><label className="settings-select-row"><span><Globe2 size={16} /> Date format</span><select value={current.date_format || 'DD/MM/YYYY'} onChange={(event) => update({ date_format: event.target.value })}><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option></select></label></div><p className="profile-help-note">Language selection is stored in your Bese26 account. Full translation coverage will expand as each interface string is translated.</p></div>;
+  if (page.key === 'appearance') return <div className="profile-subpage"><SubpageHeader title="Appearance" eyebrow="PREFERENCES" onBack={onBack} /><div className="appearance-options">{[['light', 'Light', 'Use the clean white marketplace theme', Moon], ['dark', 'Dark', 'Use the dark marketplace theme', Moon], ['system', 'System', 'Follow this device preference', Info]].map(([value, label, description, Icon]) => <button type="button" key={value} className={(current.theme || (isDark ? 'dark' : 'light')) === value ? 'selected' : ''} onClick={() => update({ theme: value })}><span><Icon size={17} /> <span><strong>{label}</strong><small>{description}</small></span></span>{(current.theme || (isDark ? 'dark' : 'light')) === value && <Check size={17} />}</button>)}</div></div>;
+  if (page.key === 'privacy') return <div className="profile-subpage"><SubpageHeader title="Privacy" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><ToggleRow icon={Eye} label="Profile visibility" description="Allow people to discover your seller profile" checked={current.profile_visibility !== false} onChange={(value) => update({ profile_visibility: value })} /><ToggleRow icon={MapPin} label="Show approximate location" description="Display your city, not your exact address" checked={current.show_approximate_location !== false} onChange={(value) => update({ show_approximate_location: value })} /><ToggleRow icon={Users} label="Show online status" description="Let buyers know when you are active" checked={current.show_online_status !== false} onChange={(value) => update({ show_online_status: value })} /><ToggleRow icon={Phone} label="Show phone number" description="Allow your phone to appear where supported" checked={current.show_phone_number === true} onChange={(value) => update({ show_phone_number: value })} /><ToggleRow icon={MessageCircle} label="Show email" description="Allow your email to appear where supported" checked={current.show_email === true} onChange={(value) => update({ show_email: value })} /><ToggleRow icon={Sparkles} label="Personalized recommendations" description="Use your activity to improve marketplace suggestions" checked={current.personalized_recommendations !== false} onChange={(value) => update({ personalized_recommendations: value })} /></div></div>;
+  if (page.key === 'communication') return <div className="profile-subpage"><SubpageHeader title="Communication" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><ToggleRow icon={Phone} label="Allow calls" description="Let buyers call when you choose phone contact" checked={current.allow_calls !== false} onChange={(value) => update({ allow_calls: value })} /><ToggleRow icon={MessageCircle} label="Allow WhatsApp" description="Allow WhatsApp contact where supported" checked={current.allow_whatsapp !== false} onChange={(value) => update({ allow_whatsapp: value })} /><ToggleRow icon={MessageCircle} label="Buyer messages" description="Receive conversations started from listings" checked={current.buyer_messages !== false} onChange={(value) => update({ buyer_messages: value })} /></div></div>;
+  if (page.key === 'notifications') return <div className="profile-subpage"><SubpageHeader title="Notification Preferences" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><ToggleRow icon={Bell} label="In-app notifications" description="Show important updates inside Bese26" checked={current.in_app_notifications !== false} onChange={(value) => update({ in_app_notifications: value })} /><ToggleRow icon={Bell} label="Email notifications" description="Receive non-critical marketplace updates by email" checked={current.email_notifications !== false} onChange={(value) => update({ email_notifications: value })} /></div><p className="profile-help-note">Critical security notifications cannot be disabled.</p></div>;
+  return null;
+}
+
+
+const pageDefinitions = {
   listings: { title: 'My Listings', eyebrow: 'SELLER CENTER' },
-  sold: { title: 'Sold Items', eyebrow: 'MY MARKETPLACE', key: 'listings' },
-  saved: { title: 'Saved Items', eyebrow: 'MY MARKETPLACE', key: 'saved' },
-  reviews: { title: 'My Reviews', eyebrow: 'MY MARKETPLACE', key: 'reviews' },
-  'seller-profile': { title: 'Seller Profile', eyebrow: 'PUBLIC STORE' },
-  analytics: { title: 'Seller Analytics', eyebrow: 'SELLER CENTER' },
-  promote: { title: 'Promote Listings', eyebrow: 'GET NOTICED' },
+  saved: { title: 'Saved Items', eyebrow: 'MY MARKETPLACE' },
+  drafts: { title: 'Drafts', eyebrow: 'MY MARKETPLACE' },
+  sold: { title: 'Sold Items', eyebrow: 'MY MARKETPLACE' },
+  'saved-searches': { title: 'Saved Searches', eyebrow: 'MY MARKETPLACE', description: 'Saved searches and alerts need their own backend table. This page is intentionally not showing fake searches.' },
+  'recently-viewed': { title: 'Recently Viewed', eyebrow: 'MY MARKETPLACE', description: 'Recently viewed history is not persisted by the current marketplace backend, so no fake history is shown.' },
+  analytics: { title: 'Seller Analytics', eyebrow: 'SELLER TOOLS' },
+  business: { title: 'Business Profile', eyebrow: 'SELLER TOOLS', description: 'Business profiles require a separate verified business record. Your personal profile remains the source of truth for now.' },
+  verification: { title: 'Verification & Trust', eyebrow: 'SELLER TOOLS', description: 'Bese26 currently reads the real profile verification status. Identity and business verification workflows are not connected yet.' },
+  reviews: { title: 'Reviews', eyebrow: 'TRUST & REPUTATION' },
   personal: { title: 'Personal Information', eyebrow: 'ACCOUNT' },
-  language: { title: 'Language', eyebrow: 'ACCOUNT' },
-  location: { title: 'Location', eyebrow: 'ACCOUNT' },
-  appearance: { title: 'Appearance', eyebrow: 'PREFERENCES' },
+  security: { title: 'Login & Security', eyebrow: 'ACCOUNT', description: 'Password changes and sign-out use Supabase Auth. Connected accounts and active-session management require additional secure backend flows.' },
+  'delete-account': { title: 'Delete Account', eyebrow: 'ACCOUNT ACTIONS', description: 'Account deletion requires a secure server-side workflow that can preserve legally required marketplace and financial records. It is not connected yet, so no destructive action is exposed.' },
+  language: { title: 'Language & Region', eyebrow: 'PREFERENCES' },
+  notifications: { title: 'Notifications', eyebrow: 'PREFERENCES' },
+  'notification-settings': { title: 'Notification Preferences', eyebrow: 'PREFERENCES' },
   privacy: { title: 'Privacy', eyebrow: 'PREFERENCES' },
-  security: { title: 'Security', eyebrow: 'PREFERENCES' },
-  help: { title: 'Help Center', eyebrow: 'HELP & SAFETY' },
-  safety: { title: 'Safety Center', eyebrow: 'HELP & SAFETY' },
+  communication: { title: 'Communication', eyebrow: 'PREFERENCES' },
+  appearance: { title: 'Appearance', eyebrow: 'PREFERENCES' },
+  wallet: { title: 'Wallet', eyebrow: 'PAYMENTS & SERVICES', description: 'Wallet, payments, and transaction records are not connected yet. No balance is shown.' },
+  subscription: { title: 'Subscription', eyebrow: 'PAYMENTS & SERVICES', description: 'Subscriptions and posting limits are not connected yet. No plan or payment status is shown.' },
+  boosting: { title: 'Boosting', eyebrow: 'PAYMENTS & SERVICES', description: 'Listing promotion and boost payments are not connected yet. No advertising data is shown.' },
+  'payment-history': { title: 'Payment History', eyebrow: 'PAYMENTS & SERVICES', description: 'Payment history is not connected yet. No transaction records are shown.' },
+  safety: { title: 'Safety Center', eyebrow: 'TRUST & SAFETY' },
+  blocked: { title: 'Blocked Users', eyebrow: 'TRUST & SAFETY', description: 'Blocking is not connected to the current messaging policies yet, so no fake blocked-user list is shown.' },
+  reports: { title: 'Reports', eyebrow: 'TRUST & SAFETY', description: 'Report submission requires a moderation report table and secure review flow, which are not connected yet.' },
+  help: { title: 'Help Center', eyebrow: 'SUPPORT' },
+  support: { title: 'Contact Support', eyebrow: 'SUPPORT', description: 'Support ticket submission is not connected yet. Please use the Help Center and the published contact channel when it is available.' },
   terms: { title: 'Terms & Conditions', eyebrow: 'LEGAL' },
   'privacy-policy': { title: 'Privacy Policy', eyebrow: 'LEGAL' },
   prohibited: { title: 'Prohibited Items', eyebrow: 'LEGAL' },
-  logout: { title: 'Logout', eyebrow: 'ACCOUNT' },
+  about: { title: 'About Bese26', eyebrow: 'ABOUT' },
 };
 
-export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAction, isDark, onToggleTheme, onNavigate, onCreateListing, onEditListing, isAdmin = false, onOpenAdmin, isActive = true }) {
+function HelpPage({ onBack }) {
+  const [open, setOpen] = useState(null);
+  const faqs = [['How do I find products?', 'Use Home search or browse approved listings.'], ['How do I post a listing?', 'Open Sell, add your real photos and details, then submit it for review.'], ['How do I save a listing?', 'Open an approved listing and tap the heart icon. Saved listings require an account.'], ['How do I contact a seller?', 'Open an approved listing and tap Chat with seller to start a real conversation.'], ['Why is my listing not public?', 'New listings remain pending until a moderator approves them. Rejected listings include review feedback in My Listings.']];
+  return <div className="profile-subpage"><SubpageHeader title="Help Center" eyebrow="SUPPORT" onBack={onBack} /><div className="faq-list">{faqs.map(([question, answer], index) => <div className={`faq-item ${open === index ? 'open' : ''}`} key={question}><button type="button" onClick={() => setOpen(open === index ? null : index)}><span><CircleHelp size={16} />{question}</span><ChevronRight size={16} className={open === index ? 'rotate-90' : ''} /></button>{open === index && <p>{answer}</p>}</div>)}</div><p className="profile-help-note">Answers reflect the Bese26 features currently connected to the real marketplace backend.</p></div>;
+}
+
+function SafetyPage({ onBack }) {
+  return <div className="profile-subpage"><SubpageHeader title="Safety Center" eyebrow="TRUST & SAFETY" onBack={onBack} /><div className="safety-hero"><ShieldCheck size={22} /><div><h2>Protect yourself</h2><p>Good habits make every exchange more comfortable.</p></div></div><div className="safety-list">{['Avoid suspicious offers or pressure to pay quickly.', 'Meet in safe, public places and tell someone where you are going.', 'Inspect products before paying or sharing sensitive details.', 'Never share passwords, OTPs, or private financial details.', 'Keep communication inside Bese26 when possible.'].map((tip) => <div key={tip}><Check size={16} />{tip}</div>)}</div><p className="profile-help-note">Reporting and blocking workflows will be added when their secure moderation backend is connected.</p></div>;
+}
+
+function PolicyPage({ page, onBack }) {
+  const policies = { terms: { title: 'Terms & Conditions', intro: 'These terms explain the rules for using the Bese26 marketplace in a safe and honest way.', sections: [['Using Bese26', 'Provide accurate account and listing information, keep sign-in details private, and use the marketplace only for lawful buying and selling.'], ['Listings and review', 'Every seller listing is reviewed before it becomes public. Bese26 may reject, remove, or restrict listings that are misleading, unsafe, duplicated, or against these rules.'], ['Buyer and seller responsibility', 'Discuss important details in chat, inspect items before paying, and choose a safe public meeting place. Bese26 is a marketplace platform and does not take possession of items or guarantee a private transaction.']] }, 'privacy-policy': { title: 'Privacy Policy', intro: 'This page explains the account and marketplace data Bese26 uses to provide the service.', sections: [['Information we use', 'We use account details, profile information, listing content, saved items, and conversations to provide marketplace features and keep the service secure.'], ['Listings and messages', 'Approved listing details are public to marketplace visitors. Conversations are available only to their participants.'], ['Your choices', 'You can update profile details, remove saved items, mark notifications as read, and sign out.']] }, prohibited: { title: 'Prohibited Items', intro: 'Do not post, request, or promote items and services that are illegal, dangerous, deceptive, or restricted.', sections: [['Illegal or harmful goods', 'Weapons, controlled drugs, stolen goods, counterfeit documents, and products intended to harm people are not allowed.'], ['Fraud and deception', 'Do not post fake offers, misleading prices, impersonation, phishing links, or requests for passwords, OTPs, or private financial details.'], ['If your listing is rejected', 'Read the review feedback in My Listings, correct the issue, and use Edit & resubmit.']] } };
+  const policy = policies[page.key];
+  return <div className="profile-subpage"><SubpageHeader title={policy.title} eyebrow="LEGAL" onBack={onBack} /><article className="legal-card"><div className="legal-updated">Bese26 marketplace policy · Last updated Aug 2026</div><h2>{policy.title}</h2><p>{policy.intro}</p>{policy.sections.map(([heading, copy]) => <section key={heading}><h3>{heading}</h3><p>{copy}</p></section>)}</article></div>;
+}
+
+function AboutPage({ onBack }) {
+  return <div className="profile-subpage"><SubpageHeader title="About Bese26" eyebrow="ABOUT" onBack={onBack} /><div className="future-card about-card"><Store size={22} /><div><strong>Bese26 marketplace</strong><p>Buy and sell with confidence. Bese26 connects people and businesses around real local listings, secure conversations, and marketplace review.</p><p className="profile-muted-note">Bese26 web marketplace · v1.0</p></div></div></div>;
+}
+
+export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAction, isDark, onToggleTheme, onNavigate, onCreateListing, onEditListing, onOpenListing, onToggleSave, isAdmin = false, onOpenAdmin, isActive = true }) {
   const [subPage, setSubPage] = useState('main');
   const [listingTab, setListingTab] = useState('Active');
   const [stats, setStats] = useState(null);
   const [profileRecord, setProfileRecord] = useState(null);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [profileContacts, setProfileContacts] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const profileRequest = useRef(0);
   useEffect(() => { if (isActive) setSubPage('main'); }, [isActive]);
-  useEffect(() => {
-    let mounted = true;
-    if (!user) { setStats(null); setProfileRecord(null); return undefined; }
-    setStatsLoading(true);
-    Promise.all([fetchSellerStats(user.id), getProfile(user.id)]).then(([nextStats, nextProfile]) => { if (mounted) { setStats(nextStats); setProfileRecord(nextProfile); } }).catch((error) => mounted && onDemoAction(error.message || 'Could not load your profile.')).finally(() => mounted && setStatsLoading(false));
-    return () => { mounted = false; };
-  }, [user, onDemoAction]);
-  const displayName = profileRecord?.display_name || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Your bese26 profile';
-  const username = profileRecord?.username ? `@${profileRecord.username}` : user?.user_metadata?.username ? `@${user.user_metadata.username}` : user?.email || 'Sign in to personalize your profile';
-  const profileLocation = [profileRecord?.city, profileRecord?.state].filter(Boolean).join(', ') || 'Location not set';
-  const profileInitials = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
-  const requiresAccount = ['listings', 'sold', 'personal'];
-  const open = (page) => { if (!user && requiresAccount.includes(page)) { onAuthRequired?.(); return; } if (page === 'saved' && onNavigate) { onNavigate('saved'); return; } setSubPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  if (subPage === 'listings' || subPage === 'sold') return <ListingManager user={user} onBack={() => setSubPage('main')} tab={subPage === 'sold' ? 'Sold' : listingTab} setTab={setListingTab} onDemoAction={onDemoAction} onCreateListing={onCreateListing} onEditListing={onEditListing} />;
-  if (subPage !== 'main') return <SimpleInfoPage page={{ ...subpages[subPage], key: subPage }} onBack={() => setSubPage('main')} onDemoAction={onDemoAction} isDark={isDark} onToggleTheme={onToggleTheme} user={user} onAuthRequired={onAuthRequired} onSignOut={onSignOut} />;
-  const profileStats = [
-    { label: 'Listings', value: statsLoading ? '…' : stats?.listings ?? 0, page: 'listings' },
-    { label: 'Sold', value: statsLoading ? '…' : stats?.sold ?? 0, page: 'sold' },
-    { label: 'Saved', value: statsLoading ? '…' : stats?.saved ?? 0, page: 'saved' },
-  ];
-  return <div className="page-stack profile-page premium-profile"><section className="profile-cover"><div className="profile-heading"><Avatar initials={profileInitials} tone="navy" size="xl" /><div className="profile-identity"><div className="profile-name-row"><h1>{displayName}</h1>{user && <VerifiedBadge text="Account" />}</div><span className="profile-username">{username}</span><div className="product-meta"><MapPin size={13} /> {profileLocation}</div><div className="seller-stats"><Star size={13} fill="currentColor" /> {stats?.rating ? stats.rating.toFixed(1) : 'New'} <span>•</span> {stats?.reviews || 0} reviews</div></div><button className="outline-button" onClick={() => user ? open('personal') : onAuthRequired?.()}><Pencil size={14} /> {user ? 'Edit profile' : 'Sign in'}</button></div></section><div className="profile-stats">{profileStats.map((stat) => <button key={stat.label} onClick={() => open(stat.page)}><strong>{stat.value}</strong><span>{stat.label}</span></button>)}</div><section><SectionLabel eyebrow="YOUR ACTIVITY" title="My Marketplace" /><div className="profile-menu-grid">{marketplaceItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}{isAdmin && <ProfileMenuCard item={{ label: 'Admin Moderation', description: 'Review pending seller listings', icon: ShieldCheck, page: 'admin', tone: 'coral' }} onOpen={onOpenAdmin} />}</div></section><section><SectionLabel eyebrow="YOUR DETAILS" title="Account" /><div className="profile-list-card">{[['personal','Personal Information',displayName,UserRound],['language','Language','English',Globe2]].map(([page, label, detail, Icon]) => <button key={page} onClick={() => open(page)}><span className="profile-list-icon"><Icon size={16} /></span><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight size={15} /></button>)}</div></section><section><SectionLabel eyebrow="PREFERENCES" title="Make it yours" /><div className="profile-list-card">{[['appearance','Appearance',isDark ? 'Dark mode' : 'Light mode',Moon],['privacy','Privacy','Profile and recommendations',Eye]].map(([page, label, detail, Icon]) => <button key={page} onClick={() => open(page)}><span className="profile-list-icon"><Icon size={16} /></span><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight size={15} /></button>)}</div></section><section><SectionLabel eyebrow="HELP & SAFETY" title="Need help?" /><div className="profile-list-card">{[['help','Help Center','Find answers and guidance',CircleHelp],['safety','Safety Center','Trade with more confidence',ShieldCheck]].map(([page, label, detail, Icon]) => <button key={page} onClick={() => open(page)}><span className="profile-list-icon"><Icon size={16} /></span><span><strong>{label}</strong><small>{detail}</small></span><ChevronRight size={15} /></button>)}</div></section><section><SectionLabel eyebrow="LEGAL" title="Before you use bese26" /><div className="profile-list-card">{[['terms','Terms & Conditions',FileText],['privacy-policy','Privacy Policy',BookOpen],['prohibited','Prohibited Items',ShieldCheck]].map(([page, label, Icon]) => <button key={page} onClick={() => open(page)}><span className="profile-list-icon"><Icon size={16} /></span><span><strong>{label}</strong><small>Marketplace policy</small></span><ChevronRight size={15} /></button>)}</div></section><section className="profile-account-actions"><button onClick={() => open('logout')}><LogOut size={16} /> Logout</button></section></div>;
+  useEffect(() => { let mounted = true; const requestId = ++profileRequest.current; if (!user) { setStats(null); setProfileRecord(null); setProfileContacts(null); return undefined; } setLoading(true); Promise.all([fetchSellerStats(user.id), getProfile(user.id), getProfileContacts(user.id)]).then(([nextStats, nextProfile, nextContacts]) => { if (mounted && requestId === profileRequest.current) { setStats(nextStats); setProfileRecord(nextProfile); setProfileContacts(nextContacts); } }).catch((error) => mounted && onDemoAction(error.message || 'Could not load your profile.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user, onDemoAction]);
+  const open = (page) => { if (!user && !['about', 'terms', 'privacy-policy', 'prohibited', 'help', 'safety'].includes(page)) { onAuthRequired?.(); return; } if (page === 'saved' && onNavigate) { onNavigate('saved'); return; } if (page === 'admin') { onOpenAdmin?.(); return; } setSubPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const displayName = profileRecord?.display_name || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Your Bese26 profile';
+  const username = profileRecord?.username ? `@${profileRecord.username}` : user?.user_metadata?.username ? `@${user.user_metadata.username}` : user ? 'Username not set' : 'Sign in to personalize your profile';
+  const profileLocation = [profileRecord?.city, profileRecord?.state, profileRecord?.country].filter(Boolean).join(', ') || 'Location not set';
+  const completionItems = useMemo(() => user ? [{ label: 'Profile photo', done: Boolean(profileRecord?.avatar_path) }, { label: 'Phone number', done: Boolean(profileContacts?.phone) }, { label: 'Location', done: Boolean(profileRecord?.city && profileRecord?.state) }, { label: 'Bio', done: Boolean(profileRecord?.bio) }, { label: 'Verified email', done: Boolean(user.email_confirmed_at) }] : [], [profileContacts, profileRecord, user]);
+  const completion = completionItems.length ? Math.round((completionItems.filter((item) => item.done).length / completionItems.length) * 100) : 0;
+  if (subPage === 'listings' || subPage === 'sold' || subPage === 'drafts') return <ListingManager user={user} onBack={() => setSubPage('main')} tab={subPage === 'sold' ? 'Sold' : subPage === 'drafts' ? 'Drafts' : listingTab} setTab={setListingTab} onCreateListing={onCreateListing} onEditListing={onEditListing} onOpenListing={onOpenListing} />;
+  if (subPage === 'saved') return <SavedItemsPage user={user} onBack={() => setSubPage('main')} onOpenListing={onOpenListing} onToggleSave={onToggleSave} />;
+  if (subPage === 'reviews') return <ReviewsPage user={user} onBack={() => setSubPage('main')} />;
+  if (subPage === 'analytics') return <AnalyticsPage user={user} onBack={() => setSubPage('main')} />;
+  if (subPage === 'notifications') return <NotificationPage user={user} onBack={() => setSubPage('main')} />;
+  if (subPage === 'personal') return <PersonalPage user={user} profile={profileRecord} onBack={() => setSubPage('main')} onAuthRequired={onAuthRequired} onSaved={(nextProfile) => { setProfileRecord(nextProfile); onDemoAction('Profile changes saved successfully.'); }} />;
+  if (['language', 'notification-settings', 'privacy', 'communication', 'appearance'].includes(subPage)) return <SettingsPage page={{ ...pageDefinitions[subPage], key: subPage }} user={user} onBack={() => setSubPage('main')} isDark={isDark} onToggleTheme={onToggleTheme} onNotice={onDemoAction} />;
+  if (subPage === 'help') return <HelpPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'safety') return <SafetyPage onBack={() => setSubPage('main')} />;
+  if (['terms', 'privacy-policy', 'prohibited'].includes(subPage)) return <PolicyPage page={{ key: subPage }} onBack={() => setSubPage('main')} />;
+  if (subPage === 'about') return <AboutPage onBack={() => setSubPage('main')} />;
+  if (subPage === 'security' || ['saved-searches', 'recently-viewed', 'business', 'verification', 'wallet', 'subscription', 'boosting', 'payment-history', 'blocked', 'reports', 'support'].includes(subPage)) return <UnavailablePage page={pageDefinitions[subPage]} onBack={() => setSubPage('main')} />;
+  if (subPage !== 'main') return <UnavailablePage page={pageDefinitions[subPage] || { title: subPage, eyebrow: 'BESE26' }} onBack={() => setSubPage('main')} />;
+
+  const statsCards = [{ label: 'Listings', value: loading ? '…' : stats?.listings ?? 0, page: 'listings' }, { label: 'Sold', value: loading ? '…' : stats?.sold ?? 0, page: 'sold' }, { label: 'Saved', value: loading ? '…' : stats?.saved ?? 0, page: 'saved' }, { label: 'Views', value: loading ? '…' : stats?.views ?? 0, page: 'analytics' }];
+  const marketplaceItems = [{ label: 'My Listings', description: 'Manage real listings and review status', icon: Package, page: 'listings', tone: 'coral' }, { label: 'Saved Items', description: 'Your saved marketplace listings', icon: Heart, page: 'saved', tone: 'lavender' }, { label: 'Drafts', description: 'Continue listings saved from Sell', icon: FileText, page: 'drafts', tone: 'gold' }, { label: 'Sold Items', description: 'Listings marked as sold', icon: Tag, page: 'sold', tone: 'mint' }, { label: 'Saved Searches', description: 'Search alerts are not connected yet', icon: Save, page: 'saved-searches', tone: 'navy' }, { label: 'Recently Viewed', description: 'History is not persisted yet', icon: Clock3, page: 'recently-viewed', tone: 'navy' }];
+  const sellerItems = [{ label: 'Seller Analytics', description: 'Real views, inquiries, and listing counts', icon: BarChart3, page: 'analytics', tone: 'coral' }, { label: 'Business Profile', description: 'Verified business records not connected', icon: Store, page: 'business', tone: 'gold' }, { label: 'Verification & Trust', description: profileRecord?.is_verified ? 'Verified by the account record' : 'Current status: not verified', icon: ShieldCheck, page: 'verification', tone: 'mint' }, { label: 'Reviews', description: `${stats?.reviews || 0} real review${stats?.reviews === 1 ? '' : 's'}`, icon: Star, page: 'reviews', tone: 'lavender' }];
+  const accountItems = [{ label: 'Personal Information', description: `${displayName} · ${profileLocation}`, icon: UserRound, page: 'personal', tone: 'coral' }, { label: 'Login & Security', description: 'Supabase Auth and account sign-out', icon: LockKeyhole, page: 'security', tone: 'navy' }];
+  const preferenceItems = [{ label: 'Language & Region', description: 'English · Nigeria · NGN', icon: Globe2, page: 'language', tone: 'navy' }, { label: 'Notifications', description: 'Read your real account updates', icon: Bell, page: 'notifications', tone: 'coral' }, { label: 'Notification Preferences', description: 'Control non-critical updates', icon: Bell, page: 'notification-settings', tone: 'lavender' }, { label: 'Privacy', description: 'Profile and location visibility', icon: Eye, page: 'privacy', tone: 'mint' }, { label: 'Communication', description: 'Calls, WhatsApp, and buyer messages', icon: MessageCircle, page: 'communication', tone: 'gold' }, { label: 'Appearance', description: isDark ? 'Dark mode' : 'Light mode', icon: Moon, page: 'appearance', tone: 'navy' }];
+  const paymentItems = [{ label: 'Wallet', description: 'No balance shown until connected', icon: WalletCards, page: 'wallet', tone: 'coral' }, { label: 'Subscription', description: 'Plans and limits not connected', icon: Tag, page: 'subscription', tone: 'lavender' }, { label: 'Boosting', description: 'Promotion service not connected', icon: ArrowRight, page: 'boosting', tone: 'gold' }, { label: 'Payment History', description: 'Transaction ledger not connected', icon: FileText, page: 'payment-history', tone: 'navy' }];
+  const safetyItems = [{ label: 'Safety Center', description: 'Safe buying and selling guidance', icon: ShieldCheck, page: 'safety', tone: 'mint' }, { label: 'Blocked Users', description: 'Blocking backend not connected', icon: Users, page: 'blocked', tone: 'navy' }, { label: 'Reports', description: 'Moderation report flow not connected', icon: AlertCircle, page: 'reports', tone: 'coral' }];
+  return <div className="page-stack profile-page premium-profile account-center"><section className="profile-cover"><div className="profile-heading"><Avatar name={displayName} path={profileRecord?.avatar_path} size="xl" /><div className="profile-identity"><div className="profile-name-row"><h1>{displayName}</h1><VerifiedBadge verified={Boolean(profileRecord?.is_verified)} /></div><span className="profile-username">{username}</span><span className="profile-account-type">{profileRecord?.account_type || 'Account type not set'}</span><div className="product-meta"><MapPin size={13} /> {profileLocation}</div><div className="seller-stats"><Star size={13} fill="currentColor" /> {stats?.rating ? stats.rating.toFixed(1) : 'No rating yet'} <span>•</span> {stats?.reviews || 0} reviews <span>•</span> Member since {profileRecord?.created_at ? new Date(profileRecord.created_at).getFullYear() : '—'}</div></div><button type="button" className="outline-button" onClick={() => user ? open('personal') : onAuthRequired?.()}><Pencil size={14} /> {user ? 'Edit profile' : 'Sign in'}</button></div>{user && <div className="profile-cover-bottom"><span>{profileRecord?.bio || 'Add a short bio to help buyers know you.'}</span><span><VerifiedBadge verified={Boolean(profileRecord?.is_verified)} /></span></div>}</section>{user && <section className="profile-completion"><div><div className="eyebrow">PROFILE COMPLETION</div><strong>{completion}% complete</strong><span>{completionItems.filter((item) => !item.done).map((item) => item.label).join(' · ') || 'Your profile is complete.'}</span></div><div className="completion-track"><span style={{ width: `${completion}%` }} /></div><button type="button" className="text-action" onClick={() => open('personal')}>Complete profile <ArrowRight size={14} /></button></section>}<div className="profile-stats">{statsCards.map((stat) => <button type="button" key={stat.label} onClick={() => open(stat.page)}><strong>{stat.value}</strong><span>{stat.label}</span></button>)}</div><section><SectionLabel eyebrow="YOUR MARKETPLACE" title="Marketplace" /><div className="profile-menu-grid">{marketplaceItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}{isAdmin && <ProfileMenuCard item={{ label: 'Admin Moderation', description: 'Review seller listings securely', icon: ShieldCheck, page: 'admin', tone: 'coral' }} onOpen={open} />}</div></section><section><SectionLabel eyebrow="SELLER TOOLS" title="Grow with confidence" /><div className="profile-menu-grid">{sellerItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section><SectionLabel eyebrow="ACCOUNT" title="Your account" /><div className="profile-menu-grid">{accountItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section><SectionLabel eyebrow="PREFERENCES" title="Make it yours" /><div className="profile-menu-grid">{preferenceItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section><SectionLabel eyebrow="PAYMENTS & SERVICES" title="Services" /><div className="profile-menu-grid">{paymentItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section><SectionLabel eyebrow="TRUST & SAFETY" title="Stay safe" /><div className="profile-menu-grid">{safetyItems.map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section><SectionLabel eyebrow="SUPPORT & LEGAL" title="Need help?" /><div className="profile-menu-grid">{[{ label: 'Help Center', description: 'Answers for buying, selling, and safety', icon: CircleHelp, page: 'help', tone: 'navy' }, { label: 'Contact Support', description: 'Support tickets are not connected yet', icon: MessageCircle, page: 'support', tone: 'coral' }, { label: 'Terms & Conditions', description: 'Marketplace rules', icon: FileText, page: 'terms', tone: 'gold' }, { label: 'Privacy Policy', description: 'How Bese26 uses account data', icon: BookOpen, page: 'privacy-policy', tone: 'lavender' }, { label: 'Prohibited Items', description: 'What cannot be listed', icon: ShieldCheck, page: 'prohibited', tone: 'mint' }, { label: 'About Bese26', description: 'Mission and current version', icon: Info, page: 'about', tone: 'navy' }].map((item) => <ProfileMenuCard item={item} onOpen={open} key={item.label} />)}</div></section><section className="profile-account-actions"><button type="button" onClick={() => open('logout')}><LogOut size={16} /> Logout</button><button type="button" onClick={() => open('delete-account')}><Trash2 size={16} /> Delete account</button></section></div>;
 }
