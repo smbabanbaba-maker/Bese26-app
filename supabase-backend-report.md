@@ -42,3 +42,14 @@ Messages now loads real participant-scoped conversations and persisted messages 
 ## Jiji-style moderation follow-up
 
 The moderation center now presents Pending, Approved, and Rejected tabs backed by `listing_moderation_events`. After the location-field query fix, the authenticated production admin session loaded Pending 0, Approved 5, and Rejected 0 without errors; the Approved tab displayed five reviewed listings, and Home displayed five approved live listings. This check did not perform a new state-changing action. The workflow mirrors the documented Jiji lifecycle—submission stays out of public search until review—while keeping Bese26’s admin authorization and audit trail under its own implementation.
+
+
+## Review-loop, notifications, and policy expansion
+
+The seller review loop now supports correction without duplicate listings. The secure `revise_rejected_listing` RPC accepts only the listing owner, only when the listing is `rejected/rejected`, updates the submitted fields, clears the rejection reason, and returns the same listing to `pending/pending`. It cannot approve or publish a listing. My Listings now exposes a clear **Rejected** tab with the stored review feedback and an **Edit & resubmit** action that opens the same listing in the continuous Sell form.
+
+The protected `moderate_listing` RPC now creates a recipient-scoped notification for the seller after an approve or reject decision. The frontend notification bell reads only the signed-in user’s notifications, marks only that user’s rows as read, and subscribes to inserts through Supabase Realtime. The database supports a controlled `moderator` role alongside `admin`; no additional moderator has been assigned. Profile role columns are excluded from ordinary self-service update grants.
+
+Profile now includes explicit Terms & Conditions, Privacy Policy, Safety Center, and Prohibited Items guidance. Wallet, payments, subscriptions, delivery checkout, AI, and promotion mechanics remain deferred and are not represented as live functionality.
+
+The expanded implementation passes the local Vite build and `git diff --check`. A new live state-changing approve/reject/resubmit sequence still requires explicit owner-authorized testing; this report does not claim that sequence has been performed.

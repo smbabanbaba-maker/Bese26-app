@@ -176,7 +176,7 @@ export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
 export async function isAdminUser(userId) {
   failIfUnavailable();
   if (!userId) return false;
-  const { data, error } = await supabase.rpc('current_user_is_admin');
+  const { data, error } = await supabase.rpc('current_user_can_moderate');
   if (error) throw error;
   return data === true;
 }
@@ -199,6 +199,31 @@ export async function moderateListing({ listingId, action, rejectionReason = nul
   return data;
 }
 
+export async function reviseRejectedListing({ listingId, values }) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('revise_rejected_listing', {
+    p_listing_id: listingId,
+    p_category_id: values.categoryId,
+    p_subcategory_id: values.subcategoryId || null,
+    p_title: values.title,
+    p_description: values.description,
+    p_price: values.price,
+    p_city: values.city,
+    p_state: values.state,
+    p_currency: values.currency || 'NGN',
+    p_pricing_type: values.pricingType || 'fixed',
+    p_condition: values.condition || null,
+    p_quantity: values.quantity || null,
+    p_unit: values.unit || null,
+    p_country: values.country || 'Nigeria',
+    p_delivery_options: values.deliveryOptions || [],
+    p_contact_preference: values.contactPreference || 'chat',
+    p_attributes: values.attributes || {},
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchModerationHistory() {
   failIfUnavailable();
   const { data, error } = await supabase
@@ -208,6 +233,27 @@ export async function fetchModerationHistory() {
     .limit(100);
   if (error) throw error;
   return data || [];
+}
+
+export async function fetchNotifications(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('notifications').select('id,notification_type,title,body,data,read_at,created_at').eq('recipient_id', userId).order('created_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function markNotificationRead(notificationId, userId) {
+  failIfUnavailable();
+  if (!notificationId || !userId) return;
+  const { error } = await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', notificationId).eq('recipient_id', userId);
+  if (error) throw error;
+}
+
+export function subscribeToNotifications(userId, onInsert) {
+  if (!supabase || !userId) return () => {};
+  const channel = supabase.channel(`notifications:${userId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert).subscribe();
+  return () => { supabase.removeChannel(channel); };
 }
 
 export async function fetchSellerStats(userId) {

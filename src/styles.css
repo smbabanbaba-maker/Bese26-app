@@ -680,3 +680,36 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .admin-status-tabs button { flex: 1; padding-inline: 8px; }
   .admin-history-card { padding: 13px; }
 }
+
+.sell-rejection-note { display: flex; align-items: flex-start; gap: 11px; padding: 14px 15px; border: 1px solid #efb4b1; border-radius: 15px; background: #fff5f4; color: #8f211e; }
+.sell-rejection-note > svg { flex: none; margin-top: 2px; }
+.sell-rejection-note strong, .sell-rejection-note p, .sell-rejection-note small { display: block; }
+.sell-rejection-note p { margin: 4px 0; font-size: 13px; line-height: 1.45; }
+.sell-rejection-note small { color: #a85a56; font-size: 11px; line-height: 1.4; }
+.managed-rejection { display: grid; gap: 5px; margin-top: 11px; padding: 10px 11px; border-left: 3px solid #c62828; border-radius: 7px; background: #fff5f4; color: #8f211e; }
+.managed-rejection strong { font-size: 11px; }
+.managed-rejection > span { font-size: 11px; line-height: 1.45; }
+.managed-rejection .secondary-button { justify-self: start; margin-top: 3px; padding: 8px 10px; font-size: 11px; }
+
+.notification-wrap { position: relative; }
+.notification-trigger { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); cursor: pointer; }
+.notification-trigger:hover { border-color: #efb4b1; color: var(--red); }
+.notification-badge { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border: 2px solid var(--bg); border-radius: 99px; background: var(--red); color: #fff; font-size: 8px; font-weight: 800; }
+.notification-panel { position: absolute; z-index: 20; top: calc(100% + 12px); right: 0; width: min(360px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 18px 45px rgba(35, 27, 25, .14); overflow: hidden; }
+.notification-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 15px; border-bottom: 1px solid var(--line); }
+.notification-panel-head strong { display: block; margin-top: 3px; font-size: 14px; }
+.notification-list { max-height: 350px; overflow-y: auto; }
+.notification-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 12px 15px; border: 0; border-bottom: 1px solid var(--line); background: var(--card); text-align: left; cursor: pointer; }
+.notification-row:last-child { border-bottom: 0; }
+.notification-row:hover, .notification-row.unread { background: #fff8f7; }
+.notification-row-icon { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 10px; background: #fff0ee; color: var(--red); }
+.notification-row > span:last-child { display: grid; gap: 3px; min-width: 0; }
+.notification-row strong { color: var(--ink); font-size: 11px; line-height: 1.35; }
+.notification-row small { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.notification-row em { color: #a9a0a0; font-size: 9px; font-style: normal; }
+.notification-empty { display: grid; justify-items: center; gap: 6px; padding: 32px 18px; color: var(--muted); text-align: center; font-size: 11px; }
+.notification-empty svg { color: var(--red); }
+.notification-empty strong { color: var(--ink); font-size: 13px; }
+@media (max-width: 620px) {
+  .notification-panel { position: fixed; top: 62px; right: 16px; }
+}

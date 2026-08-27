@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
+  Bell,
   Bookmark,
   CarFront,
   Check,
@@ -41,7 +42,7 @@ import AdminView from './components/AdminView';
 import SellView from './components/SellView';
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, getOrCreateConversation, isAdminUser, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
+import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, fetchNotifications, getOrCreateConversation, isAdminUser, markNotificationRead, sendMessage, signOut, subscribeToMessages, subscribeToNotifications, toggleFavorite } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -88,6 +89,43 @@ function Avatar({ initials, tone = 'rose', size = 'md' }) {
 
 function VerifiedBadge({ text = 'Verified' }) {
   return <span className="verified-badge"><BadgeCheck size={13} strokeWidth={2.6} /> {text}</span>;
+}
+
+function notificationTime(value) {
+  if (!value) return 'Just now';
+  const date = new Date(value);
+  const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+  return date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
+}
+
+function NotificationBell({ user, onAuthRequired, onNotice, onNavigate }) {
+  const [notifications, setNotifications] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const unreadCount = notifications.filter((item) => !item.read_at).length;
+  useEffect(() => {
+    let mounted = true;
+    if (!user) { setNotifications([]); return undefined; }
+    setLoading(true);
+    fetchNotifications(user.id).then((rows) => mounted && setNotifications(rows)).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false));
+    const unsubscribe = subscribeToNotifications(user.id, (payload) => {
+      if (!mounted || !payload?.new) return;
+      setNotifications((current) => [payload.new, ...current.filter((item) => item.id !== payload.new.id)].slice(0, 50));
+      onNotice?.('You have a new notification.');
+    });
+    return () => { mounted = false; unsubscribe(); };
+  }, [user?.id]);
+  const openNotification = async (notification) => {
+    if (!notification.read_at) {
+      try { await markNotificationRead(notification.id, user.id); setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item)); } catch { /* the notification remains visible if marking read fails */ }
+    }
+    if (notification.data?.listing_id) onNavigate?.('profile');
+    setOpen(false);
+  };
+  return <div className="notification-wrap"><button type="button" className="notification-trigger" aria-label={user ? 'Open notifications' : 'Sign in for notifications'} onClick={() => user ? setOpen((value) => !value) : onAuthRequired?.()}><Bell size={18} />{user && unreadCount > 0 && <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>}</button>{open && user && <div className="notification-panel"><div className="notification-panel-head"><div><div className="eyebrow">ACCOUNT UPDATES</div><strong>Notifications</strong></div><button type="button" className="icon-button" onClick={() => setOpen(false)} aria-label="Close notifications"><X size={16} /></button></div>{loading ? <div className="notification-empty">Loading notifications…</div> : notifications.length ? <div className="notification-list">{notifications.map((notification) => <button type="button" className={`notification-row ${notification.read_at ? '' : 'unread'}`} key={notification.id} onClick={() => openNotification(notification)}><span className="notification-row-icon"><Bell size={15} /></span><span><strong>{notification.title}</strong><small>{notification.body}</small><em>{notificationTime(notification.created_at)}</em></span></button>)}</div> : <div className="notification-empty"><Bell size={23} /><strong>No notifications yet</strong><span>Listing reviews and new messages will appear here.</span></div>}</div>}</div>;
 }
 
 function SectionHeading({ eyebrow, title, action, onAction }) {
@@ -296,6 +334,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [chatListing, setChatListing] = useState(null);
+  const [editingListing, setEditingListing] = useState(null);
 
   const showToast = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
   const requireAuth = (message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); };
@@ -344,7 +383,7 @@ export default function App() {
     });
     return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
-  const navigate = (page) => { if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const navigate = (page) => { if (page !== 'sell') setEditingListing(null); if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const goSearch = (value) => { setSearch(value); navigate('search'); };
   const openChat = async (listing) => {
     if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Sign in to chat with this seller.'); return; }
@@ -364,14 +403,14 @@ export default function App() {
     if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} />;
-    if (activeNav === 'sell') return <SellView user={sessionUser} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
+    if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} />;
-    if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} />;
-    return <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} isActive={activeNav === 'profile'} isAdmin={isAdmin} onOpenAdmin={() => navigate('admin')} />;
+    if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} onEditListing={(listing) => { setEditingListing(listing); navigate('sell'); }} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} />;
+    return <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} onEditListing={(listing) => { setEditingListing(listing); navigate('sell'); }} isActive={activeNav === 'profile'} isAdmin={isAdmin} onOpenAdmin={() => navigate('admin')} />;
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <header className="topbar"><div className="topbar-inner"><button className="mobile-menu icon-button"><Menu size={20} /></button><Logo /><div className="desktop-location"><MapPin size={15} /><span>Marketplace</span><strong>Nigeria</strong><ChevronDown size={14} /></div><div className="topbar-actions"><button className="topbar-search" onClick={() => navigate('search')}><Search size={17} /><span>Search listings</span><kbd>⌘ K</kbd></button><button type="button" className="topbar-avatar-button" onClick={() => sessionUser ? navigate('profile') : setShowAuth(true)} aria-label={sessionUser ? 'Open profile' : 'Sign in'}><Avatar initials={sessionUser ? (sessionUser.user_metadata?.display_name || sessionUser.email || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'MA'} tone="navy" /></button></div></div></header>
+    <header className="topbar"><div className="topbar-inner"><button className="mobile-menu icon-button"><Menu size={20} /></button><Logo /><div className="desktop-location"><MapPin size={15} /><span>Marketplace</span><strong>Nigeria</strong><ChevronDown size={14} /></div><div className="topbar-actions"><button className="topbar-search" onClick={() => navigate('search')}><Search size={17} /><span>Search listings</span><kbd>⌘ K</kbd></button><NotificationBell user={sessionUser} onAuthRequired={() => requireAuth('Sign in to receive marketplace notifications.')} onNotice={showToast} onNavigate={navigate} /><button type="button" className="topbar-avatar-button" onClick={() => sessionUser ? navigate('profile') : setShowAuth(true)} aria-label={sessionUser ? 'Open profile' : 'Sign in'}><Avatar initials={sessionUser ? (sessionUser.user_metadata?.display_name || sessionUser.email || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'MA'} tone="navy" /></button></div></div></header>
     <main className="main-container">{renderView()}</main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
