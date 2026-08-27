@@ -19,3 +19,10 @@ The latest production session still authenticated as the admin. Home showed five
 ## Final Jiji-style production check
 
 After deployment of commit `725f473`, the authenticated admin opened **Profile → Admin Moderation**. The live page displayed the three status tabs: **Pending 0**, **Approved 5**, and **Rejected 0**. The Approved tab showed five reviewed listings with their review timestamps and Kano locations. The Rejected tab loaded its truthful empty state. Home simultaneously showed five approved live listings. No new state-changing action was performed during this check.
+
+
+## Review-loop and notification deployment check
+
+Commit `f79439b` is deployed at `https://bese26-app.vercel.app/`; the live HTML served asset fingerprints `index-C5gF3HzD.js` and `index-CrUDfcDr.css`. The signed-out production shell displayed the real notification bell with the label **Sign in for notifications**, kept the five-item core bottom navigation, and reported no horizontal overflow (`document.scrollWidth` was below the viewport width). The live shell continued to show a truthful empty state for zero approved listings in that browser session.
+
+The authenticated seller revision and moderation-notification state transitions are implemented in Supabase and the frontend, but no new approve, reject, or resubmit action was performed during this deployment check. A live notification delivery test should be performed after the owner authorizes one real moderation action on a known test listing.
