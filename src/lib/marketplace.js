@@ -106,7 +106,7 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
   if (!supabase) return [];
   let query = supabase
     .from('listings')
-    .select('*, profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating), category:categories!listings_category_id_fkey(name), subcategory:categories!listings_subcategory_id_fkey(name), listing_media(id,storage_path,media_type,sort_order)')
+    .select(listingSelect)
     .eq('status', 'active')
     .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
@@ -134,6 +134,50 @@ export async function fetchSavedIds(userId) {
   const { data, error } = await supabase.from('listing_favorites').select('listing_id').eq('user_id', userId).limit(200);
   if (error) throw error;
   return (data || []).map((item) => item.listing_id);
+}
+
+const listingSelect = '*, profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating), category:categories!listings_category_id_fkey(name), subcategory:categories!listings_subcategory_id_fkey(name), listing_media(id,storage_path,media_type,sort_order)';
+
+async function hydrateListingRows(rows = []) {
+  return Promise.all(rows.map(async (row) => {
+    const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
+    const signedUrls = await Promise.all(media.map((item) => getListingMediaUrl(item.storage_path)));
+    return mapListing({ ...row, listing_media: media.map((item, index) => ({ ...item, signed_url: signedUrls[index] })) });
+  }));
+}
+
+export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
+  failIfUnavailable();
+  if (!sellerId) return [];
+  let query = supabase.from('listings').select(listingSelect).eq('seller_id', sellerId).order('updated_at', { ascending: false }).limit(200);
+  if (status === 'active') query = query.eq('status', 'active');
+  if (status === 'pending') query = query.in('status', ['draft', 'pending']);
+  if (status === 'sold') query = query.eq('status', 'sold');
+  if (status === 'archived') query = query.in('status', ['archived', 'rejected']);
+  const { data, error } = await query;
+  if (error) throw error;
+  return hydrateListingRows(data || []);
+}
+
+export async function fetchSellerStats(userId) {
+  failIfUnavailable();
+  if (!userId) return { listings: 0, sold: 0, saved: 0, reviews: 0, rating: 0, views: 0 };
+  const [{ data: listingRows, error: listingError }, savedIds, { data: profile, error: profileError }] = await Promise.all([
+    supabase.from('listings').select('id,status,views_count').eq('seller_id', userId).limit(1000),
+    fetchSavedIds(userId),
+    supabase.from('profiles').select('seller_rating,seller_rating_count').eq('id', userId).maybeSingle(),
+  ]);
+  if (listingError) throw listingError;
+  if (profileError) throw profileError;
+  const rows = listingRows || [];
+  return {
+    listings: rows.length,
+    sold: rows.filter((row) => row.status === 'sold').length,
+    saved: savedIds.length,
+    reviews: Number(profile?.seller_rating_count || 0),
+    rating: Number(profile?.seller_rating || 0),
+    views: rows.reduce((total, row) => total + Number(row.views_count || 0), 0),
+  };
 }
 
 export async function toggleFavorite(userId, listingId, shouldSave) {

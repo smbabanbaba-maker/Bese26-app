@@ -18,7 +18,7 @@ The existing demo data remains as a deliberate fallback while each live flow is 
 | Sell | One continuous vertical form with category-aware fields, local validation, draft persistence, listing insertion with `pending` moderation status, and Storage upload helpers. |
 | Auth | Passwordless Email OTP panel: request a six-digit code, verify it, resend it, or change email. The Supabase **Magic link or OTP** template must contain `{{ .Token }}`; Google OAuth and phone/SMS OTP are intentionally not enabled. SMTP delivery remains an external configuration that must be tested with a real inbox. |
 | Messages | Existing polished demo conversation UI remains in place while the database conversation and Realtime layer is wired and tested incrementally. |
-| Wallet, AI, Profile, Notifications | Existing UI remains available, but production persistence and privileged workflows are future integration slices. |
+| Wallet, AI, Profile, Notifications | Profile identity, seller statistics, and My Listings use authenticated Supabase reads; Wallet, some analytics/promotions, and notification persistence remain future integration slices. |
 
 ## Supabase architecture
 
@@ -68,10 +68,11 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 
 1. **Completed foundation:** Supabase project verification, marketplace schema, seed categories, RLS policies, Storage buckets and policies, and Realtime publication entries.
 2. **Completed initial client layer:** Supabase client module, environment template, Email OTP Auth panel, active listing query helper, favorites helper, draft persistence, listing insertion, and media upload helper.
-3. **Next verification slice:** Use a dedicated test account to verify OTP email delivery and code verification, profile bootstrap, seller-only draft and listing mutations, public approved listing reads, Storage uploads, and favorite isolation.
-4. **Next product slice:** Replace the demo Messages screen with database conversations, persisted messages, attachment metadata, and Realtime updates.
-5. **Later slices:** Complete Profile, Notifications, seller moderation/admin tools, review completion rules, AI integration, and production observability.
-6. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
+3. **Completed marketplace account slice:** Authenticated Profile statistics and My Listings now read owner-scoped Supabase rows, with status tabs and a Create new listing action returning to the continuous Sell form.
+4. **Next verification slice:** Use a dedicated test account to verify sign-up/sign-in, profile bootstrap, seller-only draft and listing mutations, public approved listing reads, Storage uploads, and favorite isolation.
+5. **Next product slice:** Replace the remaining demo Wallet and seller analytics/promotions surfaces with persisted marketplace records and moderation-aware workflows.
+6. **Later slices:** Complete Notifications, seller moderation/admin tools, review completion rules, AI integration, and production observability.
+7. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
 
 ## References
 
