@@ -1,4 +1,4 @@
-import { getAvatarUrl, getListingMediaUrl, supabase } from './supabase';
+import { getAvatarUrl, getListingMediaUrls, supabase } from './supabase';
 
 function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
@@ -124,16 +124,12 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     .eq('status', 'active')
     .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(24);
   if (search.trim()) query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
   if (category && category !== 'All') query = query.eq('category.name', category);
   const { data, error } = await query;
   if (error) throw error;
-  return Promise.all((data || []).map(async (row) => {
-    const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
-    const signedUrls = await Promise.all(media.map((item) => getListingMediaUrl(item.storage_path)));
-    return mapListing({ ...row, listing_media: media.map((item, index) => ({ ...item, signed_url: signedUrls[index] })) });
-  }));
+  return hydrateListingRows(data || [], { firstMediaOnly: true });
 }
 
 export async function fetchCategories() {
@@ -150,14 +146,26 @@ export async function fetchSavedIds(userId) {
   return (data || []).map((item) => item.listing_id);
 }
 
-const listingSelect = '*, profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating), category:categories!listings_category_id_fkey(name), subcategory:categories!listings_subcategory_id_fkey(name), listing_media(id,storage_path,media_type,sort_order)';
+const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 
-async function hydrateListingRows(rows = []) {
-  return Promise.all(rows.map(async (row) => {
-    const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
-    const signedUrls = await Promise.all(media.map((item) => getListingMediaUrl(item.storage_path)));
-    return mapListing({ ...row, listing_media: media.map((item, index) => ({ ...item, signed_url: signedUrls[index] })) });
+async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
+  const mediaByRow = rows.map((row) => ({
+    row,
+    media: [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order),
   }));
+  const signedEntries = mediaByRow.flatMap(({ row, media }) => (firstMediaOnly ? media.slice(0, 1) : media).map((item) => ({ key: `${row.id}:${item.storage_path}`, path: item.storage_path })));
+  const signedUrls = await getListingMediaUrls(signedEntries.map((entry) => entry.path));
+  const signedByKey = Object.fromEntries(signedEntries.map((entry, index) => [entry.key, signedUrls[index] || '']));
+  return mediaByRow.map(({ row, media }) => mapListing({ ...row, listing_media: media.map((item) => ({ ...item, signed_url: signedByKey[`${row.id}:${item.storage_path}`] || '' })) }));
+}
+
+export async function fetchListingDetails(listingId) {
+  failIfUnavailable();
+  if (!listingId) return null;
+  const { data, error } = await supabase.from('listings').select(listingSelect).eq('id', listingId).maybeSingle();
+  if (error) throw error;
+  const [listing] = await hydrateListingRows(data ? [data] : []);
+  return listing || null;
 }
 
 export async function fetchMyListings({ sellerId, status = 'all' } = {}) {

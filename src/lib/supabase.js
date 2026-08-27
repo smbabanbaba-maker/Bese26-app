@@ -26,11 +26,11 @@ export function getStoragePublicUrl(bucket, path) {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 
-export async function getListingMediaUrl(path) {
-  if (!supabase || !path) return '';
-  const { data, error } = await supabase.storage.from('listing-media').createSignedUrl(path, 3600);
-  if (error) return '';
-  return data?.signedUrl || '';
+export async function getListingMediaUrls(paths = []) {
+  if (!supabase || !paths.length) return [];
+  const { data, error } = await supabase.storage.from('listing-media').createSignedUrls(paths, 3600);
+  if (error) return [];
+  return (data || []).map((item) => item?.signedUrl || '');
 }
 
 export function getAvatarUrl(path) {

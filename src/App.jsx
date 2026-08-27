@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -36,12 +36,12 @@ import {
   X,
 } from 'lucide-react';
 
-import ProfileView from './components/ProfileView';
-import AdminView from './components/AdminView';
-import SellView from './components/SellView';
+const ProfileView = lazy(() => import('./components/ProfileView'));
+const AdminView = lazy(() => import('./components/AdminView'));
+const SellView = lazy(() => import('./components/SellView'));
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, getOrCreateConversation, isAdminUser, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
+import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, getOrCreateConversation, isAdminUser, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -94,9 +94,9 @@ function SectionHeading({ eyebrow, title, action, onAction }) {
 
 function ProductCard({ listing, onOpen, isSaved, onToggleSave, compact = false }) {
   return (
-    <article className={`product-card ${compact ? 'product-card-compact' : ''}`} onClick={() => onOpen(listing)}>
+    <article className={`product-card ${compact ? 'product-card-compact' : ''}`} role="button" tabIndex={0} aria-label={`Open listing: ${listing.title}`} onClick={() => onOpen(listing)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); onOpen(listing); } }}>
       <div className="product-image-wrap">
-        {listing.image ? <img src={listing.image} alt={listing.title} className="product-image" /> : <div className="product-image-placeholder"><Package size={26} /></div>}
+        {listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" /> : <div className="product-image-placeholder"><Package size={26} /></div>}
         {listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> Promoted</span>}
         <button className={`save-button ${isSaved ? 'saved' : ''}`} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} onClick={(event) => { event.stopPropagation(); onToggleSave(listing.id); }}>
           <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
@@ -203,7 +203,7 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
 function SavedView({ marketListings, savedIds, onOpenListing, onToggleSave }) {
   const saved = marketListings.filter((listing) => savedIds.includes(listing.id));
   return <div className="page-stack"><div className="page-title-row"><div><div className="eyebrow">KEEP AN EYE ON IT</div><h1>Saved</h1></div><span className="count-bubble">{saved.length}</span></div>
-    <section><SectionHeading title="Saved listings" />{saved.length ? <div className="saved-list">{saved.map((listing) => <div className="saved-row" key={listing.id}><div className="saved-row-media" onClick={() => onOpenListing(listing)}>{listing.image ? <img src={listing.image} alt={listing.title} /> : <Package size={20} />}</div><div className="saved-row-copy" onClick={() => onOpenListing(listing)}><strong>{listing.title}</strong><span>{listing.location}</span><b>{listing.price}</b></div><button className="save-button saved" aria-label={`Remove ${listing.title} from saved`} onClick={() => onToggleSave(listing.id)}><Heart size={17} fill="currentColor" /></button></div>)}</div> : <div className="empty-state compact-empty"><Bookmark size={24} /><h3>Your shortlist is empty</h3><p>Approved listings you save will appear here.</p></div>}</section>
+    <section><SectionHeading title="Saved listings" />{saved.length ? <div className="saved-list">{saved.map((listing) => <div className="saved-row" key={listing.id}><div className="saved-row-media" onClick={() => onOpenListing(listing)}>{listing.image ? <img src={listing.image} alt={listing.title} loading="lazy" decoding="async" /> : <Package size={20} />}</div><div className="saved-row-copy" onClick={() => onOpenListing(listing)}><strong>{listing.title}</strong><span>{listing.location}</span><b>{listing.price}</b></div><button className="save-button saved" aria-label={`Remove ${listing.title} from saved`} onClick={() => onToggleSave(listing.id)}><Heart size={17} fill="currentColor" /></button></div>)}</div> : <div className="empty-state compact-empty"><Bookmark size={24} /><h3>Your shortlist is empty</h3><p>Approved listings you save will appear here.</p></div>}</section>
   </div>;
 }
 
@@ -332,6 +332,12 @@ export default function App() {
   }, []);
   const navigate = (page) => { if (page !== 'sell') setEditingListing(null); if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const goSearch = (value) => { setSearch(value); navigate('search'); };
+  const openListing = (listing) => {
+    setSelectedListing(listing);
+    fetchListingDetails(listing.id).then((details) => {
+      if (details) setSelectedListing((current) => current?.id === listing.id ? details : current);
+    }).catch(() => {});
+  };
   const openChat = async (listing) => {
     if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Sign in to chat with this seller.'); return; }
     if (!isSupabaseConfigured) { showToast('Chat is unavailable until the marketplace database is connected.'); return; }
@@ -347,9 +353,9 @@ export default function App() {
   };
 
   const renderView = () => {
-    if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
-    if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
-    if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} />;
+    if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
+    if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'ai') return <UnavailableView icon={Sparkles} eyebrow="AI TOOLS" title="AI tools are coming soon" description="The marketplace assistant is not connected yet. Bese26 will not show invented AI answers or recommendations." onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
@@ -359,8 +365,8 @@ export default function App() {
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <main className="main-container">{renderView()}</main>
-    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
+    <main className="main-container"><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></main>
+    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); showToast('Signed in to bese26.'); }} />}
     <ListingModal listing={selectedListing} onClose={() => setSelectedListing(null)} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} />

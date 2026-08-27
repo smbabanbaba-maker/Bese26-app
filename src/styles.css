@@ -722,3 +722,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .unavailable-card h1 { font-size:27px; margin-bottom:9px; }
 .unavailable-card p { max-width:410px; margin:0 auto 20px; color:var(--muted); font-size:12px; line-height:1.65; }
 @media (max-width:640px) { .unavailable-page { min-height:55vh; } .unavailable-card { padding:27px 20px; border-radius:16px; } .unavailable-card h1 { font-size:23px; } .unavailable-card p { font-size:11px; } }
+
+.route-loading { min-height:52vh; display:grid; place-items:center; color:var(--muted); font-size:12px; letter-spacing:.02em; }
+
+.product-card:focus-visible { outline:3px solid rgba(229,57,53,.25); outline-offset:3px; }
