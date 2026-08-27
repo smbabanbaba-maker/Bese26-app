@@ -52,3 +52,20 @@ Commit `1b81cc4` is on GitHub `main`. Vercel served HTTP 200 with the new assets
 
 
 The production console check returned no output and no runtime error after loading the expanded Profile route.
+
+
+## Follow-up backend audit
+
+The authorized Supabase project currently contains these public tables: `profiles`, `profile_contacts`, `profile_preferences`, `listings`, `listing_media`, `listing_favorites`, `listing_drafts`, `conversations`, `conversation_participants`, `messages`, `reviews`, `notifications`, `categories`, `category_fields`, and `listing_moderation_events`. The live inventory reported 3 profiles, 7 listings, 3 favorites, and 11 listing drafts. There are still no tables for followers, businesses, saved searches, reports, blocks, wallet, subscriptions, boosts, or payment history.
+
+
+## Real workflow expansion
+
+The Profile menu now exposes real Saved Searches, Business Profile, Followers & Following, Blocked Users, and Reports pages. The local unauthenticated smoke check rendered the new labels and continued to show sign-in gating for private actions; unsupported payments remain clearly unavailable.
+
+
+## Full real workflow expansion
+
+A second secure migration added RLS-protected `profile_follows`, `saved_searches`, `business_profiles`, `profile_blocks`, and `user_reports` tables. It also added an authenticated `users_are_blocked` security-definer function and updated conversation read/insert policies so blocked pairs cannot open or read conversations. The frontend now provides real pages for saved-search create/delete, business profile save/read, password update through Supabase Auth, follower/following read, block/unblock, report submission/history, and verification-status read. The local unauthenticated check correctly opens the sign-in modal for private workflows.
+
+The build after this expansion passed with initial JS `452.82 kB` (`129.11 kB gzip`), Profile route chunk `65.10 kB` (`16.65 kB gzip`), and CSS `107.98 kB` (`20.46 kB gzip`).

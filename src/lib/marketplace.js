@@ -88,6 +88,14 @@ export async function signOut() {
   if (error) throw error;
 }
 
+export async function updatePassword(password) {
+  failIfUnavailable();
+  if (!password || password.length < 8) throw new Error('Use a password with at least 8 characters.');
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error) throw error;
+  return data.user;
+}
+
 export async function getProfile(userId) {
   failIfUnavailable();
   const { data, error } = await supabase
@@ -360,6 +368,159 @@ export async function fetchProfileReviews(userId, mode = 'about') {
     .limit(100);
   if (error) throw error;
   return data || [];
+}
+
+export async function fetchSavedSearches(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('saved_searches').select('id,query,category,location,min_price,max_price,filters,alerts_enabled,created_at,updated_at').eq('user_id', userId).order('updated_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function saveSavedSearch(userId, values) {
+  failIfUnavailable();
+  const payload = {
+    ...(values.id ? { id: values.id } : {}),
+    user_id: userId,
+    query: String(values.query || '').trim(),
+    category: values.category || null,
+    location: values.location || null,
+    min_price: values.min_price === '' || values.min_price == null ? null : Number(values.min_price),
+    max_price: values.max_price === '' || values.max_price == null ? null : Number(values.max_price),
+    filters: values.filters || {},
+    alerts_enabled: values.alerts_enabled !== false,
+  };
+  if (!payload.query && !payload.category && !payload.location) throw new Error('Add a search, category, or location before saving.');
+  const { data, error } = await supabase.from('saved_searches').upsert(payload).select('id,query,category,location,min_price,max_price,filters,alerts_enabled,created_at,updated_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteSavedSearch(userId, searchId) {
+  failIfUnavailable();
+  const { error } = await supabase.from('saved_searches').delete().eq('id', searchId).eq('user_id', userId);
+  if (error) throw error;
+}
+
+export async function getBusinessProfile(userId) {
+  failIfUnavailable();
+  if (!userId) return null;
+  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,logo_path,category,description,phone,email,country,state,city,address,business_hours,website,social_links,registration_number,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function saveBusinessProfile(userId, values) {
+  failIfUnavailable();
+  const payload = {
+    profile_id: userId,
+    business_name: String(values.business_name || '').trim(),
+    logo_path: values.logo_path || null,
+    category: values.category || null,
+    description: values.description || null,
+    phone: values.phone || null,
+    email: values.email || null,
+    country: values.country || 'Nigeria',
+    state: values.state || null,
+    city: values.city || null,
+    address: values.address || null,
+    business_hours: values.business_hours || {},
+    website: values.website || null,
+    social_links: values.social_links || {},
+    registration_number: values.registration_number || null,
+  };
+  if (!payload.business_name) throw new Error('Business name is required.');
+  const { data, error } = await supabase.from('business_profiles').upsert(payload).select('profile_id,business_name,logo_path,category,description,phone,email,country,state,city,address,business_hours,website,social_links,registration_number,is_verified,created_at,updated_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchBlockedUsers(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('profile_blocks').select('blocked_id,created_at,blocked:profiles!profile_blocks_blocked_id_fkey(id,display_name,username,avatar_path)').eq('blocker_id', userId).order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function blockUser(userId, blockedId) {
+  failIfUnavailable();
+  if (!blockedId || userId === blockedId) throw new Error('You cannot block this profile.');
+  const { error } = await supabase.from('profile_blocks').insert({ blocker_id: userId, blocked_id: blockedId });
+  if (error) throw error;
+}
+
+export async function unblockUser(userId, blockedId) {
+  failIfUnavailable();
+  const { error } = await supabase.from('profile_blocks').delete().eq('blocker_id', userId).eq('blocked_id', blockedId);
+  if (error) throw error;
+}
+
+export async function submitUserReport(userId, values) {
+  failIfUnavailable();
+  const reason = String(values.reason || '').trim();
+  if (!reason) throw new Error('Choose a report reason.');
+  const { data, error } = await supabase.from('user_reports').insert({ reporter_id: userId, target_type: values.target_type || 'user', target_id: values.target_id || null, reason, description: values.description || null }).select('id,target_type,target_id,reason,description,status,created_at,updated_at').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchMyReports(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('user_reports').select('id,target_type,target_id,reason,description,status,created_at,updated_at').eq('reporter_id', userId).order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getFollowState(userId, targetId) {
+  failIfUnavailable();
+  if (!userId || !targetId || userId === targetId) return { following: false, followers: 0, followingCount: 0 };
+  const [{ data: relation, error: relationError }, { count: followers, error: followerError }, { count: followingCount, error: followingError }] = await Promise.all([
+    supabase.from('profile_follows').select('follower_id').eq('follower_id', userId).eq('following_id', targetId).maybeSingle(),
+    supabase.from('profile_follows').select('follower_id', { count: 'exact', head: true }).eq('following_id', targetId),
+    supabase.from('profile_follows').select('following_id', { count: 'exact', head: true }).eq('follower_id', targetId),
+  ]);
+  if (relationError) throw relationError;
+  if (followerError) throw followerError;
+  if (followingError) throw followingError;
+  return { following: Boolean(relation), followers: followers || 0, followingCount: followingCount || 0 };
+}
+
+export async function toggleFollow(userId, targetId, shouldFollow) {
+  failIfUnavailable();
+  if (!targetId || userId === targetId) throw new Error('You cannot follow this profile.');
+  if (shouldFollow) {
+    const { error } = await supabase.from('profile_follows').upsert({ follower_id: userId, following_id: targetId }, { onConflict: 'follower_id,following_id' });
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from('profile_follows').delete().eq('follower_id', userId).eq('following_id', targetId);
+    if (error) throw error;
+  }
+}
+
+export async function fetchProfileRelations(userId, mode = 'followers') {
+  failIfUnavailable();
+  if (!userId) return [];
+  const isFollowers = mode === 'followers';
+  const column = isFollowers ? 'following_id' : 'follower_id';
+  const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,is_verified)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,is_verified)';
+  const { data, error } = await supabase.from('profile_follows').select(`follower_id,following_id,created_at,${relation}`).eq(column, userId).order('created_at', { ascending: false }).limit(200);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchFollowSummary(userId) {
+  failIfUnavailable();
+  if (!userId) return { followers: 0, following: 0 };
+  const [{ count: followers, error: followersError }, { count: following, error: followingError }] = await Promise.all([
+    supabase.from('profile_follows').select('follower_id', { count: 'exact', head: true }).eq('following_id', userId),
+    supabase.from('profile_follows').select('following_id', { count: 'exact', head: true }).eq('follower_id', userId),
+  ]);
+  if (followersError) throw followersError;
+  if (followingError) throw followingError;
+  return { followers: followers || 0, following: following || 0 };
 }
 
 export async function toggleFavorite(userId, listingId, shouldSave) {
