@@ -15,3 +15,8 @@ The public listing query was reduced from 50 to 24 rows, its select list now nam
 ## Accessibility and runtime smoke test
 
 The optimized local Home rendered all seven bottom navigation items and seven real approved listings. Product cards now expose keyboard semantics with `role="button"`, `tabIndex="0"`, Enter/Space activation, and visible focus styling. Navigation buttons expose `aria-current` for the active page. The browser console showed no runtime errors during Home load and listing-detail navigation.
+
+
+## Production verification
+
+Commit `7769071` deployed to `https://bese26-app.vercel.app/?v=7769071` with HTTP 200. The served initial JavaScript asset was `index-B6w3BxlE.js`; route chunks for Admin, Sell, and Profile remain split in the build. Production rendered seven real approved listings, the fixed seven-item navigation, and no console output or runtime error during the smoke check.
