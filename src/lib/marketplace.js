@@ -545,11 +545,39 @@ export async function saveListingDraft({ id, sellerId, title, payload }) {
   return data;
 }
 
+export async function fetchSellerEntitlement() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('get_seller_entitlement');
+  if (error) throw error;
+  return data?.[0] || { plan_key: 'free', subscription_status: 'inactive', is_paid: false, free_posts_limit: 3, free_posts_used: 0, free_posts_remaining: 3, listing_limit: 3, current_period_end: null };
+}
+
 export async function createListing({ sellerId, values }) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('listings').insert({ ...values, seller_id: sellerId, status: 'pending', moderation_status: 'pending' }).select().single();
-  if (error) throw error;
-  return data;
+  if (!sellerId) throw new Error('Sign in before posting a listing.');
+  const { data, error } = await supabase.rpc('create_listing_with_plan', {
+    p_category_id: values.category_id,
+    p_subcategory_id: values.subcategory_id || null,
+    p_title: values.title,
+    p_description: values.description,
+    p_price: values.price,
+    p_currency: values.currency || 'NGN',
+    p_pricing_type: values.pricing_type || 'fixed',
+    p_condition: values.condition || null,
+    p_quantity: values.quantity || null,
+    p_unit: values.unit || null,
+    p_country: values.country || 'Nigeria',
+    p_state: values.state,
+    p_city: values.city,
+    p_delivery_options: values.delivery_options || [],
+    p_contact_preference: values.contact_preference || 'chat',
+    p_attributes: values.attributes || {},
+  });
+  if (error) {
+    if (error.message?.includes('FREE_POST_LIMIT_REACHED')) throw new Error('Your 3 free posts have been used. Choose a subscription plan to post more listings.');
+    throw error;
+  }
+  return Array.isArray(data) ? data[0] : data;
 }
 
 export async function uploadListingMedia({ userId, listingId, file, sortOrder = 0 }) {

@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { createListing, fetchCategories, getProfile, reviseRejectedListing, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
+import { createListing, fetchCategories, fetchSellerEntitlement, getProfile, reviseRejectedListing, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
 
 const categoryGroups = {
   Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories'],
@@ -72,13 +72,14 @@ function Toggle({ checked, onChange, label }) {
   return <button type="button" className={`sell-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button>;
 }
 
-export default function SellView({ user, onAuthRequired, onDemoAction, initialListing = null }) {
+export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSubscription, initialListing = null }) {
   const [form, setForm] = useState(() => { try { return { ...initialForm, ...JSON.parse(window.localStorage.getItem('bese26-sell-draft') || '{}') }; } catch { return initialForm; } });
   const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
   const [draftSaved, setDraftSaved] = useState(false);
   const [errors, setErrors] = useState([]);
   const [publishState, setPublishState] = useState('idle');
+  const [entitlement, setEntitlement] = useState(null);
   const [editMode, setEditMode] = useState(Boolean(initialListing));
   const mediaInput = useRef(null);
   const cameraInput = useRef(null);
@@ -144,6 +145,13 @@ export default function SellView({ user, onAuthRequired, onDemoAction, initialLi
         sellerLocation: profile.country || current.sellerLocation,
       }));
     }).catch(() => {});
+    return () => { mounted = false; };
+  }, [user, editMode]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!user || !isSupabaseConfigured || editMode) { setEntitlement(null); return undefined; }
+    fetchSellerEntitlement().then((data) => mounted && setEntitlement(data)).catch(() => {});
     return () => { mounted = false; };
   }, [user, editMode]);
 
@@ -230,6 +238,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, initialLi
       await Promise.all(uploadableMedia.map((item, index) => uploadListingMedia({ userId: user.id, listingId: listing.id, file: item.file, sortOrder: item.cover ? 0 : index + 1 })));
       setPublishState('success');
       setDraftSaved(false);
+      if (!editMode) fetchSellerEntitlement().then(setEntitlement).catch(() => {});
       window.localStorage.removeItem('bese26-sell-draft');
       onDemoAction(editMode ? 'Listing changes submitted for bese26 moderation.' : 'Listing submitted for bese26 moderation.');
     } catch (error) {
@@ -251,7 +260,8 @@ export default function SellView({ user, onAuthRequired, onDemoAction, initialLi
     const deliveryOptions = serviceListing ? ['At buyer location', 'At seller location', 'Online service'] : ['Buyer pickup', 'Seller delivery', 'Shipping'];
     return <section id="sell-location" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon mint"><MapPin size={19} /></span><div><div className="eyebrow">LOCATION & DELIVERY</div><h2>Where is it located?</h2><p>Your profile location is already filled in.</p></div></div><div className="profile-location-card"><div className="profile-location-icon"><MapPin size={18} /></div><div><strong>{form.sellerLocation}</strong><span>From your seller profile</span></div></div><div className="sell-form-grid location-fields"><Field label="State*" value={form.state} onChange={(value) => update('state', value)} options={['Kano', 'Kaduna', 'Abuja (FCT)', 'Lagos', 'Plateau', 'Other']} /><Field label="City*" value={form.city} onChange={(value) => update('city', value)} options={['Kano Municipal', 'Nassarawa', 'Fagge', 'Gwale', 'Tarauni', 'Other']} /><Field label="Area" value={form.area} onChange={(value) => update('area', value)} placeholder="e.g. Hotoro" /></div><div className="privacy-location-row"><div><strong>Show approximate location publicly</strong><small>Your exact address stays private.</small></div><Toggle label="Approximate location" checked={form.approximate} onChange={(value) => update('approximate', value)} /></div><div className="sell-subheading"><MapPin size={15} /> {serviceListing ? 'How will you provide it?' : 'Delivery'}</div><div className="choice-pill-grid">{deliveryOptions.map((item) => <button type="button" key={item} className={form.delivery === item ? 'selected' : ''} onClick={() => update('delivery', item)}>{item}</button>)}</div>{!serviceListing && <div className="delivery-fee-row"><strong>Delivery fee</strong><select value={form.deliveryFee} onChange={(event) => update('deliveryFee', event.target.value)}><option>Free</option><option>Fixed fee</option><option>Calculated separately</option><option>Negotiable</option></select></div>}<div className="sell-subheading"><MessageCircle size={15} /> Contact</div><div className="contact-preferences"><label><input type="checkbox" checked={form.contactChat} onChange={(event) => update('contactChat', event.target.checked)} /> <MessageCircle size={14} /> Bese26 Chat</label><label><input type="checkbox" checked={form.contactPhone} onChange={(event) => update('contactPhone', event.target.checked)} /> <Phone size={14} /> Phone</label><label><input type="checkbox" checked={form.contactWhatsApp} onChange={(event) => update('contactWhatsApp', event.target.checked)} /> WhatsApp</label></div></section>;
   };
-  const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">SUBMITTED FOR REVIEW</div><h2>{editMode ? 'Your revised listing was submitted' : 'Your listing was submitted'}</h2><p>Your listing is saved in My Listings as pending. It will appear on Home after marketplace approval.</p><div className="publish-success-actions"><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>{editMode ? 'Ready to resubmit?' : 'Ready to post?'}</h2><p>Check your details above, then {editMode ? 'send your corrections back for review.' : 'publish your listing.'}</p></div></div><div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : editMode ? 'Resubmit for review' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
+  const planUsageNote = !editMode && entitlement ? <div className={`sell-plan-usage ${entitlement.free_posts_remaining === 0 ? 'exhausted' : ''}`}><div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan` : `${entitlement.free_posts_remaining} of ${entitlement.free_posts_limit} free posts remaining`}</strong><small>{entitlement.is_paid ? `${entitlement.listing_limit} active listing capacity` : entitlement.free_posts_remaining ? 'Your first 3 posts are free for new users.' : 'Your free posting allowance is finished.'}</small></div>{entitlement.free_posts_remaining === 0 && !entitlement.is_paid && <button type="button" className="text-action" onClick={onOpenSubscription}>View plans <ArrowRight size={14} /></button>}</div> : null;
+  const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">SUBMITTED FOR REVIEW</div><h2>{editMode ? 'Your revised listing was submitted' : 'Your listing was submitted'}</h2><p>Your listing is saved in My Listings as pending. It will appear on Home after marketplace approval.</p><div className="publish-success-actions"><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>{editMode ? 'Ready to resubmit?' : 'Ready to post?'}</h2><p>Check your details above, then {editMode ? 'send your corrections back for review.' : 'publish your listing.'}</p></div></div>{planUsageNote}<div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : editMode ? 'Resubmit for review' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
 
   return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new ad'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved on this device</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{renderMedia()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div></>}</div>;
 }
