@@ -44,3 +44,14 @@ The live Messages screen showed `No conversations yet` and `Select a listing to 
 ## Listing publish verification
 
 A read-only Supabase query confirmed that recent Sell submissions are present in `public.listings` with `status = pending` and `moderation_status = pending`. A second query confirmed real `public.listing_media` rows with image MIME types and non-zero file sizes for recent submissions. The upload path is therefore working; public Home intentionally excludes these rows until moderation changes them to active/approved. The Sell success copy and My Listings Pending tab now explain this boundary.
+
+
+## Admin moderation implementation and security checks
+
+The first admin account is the user-authorized `smbabanbaba@gmail.com`; a read-only query confirmed its profile has `app_role = 'admin'`. The moderation migration adds `listing_moderation_events`, admin-only pending listing/media reads, and the protected `moderate_listing` RPC. The RPC accepts only `approve` or `reject`, requires an admin check, changes only a currently pending/pending listing, and records the acting admin and action. Admin role assignment is not exposed as a self-service profile update.
+
+The frontend adds a profile-only entry at **Profile → Admin Moderation**. It loads pending rows from Supabase, displays seller/category/price/location/media details, requires a rejection reason, and removes a successfully reviewed item from the queue. Home continues to query only `active` plus `approved` listings, so an approval is the deliberate boundary that makes a listing public.
+
+Local verification passed with `npm run build` and `git diff --check`. In a signed-out browser session, both the admin-status RPC and moderation RPC returned permission-denied, confirming unauthenticated clients cannot invoke them. The Supabase security advisor no longer reports the unnecessary SECURITY DEFINER admin-status helper; it retains one intentional warning for the exposed moderation RPC because that privileged RPC is required to enforce the admin-only state transition, plus the separate Auth warning that leaked-password protection is disabled.
+
+An authenticated admin has not yet completed a live browser session in this audit, so no approve/reject state change or production queue result is claimed until the owner signs in through the normal Bese26 email/password flow and explicitly authorizes one real test action.

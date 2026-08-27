@@ -37,10 +37,11 @@ import {
 } from 'lucide-react';
 
 import ProfileView from './components/ProfileView';
+import AdminView from './components/AdminView';
 import SellView from './components/SellView';
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, getOrCreateConversation, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
+import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, getOrCreateConversation, isAdminUser, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -292,6 +293,7 @@ export default function App() {
   const [marketListings, setMarketListings] = useState([]);
   const [marketCategories, setMarketCategories] = useState([]);
   const [sessionUser, setSessionUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [chatListing, setChatListing] = useState(null);
 
@@ -320,8 +322,10 @@ export default function App() {
           setMarketCategories(remoteCategories);
         }
         if (session?.user) {
-          const remoteSaved = await fetchSavedIds(session.user.id);
-          if (mounted) setSavedIds(remoteSaved);
+          const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
+          if (mounted) { setSavedIds(remoteSaved); setIsAdmin(admin); }
+        } else if (mounted) {
+          setIsAdmin(false);
         }
         if (mounted) setSessionUser(session?.user || null);
       } catch (error) {
@@ -332,8 +336,11 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setSessionUser(session?.user || null);
-      if (event === 'SIGNED_IN' && session?.user) fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
-      if (event === 'SIGNED_OUT') setSavedIds([]);
+      if (event === 'SIGNED_IN' && session?.user) {
+        fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
+        isAdminUser(session.user.id).then(setIsAdmin).catch(() => setIsAdmin(false));
+      }
+      if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); }
     });
     return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
@@ -359,7 +366,8 @@ export default function App() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} />;
-    return <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} isActive={activeNav === 'profile'} />;
+    if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} />;
+    return <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} isActive={activeNav === 'profile'} isAdmin={isAdmin} onOpenAdmin={() => navigate('admin')} />;
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>

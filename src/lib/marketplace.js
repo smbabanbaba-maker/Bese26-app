@@ -173,6 +173,32 @@ export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
   return hydrateListingRows(data || []);
 }
 
+export async function isAdminUser(userId) {
+  failIfUnavailable();
+  if (!userId) return false;
+  const { data, error } = await supabase.rpc('current_user_is_admin');
+  if (error) throw error;
+  return data === true;
+}
+
+export async function fetchPendingListings() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('listings').select(listingSelect).eq('status', 'pending').eq('moderation_status', 'pending').order('created_at', { ascending: true }).limit(100);
+  if (error) throw error;
+  return hydrateListingRows(data || []);
+}
+
+export async function moderateListing({ listingId, action, rejectionReason = null }) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('moderate_listing', {
+    p_listing_id: listingId,
+    p_action: action,
+    p_rejection_reason: rejectionReason,
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchSellerStats(userId) {
   failIfUnavailable();
   if (!userId) return { listings: 0, sold: 0, saved: 0, reviews: 0, rating: 0, views: 0 };

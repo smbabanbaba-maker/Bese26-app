@@ -1,6 +1,6 @@
 # bese26
 
-**bese26** is a premium, mobile-first marketplace app for Nigeria. Its white-primary, red-accent interface lets people discover listings, search nearby goods and services, save items, post listings, message sellers, use the marketplace assistant, review wallet activity, and manage their account from one focused experience.
+**bese26** is a premium, mobile-first marketplace app for Nigeria. Its white-primary, red-accent interface lets people discover approved listings, search nearby goods and services, save items, post listings, message sellers, and manage their account from one focused experience.
 
 ## Current product state
 
@@ -19,15 +19,16 @@ The app has been converted to a real marketplace experience: all demo fallbacks,
 | Auth | Email/password authentication. Redirects to live Vercel URL after confirmation. |
 | Messages | Real conversation list and message history for authenticated users. No demo threads. |
 | Profile | Real identity, location, and statistics from Supabase. Personal Information form updates real profile and contact records. |
+| Admin moderation | The authorized admin sees Profile → Admin Moderation, reviews pending listings, and can approve or reject through a protected Supabase RPC. Approved listings become public on Home; rejected listings retain the review reason. |
 | Wallet and AI | Removed from primary navigation until real backend services are implemented. |
 
 ## Supabase architecture
 
-The migration is stored at `supabase/migrations/20260827060000_marketplace_foundation.sql`. It creates `profiles`, `profile_contacts`, `categories`, `category_fields`, `listings`, `listing_media`, `listing_favorites`, `listing_drafts`, `conversations`, `conversation_participants`, `messages`, `reviews`, and `notifications`.
+The foundation migration is stored at `supabase/migrations/20260827060000_marketplace_foundation.sql`. The moderation migrations `20260827190000_admin_moderation.sql`, `20260827191000_admin_status_rpc.sql`, and `20260827192000_admin_status_invoker.sql` add the controlled admin role, moderation audit events, protected pending-listing reads, and approve/reject RPC boundary. Together they create `profiles`, `profile_contacts`, `categories`, `category_fields`, `listings`, `listing_media`, `listing_favorites`, `listing_drafts`, `conversations`, `conversation_participants`, `messages`, `reviews`, `notifications`, and `listing_moderation_events`.
 
 Listings use separate price, location, delivery, moderation, and status fields together with a JSONB `attributes` object. This keeps the model flexible for Nigerian categories such as Phones & Tablets, Electronics, Vehicles, Property, Fashion, Agriculture, and Jobs & Services without creating a separate table for every category. Binary images and videos stay in Supabase Storage; `listing_media` stores only object paths and metadata.
 
-RLS is enabled on every application table. Public reads are limited to active approved listings, active categories, public profile rows, listing media attached to public listings, and published reviews. Authenticated users can manage only their own profile, contact data, drafts, listings, listing media, favorites, reviews, and notifications. Conversations and messages are participant-scoped. Storage uses `listing-media` and `avatars` buckets with MIME and size limits plus owner/path policies. Realtime is limited to `messages` and `notifications`.
+RLS is enabled on every application table. Public reads are limited to active approved listings, active categories, public profile rows, listing media attached to public listings, and published reviews. Authenticated users can manage only their own profile, contact data, drafts, listings, listing media, favorites, reviews, and notifications. Conversations and messages are participant-scoped. Only the user-selected admin account `smbabanbaba@gmail.com` is initially assigned `app_role = 'admin'`; ordinary users cannot grant themselves this role or approve listings. Storage uses `listing-media` and `avatars` buckets with MIME and size limits plus owner/path policies; admin pending-media reads are restricted to the moderation queue. Realtime is limited to `messages` and `notifications`.
 
 ## Local setup
 
@@ -71,9 +72,10 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 2. **Completed initial client layer:** Supabase client module, environment template, email/password Auth panel, active listing query helper, favorites helper, draft persistence, listing insertion, and media upload helper.
 3. **Completed real-app cleanup:** Removed all demo fallbacks, hardcoded data, and non-functional placeholders. Home, Search, Saved, Messages, and Profile now use real Supabase state exclusively.
 4. **Completed profile management:** Personal Information form now updates real Supabase profile and contact tables.
-5. **Next product slice:** Implement real Wallet ledger, payment integration, and AI marketplace assistant.
-6. **Later slices:** Complete real Notifications, seller moderation tools, and review completion rules.
-7. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
+5. **Completed moderation foundation:** Sellers publish into Pending; the authorized admin can review pending listings through a protected moderation boundary. Admin role changes remain controlled database operations rather than self-service profile edits.
+6. **Next product slice:** Implement real Wallet ledger, payment integration, and AI marketplace assistant.
+7. **Later slices:** Complete real Notifications, review completion rules, and controlled admin-management tooling.
+8. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
 
 ## References
 
