@@ -8,3 +8,8 @@ At desktop browser width the navigation uses the base flex layout; the mobile br
 
 
 A headless 474×1080 render confirmed all seven labels remain visible in one row at the bottom: Home, Wallet, Saved, Sell, Messages, AI, and Profile. The fixed bar stayed within the viewport and the labels remained readable; no horizontal scrolling was introduced.
+
+
+## Production verification
+
+After deployment of commit `8101c42`, the production page at `https://bese26-app.vercel.app/?v=8101c42` served asset `index-D9-4KPtx.js` with HTTP 200. The live DOM showed the exact order **Home**, **Wallet**, **Saved**, **Sell**, **Messages**, **AI**, **Profile**. The bar reported `position: fixed`, its bottom edge matched the viewport bottom, and no horizontal overflow was present.
