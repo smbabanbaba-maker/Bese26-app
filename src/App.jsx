@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  Bell,
   Bookmark,
   CarFront,
   Check,
@@ -19,7 +18,6 @@ import {
   Laptop,
   MapPin,
   MessageCircle,
-  Menu,
   Moon,
   Package,
   Plus,
@@ -33,6 +31,7 @@ import {
   Sprout,
   Star,
   UserRound,
+  WalletCards,
   Wrench,
   X,
 } from 'lucide-react';
@@ -42,7 +41,7 @@ import AdminView from './components/AdminView';
 import SellView from './components/SellView';
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, fetchNotifications, getOrCreateConversation, isAdminUser, markNotificationRead, sendMessage, signOut, subscribeToMessages, subscribeToNotifications, toggleFavorite } from './lib/marketplace';
+import { fetchActiveListings, fetchCategories, fetchSavedIds, fetchConversations, fetchMessages, getOrCreateConversation, isAdminUser, sendMessage, signOut, subscribeToMessages, toggleFavorite } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -61,26 +60,14 @@ const iconMap = {
 
 const navItems = [
   { key: 'home', label: 'Home', icon: House },
-  { key: 'saved', label: 'Saved', icon: Bookmark },
+  { key: 'wallet', label: 'Wallet', icon: WalletCards },
   { key: 'sell', label: 'Sell', icon: Plus },
-  { key: 'messages', label: 'Messages', icon: MessageCircle },
+  { key: 'ai', label: 'AI', icon: Sparkles },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
 
 function formatNaira(value) {
   return `₦${Number(value).toLocaleString('en-NG')}`;
-}
-
-function Logo() {
-  return (
-    <div className="brand-lockup" aria-label="bese26 home">
-      <div className="brand-mark">B</div>
-      <div>
-        <div className="brand-name">bese26</div>
-        <div className="brand-tagline">marketplace</div>
-      </div>
-    </div>
-  );
 }
 
 function Avatar({ initials, tone = 'rose', size = 'md' }) {
@@ -89,43 +76,6 @@ function Avatar({ initials, tone = 'rose', size = 'md' }) {
 
 function VerifiedBadge({ text = 'Verified' }) {
   return <span className="verified-badge"><BadgeCheck size={13} strokeWidth={2.6} /> {text}</span>;
-}
-
-function notificationTime(value) {
-  if (!value) return 'Just now';
-  const date = new Date(value);
-  const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
-  return date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
-}
-
-function NotificationBell({ user, onAuthRequired, onNotice, onNavigate }) {
-  const [notifications, setNotifications] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const unreadCount = notifications.filter((item) => !item.read_at).length;
-  useEffect(() => {
-    let mounted = true;
-    if (!user) { setNotifications([]); return undefined; }
-    setLoading(true);
-    fetchNotifications(user.id).then((rows) => mounted && setNotifications(rows)).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false));
-    const unsubscribe = subscribeToNotifications(user.id, (payload) => {
-      if (!mounted || !payload?.new) return;
-      setNotifications((current) => [payload.new, ...current.filter((item) => item.id !== payload.new.id)].slice(0, 50));
-      onNotice?.('You have a new notification.');
-    });
-    return () => { mounted = false; unsubscribe(); };
-  }, [user?.id]);
-  const openNotification = async (notification) => {
-    if (!notification.read_at) {
-      try { await markNotificationRead(notification.id, user.id); setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item)); } catch { /* the notification remains visible if marking read fails */ }
-    }
-    if (notification.data?.listing_id) onNavigate?.('profile');
-    setOpen(false);
-  };
-  return <div className="notification-wrap"><button type="button" className="notification-trigger" aria-label={user ? 'Open notifications' : 'Sign in for notifications'} onClick={() => user ? setOpen((value) => !value) : onAuthRequired?.()}><Bell size={18} />{user && unreadCount > 0 && <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>}</button>{open && user && <div className="notification-panel"><div className="notification-panel-head"><div><div className="eyebrow">ACCOUNT UPDATES</div><strong>Notifications</strong></div><button type="button" className="icon-button" onClick={() => setOpen(false)} aria-label="Close notifications"><X size={16} /></button></div>{loading ? <div className="notification-empty">Loading notifications…</div> : notifications.length ? <div className="notification-list">{notifications.map((notification) => <button type="button" className={`notification-row ${notification.read_at ? '' : 'unread'}`} key={notification.id} onClick={() => openNotification(notification)}><span className="notification-row-icon"><Bell size={15} /></span><span><strong>{notification.title}</strong><small>{notification.body}</small><em>{notificationTime(notification.created_at)}</em></span></button>)}</div> : <div className="notification-empty"><Bell size={23} /><strong>No notifications yet</strong><span>Listing reviews and new messages will appear here.</span></div>}</div>}</div>;
 }
 
 function SectionHeading({ eyebrow, title, action, onAction }) {
@@ -179,9 +129,17 @@ function QuickAction({ icon: Icon, label, note, tone, onClick }) {
   return <button className={`quick-action quick-action-${tone}`} onClick={onClick}><span className="quick-action-icon"><Icon size={17} /></span><span><strong>{label}</strong><small>{note}</small></span><ChevronRight size={14} className="quick-action-arrow" /></button>;
 }
 
+function UnavailableView({ icon: Icon, eyebrow, title, description, onBack, backLabel = 'Back to Home' }) {
+  return <div className="page-stack unavailable-page"><section className="unavailable-card"><span className="unavailable-icon"><Icon size={24} /></span><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{description}</p><button className="primary-button" onClick={onBack}>{backLabel}<ArrowRight size={16} /></button></section></div>;
+}
+
 function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   return (
     <div className="page-stack home-page">
+      <section className="discovery-banner">
+        <div className="discovery-copy"><div className="eyebrow light">WELCOME TO BESE26</div><h1>Shop smarter.<br /><span>Sell with confidence.</span></h1><p>Discover everyday essentials from people and businesses near you.</p></div>
+        <div className="discovery-actions"><div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div><button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button></div>
+      </section>
       <section className="search-section">
         <div className="search-box home-search">
           <Search size={18} />
@@ -390,6 +348,8 @@ export default function App() {
     if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={setSelectedListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={setSelectedListing} onToggleSave={toggleSave} />;
+    if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
+    if (activeNav === 'ai') return <UnavailableView icon={Sparkles} eyebrow="AI TOOLS" title="AI tools are coming soon" description="The marketplace assistant is not connected yet. Bese26 will not show invented AI answers or recommendations." onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} />;
     if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} onEditListing={(listing) => { setEditingListing(listing); navigate('sell'); }} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} />;
@@ -397,7 +357,6 @@ export default function App() {
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <header className="topbar"><div className="topbar-inner"><button className="mobile-menu icon-button"><Menu size={20} /></button><Logo /><div className="desktop-location"><MapPin size={15} /><span>Marketplace</span><strong>Nigeria</strong><ChevronDown size={14} /></div><div className="topbar-actions"><button className="topbar-search" onClick={() => navigate('search')}><Search size={17} /><span>Search listings</span><kbd>⌘ K</kbd></button><NotificationBell user={sessionUser} onAuthRequired={() => requireAuth('Sign in to receive marketplace notifications.')} onNotice={showToast} onNavigate={navigate} /><button type="button" className="topbar-avatar-button" onClick={() => sessionUser ? navigate('profile') : setShowAuth(true)} aria-label={sessionUser ? 'Open profile' : 'Sign in'}><Avatar initials={sessionUser ? (sessionUser.user_metadata?.display_name || sessionUser.email || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'MA'} tone="navy" /></button></div></div></header>
     <main className="main-container">{renderView()}</main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
