@@ -16,7 +16,7 @@ The existing demo data remains as a deliberate fallback while each live flow is 
 | Product detail | Gallery, key-detail chips, seller context, save, share, report, call, and chat actions. Chat opens a real conversation when both authenticated marketplace identities are available. |
 | Saved | Favorites use Supabase for an authenticated user; unauthenticated browsing continues to use the existing local fallback state. |
 | Sell | One continuous vertical form with category-aware fields, local validation, draft persistence, listing insertion with `pending` moderation status, and Storage upload helpers. |
-| Auth | Passwordless Email OTP panel: request a six-digit code, verify it, resend it, or change email. The Supabase **Magic link or OTP** template must contain `{{ .Token }}`; Google OAuth and phone/SMS OTP are intentionally not enabled. SMTP delivery remains an external configuration that must be tested with a real inbox. |
+| Auth | Email/password sign-up and sign-in panel. Confirmation email branding and SMTP delivery remain an external configuration to finish later; Google OAuth and phone/SMS OTP are not enabled. |
 | Messages | Existing polished demo conversation UI remains in place while the database conversation and Realtime layer is wired and tested incrementally. |
 | Wallet, AI, Profile, Notifications | Profile identity, seller statistics, and My Listings use authenticated Supabase reads; Wallet, some analytics/promotions, and notification persistence remain future integration slices. |
 
@@ -67,7 +67,7 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 ## Rollout roadmap
 
 1. **Completed foundation:** Supabase project verification, marketplace schema, seed categories, RLS policies, Storage buckets and policies, and Realtime publication entries.
-2. **Completed initial client layer:** Supabase client module, environment template, Email OTP Auth panel, active listing query helper, favorites helper, draft persistence, listing insertion, and media upload helper.
+2. **Completed initial client layer:** Supabase client module, environment template, email/password Auth panel, active listing query helper, favorites helper, draft persistence, listing insertion, and media upload helper.
 3. **Completed marketplace account slice:** Authenticated Profile statistics and My Listings now read owner-scoped Supabase rows, with status tabs and a Create new listing action returning to the continuous Sell form.
 4. **Next verification slice:** Use a dedicated test account to verify sign-up/sign-in, profile bootstrap, seller-only draft and listing mutations, public approved listing reads, Storage uploads, and favorite isolation.
 5. **Next product slice:** Replace the remaining demo Wallet and seller analytics/promotions surfaces with persisted marketplace records and moderation-aware workflows.

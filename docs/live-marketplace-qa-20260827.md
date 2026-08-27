@@ -7,3 +7,5 @@ The current visible screens still contain demo/local marketplace data in several
 The AI screen rendered with prompt suggestions and a composer. The Wallet screen rendered with the existing demo balance/activity and correctly exposed its current demo actions. These screens did not blank or produce a visible runtime error during navigation.
 
 The password-auth revert was deployed and verified at `https://bese26-app.vercel.app/?v=d033681`. The live authentication panel now shows Email, Password, Sign in, and the Create account switch, with no OTP-only controls. Production build and `git diff --check` passed before the push.
+
+The latest production build from commit `7331411` was verified at `https://bese26-app.vercel.app/?v=7331411`. Profile now shows real signed-out values of 0 Listings, 0 Sold, 0 Saved, and 0 Reviews, plus the authenticated-only My Listings entry point; it no longer shows the previous fake 125/48/32/24 counters.
