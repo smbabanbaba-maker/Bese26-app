@@ -199,6 +199,17 @@ export async function moderateListing({ listingId, action, rejectionReason = nul
   return data;
 }
 
+export async function fetchModerationHistory() {
+  failIfUnavailable();
+  const { data, error } = await supabase
+    .from('listing_moderation_events')
+    .select('id,action,rejection_reason,created_at,listing:listings!listing_id(id,title,price,currency,location_city,location_state,status,moderation_status)')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchSellerStats(userId) {
   failIfUnavailable();
   if (!userId) return { listings: 0, sold: 0, saved: 0, reviews: 0, rating: 0, views: 0 };
