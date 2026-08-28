@@ -104,7 +104,7 @@ export async function deleteMyAccount() {
 
 export async function updatePassword(password) {
   failIfUnavailable();
-  if (!password || password.length < 8) throw new Error('Use a password with at least 8 characters.');
+  if (!password || password.length < 6) throw new Error('Use a password with at least 6 characters.');
   const { data, error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
   return data.user;
