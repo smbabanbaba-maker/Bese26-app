@@ -13,8 +13,8 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
   const submit = async (event) => {
     event.preventDefault();
     setStatus({ type: '', message: '' });
-    if (form.password.length < 6) {
-      setStatus({ type: 'error', message: 'Use a password with at least 6 characters.' });
+    if (form.password.length < 8) {
+      setStatus({ type: 'error', message: 'Use a password with at least 8 characters.' });
       return;
     }
     setLoading(true);
@@ -64,7 +64,7 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
           <label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label>
         </>}
         <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
-        <label><span><LockKeyhole size={14} /> Password</span><input type="password" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} required /></label>
+        <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={8} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 8 characters" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} required /></label>
         <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button>
       </form>
       <button type="button" className="auth-switch" onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setStatus({ type: '', message: '' }); }}>{mode === 'signin' ? 'New to bese26? Create an account' : 'Already have an account? Sign in'}</button>
