@@ -42,6 +42,7 @@ import {
 import { getAvatarUrl } from '../lib/supabase';
 import {
   blockUser,
+  deleteMyAccount,
   deleteSavedSearch,
   fetchBlockedUsers,
   fetchFollowSummary,
@@ -372,7 +373,7 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   const profileRequest = useRef(0);
   useEffect(() => { if (isActive) setSubPage('main'); }, [isActive]);
   useEffect(() => { let mounted = true; const requestId = ++profileRequest.current; if (!user) { setStats(null); setProfileRecord(null); setProfileContacts(null); return undefined; } setLoading(true); Promise.all([fetchSellerStats(user.id), getProfile(user.id), getProfileContacts(user.id)]).then(([nextStats, nextProfile, nextContacts]) => { if (mounted && requestId === profileRequest.current) { setStats(nextStats); setProfileRecord(nextProfile); setProfileContacts(nextContacts); } }).catch((error) => mounted && onDemoAction(error.message || 'Could not load your profile.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user, onDemoAction]);
-  const open = (page) => { if (!user && !['about', 'terms', 'privacy-policy', 'prohibited', 'help', 'safety', 'subscription'].includes(page)) { onAuthRequired?.(); return; } if (page === 'saved' && onNavigate) { onNavigate('saved'); return; } if (page === 'admin') { onOpenAdmin?.(); return; } if (page === 'subscription') { onOpenSubscription?.(); return; } setSubPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const open = async (page) => { if (!user && !['about', 'terms', 'privacy-policy', 'prohibited', 'help', 'safety', 'subscription'].includes(page)) { onAuthRequired?.(); return; } if (page === 'saved' && onNavigate) { onNavigate('saved'); return; } if (page === 'admin') { onOpenAdmin?.(); return; } if (page === 'subscription') { onOpenSubscription?.(); return; } if (page === 'logout') { try { await onSignOut?.(); } catch (error) { onDemoAction(error.message || 'Could not log out.'); } return; } if (page === 'delete-account') { if (!window.confirm('Delete your Bese26 account permanently? This cannot be undone.')) return; try { await deleteMyAccount(); onDemoAction('Your account was deleted.'); } catch (error) { onDemoAction(error.message || 'Could not delete your account.'); } return; } setSubPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const displayName = profileRecord?.display_name || user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Your Bese26 profile';
   const username = profileRecord?.username ? `@${profileRecord.username}` : user?.user_metadata?.username ? `@${user.user_metadata.username}` : user ? 'Username not set' : 'Sign in to personalize your profile';
   const profileLocation = [profileRecord?.city, profileRecord?.state, profileRecord?.country].filter(Boolean).join(', ') || 'Location not set';

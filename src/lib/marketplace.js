@@ -95,6 +95,12 @@ export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
 }
+export async function deleteMyAccount() {
+  failIfUnavailable();
+  const { error } = await supabase.rpc('delete_my_account');
+  if (error) throw error;
+  await supabase.auth.signOut();
+}
 
 export async function updatePassword(password) {
   failIfUnavailable();
