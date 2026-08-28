@@ -552,6 +552,33 @@ export async function fetchSellerEntitlement() {
   return data?.[0] || { plan_key: 'free', subscription_status: 'inactive', is_paid: false, free_posts_limit: 3, free_posts_used: 0, free_posts_remaining: 3, listing_limit: 3, current_period_end: null };
 }
 
+export async function fetchPaymentHistory(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('payment_transactions').select('id,plan_key,reference,amount_kobo,currency,status,provider_subscription_id,created_at,updated_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(30);
+  if (error) throw error;
+  return data || [];
+}
+
+async function callPaystackEndpoint(path, body) {
+  failIfUnavailable();
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!session?.access_token) throw new Error('Sign in before starting a subscription.');
+  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || 'Could not contact the payment service.');
+  return payload;
+}
+
+export async function startPaystackCheckout(planKey) {
+  return callPaystackEndpoint('/api/paystack/initialize', { planKey });
+}
+
+export async function verifyPaystackPayment(reference) {
+  return callPaystackEndpoint('/api/paystack/verify', { reference });
+}
+
 export async function createListing({ sellerId, values }) {
   failIfUnavailable();
   if (!sellerId) throw new Error('Sign in before posting a listing.');

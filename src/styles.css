@@ -861,3 +861,15 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .sell-plan-usage .text-action { flex:none; }
 @media (max-width:900px) { .subscription-plan-grid { grid-template-columns:repeat(2,1fr); } .advanced-plans .subscription-plan-grid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:640px) { .subscription-hero { align-items:flex-start; padding:20px; } .subscription-hero-mark { width:45px; height:45px; border-radius:13px; } .subscription-hero h1 { font-size:26px; } .subscription-section-heading { align-items:flex-start; flex-direction:column; gap:4px; } .subscription-plan-grid, .advanced-plans .subscription-plan-grid { grid-template-columns:1fr; } .subscription-usage { align-items:flex-start; flex-direction:column; gap:10px; } .subscription-usage > div:first-child { min-width:0; } .subscription-usage-track { width:100%; flex:none; } }
+
+.profile-payment-list { display: grid; gap: 10px; }
+.profile-payment-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.profile-payment-row > div:first-child { min-width: 0; display: grid; gap: 4px; }
+.profile-payment-row strong { color: var(--ink); font-size: 0.86rem; }
+.profile-payment-row small { color: var(--muted); font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-payment-meta { display: grid; justify-items: end; gap: 5px; flex: 0 0 auto; }
+.profile-payment-meta strong { white-space: nowrap; }
+.status-pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 0.64rem; font-weight: 700; text-transform: capitalize; }
+.status-pill.successful { color: #17603b; background: #e5f6ec; }
+.status-pill.initialized, .status-pill.pending { color: #855b08; background: #fff4d7; }
+.status-pill.failed, .status-pill.reversed, .status-pill.refunded { color: #a92f35; background: #ffe7e8; }

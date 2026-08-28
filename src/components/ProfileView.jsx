@@ -49,6 +49,7 @@ import {
   fetchMyListings,
   fetchMyReports,
   fetchNotifications,
+  fetchPaymentHistory,
   fetchProfileRelations,
   fetchProfileReviews,
   fetchSavedListings,
@@ -248,7 +249,7 @@ const pageDefinitions = {
   wallet: { title: 'Wallet', eyebrow: 'PAYMENTS & SERVICES', description: 'Wallet, payments, and transaction records are not connected yet. No balance is shown.' },
   subscription: { title: 'Subscription', eyebrow: 'PAYMENTS & SERVICES', description: 'View seller plans and your free-post allowance.' },
   boosting: { title: 'Boosting', eyebrow: 'PAYMENTS & SERVICES', description: 'Listing promotion and boost payments are not connected yet. No advertising data is shown.' },
-  'payment-history': { title: 'Payment History', eyebrow: 'PAYMENTS & SERVICES', description: 'Payment history is not connected yet. No transaction records are shown.' },
+  'payment-history': { title: 'Payment History', eyebrow: 'PAYMENTS & SERVICES', description: 'View verified Paystack payments for your account.' },
   safety: { title: 'Safety Center', eyebrow: 'TRUST & SAFETY' },
   blocked: { title: 'Blocked Users', eyebrow: 'TRUST & SAFETY' },
   reports: { title: 'Reports', eyebrow: 'TRUST & SAFETY' },
@@ -354,6 +355,13 @@ function VerificationPage({ profile, onBack }) {
   return <div className="profile-subpage"><SubpageHeader title="Verification & Trust" eyebrow="SELLER TOOLS" onBack={onBack} /><div className="safety-hero"><ShieldCheck size={22} /><div><h2>{verified ? 'Verified profile' : 'Not verified yet'}</h2><p>{verified ? 'Your current profile record is marked verified.' : 'Bese26 currently reads the verification flag from your profile record.'}</p></div></div><div className="settings-card"><div className="settings-info-row"><strong>Profile status</strong><span>{verified ? 'Verified' : 'Not verified'}</span></div><div className="settings-info-row"><strong>Identity review</strong><span>Not connected</span></div><div className="settings-info-row"><strong>Business review</strong><span>Not connected</span></div></div><p className="profile-help-note">No verification badge is added by this page. Only the secure profile record can mark an account verified.</p></div>;
 }
 
+function PaymentHistoryPage({ user, onBack }) {
+  const [rows, setRows] = useState(null);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; fetchPaymentHistory(user?.id).then((data) => mounted && setRows(data)).catch((reason) => mounted && setError(reason.message || 'Could not load payment history.')); return () => { mounted = false; }; }, [user?.id]);
+  return <div className="profile-subpage"><SubpageHeader title="Payment History" eyebrow="PAYMENTS & SERVICES" onBack={onBack} /><p className="profile-subpage-intro">Only verified Paystack payment records for your account appear here.</p>{error && <div className="profile-state-card error"><AlertCircle size={18} /><p>{error}</p></div>}{rows === null && !error && <div className="profile-state-card"><Clock3 size={18} /><p>Loading payment history…</p></div>}{rows?.length === 0 && <div className="profile-state-card"><WalletCards size={18} /><p>No verified payments yet. Your payment record will appear after Paystack confirms a transaction.</p></div>}{rows?.length > 0 && <div className="profile-payment-list">{rows.map((row) => <div className="profile-payment-row" key={row.id}><div><strong>{row.plan_key === 'business' ? 'Business' : row.plan_key === 'premium' ? 'Premium' : 'Basic'} plan</strong><small>{new Date(row.created_at).toLocaleDateString('en-NG')} · {row.reference.slice(0, 18)}…</small></div><div className="profile-payment-meta"><strong>₦{(Number(row.amount_kobo) / 100).toLocaleString('en-NG')}</strong><span className={`status-pill ${row.status}`}>{row.status}</span></div></div>)}</div>}</div>;
+}
+
 export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAction, isDark, onToggleTheme, onNavigate, onCreateListing, onEditListing, onOpenListing, onToggleSave, isAdmin = false, onOpenAdmin, onOpenSubscription, isActive = true }) {
   const [subPage, setSubPage] = useState('main');
   const [listingTab, setListingTab] = useState('Active');
@@ -388,7 +396,8 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   if (subPage === 'safety') return <SafetyPage onBack={() => setSubPage('main')} />;
   if (['terms', 'privacy-policy', 'prohibited'].includes(subPage)) return <PolicyPage page={{ key: subPage }} onBack={() => setSubPage('main')} />;
   if (subPage === 'about') return <AboutPage onBack={() => setSubPage('main')} />;
-  if (['recently-viewed', 'wallet', 'boosting', 'payment-history', 'support'].includes(subPage)) return <UnavailablePage page={pageDefinitions[subPage]} onBack={() => setSubPage('main')} />;
+  if (subPage === 'payment-history') return <PaymentHistoryPage user={user} onBack={() => setSubPage('main')} />;
+  if (['recently-viewed', 'wallet', 'boosting', 'support'].includes(subPage)) return <UnavailablePage page={pageDefinitions[subPage]} onBack={() => setSubPage('main')} />;
   if (subPage !== 'main') return <UnavailablePage page={pageDefinitions[subPage] || { title: subPage, eyebrow: 'BESE26' }} onBack={() => setSubPage('main')} />;
 
   const statsCards = [{ label: 'Listings', value: loading ? '…' : stats?.listings ?? 0, page: 'listings' }, { label: 'Sold', value: loading ? '…' : stats?.sold ?? 0, page: 'sold' }, { label: 'Saved', value: loading ? '…' : stats?.saved ?? 0, page: 'saved' }, { label: 'Views', value: loading ? '…' : stats?.views ?? 0, page: 'analytics' }];
