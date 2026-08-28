@@ -286,7 +286,7 @@ export async function reviseRejectedListing({ listingId, values }) {
     p_quantity: values.quantity || null,
     p_unit: values.unit || null,
     p_country: values.country || 'Nigeria',
-    p_delivery_options: values.deliveryOptions || [],
+    p_delivery_options: JSON.stringify(Array.isArray(values.deliveryOptions) ? values.deliveryOptions : []),
     p_contact_preference: values.contactPreference || 'chat',
     p_attributes: values.attributes || {},
   });
@@ -610,7 +610,7 @@ export async function createListing({ sellerId, values }) {
     p_country: values.country || 'Nigeria',
     p_state: values.state,
     p_city: values.city,
-    p_delivery_options: values.delivery_options || [],
+    p_delivery_options: JSON.stringify(Array.isArray(values.delivery_options) ? values.delivery_options : []),
     p_contact_preference: values.contact_preference || 'chat',
     p_attributes: values.attributes || {},
   });
