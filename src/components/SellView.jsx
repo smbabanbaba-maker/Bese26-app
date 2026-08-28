@@ -41,19 +41,19 @@ const categoryGroups = {
 
 const dynamicFields = {
   Vehicles: [
-    ['make', 'Make', 'e.g. Toyota'], ['model', 'Model', 'e.g. Corolla'], ['year', 'Year', '2017'], ['mileage', 'Mileage', 'e.g. 85,000 km'], ['fuel', 'Fuel type', 'Select fuel type', ['Petrol', 'Diesel', 'Hybrid', 'Electric']], ['transmission', 'Transmission', 'Select transmission', ['Automatic', 'Manual']], ['engine', 'Engine size', 'e.g. 1.8L'], ['body', 'Body type', 'Select body type', ['Sedan', 'SUV', 'Hatchback', 'Pickup', 'Van']], ['owners', 'Number of owners', 'e.g. 2'], ['registration', 'Registration status', 'Select status', ['Registered', 'Unregistered', 'Foreign used']],
+    ['make', 'Make', 'e.g. Toyota'], ['model', 'Model', 'e.g. Corolla'], ['year', 'Year', 'e.g. 2017'], ['mileage', 'Mileage', 'e.g. 85,000 km'], ['fuel', 'Fuel type', 'Select fuel type', ['Petrol', 'Diesel', 'Hybrid', 'Electric']], ['transmission', 'Transmission', 'Select transmission', ['Automatic', 'Manual']],
   ],
   Electronics: [
-    ['brand', 'Brand', 'e.g. Apple'], ['model', 'Model', 'e.g. iPhone 15 Pro'], ['storage', 'Storage', 'e.g. 256GB'], ['ram', 'RAM', 'e.g. 8GB'], ['network', 'Network', 'Select network', ['Unlocked', 'MTN', 'Airtel', 'Glo', '9mobile']], ['sim', 'SIM type', 'Select SIM type', ['Single SIM', 'Dual SIM', 'eSIM']], ['color', 'Color', 'e.g. Natural Titanium'], ['battery', 'Battery health', 'e.g. 94%'], ['warranty', 'Warranty', 'Select warranty', ['None', 'Seller warranty', 'Manufacturer warranty']],
+    ['brand', 'Brand', 'e.g. Apple'], ['model', 'Model', 'e.g. iPhone 15 Pro'], ['storage', 'Storage', 'e.g. 256GB'], ['network', 'Network', 'Select network', ['Unlocked', 'MTN', 'Airtel', 'Glo', '9mobile']],
   ],
   Property: [
-    ['propertyType', 'Property type', 'Select type', ['House', 'Apartment', 'Land', 'Shop', 'Office', 'Warehouse', 'Farm']], ['listingType', 'Listing type', 'Select listing type', ['For sale', 'For rent', 'Short-let']], ['bedrooms', 'Bedrooms', 'e.g. 3'], ['bathrooms', 'Bathrooms', 'e.g. 3'], ['toilets', 'Toilets', 'e.g. 4'], ['size', 'Size', 'e.g. 500 sqm'], ['furnishing', 'Furnishing', 'Select furnishing', ['Furnished', 'Semi-furnished', 'Unfurnished']], ['parking', 'Parking', 'Select parking', ['Available', 'Not available']], ['power', 'Power supply', 'e.g. Prepaid meter, generator'], ['water', 'Water supply', 'e.g. Borehole'], ['security', 'Security', 'e.g. Estate security'], ['titleStatus', 'Title/document status', 'Select status', ['Verified documents', 'Documents available', 'Pending verification']],
+    ['propertyType', 'Property type', 'Select type', ['House', 'Apartment', 'Land', 'Shop', 'Office', 'Warehouse', 'Farm']], ['listingType', 'Listing type', 'Select listing type', ['For sale', 'For rent', 'Short-let']], ['bedrooms', 'Bedrooms', 'e.g. 3'], ['bathrooms', 'Bathrooms', 'e.g. 2'], ['size', 'Size', 'e.g. 500 sqm'],
   ],
   Agriculture: [
-    ['productType', 'Product type', 'Select type', ['Crop', 'Livestock', 'Equipment', 'Farm service']], ['variety', 'Variety / species', 'e.g. Maize, broiler'], ['quantity', 'Quantity available', 'e.g. 100'], ['unit', 'Unit', 'Select unit', ['Item', 'Kg', 'Bag', 'Crate', 'Ton', 'Litre']], ['grade', 'Grade / quality', 'e.g. Grade A'], ['harvestDate', 'Harvest date', 'e.g. August 2026'], ['availability', 'Availability', 'Select availability', ['Available now', 'Pre-order', 'Seasonal']], ['minimumOrder', 'Minimum order quantity', 'e.g. 10'], ['wholesale', 'Wholesale / retail', 'Select option', ['Retail', 'Wholesale', 'Both']],
+    ['productType', 'Product type', 'Select type', ['Crop', 'Livestock', 'Equipment', 'Farm service']], ['variety', 'Variety / species', 'e.g. Maize, broiler'], ['quantity', 'Quantity available', 'e.g. 100'], ['unit', 'Unit', 'Select unit', ['Item', 'Kg', 'Bag', 'Crate', 'Ton', 'Litre']], ['availability', 'Availability', 'Select availability', ['Available now', 'Pre-order', 'Seasonal']],
   ],
   'Jobs & Services': [
-['experience', 'Experience', 'e.g. 5 years'], ['serviceArea', 'Service area', 'e.g. Kano and nearby cities'], ['availability', 'Availability', 'Select availability', ['Available now', 'Weekdays', 'Weekends', 'By appointment']], ['pricingModel', 'Pricing model', 'Select model', ['Starting from', 'Per hour', 'Per day', 'Per project', 'Contact seller']], ['deliveryMethod', 'Delivery method', 'Select method', ['At buyer location', 'At seller location', 'Online service', 'Digital delivery']],
+    ['experience', 'Experience', 'e.g. 5 years'], ['serviceArea', 'Service area', 'e.g. Kano and nearby cities'], ['availability', 'Availability', 'Select availability', ['Available now', 'Weekdays', 'Weekends', 'By appointment']], ['pricingModel', 'Pricing model', 'Select model', ['Starting from', 'Per hour', 'Per day', 'Per project', 'Contact seller']],
   ],
 };
 
@@ -64,8 +64,8 @@ const initialForm = {
   contactChat: true, contactPhone: false, contactWhatsApp: false, sellerName: '', sellerHandle: '', sellerLocation: 'Nigeria',
 };
 
-function Field({ label, value, onChange, placeholder, options, type = 'text', wide = false }) {
-  return <label className={wide ? 'sell-field wide' : 'sell-field'}><span>{label}</span>{options ? <select value={value || options[0]} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select> : type === 'textarea' ? <textarea value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /> : <input type={type} value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />}</label>;
+function Field({ label, value, onChange, placeholder, options, type = 'text', wide = false, error = '' }) {
+  return <label className={`${wide ? 'sell-field wide' : 'sell-field'} ${error ? 'has-error' : ''}`}><span>{label}</span>{options ? <select value={value || options[0]} onChange={(event) => onChange(event.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select> : type === 'textarea' ? <textarea value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /> : <input type={type} value={value || ''} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} />}{error && <small className="field-error">{error}</small>}</label>;
 }
 
 function Toggle({ checked, onChange, label }) {
@@ -87,6 +87,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const update = (key, value) => { setForm((current) => ({ ...current, [key]: value })); setErrors([]); setDraftSaved(false); };
   const subcategories = categoryGroups[form.category] || categoryGroups.Other;
   const fields = dynamicFields[form.category] || [];
+  const fieldError = (needle) => errors.find((error) => error.toLowerCase().includes(needle)) || '';
   const priceDisplay = form.price ? `${form.currency} ${Number(form.price).toLocaleString()}` : `${form.currency} 0`;
   const categoryNeedsCondition = !['Property', 'Jobs & Services'].includes(form.category);
 

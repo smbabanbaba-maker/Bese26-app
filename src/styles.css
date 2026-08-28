@@ -608,6 +608,12 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .auth-form label > span { display: flex; align-items: center; gap: 5px; color: var(--muted); }
 .auth-form input { width: 100%; }
 .auth-submit { width: 100%; margin-top: 4px; }
+.google-auth-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 18px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); font-size: 12px; font-weight: 700; transition: background .18s ease, transform .16s var(--ease); }
+.google-auth-button:hover { background: var(--soft); }
+.google-auth-button:active { transform: scale(.98); }
+.google-auth-button strong { display: grid; place-items: center; width: 20px; height: 20px; color: #4285f4; font: 800 15px Arial, sans-serif; }
+.auth-divider { display: flex; align-items: center; gap: 10px; margin: 15px 0 0; color: var(--muted); font-size: 10px; }
+.auth-divider::before, .auth-divider::after { content: ''; height: 1px; flex: 1; background: var(--line); }
 .auth-switch { width: 100%; margin-top: 16px; color: var(--red); font-size: 11px; font-weight: 700; text-align: center; }
 .auth-switch:hover { text-decoration: underline; }
 @media (max-width: 560px) {

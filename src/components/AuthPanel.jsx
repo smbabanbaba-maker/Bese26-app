@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, LockKeyhole, Mail, UserRound, X } from 'lucide-react';
-import { signIn, signUp } from '../lib/marketplace';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { signIn, signInWithGoogle, signUp } from '../lib/marketplace';
 
 export default function AuthPanel({ onClose, onAuthenticated }) {
   const [mode, setMode] = useState('signin');
@@ -34,6 +35,16 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
       setLoading(false);
     }
   };
+  const continueWithGoogle = async () => {
+    setStatus({ type: '', message: '' });
+    setLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message || 'Google sign-in is unavailable. Check that Google is enabled in Supabase Auth.' });
+      setLoading(false);
+    }
+  };
 
   return <div className="auth-backdrop" onClick={onClose}>
     <section className="auth-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
@@ -43,6 +54,10 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
       <h2 id="auth-title">{mode === 'signin' ? 'Welcome back.' : 'Create your bese26 account.'}</h2>
       <p className="auth-panel-copy">{mode === 'signin' ? 'Sign in to save listings, post items, and chat with sellers.' : 'Use your email to create a secure marketplace account.'}</p>
       {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
+      {mode === 'signin' && isSupabaseConfigured && <>
+        <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><strong>G</strong> Continue with Google</button>
+        <div className="auth-divider"><span>or use email</span></div>
+      </>}
       <form onSubmit={submit} className="auth-form">
         {mode === 'signup' && <>
           <label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label>
