@@ -351,6 +351,10 @@ export default function App() {
     };
     loadBackend();
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
+    const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
+    const refreshWhenFocused = () => loadBackend();
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    window.addEventListener('focus', refreshWhenFocused);
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setSessionUser(session?.user || null);
@@ -361,7 +365,7 @@ export default function App() {
       }
       if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); setSelectedListing(null); setChatListing(null); setChatTargetId(null); setEditingListing(null); setSearch(''); setActiveNav('home'); loadBackend(); }
     });
-    return () => { mounted = false; window.clearInterval(refreshTimer); subscription.unsubscribe(); };
+    return () => { mounted = false; window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', refreshWhenVisible); window.removeEventListener('focus', refreshWhenFocused); subscription.unsubscribe(); };
   }, []);
   useEffect(() => {
     if (!sessionUser || !isSupabaseConfigured) return undefined;
