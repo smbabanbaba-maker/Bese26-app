@@ -880,3 +880,30 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .status-pill.successful { color: #17603b; background: #e5f6ec; }
 .status-pill.initialized, .status-pill.pending { color: #855b08; background: #fff4d7; }
 .status-pill.failed, .status-pill.reversed, .status-pill.refunded { color: #a92f35; background: #ffe7e8; }
+
+/* Public Bese44 business profile */
+.public-business-shell { min-height: 100vh; background: #f8f9fa; color: #171717; }
+.public-business-topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 18px; max-width: 1100px; margin: 0 auto; padding: 0 24px; border-bottom: 1px solid #e7e8eb; }
+.public-brand { display: inline-flex; align-items: center; gap: 9px; color: inherit; text-decoration: none; font: 800 18px Manrope, sans-serif; }
+.public-brand strong span { color: #e53935; }
+.public-business-main { max-width: 1100px; margin: 0 auto; padding: 42px 24px 70px; }
+.public-business-hero { display: grid; grid-template-columns: 150px 1fr; gap: 30px; align-items: center; padding: 34px; background: #24262b; color: white; border-radius: 22px; box-shadow: 0 14px 35px rgba(31,26,26,.12); }
+.public-business-logo { width: 150px; height: 150px; border-radius: 28px; display: grid; place-items: center; overflow: hidden; background: #ff7772; color: white; font: 800 58px Manrope, sans-serif; }
+.public-business-logo img { width: 100%; height: 100%; object-fit: cover; }
+.public-business-identity h1 { font-size: clamp(28px, 5vw, 48px); line-height: 1; margin: 0 0 8px; }
+.public-business-handle { color: #f2cc74; font-size: 14px; margin-right: 12px; }
+.public-business-identity .verified-badge { display: inline-flex; color: #bcebdc; margin-top: 8px; }
+.public-business-identity p { max-width: 650px; color: #d0d2d6; line-height: 1.55; margin: 18px 0 10px; }
+.public-business-location { display: inline-flex; align-items: center; gap: 5px; color: #d0d2d6; font-size: 12px; }
+.public-business-actions { display: flex; gap: 9px; margin-top: 22px; flex-wrap: wrap; }
+.public-business-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 42px; }
+.public-business-stats > div { background: white; border: 1px solid #e7e8eb; border-radius: 15px; padding: 18px; display: flex; flex-direction: column; gap: 5px; }
+.public-business-stats strong { font: 800 20px Manrope, sans-serif; overflow-wrap: anywhere; }
+.public-business-stats span, .public-business-listings .section-heading > span { color: #717782; font-size: 11px; }
+.public-business-listings .section-heading { margin-bottom: 18px; }
+.public-business-footer { max-width: 1100px; margin: 0 auto; padding: 0 24px 28px; color: #8b9099; font-size: 11px; }
+.public-business-not-found { max-width: 560px; margin: 16vh auto; padding: 34px; text-align: center; background: white; border: 1px solid #e7e8eb; border-radius: 20px; box-shadow: 0 12px 36px rgba(25,30,42,.06); }
+.public-business-not-found .brand-mark { margin: 0 auto 24px; }
+.public-business-not-found h1 { font-size: 32px; margin-bottom: 10px; }
+.public-business-not-found p { color: #717782; line-height: 1.55; margin-bottom: 22px; }
+@media (max-width: 640px) { .public-business-topbar { padding: 0 16px; } .public-business-main { padding: 22px 16px 52px; } .public-business-hero { grid-template-columns: 1fr; gap: 20px; padding: 22px; } .public-business-logo { width: 104px; height: 104px; border-radius: 22px; font-size: 42px; } .public-business-identity h1 { font-size: 31px; } .public-business-stats { margin-bottom: 30px; } .public-business-stats > div { padding: 13px; } .public-business-stats strong { font-size: 15px; } .public-business-footer { padding-left: 16px; padding-right: 16px; } }
