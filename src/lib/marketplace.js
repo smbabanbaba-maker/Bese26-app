@@ -420,7 +420,7 @@ export async function deleteSavedSearch(userId, searchId) {
 export async function getBusinessProfile(userId) {
   failIfUnavailable();
   if (!userId) return null;
-  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,logo_path,category,description,phone,email,country,state,city,address,business_hours,website,social_links,registration_number,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
+  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -430,24 +430,45 @@ export async function saveBusinessProfile(userId, values) {
   const payload = {
     profile_id: userId,
     business_name: String(values.business_name || '').trim(),
+    business_handle: String(values.business_handle || '').trim().replace(/^@/, '').toLowerCase() || null,
+    business_type: values.business_type || null,
     logo_path: values.logo_path || null,
     category: values.category || null,
     description: values.description || null,
     phone: values.phone || null,
+    whatsapp: values.whatsapp || null,
     email: values.email || null,
     country: values.country || 'Nigeria',
     state: values.state || null,
     city: values.city || null,
+    area: values.area || null,
     address: values.address || null,
     business_hours: values.business_hours || {},
     website: values.website || null,
     social_links: values.social_links || {},
     registration_number: values.registration_number || null,
+    delivery_available: Boolean(values.delivery_available),
+    pickup_available: values.pickup_available !== false,
+    years_in_business: values.years_in_business === '' || values.years_in_business == null ? null : Number(values.years_in_business),
+    public_contact: Boolean(values.public_contact),
+    location_visibility: values.location_visibility || 'city',
   };
   if (!payload.business_name) throw new Error('Business name is required.');
-  const { data, error } = await supabase.from('business_profiles').upsert(payload).select('profile_id,business_name,logo_path,category,description,phone,email,country,state,city,address,business_hours,website,social_links,registration_number,is_verified,created_at,updated_at').single();
+  if (payload.business_handle && !/^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$/.test(payload.business_handle)) throw new Error('Use 3–30 lowercase letters, numbers, or hyphens for the business handle.');
+  const { data, error } = await supabase.from('business_profiles').upsert(payload).select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').single();
   if (error) throw error;
   return data;
+}
+
+export async function uploadBusinessLogo({ userId, file, previousPath = null }) {
+  failIfUnavailable();
+  if (!userId || !file || !file.type.startsWith('image/')) throw new Error('Choose a valid business logo image.');
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const path = `${userId}/business/${crypto.randomUUID()}-${safeName || 'business-logo.jpg'}`;
+  const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (uploadError) throw uploadError;
+  if (previousPath) await supabase.storage.from('avatars').remove([previousPath]);
+  return { path, url: getAvatarUrl(path) };
 }
 
 export async function fetchBlockedUsers(userId) {
