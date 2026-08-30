@@ -695,13 +695,12 @@ export async function fetchPaymentHistory(userId) {
 
 async function getAccessToken() {
   failIfUnavailable();
+  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+  if (!refreshError && refreshed.session?.access_token) return refreshed.session.access_token;
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) throw sessionError;
   if (session?.access_token) return session.access_token;
-  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-  if (refreshError) throw refreshError;
-  if (!refreshed.session?.access_token) throw new Error('Your session is not available. Sign in again.');
-  return refreshed.session.access_token;
+  throw new Error('Your session is not available. Sign in again.');
 }
 
 async function callPaystackEndpoint(path, body) {
