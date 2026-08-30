@@ -54,6 +54,7 @@ import {
   fetchPaymentHistory,
   fetchProfileRelations,
   fetchProfileReviews,
+  fetchRecentlyViewed,
   fetchSavedListings,
   fetchSavedSearches,
   fetchSellerStats,
@@ -65,6 +66,8 @@ import {
   saveBusinessProfile,
   saveSavedSearch,
   removeAvatar,
+  removeRecentlyViewed,
+  clearRecentlyViewed,
   submitUserReport,
 
   unblockUser,
@@ -162,6 +165,17 @@ function SavedItemsPage({ user, onBack, onOpenListing, onToggleSave }) {
   const load = () => { setLoading(true); fetchSavedListings(user.id).then(setItems).catch((requestError) => setError(requestError.message || 'Could not load your saved items.')).finally(() => setLoading(false)); };
   useEffect(load, [user.id]);
   return <div className="profile-subpage"><SubpageHeader title="Saved Items" eyebrow="MY MARKETPLACE" onBack={onBack} />{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading saved items" description="Getting your saved listings from Bese26." /> : items.length ? <div className="saved-list profile-saved-list">{items.map((listing) => <div className="saved-row" key={listing.id}><button type="button" className="saved-row-media" onClick={() => onOpenListing?.(listing)} aria-label={`Open ${listing.title}`}>{listing.image ? <img src={listing.image} alt={listing.title} loading="lazy" decoding="async" /> : <Package size={20} />}</button><button type="button" className="saved-row-copy" onClick={() => onOpenListing?.(listing)}><strong>{listing.title}</strong><span>{listing.seller} · {listing.location}</span><b>{listing.price}</b></button><button type="button" className="save-button saved" aria-label={`Remove ${listing.title} from saved`} onClick={() => { onToggleSave(listing.id); setItems((current) => current.filter((item) => item.id !== listing.id)); }}><Heart size={17} fill="currentColor" /></button></div>)}</div> : <EmptyState icon={Heart} title="No saved items yet" description="Listings you save from the marketplace will appear here." action="Explore marketplace" onAction={onBack} />}<button type="button" className="secondary-button full-width" onClick={load}><RefreshCw size={15} /> Refresh saved items</button></div>;
+}
+
+function RecentlyViewedPage({ user, onBack, onOpenListing, onNotice }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const load = () => { setLoading(true); setError(''); fetchRecentlyViewed(user.id).then(setItems).catch((requestError) => setError(requestError.message || 'Could not load recently viewed listings.')).finally(() => setLoading(false)); };
+  useEffect(load, [user.id]);
+  const remove = async (id) => { try { await removeRecentlyViewed(user.id, id); setItems((current) => current.filter((item) => item.id !== id)); onNotice('Removed from recently viewed.'); } catch (requestError) { setError(requestError.message || 'Could not remove this item.'); } };
+  const clear = async () => { try { await clearRecentlyViewed(user.id); setItems([]); onNotice('Recently viewed history cleared.'); } catch (requestError) { setError(requestError.message || 'Could not clear history.'); } };
+  return <div className="profile-subpage"><SubpageHeader title="Recently Viewed" eyebrow="MY MARKETPLACE" onBack={onBack} />{error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}{loading ? <EmptyState title="Loading history" description="Getting your saved viewing history." /> : items.length ? <><div className="profile-inline-actions"><button type="button" className="secondary-button" onClick={load}><RefreshCw size={15} /> Refresh</button><button type="button" className="text-action danger-action" onClick={clear}><Trash2 size={15} /> Clear history</button></div><div className="saved-list profile-saved-list">{items.map((listing) => <div className="saved-row" key={listing.id}><button type="button" className="saved-row-media" onClick={() => onOpenListing?.(listing)} aria-label={`Open ${listing.title}`}>{listing.image ? <img src={listing.image} alt={listing.title} loading="lazy" decoding="async" /> : <Package size={20} />}</button><button type="button" className="saved-row-copy" onClick={() => onOpenListing?.(listing)}><strong>{listing.title}</strong><span>{listing.seller} · {listing.location}</span><b>{listing.price}</b></button><button type="button" className="icon-button" onClick={() => remove(listing.id)} aria-label={`Remove ${listing.title} from history`}><Trash2 size={16} /></button></div>)}</div></> : <EmptyState icon={Clock3} title="No recently viewed listings" description="Listings you open will appear here across your devices after you sign in." />}</div>;
 }
 
 function ReviewsPage({ user, onBack }) {
@@ -390,6 +404,7 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   if (subPage === 'saved') return <SavedItemsPage user={user} onBack={() => setSubPage('main')} onOpenListing={onOpenListing} onToggleSave={onToggleSave} />;
   if (subPage === 'reviews') return <ReviewsPage user={user} onBack={() => setSubPage('main')} />;
   if (subPage === 'analytics') return <AnalyticsPage user={user} onBack={() => setSubPage('main')} />;
+  if (subPage === 'recently-viewed') return <RecentlyViewedPage user={user} onBack={() => setSubPage('main')} onOpenListing={onOpenListing} onNotice={onDemoAction} />;
   if (subPage === 'notifications') return <NotificationPage user={user} onBack={() => setSubPage('main')} />;
   if (subPage === 'personal') return <PersonalPage user={user} profile={profileRecord} onBack={() => setSubPage('main')} onAuthRequired={onAuthRequired} onSaved={(nextProfile) => { setProfileRecord(nextProfile); onDemoAction('Profile changes saved successfully.'); }} />;
   if (subPage === 'saved-searches') return <SavedSearchesPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
@@ -409,7 +424,7 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   if (subPage !== 'main') return <UnavailablePage page={pageDefinitions[subPage] || { title: subPage, eyebrow: 'BESE26' }} onBack={() => setSubPage('main')} />;
 
   const statsCards = [{ label: 'Listings', value: loading ? '…' : stats?.listings ?? 0, page: 'listings' }, { label: 'Sold', value: loading ? '…' : stats?.sold ?? 0, page: 'sold' }, { label: 'Saved', value: loading ? '…' : stats?.saved ?? 0, page: 'saved' }, { label: 'Views', value: loading ? '…' : stats?.views ?? 0, page: 'analytics' }];
-  const marketplaceItems = [{ label: 'My Listings', description: 'Manage real listings and review status', icon: Package, page: 'listings', tone: 'coral' }, { label: 'Saved Items', description: 'Your saved marketplace listings', icon: Heart, page: 'saved', tone: 'lavender' }, { label: 'Drafts', description: 'Continue listings saved from Sell', icon: FileText, page: 'drafts', tone: 'gold' }, { label: 'Sold Items', description: 'Listings marked as sold', icon: Tag, page: 'sold', tone: 'mint' }, { label: 'Saved Searches', description: 'Save real searches and alerts', icon: Save, page: 'saved-searches', tone: 'navy' }, { label: 'Recently Viewed', description: 'History is not persisted yet', icon: Clock3, page: 'recently-viewed', tone: 'navy' }];
+  const marketplaceItems = [{ label: 'My Listings', description: 'Manage real listings and review status', icon: Package, page: 'listings', tone: 'coral' }, { label: 'Saved Items', description: 'Your saved marketplace listings', icon: Heart, page: 'saved', tone: 'lavender' }, { label: 'Drafts', description: 'Continue listings saved from Sell', icon: FileText, page: 'drafts', tone: 'gold' }, { label: 'Sold Items', description: 'Listings marked as sold', icon: Tag, page: 'sold', tone: 'mint' }, { label: 'Saved Searches', description: 'Save real searches and alerts', icon: Save, page: 'saved-searches', tone: 'navy' }, { label: 'Recently Viewed', description: 'Your cross-device viewing history', icon: Clock3, page: 'recently-viewed', tone: 'navy' }];
   const sellerItems = [{ label: 'Seller Analytics', description: 'Real views, inquiries, and listing counts', icon: BarChart3, page: 'analytics', tone: 'coral' }, { label: 'Business Profile', description: 'Save your real business record', icon: Store, page: 'business', tone: 'gold' }, { label: 'Verification & Trust', description: profileRecord?.is_verified ? 'Verified by the account record' : 'Current status: not verified', icon: ShieldCheck, page: 'verification', tone: 'mint' }, { label: 'Reviews', description: `${stats?.reviews || 0} real review${stats?.reviews === 1 ? '' : 's'}`, icon: Star, page: 'reviews', tone: 'lavender' }, { label: 'Followers & Following', description: 'Manage real profile connections', icon: Users, page: 'following', tone: 'navy' }];
   const accountItems = [{ label: 'Personal Information', description: `${displayName} · ${profileLocation}`, icon: UserRound, page: 'personal', tone: 'coral' }, { label: 'Login & Security', description: 'Supabase Auth and account sign-out', icon: LockKeyhole, page: 'security', tone: 'navy' }];
   const preferenceItems = [{ label: 'Language & Region', description: 'English · Nigeria · NGN', icon: Globe2, page: 'language', tone: 'navy' }, { label: 'Notifications', description: 'Read your real account updates', icon: Bell, page: 'notifications', tone: 'coral' }, { label: 'Notification Preferences', description: 'Control non-critical updates', icon: Bell, page: 'notification-settings', tone: 'lavender' }, { label: 'Privacy', description: 'Profile and location visibility', icon: Eye, page: 'privacy', tone: 'mint' }, { label: 'Communication', description: 'Calls, WhatsApp, and buyer messages', icon: MessageCircle, page: 'communication', tone: 'gold' }, { label: 'Appearance', description: isDark ? 'Dark mode' : 'Light mode', icon: Moon, page: 'appearance', tone: 'navy' }];

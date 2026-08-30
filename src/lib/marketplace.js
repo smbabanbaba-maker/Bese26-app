@@ -374,7 +374,29 @@ export async function fetchSavedListings(userId) {
   if (error) throw error;
   return hydrateListingRows(data || [], { firstMediaOnly: true });
 }
-
+export async function recordRecentlyViewed(userId, listingId) {
+  failIfUnavailable();
+  if (!userId || !listingId) return;
+  const { error } = await supabase.from('recently_viewed').upsert({ user_id: userId, listing_id: listingId, viewed_at: new Date().toISOString() });
+  if (error) throw error;
+}
+export async function fetchRecentlyViewed(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('recently_viewed').select('listing_id,viewed_at,listing:listings!listing_id(*)').eq('user_id', userId).order('viewed_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  return hydrateListingRows((data || []).map((item) => item.listing).filter(Boolean), { firstMediaOnly: true });
+}
+export async function removeRecentlyViewed(userId, listingId) {
+  failIfUnavailable();
+  const { error } = await supabase.from('recently_viewed').delete().eq('user_id', userId).eq('listing_id', listingId);
+  if (error) throw error;
+}
+export async function clearRecentlyViewed(userId) {
+  failIfUnavailable();
+  const { error } = await supabase.from('recently_viewed').delete().eq('user_id', userId);
+  if (error) throw error;
+}
 export async function fetchMyDrafts(userId) {
   failIfUnavailable();
   if (!userId) return [];

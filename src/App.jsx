@@ -41,7 +41,7 @@ const AdminView = lazy(() => import('./components/AdminView'));
 const SellView = lazy(() => import('./components/SellView'));
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchPublicBusiness, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchSellerEntitlement, getOrCreateConversation, isAdminUser, sendMessage, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, verifyPaystackPayment } from './lib/marketplace';
+import { fetchActiveListings, fetchCategories, fetchPublicBusiness, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchSellerEntitlement, getOrCreateConversation, isAdminUser, recordRecentlyViewed, sendMessage, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, verifyPaystackPayment } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -401,6 +401,7 @@ export default function App() {
   const goSearch = (value) => { setSearch(value); navigate('search'); };
   const openListing = (listing) => {
     setSelectedListing(listing);
+    if (sessionUser?.id) recordRecentlyViewed(sessionUser.id, listing.id).catch(() => {});
     fetchListingDetails(listing.id).then((details) => {
       if (details) setSelectedListing((current) => current?.id === listing.id ? details : current);
     }).catch(() => {});
