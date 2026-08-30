@@ -13,8 +13,8 @@ Add these to the Bese26 Vercel project. Choose **Secret** for the two key values
 | `PAYSTACK_BASIC_PLAN_CODE` | Config | Paystack monthly Basic plan code, for example `PLN_...` |
 | `PAYSTACK_PREMIUM_PLAN_CODE` | Config | Paystack monthly Premium plan code |
 | `PAYSTACK_BUSINESS_PLAN_CODE` | Config | Paystack monthly Business plan code |
-| `APP_URL` | Config | `https://bese26-app.vercel.app` |
-| `PAYSTACK_CALLBACK_URL` | Config | `https://bese26-app.vercel.app/?payment=paystack` |
+| `APP_URL` | Config | `https://bese26.shop` |
+| `PAYSTACK_CALLBACK_URL` | Config | `https://bese26.shop/?payment=paystack` |
 
 Use **Production** for the production deployment. Add the same non-live values to **Preview** only when testing preview deployments. Keep Test Secret Key in Preview/Development and do not mix it with Live keys.
 
@@ -24,7 +24,7 @@ In Paystack Test Mode, create three monthly plans using these amounts: Basic `â‚
 
 In **Settings â†’ API Keys & Webhooks**, set the Test Webhook URL to:
 
-`https://bese26-app.vercel.app/api/paystack/webhook`
+`https://bese26.shop/api/paystack/webhook`
 
 The callback URL is already sent by the server, but it is also safe to set the same callback URL in the dashboard.
 
