@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     if (metadata.user_id !== user.id) return sendJson(res, 403, { error: 'This payment does not belong to your account.' });
     if (data.status !== 'success') return sendJson(res, 200, { successful: false, status: data.status, message: 'Payment has not completed.' });
     const supabase = getSupabaseAdmin();
-    const { data: payment, error } = await supabase.from('payment_transactions').select('id,user_id,plan_key,reference,amount_kobo,status').eq('reference', reference).eq('user_id', user.id).maybeSingle();
+    const { data: payment, error } = await supabase.from('payment_transactions').select('id,user_id,plan_key,purpose,listing_boost_id,reference,amount_kobo,status').eq('reference', reference).eq('user_id', user.id).maybeSingle();
     if (error) throw error;
     if (!payment) return sendJson(res, 400, { error: 'Payment record was not found. Please start checkout again.' });
     const result = await fulfillSuccessfulPayment({ supabase, payment, eventName: 'charge.success', providerData: data });

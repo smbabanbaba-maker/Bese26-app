@@ -800,3 +800,29 @@ export function subscribeToMessages(conversationId, onMessage) {
   const channel = supabase.channel(`conversation-${conversationId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => onMessage(payload.new)).subscribe();
   return () => { supabase.removeChannel(channel); };
 }
+
+export async function fetchBoostPackages() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('boost_packages').select('id,name,duration_days,price_kobo,placement').eq('is_active', true).order('price_kobo').limit(20);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchMyBoosts(userId) {
+  failIfUnavailable();
+  if (!userId) return [];
+  const { data, error } = await supabase.from('listing_boosts').select('id,listing_id,package_id,status,starts_at,ends_at,created_at,listing:listings!listing_id(title),package:boost_packages!package_id(name,placement)').eq('seller_id', userId).order('created_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function initializeBoostPayment({ listingId, packageId }) {
+  if (!supabase) throw new Error('Supabase is not configured.');
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+  if (!token) throw new Error('Sign in before boosting a listing.');
+  const response = await fetch('/api/paystack/initialize', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ mode: 'boost', listingId, packageId }) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || 'Could not start boost checkout.');
+  return payload;
+}

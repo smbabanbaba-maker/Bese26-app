@@ -10,7 +10,7 @@ async function handleEvent(supabase, event, data) {
   if (event === 'charge.success') {
     const metadata = metadataFor(data);
     if (metadata.user_id && metadata.plan_key) {
-      const { data: payment } = await supabase.from('payment_transactions').select('id,user_id,plan_key,reference,amount_kobo,status').eq('reference', data.reference).eq('user_id', metadata.user_id).maybeSingle();
+      const { data: payment } = await supabase.from('payment_transactions').select('id,user_id,plan_key,purpose,listing_boost_id,reference,amount_kobo,status').eq('reference', data.reference).eq('user_id', metadata.user_id).maybeSingle();
       if (payment) await fulfillSuccessfulPayment({ supabase, payment, eventName: event, providerData: data });
     }
     return;
