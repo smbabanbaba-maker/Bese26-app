@@ -243,6 +243,16 @@ export async function fetchPublicBusiness(handle) {
   return { business, listings };
 }
 
+export async function fetchBusinessDirectory(search = '') {
+  failIfUnavailable();
+  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,is_active').eq('is_active', true).eq('is_verified', true).order('business_name').limit(60);
+  const value = String(search || '').trim();
+  if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
   failIfUnavailable();
   if (!sellerId) return [];

@@ -30,6 +30,7 @@ import {
   Sparkles,
   Sprout,
   Star,
+  Store,
   UserRound,
   WalletCards,
   Wrench,
@@ -41,7 +42,7 @@ const AdminView = lazy(() => import('./components/AdminView'));
 const SellView = lazy(() => import('./components/SellView'));
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchCategories, fetchPublicBusiness, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchSellerEntitlement, getOrCreateConversation, isAdminUser, recordRecentlyViewed, sendMessage, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, verifyPaystackPayment } from './lib/marketplace';
+import { fetchActiveListings, fetchBusinessDirectory, fetchCategories, fetchPublicBusiness, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchSellerEntitlement, getOrCreateConversation, isAdminUser, recordRecentlyViewed, sendMessage, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, verifyPaystackPayment } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -64,7 +65,7 @@ const navItems = [
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
-  { key: 'ai', label: 'AI', icon: Sparkles },
+  { key: 'business', label: 'Business', icon: Store },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
 
@@ -308,6 +309,15 @@ function PublicBusinessPage({ handle }) {
   return <div className="public-business-shell"><header className="public-business-topbar"><a href="https://bese26-app.vercel.app/" className="public-brand"><span className="brand-mark">B</span><strong>Bese44<span>.shop</span></strong></a><button type="button" className="secondary-button" onClick={share}>Share profile</button></header><main className="public-business-main"><section className="public-business-hero"><div className="public-business-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${business.business_name} logo`} /> : <span>{business.business_name.slice(0, 1).toUpperCase()}</span>}</div><div className="public-business-identity"><div className="eyebrow">PUBLIC BUSINESS PROFILE</div><h1>{business.business_name}</h1><strong className="public-business-handle">@{business.business_handle}</strong>{business.is_verified && <span className="verified-badge"><BadgeCheck size={13} /> Verified Business</span>}<p>{business.description || 'This business has not added a public description yet.'}</p><span className="public-business-location"><MapPin size={14} /> {location || 'Nigeria'}</span><div className="public-business-actions"><button type="button" className="primary-button" onClick={() => window.location.href = 'https://bese26-app.vercel.app/'}>View on Bese26 <ArrowRight size={15} /></button><button type="button" className="secondary-button" onClick={share}>Share</button></div></div></section><section className="public-business-stats"><div><strong>{listings.length}</strong><span>Listings</span></div><div><strong>{business.category || '—'}</strong><span>Category</span></div><div><strong>{business.business_type || 'Business'}</strong><span>Type</span></div></section><section className="public-business-listings"><div className="section-heading"><div><div className="eyebrow">AVAILABLE NOW</div><h2>Listings from {business.business_name}</h2></div><span>{listings.length} listing{listings.length === 1 ? '' : 's'}</span></div>{listings.length ? <div className="product-grid">{listings.map((listing) => <article className="product-card" key={listing.id}><div className="product-image-wrap">{listing.image ? <img src={listing.image} alt={listing.title} className="product-image" /> : <div className="product-image-placeholder"><Package size={26} /></div>}</div><div className="product-info"><div className="product-price">{listing.price}</div><h3>{listing.title}</h3><div className="product-meta"><MapPin size={13} /> {listing.location}</div><div className="product-foot"><span>{listing.condition}</span><span>{listing.posted}</span></div></div></article>)}</div> : <div className="empty-state"><Package size={26} /><h3>No listings yet.</h3><p>This business has not published any approved listings.</p></div>}</section></main><footer className="public-business-footer">Powered by Bese44.shop · Marketplace by Bese26</footer></div>;
 }
 
+function BusinessDirectoryView({ onBack }) {
+  const [search, setSearch] = useState('');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => { let mounted = true; setLoading(true); setError(''); fetchBusinessDirectory(search).then((rows) => mounted && setItems(rows)).catch((reason) => mounted && setError(reason.message || 'Could not load businesses.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [search]);
+  return <div className="page-stack business-directory-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div><section className="business-directory-hero"><div className="eyebrow light">BESE44 BUSINESS</div><h1>Discover trusted local companies.</h1><p>Browse verified businesses, view their listings, and contact them directly through their public profile.</p></section><div className="search-box business-directory-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search company, category, or city" aria-label="Search businesses" /></div>{error && <div className="auth-status error">{error}</div>}{loading ? <div className="route-loading">Loading verified businesses…</div> : items.length ? <div className="business-directory-grid">{items.map((business) => { const location = [business.city, business.state].filter(Boolean).join(', '); return <article className="business-directory-card" key={business.profile_id}><div className="business-directory-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${business.business_name} logo`} /> : <Store size={26} />}</div><div className="business-directory-copy"><span className="eyebrow">{business.category || business.business_type || 'VERIFIED BUSINESS'}</span><h2>{business.business_name}</h2><strong>@{business.business_handle}</strong><p>{business.description || 'Explore this company’s public profile and available listings.'}</p><small>{location || 'Nigeria'}{business.delivery_available ? ' · Delivery' : ''}{business.pickup_available ? ' · Pickup' : ''}</small></div><a className="primary-button" href={`/@${business.business_handle}`}>View company <ArrowRight size={15} /></a></article>; })}</div> : <div className="empty-state"><Store size={26} /><h3>No verified businesses found</h3><p>{search ? 'Try another company name, category, or city.' : 'Verified companies will appear here after their profiles are approved.'}</p></div>}</div>;
+}
+
 export default function App() {
   const publicHandle = typeof window !== 'undefined' ? window.location.pathname.match(/^\/@([a-z0-9-]+)\/?$/i)?.[1]?.toLowerCase() : null;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
@@ -426,7 +436,7 @@ export default function App() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'ai') return <UnavailableView icon={Sparkles} eyebrow="AI TOOLS" title="AI tools are coming soon" description="The marketplace assistant is not connected yet. Bese26 will not show invented AI answers or recommendations." onBack={() => navigate('home')} />;
+    if (activeNav === 'business') return <BusinessDirectoryView onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} />;
     if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} onEditListing={(listing) => { setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
