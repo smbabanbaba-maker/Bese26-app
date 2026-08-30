@@ -97,7 +97,7 @@ function ProductCard({ listing, onOpen, isSaved, onToggleSave, compact = false }
   return (
     <article className={`product-card ${compact ? 'product-card-compact' : ''}`} role="button" tabIndex={0} aria-label={`Open listing: ${listing.title}`} onClick={() => onOpen(listing)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); onOpen(listing); } }}>
       <div className="product-image-wrap">
-        {listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" /> : <div className="product-image-placeholder"><Package size={26} /></div>}
+        {listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /> : null}<div className="product-image-placeholder" hidden={Boolean(listing.image)}><Package size={26} /></div>
         {listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> Promoted</span>}
         <button className={`save-button ${isSaved ? 'saved' : ''}`} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} onClick={(event) => { event.stopPropagation(); onToggleSave(listing.id); }}>
           <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
