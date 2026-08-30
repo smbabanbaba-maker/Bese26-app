@@ -237,10 +237,12 @@ export async function fetchPublicBusiness(handle) {
   const { data: business, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at').eq('business_handle', normalized).eq('is_active', true).maybeSingle();
   if (businessError) throw businessError;
   if (!business || !business.is_verified) return null;
+  const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
+  if (ownerError) throw ownerError;
   const { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
   if (listingsError) throw listingsError;
   const listings = await hydrateListingRows(rows || [], { firstMediaOnly: true });
-  return { business, listings };
+  return { business, ownerProfile, listings };
 }
 
 export async function fetchBusinessDirectory(search = '') {

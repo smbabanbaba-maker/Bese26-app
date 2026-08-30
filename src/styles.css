@@ -906,6 +906,13 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .public-business-not-found .brand-mark { margin: 0 auto 24px; }
 .public-business-not-found h1 { font-size: 32px; margin-bottom: 10px; }
 .public-business-not-found p { color: #717782; line-height: 1.55; margin-bottom: 22px; }
+.public-business-owner { margin: 20px 0; padding: 20px; background: white; border: 1px solid #e7e8eb; border-radius: 18px; }
+.public-owner-row { display: flex; align-items: center; gap: 14px; }
+.public-owner-row img, .public-owner-avatar { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; background: #fff0ee; color: #c62828; font: 800 22px Manrope, sans-serif; flex: none; }
+.public-owner-row > div:nth-child(2) { min-width: 0; flex: 1; }
+.public-owner-row strong, .public-owner-row span, .public-owner-row p { display: block; }
+.public-owner-row span { color: #a7382c; font-size: 12px; margin-top: 3px; }
+.public-owner-row p { color: #717782; font-size: 12px; margin-top: 5px; line-height: 1.4; }
 @media (max-width: 640px) { .public-business-topbar { padding: 0 16px; } .public-business-main { padding: 22px 16px 52px; } .public-business-hero { grid-template-columns: 1fr; gap: 20px; padding: 22px; } .public-business-logo { width: 104px; height: 104px; border-radius: 22px; font-size: 42px; } .public-business-identity h1 { font-size: 31px; } .public-business-stats { margin-bottom: 30px; } .public-business-stats > div { padding: 13px; } .public-business-stats strong { font-size: 15px; } .public-business-footer { padding-left: 16px; padding-right: 16px; } }
 
 /* Business directory */
