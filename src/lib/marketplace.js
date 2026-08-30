@@ -693,12 +693,20 @@ export async function fetchPaymentHistory(userId) {
   return data || [];
 }
 
-async function callPaystackEndpoint(path, body) {
+async function getAccessToken() {
   failIfUnavailable();
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) throw sessionError;
-  if (!session?.access_token) throw new Error('Sign in before starting a subscription.');
-  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify(body) });
+  if (session?.access_token) return session.access_token;
+  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) throw refreshError;
+  if (!refreshed.session?.access_token) throw new Error('Your session is not available. Sign in again.');
+  return refreshed.session.access_token;
+}
+
+async function callPaystackEndpoint(path, body) {
+  const accessToken = await getAccessToken();
+  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify(body) });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || 'Could not contact the payment service.');
   return payload;
@@ -817,10 +825,7 @@ export async function fetchMyBoosts(userId) {
 }
 
 export async function initializeBoostPayment({ listingId, packageId }) {
-  if (!supabase) throw new Error('Supabase is not configured.');
-  const { data: sessionData } = await supabase.auth.getSession();
-  const token = sessionData.session?.access_token;
-  if (!token) throw new Error('Sign in before boosting a listing.');
+  const token = await getAccessToken();
   const response = await fetch('/api/paystack/initialize', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ mode: 'boost', listingId, packageId }) });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || 'Could not start boost checkout.');
