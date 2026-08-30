@@ -110,6 +110,45 @@ export async function updatePassword(password) {
   return data.user;
 }
 
+export async function fetchVerificationApplications(userId) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('verification_applications').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+export async function submitVerificationApplication(userId, values) {
+  failIfUnavailable();
+  const payload = { user_id: userId, verification_type: values.verification_type, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
+  const { data, error } = await supabase.from('verification_applications').insert(payload).select().single();
+  if (error) throw error;
+  return data;
+}
+export async function fetchVerificationQueue() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('verification_applications').select('*,profile:profiles!verification_applications_user_id_fkey(display_name,username)').eq('status', 'pending').order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+export async function reviewVerificationApplication({ id, userId, status, reviewerNote }) {
+  failIfUnavailable();
+  const { data: currentUser } = await supabase.auth.getUser();
+  const { data, error } = await supabase.from('verification_applications').update({ status, reviewer_note: reviewerNote || null, reviewed_by: currentUser.user?.id || null, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+  if (error) throw error;
+  if (status === 'approved') { const { error: profileError } = await supabase.from('profiles').update({ is_verified: true }).eq('id', userId); if (profileError) throw profileError; }
+  return data;
+}
+export async function uploadVerificationDocument({ userId, file }) {
+  failIfUnavailable();
+  if (!userId || !file) throw new Error('Choose a verification document first.');
+  if (!['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type)) throw new Error('Use JPG, PNG, WEBP, or PDF format.');
+  if (file.size > 8000000) throw new Error('The document must be smaller than 8 MB.');
+  const name = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const path = `${userId}/${crypto.randomUUID()}-${name}`;
+  const { error } = await supabase.storage.from('verification-documents').upload(path, file, { upsert: false, contentType: file.type });
+  if (error) throw error;
+  return path;
+}
+
 export async function getProfile(userId) {
   failIfUnavailable();
   const { data, error } = await supabase
