@@ -61,7 +61,6 @@ const iconMap = {
 
 const navItems = [
   { key: 'home', label: 'Home', icon: House },
-  { key: 'wallet', label: 'Wallet', icon: WalletCards },
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
