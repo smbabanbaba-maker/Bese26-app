@@ -741,7 +741,7 @@ export async function createListing({ sellerId, values }) {
     p_attributes: values.attributes || {},
   });
   if (error) {
-    if (error.message?.includes('FREE_POST_LIMIT_REACHED')) throw new Error('Your 3 free posts have been used. Choose a subscription plan to post more listings.');
+    if (error.message?.includes('ACTIVE_LISTING_LIMIT_REACHED') || error.message?.includes('FREE_POST_LIMIT_REACHED')) throw new Error('Your plan has reached its active listing limit. Choose a subscription plan to post more listings.');
     throw error;
   }
   return Array.isArray(data) ? data[0] : data;
