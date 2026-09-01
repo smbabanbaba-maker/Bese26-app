@@ -997,3 +997,14 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* Seller identity shown on every listing card */
+.listing-seller-line { display: flex; align-items: center; gap: 7px; min-width: 0; margin-top: 9px; color: var(--muted); font-size: 10px; }
+.listing-seller-avatar { width: 22px; height: 22px; display: grid; place-items: center; flex: none; border-radius: 50%; background: #fff0ee; color: #b64239; font: 800 8px Manrope, sans-serif; text-transform: uppercase; }
+.listing-seller-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-weight: 700; }
+.listing-seller-verified { flex: none; color: #2f9471; }
+.product-card-compact .listing-seller-line { margin-top: 6px; }
+.product-card-compact .listing-seller-avatar { width: 19px; height: 19px; font-size: 7px; }
+.product-card-compact .listing-seller-name { max-width: 120px; }
+.seller-detail strong svg { color: #2f9471; flex: none; }
+.seller-detail small + small { margin-top: 2px; }

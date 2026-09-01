@@ -27,6 +27,7 @@ export function mapListing(row) {
   const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
   const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
   const seller = row.profiles || {};
+  const business = row.business_profile || {};
   const category = row.category || row.categories || {};
   const subcategory = row.subcategory || {};
   const location = [row.city, row.state].filter(Boolean).join(', ') || row.country || 'Nigeria';
@@ -44,11 +45,14 @@ export function mapListing(row) {
     category: category.name || 'Marketplace',
     subcategory: subcategory.name || '',
     seller: seller.display_name || 'bese26 seller',
+    sellerDisplayName: business.business_name || seller.display_name || 'bese26 seller',
+    sellerBusinessName: business.business_name || '',
+    sellerBusinessHandle: business.business_handle || '',
     sellerId: row.seller_id,
-    sellerAvatar: getAvatarUrl(seller.avatar_path),
-    sellerInitials: initials(seller.display_name),
+    sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
+    sellerInitials: initials(business.business_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
-    verified: Boolean(seller.is_verified),
+    verified: Boolean(seller.is_verified || business.is_verified),
     promoted: false,
     description: row.description || '',
     attributes: row.attributes || {},
@@ -265,8 +269,14 @@ export async function fetchSavedIds(userId) {
 const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
+  const sellerIds = [...new Set(rows.map((row) => row.seller_id).filter(Boolean))];
+  const { data: businessProfiles, error: businessError } = sellerIds.length
+    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active').in('profile_id', sellerIds).eq('is_active', true)
+    : { data: [], error: null };
+  if (businessError) throw businessError;
+  const businessBySeller = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
   const mediaByRow = rows.map((row) => ({
-    row,
+    row: { ...row, business_profile: businessBySeller[row.seller_id] || null },
     media: [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order),
   }));
   const signedEntries = mediaByRow.flatMap(({ row, media }) => (firstMediaOnly ? media.slice(0, 1) : media).map((item) => ({ key: `${row.id}:${item.storage_path}`, path: item.storage_path })));
