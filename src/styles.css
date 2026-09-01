@@ -963,3 +963,37 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .business-listing-message { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; width: fit-content; padding: 8px 11px; font-size: 12px; }
 @media (max-width: 640px) { .business-listing-message { width: 100%; justify-content: center; } }
 @media (max-width: 640px) { .business-directory-card { grid-template-columns: auto 1fr; } .business-directory-card > .primary-button { grid-column: 1 / -1; width: 100%; justify-content: center; } .business-directory-logo { width: 58px; height: 58px; } }
+
+/* Bese26 motion system: subtle, fast, and safe for marketplace tasks */
+@keyframes bese26Rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bese26SoftScale { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes bese26Pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+@keyframes bese26HeartPop { 0% { transform: scale(1); } 45% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes bese26Shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@keyframes bese26Skeleton { 0% { background-position: 120% 0; } 100% { background-position: -20% 0; } }
+.page-stack { animation: bese26Rise .42s var(--ease) both; }
+.home-page .hero-panel, .home-page .discovery-banner { animation: bese26SoftScale .48s var(--ease) both; }
+.home-page .search-section { animation: bese26Rise .48s .06s var(--ease) both; }
+.home-page .category-grid, .home-page .quick-actions-grid, .home-page .product-grid { animation: bese26Rise .48s .1s var(--ease) both; }
+.product-card, .business-directory-card, .notification-row, .settings-card { animation: bese26Rise .42s var(--ease) both; }
+.product-grid .product-card:nth-child(2), .business-directory-grid .business-directory-card:nth-child(2), .notification-list .notification-row:nth-child(2) { animation-delay: .05s; }
+.product-grid .product-card:nth-child(3), .business-directory-grid .business-directory-card:nth-child(3), .notification-list .notification-row:nth-child(3) { animation-delay: .1s; }
+.product-grid .product-card:nth-child(4), .business-directory-grid .business-directory-card:nth-child(4), .notification-list .notification-row:nth-child(4) { animation-delay: .15s; }
+.product-grid .product-card:nth-child(n+5), .business-directory-grid .business-directory-card:nth-child(n+5) { animation-delay: .2s; }
+.business-directory-page .business-directory-hero { animation: bese26SoftScale .45s var(--ease) both; }
+.business-directory-page .business-directory-search { animation: bese26Rise .42s .08s var(--ease) both; }
+.business-profile-page, .profile-subpage { animation: bese26Rise .4s var(--ease) both; }
+.listing-modal { animation: bese26SoftScale .3s var(--ease) both; }
+.modal-image-wrap img { transition: transform .5s var(--ease), opacity .25s ease; }
+.modal-image-wrap:hover img { transform: scale(1.035); }
+.save-button:active, .favorite-button:active, [aria-label*="Save"]:active, [aria-label*="Favourite"]:active { animation: bese26HeartPop .32s ease; }
+.primary-button:active, .dark-button:active, .publish-button:active, .message-button:active { transform: scale(.97); }
+.business-listing-message:hover, .google-auth-button:hover, .quick-action:hover { transform: translateY(-2px); }
+.business-listing-message, .google-auth-button, .quick-action, .primary-button, .text-button, .bottom-nav button { transition: transform .2s var(--ease), background .2s ease, color .2s ease, box-shadow .2s ease; }
+.auth-status.error { animation: bese26Shake .34s ease; }
+.auth-status.success, .payment-success, .success-message { animation: bese26Pulse .55s ease; }
+.route-loading, .loading-state, .skeleton, [aria-busy="true"] { background-image: linear-gradient(100deg, transparent 25%, rgba(255,255,255,.55) 50%, transparent 75%); background-size: 240% 100%; animation: bese26Skeleton 1.25s ease-in-out infinite; }
+.bottom-nav button.active, .bottom-nav button[aria-current="page"] { animation: bese26SoftScale .24s ease both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
