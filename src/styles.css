@@ -610,8 +610,11 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .auth-welcome-content h2 { white-space: pre-line; font-size: clamp(28px, 4vw, 43px); line-height: .98; letter-spacing: -.07em; margin-bottom: 18px; }
 .auth-welcome-content p { color: #bdbdc1; font-size: 11px; line-height: 1.6; }
 .auth-form-panel { position: relative; padding: 43px 42px 34px; display: flex; flex-direction: column; justify-content: center; background: #fff; }
-.auth-panel.is-signup .auth-welcome-panel { order: 2; }
-.auth-panel.is-signup .auth-form-panel { order: 1; }
+.auth-form-flip-shell { min-width: 0; perspective: 1200px; background: #fff; }
+.auth-form-flip-card { position: relative; width: 100%; min-height: 440px; height: 100%; transform-style: preserve-3d; transition: transform .72s cubic-bezier(.2,.7,.2,1); }
+.auth-form-flip-shell.is-flipped .auth-form-flip-card { transform: rotateY(180deg); }
+.auth-form-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.auth-form-back { transform: rotateY(180deg); }
 .auth-panel-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; color: #fff; background: #111; margin-bottom: 18px; }
 .auth-form-panel h2 { font-size: 30px; line-height: 1.08; margin-bottom: 8px; max-width: 310px; }
 .auth-panel-copy { color: #717782; font-size: 12px; line-height: 1.55; max-width: 340px; }
@@ -637,8 +640,10 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 @media (max-width: 640px) {
   .auth-backdrop { align-items: end; padding: 0; }
   .auth-panel { width: 100%; min-height: 0; max-height: 94vh; overflow-y: auto; grid-template-columns: 1fr; border-radius: 22px 22px 0 0; }
-  .auth-welcome-panel, .auth-panel.is-signup .auth-welcome-panel { order: 1; min-height: 165px; }
-  .auth-form-panel, .auth-panel.is-signup .auth-form-panel { order: 2; padding: 28px 22px 30px; }
+  .auth-welcome-panel { min-height: 165px; }
+  .auth-form-flip-shell { min-height: 470px; }
+  .auth-form-flip-card { min-height: 470px; }
+  .auth-form-panel { padding: 28px 22px 30px; }
   .auth-welcome-content { padding: 27px 24px; margin: 0; }
   .auth-welcome-kicker { margin-bottom: 14px; }
   .auth-welcome-mark { display: none; }
