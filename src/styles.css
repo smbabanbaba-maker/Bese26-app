@@ -1008,3 +1008,8 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .product-card-compact .listing-seller-name { max-width: 120px; }
 .seller-detail strong svg { color: #2f9471; flex: none; }
 .seller-detail small + small { margin-top: 2px; }
+
+.verified-filter-chip { display: inline-flex; align-items: center; gap: 6px; }
+.verified-filter-chip svg { color: #2f9471; }
+.verified-filter-chip.active { color: #fff; background: #2f9471; border-color: #2f9471; }
+.verified-filter-chip.active svg { color: #fff; }
