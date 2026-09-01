@@ -118,7 +118,8 @@ export async function fetchVerificationApplications(userId) {
 }
 export async function submitVerificationApplication(userId, values) {
   failIfUnavailable();
-  const payload = { user_id: userId, verification_type: values.verification_type, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
+  const durationMonths = Math.min(12, Math.max(1, Number(values.duration_months) || 1));
+  const payload = { user_id: userId, verification_type: values.verification_type, duration_months: durationMonths, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
   const { data, error } = await supabase.from('verification_applications').insert(payload).select().single();
   if (error) throw error;
   return data;
@@ -129,12 +130,26 @@ export async function fetchVerificationQueue() {
   if (error) throw error;
   return data || [];
 }
-export async function reviewVerificationApplication({ id, userId, status, reviewerNote }) {
+export async function reviewVerificationApplication({ id, userId, status, verificationType = 'seller', reviewerNote, durationMonths = 1 }) {
   failIfUnavailable();
   const { data: currentUser } = await supabase.auth.getUser();
-  const { data, error } = await supabase.from('verification_applications').update({ status, reviewer_note: reviewerNote || null, reviewed_by: currentUser.user?.id || null, updated_at: new Date().toISOString() }).eq('id', id).select().single();
+  const updateValues = { status, reviewer_note: reviewerNote || null, reviewed_by: currentUser.user?.id || null, updated_at: new Date().toISOString() };
+  if (status === 'approved') {
+    const months = Math.min(12, Math.max(1, Number(durationMonths) || 1));
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + months);
+    updateValues.expires_at = expiresAt.toISOString();
+  }
+  const { data, error } = await supabase.from('verification_applications').update(updateValues).eq('id', id).select().single();
   if (error) throw error;
-  if (status === 'approved') { const { error: profileError } = await supabase.from('profiles').update({ is_verified: true }).eq('id', userId); if (profileError) throw profileError; }
+  if (status === 'approved') {
+    const { error: profileError } = await supabase.from('profiles').update({ is_verified: true, verification_expires_at: updateValues.expires_at }).eq('id', userId);
+    if (profileError) throw profileError;
+    if (verificationType === 'business') {
+      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true, verification_expires_at: updateValues.expires_at }).eq('profile_id', userId);
+      if (businessError) throw businessError;
+    }
+  }
   return data;
 }
 export async function uploadVerificationDocument({ userId, file }) {
