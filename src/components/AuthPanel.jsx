@@ -46,28 +46,41 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
     }
   };
 
+  const isSignin = mode === 'signin';
   return <div className="auth-backdrop" onClick={onClose}>
-    <section className="auth-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
+    <section className={`auth-panel ${isSignin ? 'is-signin' : 'is-signup'}`} onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
       <button type="button" className="modal-close icon-button" onClick={onClose} aria-label="Close authentication"><X size={18} /></button>
-      <div className="auth-panel-mark"><LockKeyhole size={18} /></div>
-      <div className="eyebrow">SAFE MARKETPLACE ACCESS</div>
-      <h2 id="auth-title">{mode === 'signin' ? 'Welcome back.' : 'Create your bese26 account.'}</h2>
-      <p className="auth-panel-copy">{mode === 'signin' ? 'Sign in to save listings, post items, and chat with sellers.' : 'Use your email to create a secure marketplace account.'}</p>
-      {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
-      {mode === 'signin' && isSupabaseConfigured && <>
-        <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
-        <div className="auth-divider"><span>or use email</span></div>
-      </>}
-      <form onSubmit={submit} className="auth-form">
-        {mode === 'signup' && <>
-          <label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label>
-          <label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label>
+      <div className="auth-welcome-panel" aria-hidden="true">
+        <div className="auth-welcome-shape auth-welcome-shape-one" />
+        <div className="auth-welcome-shape auth-welcome-shape-two" />
+        <div className="auth-welcome-content">
+          <span className="auth-welcome-kicker">BESE26 MARKETPLACE</span>
+          <span className="auth-welcome-mark"><LockKeyhole size={18} /></span>
+          <h2>{isSignin ? 'WELCOME\nBACK!' : 'JOIN THE\nMARKETPLACE'}</h2>
+          <p>{isSignin ? 'Save listings, post items, and chat with sellers securely.' : 'Create your profile and start buying or selling with confidence.'}</p>
+        </div>
+      </div>
+      <div className="auth-form-panel">
+        <div className="auth-panel-mark"><LockKeyhole size={18} /></div>
+        <div className="eyebrow">SAFE MARKETPLACE ACCESS</div>
+        <h2 id="auth-title">{isSignin ? 'Login' : 'Create account'}</h2>
+        <p className="auth-panel-copy">{isSignin ? 'Welcome back to your marketplace.' : 'Set up your secure bese26 account.'}</p>
+        {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
+        {isSignin && isSupabaseConfigured && <>
+          <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
+          <div className="auth-divider"><span>or use email</span></div>
         </>}
-        <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
-        <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} required /></label>
-        <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}</button>
-      </form>
-      <button type="button" className="auth-switch" onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setStatus({ type: '', message: '' }); }}>{mode === 'signin' ? 'New to bese26? Create an account' : 'Already have an account? Sign in'}</button>
+        <form onSubmit={submit} className="auth-form">
+          {mode === 'signup' && <>
+            <label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label>
+            <label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label>
+          </>}
+          <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
+          <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete={isSignin ? 'current-password' : 'new-password'} required /></label>
+          <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : isSignin ? 'Login' : 'Create account'}</button>
+        </form>
+        <button type="button" className="auth-switch" onClick={() => { setMode(isSignin ? 'signup' : 'signin'); setStatus({ type: '', message: '' }); }}>{isSignin ? 'Don’t have an account? Sign up' : 'Already have an account? Login'}</button>
+      </div>
     </section>
   </div>;
 }
