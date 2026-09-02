@@ -365,6 +365,12 @@ function App() {
   const [chatListing, setChatListing] = useState(null);
   const [editingListing, setEditingListing] = useState(null);
 
+  // Always start the marketplace shell on Home; only explicit deep links may open another view.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('chat_listing') && !params.has('reference') && !params.has('payment')) setActiveNav('home');
+  }, []);
+
   const showToast = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
   const requireAuth = (message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); };
   const toggleSave = (id) => {
