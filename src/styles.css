@@ -1372,3 +1372,39 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .category-strip { gap: 20px; }
   .product-grid { gap: 10px; }
 }
+
+/* Final listing detail palette and typography polish */
+.listing-detail-inspired { background: #fff; color: #171717; }
+.listing-detail-inspired .listing-detail-header { background: #fff; border-bottom-color: #e9e9e9; }
+.listing-detail-inspired .listing-detail-header strong { font-size: 14px; color: #171717; }
+.listing-detail-inspired .listing-detail-body { background: #f7f7f7; padding: 14px 12px 22px; }
+.listing-detail-inspired .listing-detail-body h1 { color: #171717; font-size: clamp(19px, 5vw, 22px); line-height: 1.18; margin-bottom: 6px; }
+.listing-detail-inspired .listing-location-line { color: #6b6b6b; font-size: 10px; }
+.listing-detail-inspired .listing-location-line svg { color: #d71920; }
+.listing-detail-inspired .listing-detail-price { color: #d71920; font-size: 20px; font-weight: 800; margin-bottom: 11px; }
+.listing-detail-inspired .listing-primary-actions { gap: 8px; }
+.listing-detail-inspired .secondary-contact-button, .listing-detail-inspired .primary-contact-button, .listing-detail-inspired .listing-start-chat, .listing-detail-inspired .make-offer-wide, .listing-detail-inspired .post-similar-button { min-height: 44px; border-radius: 9px; font-size: 12px; font-weight: 700; }
+.listing-detail-inspired .secondary-contact-button { color: #d71920; border: 1.5px solid #d71920; background: #fff; }
+.listing-detail-inspired .primary-contact-button, .listing-detail-inspired .listing-start-chat { color: #fff; background: #d71920; border: 1px solid #d71920; }
+.listing-detail-inspired .listing-chat-card, .listing-detail-inspired .listing-info-card, .listing-detail-inspired .seller-profile-card, .listing-detail-inspired .listing-description-card { margin-top: 10px; padding: 13px; border-radius: 11px; background: #fff; border: 1px solid #e8e8e8; box-shadow: 0 2px 8px rgba(20,20,20,.025); }
+.listing-detail-inspired .listing-chat-card h2 { color: #171717; font-size: 15px; margin-bottom: 10px; }
+.listing-detail-inspired .quick-message-row { gap: 6px; padding-bottom: 8px; }
+.listing-detail-inspired .quick-message-row button { color: #d71920; border: 1px solid #d71920; border-radius: 8px; background: #fff; padding: 8px 10px; font-size: 10px; }
+.listing-detail-inspired .listing-chat-card textarea { min-height: 72px; padding: 11px; border: 1px solid #d9d9d9; border-radius: 9px; color: #262626; font-size: 12px; background: #fff; }
+.listing-detail-inspired .listing-start-chat { margin-top: 8px; }
+.listing-detail-inspired .listing-info-card h2 { color: #171717; font-size: 15px; }
+.listing-detail-inspired .listing-info-card span, .listing-detail-inspired .listing-description-card { color: #555; font-size: 11px; line-height: 1.55; }
+.listing-detail-inspired .listing-store-card svg { color: #d71920; }
+.listing-detail-inspired .listing-store-card button { color: #d71920; font-size: 11px; }
+.listing-detail-inspired .make-offer-wide, .listing-detail-inspired .post-similar-button { color: #d71920; border: 1.5px solid #d71920; background: #fff; margin-top: 10px; }
+.listing-detail-inspired .seller-profile-heading strong { color: #171717; font-size: 13px; }
+.listing-detail-inspired .seller-profile-heading span, .listing-detail-inspired .seller-profile-heading small { color: #777; font-size: 10px; }
+.listing-detail-inspired .seller-profile-heading span svg { color: #d71920; }
+.listing-detail-inspired .seller-profile-heading button { color: #d71920; font-size: 11px; }
+.listing-detail-inspired .seller-profile-card h3 { color: #171717; font-size: 14px; margin: 14px 0 6px; }
+.listing-detail-inspired .seller-feedback-empty { color: #777; font-size: 11px; line-height: 1.45; }
+.listing-detail-inspired .listing-bottom-actions { gap: 8px; padding: 13px; margin-top: 10px; background: #fff; border-radius: 11px; }
+.listing-detail-inspired .listing-bottom-actions button { min-height: 42px; color: #d71920; border: 1.5px solid #d71920; border-radius: 9px; font-size: 11px; }
+.listing-detail-inspired .listing-bottom-actions .report-action { color: #d71920; border-color: #d71920; }
+.listing-detail-inspired .more-dots { color: #171717; font-size: 20px; }
+@media (max-width: 640px) { .listing-detail-inspired { border-radius: 14px 14px 0 0; } .listing-detail-inspired .modal-image-wrap { height: min(60vw, 330px); min-height: 220px; } .listing-detail-inspired .modal-image-wrap img { min-height: 220px; } }
