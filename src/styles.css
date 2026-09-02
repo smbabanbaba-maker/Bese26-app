@@ -1153,3 +1153,64 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .auth-welcome-content h2 { font-size: 31px; }
   .auth-welcome-content p { max-width: 250px; }
 }
+
+/* Keep the reference's horizontal card on phones too; do not stack the panels vertically. */
+@media (max-width: 640px) {
+  .auth-backdrop { align-items: center; padding: 12px; }
+  .auth-panel {
+    width: min(100%, 560px);
+    max-height: 92vh;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .auth-form-flip-shell,
+  .auth-form-flip-card,
+  .auth-form-face { min-height: 330px; height: min(78vw, 380px); }
+  .auth-form-face {
+    display: grid;
+    grid-template-columns: 58% 42%;
+    flex-direction: initial;
+  }
+  .auth-form-face-content {
+    order: initial !important;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 22px 14px 19px;
+  }
+  .auth-form-face-content::after {
+    display: block;
+    right: -66px;
+    width: 102px;
+  }
+  .auth-form-face .auth-welcome-panel {
+    order: initial !important;
+    min-height: 0;
+    display: flex;
+  }
+  .auth-welcome-content {
+    max-width: 150px;
+    margin: auto 4px auto 16px;
+    padding: 16px 3px 16px 12px;
+  }
+  .auth-welcome-kicker { font-size: 6px; letter-spacing: 1px; margin-bottom: 12px; }
+  .auth-welcome-mark { width: 22px; height: 22px; margin-bottom: 11px; }
+  .auth-welcome-mark svg { width: 12px; height: 12px; }
+  .auth-welcome-content h2 { font-size: clamp(19px, 6vw, 28px); margin-bottom: 9px; }
+  .auth-welcome-content p { max-width: 115px; font-size: 7px; line-height: 1.4; }
+  .auth-panel-mark { width: 23px; height: 23px; margin-bottom: 9px; }
+  .auth-panel-mark svg { width: 13px; height: 13px; }
+  .auth-form-panel h2 { font-size: 22px; }
+  .auth-panel-copy { font-size: 8px; line-height: 1.35; }
+  .auth-form { gap: 7px; margin-top: 9px; }
+  .auth-form label > span { font-size: 7px; }
+  .auth-form input { padding: 5px 1px; font-size: 9px; }
+  .auth-submit { min-height: 27px; margin-top: 4px; font-size: 8px; }
+  .google-auth-button { margin-top: 7px; padding: 6px 7px; font-size: 7px; }
+  .google-logo { width: 14px; height: 14px; }
+  .google-logo i { width: 11px; height: 11px; font-size: 9px; }
+  .auth-divider { margin: 6px 0 0; font-size: 7px; }
+  .auth-switch { margin-top: 8px; font-size: 7px; }
+  .auth-status { margin-top: 6px; padding: 5px; font-size: 7px; }
+  .auth-form-back .auth-welcome-panel { order: 2 !important; }
+  .auth-form-back .auth-form-face-content { order: 1 !important; }
+}
