@@ -1050,3 +1050,28 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .verified-filter-chip svg { color: #2f9471; }
 .verified-filter-chip.active { color: #fff; background: #2f9471; border-color: #2f9471; }
 .verified-filter-chip.active svg { color: #fff; }
+
+/* Two-sided auth card: form on the left, welcome panel on the right. */
+.auth-panel { display: block; min-height: 440px; }
+.auth-form-flip-shell { position: relative; width: 100%; min-height: 440px; height: 100%; }
+.auth-form-flip-card { min-height: 440px; height: 100%; }
+.auth-form-face { display: grid; grid-template-columns: 58% 42%; min-height: 440px; background: #fff; }
+.auth-form-face-content { position: relative; min-width: 0; }
+.auth-form-face .auth-welcome-panel { min-width: 0; }
+.auth-form-back { transform: rotateY(180deg); }
+.auth-form-back .auth-welcome-panel { order: 2; }
+.auth-form-back .auth-form-face-content { order: 1; }
+@media (max-width: 640px) {
+  .auth-panel { min-height: 0; }
+  .auth-form-flip-shell, .auth-form-flip-card { min-height: 610px; }
+  .auth-form-face { display: flex; flex-direction: column; min-height: 610px; }
+  .auth-form-face-content { order: 2 !important; flex: 1; padding: 28px 22px 30px; }
+  .auth-form-face .auth-welcome-panel { order: 1 !important; min-height: 165px; flex: none; }
+  .auth-form-face .auth-welcome-content { padding: 27px 24px; margin: 0; }
+  .auth-form-face .auth-welcome-mark { display: none; }
+  .auth-form-face .auth-welcome-kicker { margin-bottom: 14px; }
+  .auth-form-face .auth-welcome-content h2 { font-size: 31px; margin-bottom: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-form-flip-card { transition: none; }
+}
