@@ -443,7 +443,6 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   if (subPage === 'notifications') return <NotificationPage user={user} onBack={() => setSubPage('main')} />;
   if (subPage === 'personal') return <PersonalPage user={user} profile={profileRecord} onBack={() => setSubPage('main')} onAuthRequired={onAuthRequired} onSaved={(nextProfile) => { setProfileRecord(nextProfile); onDemoAction('Profile changes saved successfully.'); }} />;
   if (subPage === 'saved-searches') return <SavedSearchesPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
-  if (subPage === 'business') return <BusinessProfilePage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} onOpenSubscription={onOpenSubscription} onOpenVerification={() => setSubPage('verification')} />;
   if (subPage === 'security') return <SecurityPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
   if (subPage === 'following') return <RelationsPage user={user} onBack={() => setSubPage('main')} />;
   if (subPage === 'blocked') return <BlockedUsersPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
