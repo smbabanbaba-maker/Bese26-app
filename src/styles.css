@@ -1069,3 +1069,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .company-save-button:disabled { opacity: .65; }
 .company-preview-link { display: inline-flex; justify-content: center; align-items: center; gap: 7px; color: #08a947; font-weight: 700; text-decoration: none; }
 @media (max-width: 640px) { .company-link-page { padding: 0 14px 30px; } .company-link-page .profile-subpage-header { margin: 0 -14px 20px; } .company-link-form { gap: 20px; } }
+.business-directory-card h2 { display: flex; align-items: center; gap: 6px; }
+.business-verified-icon { color: #d71920; vertical-align: middle; }
+.business-listing-actions { display: flex; gap: 8px; margin-top: 12px; }
+.business-listing-actions a { flex: 1; justify-content: center; }
