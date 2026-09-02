@@ -855,3 +855,27 @@ export async function initializeBoostPayment({ listingId, packageId }) {
   if (!response.ok) throw new Error(payload.error || 'Could not start boost checkout.');
   return payload;
 }
+
+
+export async function requestListingCallback({ listingId, requesterId, sellerId, message = null }) {
+  failIfUnavailable();
+  if (!requesterId || !sellerId || requesterId === sellerId) throw new Error('You cannot request a callback from your own listing.');
+  if (!listingId) throw new Error('Listing is required.');
+  const { data, error } = await supabase.from('listing_callback_requests').insert({ listing_id: listingId, requester_id: requesterId, seller_id: sellerId, message: message?.trim() || null }).select('id,status,created_at').single();
+  if (error) {
+    if (error.code === '23505') throw new Error('You already requested a callback for this listing.');
+    throw error;
+  }
+  return data;
+}
+
+export async function reportListing({ listingId, reporterId, reason = 'other', details = null }) {
+  failIfUnavailable();
+  if (!reporterId) throw new Error('Sign in before reporting a listing.');
+  if (!listingId) throw new Error('Listing is required.');
+  const allowedReasons = ['scam', 'prohibited_item', 'fake_information', 'harassment', 'other'];
+  if (!allowedReasons.includes(reason)) throw new Error('Choose a valid report reason.');
+  const { data, error } = await supabase.from('listing_reports').insert({ listing_id: listingId, reporter_id: reporterId, reason, details: details?.trim() || null }).select('id,status,created_at').single();
+  if (error) throw error;
+  return data;
+}
