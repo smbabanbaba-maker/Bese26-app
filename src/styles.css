@@ -1093,3 +1093,26 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .verification-choice button { display: flex; justify-content: center; align-items: center; gap: 7px; min-height: 52px; border: 1px solid #dedede; border-radius: 13px; background: #fff; color: #454545; font-weight: 700; }
 .verification-choice button.selected { border-color: #d71920; background: #fff2f2; color: #d71920; box-shadow: 0 0 0 2px rgba(215,25,32,.08); }
 .verification-choice small { color: #747474; font-size: 12px; }
+/* Compact business setup: restrained type, white canvas, black structure, red action */
+.company-link-page { color: #171717; }
+.company-link-page .profile-subpage-header { margin-bottom: 14px; }
+.company-link-page .profile-subpage-header h1 { font-size: 16px; font-weight: 800; }
+.company-link-page .eyebrow { color: #d71920; font-size: 10px; letter-spacing: .12em; }
+.business-setup-intro { gap: 10px; margin: 4px 0 14px; padding: 12px 13px; border-radius: 10px; background: #171717; }
+.business-setup-intro h2 { font-size: 14px; line-height: 1.25; }
+.business-setup-intro p { font-size: 11px; line-height: 1.35; }
+.business-setup-mark { width: 36px; height: 36px; flex-basis: 36px; border-radius: 9px; background: #d71920; }
+.company-link-form { gap: 14px; max-width: 620px; }
+.company-link-form > label { gap: 5px; color: #292929; font-size: 11px; font-weight: 800; }
+.company-link-form input, .company-link-form textarea { border: 1px solid #171717; border-radius: 8px; padding: 11px 12px; font-size: 14px; }
+.company-link-form textarea { min-height: 72px; }
+.company-link-form input:focus, .company-link-form textarea:focus { border-color: #d71920; box-shadow: 0 0 0 2px rgba(215,25,32,.1); }
+.business-logo-upload { min-height: 58px; padding: 8px 11px; border: 1px dashed #171717; border-radius: 8px; font-size: 12px; }
+.business-logo-upload img { width: 42px; height: 42px; border-radius: 7px; }
+.business-logo-upload span { color: #d71920; font-size: 12px; }
+.company-link-status { gap: 5px; padding: 10px 11px; border-left: 3px solid #d71920; background: #f7f7f7; color: #444; font-size: 11px; }
+.company-link-status strong { color: #171717; overflow-wrap: anywhere; }
+.company-save-button { min-height: 45px; border-radius: 8px; background: #d71920; font-size: 14px; }
+.company-preview-link { color: #d71920; font-size: 12px; }
+.company-link-form .secondary-button { border-color: #171717; color: #171717; border-radius: 8px; font-size: 12px; }
+@media (max-width: 640px) { .company-link-page { padding: 0 12px 24px; } .company-link-page .profile-subpage-header { margin: 0 -12px 14px; padding: 10px 12px; } .company-link-form { gap: 13px; } }
