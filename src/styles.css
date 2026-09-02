@@ -1123,3 +1123,28 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .business-owner-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .business-owner-actions button { display: flex; justify-content: center; align-items: center; gap: 5px; min-height: 37px; border: 1px solid #171717; border-radius: 7px; background: #171717; color: #fff; font-size: 11px; font-weight: 700; }
 .business-owner-actions button:last-child { background: #fff; color: #d71920; border-color: #d71920; }
+/* Public business preview and stable left-aligned form layout */
+.company-link-page { width: 100%; max-width: 760px; margin: 0 auto; text-align: left; }
+.company-link-page .profile-subpage-header > div { min-width: 0; flex: 1; }
+.company-link-page .profile-subpage-header h1 { white-space: normal; overflow-wrap: anywhere; }
+.company-link-form { width: 100%; margin-left: 0; margin-right: 0; text-align: left; }
+.company-link-form > label, .company-link-form input, .company-link-form textarea { text-align: left; }
+.company-link-status { display: grid; grid-template-columns: auto auto 1fr; align-items: center; }
+.company-link-status strong { min-width: 0; }
+.public-page-preview { padding: 14px; border: 1px solid #dedede; border-radius: 10px; background: #fff; box-shadow: 0 5px 18px rgba(0,0,0,.05); }
+.public-page-preview-top { display: flex; align-items: center; gap: 9px; }
+.preview-logo { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 9px; color: #fff; background: #171717; overflow: hidden; }
+.preview-logo img { width: 100%; height: 100%; object-fit: cover; }
+.public-page-preview-top > div { display: grid; gap: 2px; min-width: 0; }
+.public-page-preview-top strong { font-size: 13px; overflow-wrap: anywhere; }
+.public-page-preview-top small { color: #777; font-size: 11px; }
+.preview-badge { margin-left: auto; padding: 4px 7px; border-radius: 999px; color: #d71920; background: #fff1f1; font-size: 9px; font-weight: 800; white-space: nowrap; }
+.public-page-preview p { margin: 12px 0 7px; color: #555; font-size: 12px; line-height: 1.45; }
+.preview-location { display: flex; align-items: center; gap: 4px; color: #777; font-size: 11px; overflow-wrap: anywhere; }
+.preview-stats { display: flex; gap: 18px; margin-top: 13px; padding-top: 11px; border-top: 1px solid #eee; color: #777; font-size: 10px; }
+.preview-stats span { display: grid; gap: 2px; }
+.preview-stats b { color: #171717; font-size: 13px; }
+.preview-actions { display: flex; gap: 7px; margin-top: 12px; }
+.preview-actions span { flex: 1; padding: 8px; border: 1px solid #171717; border-radius: 6px; color: #171717; text-align: center; font-size: 11px; font-weight: 700; }
+.preview-actions span:last-child { color: #fff; background: #d71920; border-color: #d71920; }
+@media (max-width: 640px) { .company-link-page { max-width: none; } .public-page-preview { width: 100%; } .preview-stats { gap: 12px; } }
