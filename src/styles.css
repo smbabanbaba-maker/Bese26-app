@@ -1073,3 +1073,10 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .business-verified-icon { color: #d71920; vertical-align: middle; }
 .business-listing-actions { display: flex; gap: 8px; margin-top: 12px; }
 .business-listing-actions a { flex: 1; justify-content: center; }
+.verification-readiness-card { margin: 14px 0; padding: 16px; border: 1px solid #eadfe0; border-left: 4px solid #d71920; border-radius: 16px; background: #fffafa; }
+.verification-readiness-card > div:first-child { display: flex; align-items: center; gap: 8px; color: #171717; }
+.verification-readiness-card > div:first-child svg { color: #d71920; }
+.verification-readiness-card p { margin: 8px 0 12px; color: #626262; font-size: 13px; }
+.verification-checklist { display: flex; flex-wrap: wrap; gap: 8px; }
+.verification-checklist span { display: inline-flex; align-items: center; gap: 4px; padding: 6px 9px; border-radius: 999px; color: #8b5052; background: #fff0f0; font-size: 11px; }
+.verification-checklist span.complete { color: #176c42; background: #eaf8ef; }
