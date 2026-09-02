@@ -1321,3 +1321,54 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   }
   .auth-welcome-content h2 { font-size: clamp(22px, 7vw, 32px); }
 }
+
+/* Bese26 marketplace palette: white, black and red only. */
+.discovery-stat { color: #ff7772; }
+.category-tile,
+.category-tile.tone-coral,
+.category-tile.tone-lavender,
+.category-tile.tone-blue,
+.category-tile.tone-sand,
+.category-tile.tone-pink,
+.category-tile.tone-green,
+.category-tile.tone-peach,
+.category-tile.tone-mint,
+.category-tile.tone-slate,
+.category-tile.tone-gold,
+.category-tile.tone-sky,
+.category-tile.tone-lime { background: #fff; border-color: var(--line); color: var(--ink); }
+.category-tile:hover { border-color: #efb4af; box-shadow: 0 10px 24px rgba(229,57,53,.09); }
+.category-icon,
+.tone-coral .category-icon,
+.tone-lavender .category-icon,
+.tone-blue .category-icon,
+.tone-sand .category-icon,
+.tone-pink .category-icon,
+.tone-green .category-icon,
+.tone-peach .category-icon,
+.tone-mint .category-icon,
+.tone-slate .category-icon,
+.tone-gold .category-icon,
+.tone-sky .category-icon,
+.tone-lime .category-icon { background: #fff0ee; color: var(--red); }
+.category-chevron { color: #9699a1; }
+.quick-action-coral .quick-action-icon,
+.quick-action-lavender .quick-action-icon,
+.quick-action-gold .quick-action-icon,
+.quick-action-mint .quick-action-icon { background: #fff0ee; color: var(--red); }
+.trending-label { color: var(--red); }
+.trust-strip-icon,
+.trust-strip-blue,
+.trust-strip-gold { background: #fff0ee; color: var(--red); }
+.product-image-wrap { background: #f1f1f1; }
+.product-image-placeholder { color: #9b9da3; background: linear-gradient(135deg, #f7f7f7, #ececee); }
+.promoted-pill { background: #111315; color: #fff; }
+.modal-delivery-note { color: #8f2825; background: #fff0ee; border-color: #f2cfcc; }
+.modal-delivery-note strong { color: #721d1b; }
+.modal-delivery-note small { color: #a04d49; }
+.verified-badge, .listing-seller-verified { color: var(--red); }
+.product-price, .modal-price { color: var(--ink); }
+@media (max-width: 640px) {
+  .category-strip { gap: 20px; }
+  .product-grid { gap: 10px; }
+}
