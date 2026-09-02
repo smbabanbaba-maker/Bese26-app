@@ -1214,3 +1214,86 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .auth-form-back .auth-welcome-panel { order: 2 !important; }
   .auth-form-back .auth-form-face-content { order: 1 !important; }
 }
+
+.auth-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.auth-signup-form { gap: 10px; }
+@media (max-width: 640px) {
+  .auth-field-row { gap: 8px; }
+  .auth-signup-form { gap: 7px; }
+}
+
+/* Premium Bese26 auth refresh. */
+.auth-backdrop { background: radial-gradient(circle at 20% 15%, rgba(231, 59, 54, .18), transparent 34%), rgba(12, 13, 16, .72); }
+.auth-panel {
+  width: min(100%, 820px);
+  min-height: 470px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 24px;
+  box-shadow: 0 34px 100px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.08);
+  background: #101114;
+}
+.auth-form-flip-shell, .auth-form-flip-card, .auth-form-face { min-height: 468px; }
+.auth-form-face { grid-template-columns: 56% 44%; }
+.auth-form-face-content {
+  padding: 48px 50px 38px;
+  background: linear-gradient(145deg, #fff 0%, #fcfbfa 72%, #f5eeee 100%);
+}
+.auth-form-face-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e53935, #ff756f, transparent);
+}
+.auth-form-face-content::after { right: -128px; width: 200px; opacity: .96; }
+.auth-welcome-panel { background: radial-gradient(circle at 75% 24%, rgba(229,57,53,.25), transparent 27%), linear-gradient(145deg, #111216 0%, #08090b 100%); }
+.auth-welcome-panel::before {
+  content: '';
+  position: absolute;
+  width: 270px;
+  height: 270px;
+  right: -115px;
+  bottom: -122px;
+  border: 1px solid rgba(229,57,53,.42);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(229,57,53,.07), 0 0 0 44px rgba(229,57,53,.04);
+}
+.auth-welcome-content { margin: auto 25px auto 38px; max-width: 260px; padding: 40px 18px; }
+.auth-welcome-kicker { color: #ef625d; font-size: 8px; letter-spacing: 2.2px; }
+.auth-welcome-mark { background: rgba(229,57,53,.15); border-color: rgba(229,57,53,.6); color: #ff716b; }
+.auth-welcome-content h2 { font-weight: 900; letter-spacing: -.065em; }
+.auth-welcome-content p { color: #b7b8bd; font-size: 11px; }
+.auth-panel-mark { color: #fff; background: #e53935; box-shadow: 0 8px 18px rgba(229,57,53,.25); }
+.auth-form-panel h2 { font-size: 34px; letter-spacing: -.07em; }
+.auth-panel-copy { font-size: 11px; color: #85878d; }
+.auth-form { max-width: 330px; gap: 14px; margin-top: 21px; }
+.auth-form label > span { color: #686b73; font-size: 10px; font-weight: 700; }
+.auth-form input { padding: 10px 2px; border-bottom: 1px solid #c9cbd0; font-size: 13px; transition: border-color .2s ease, box-shadow .2s ease; }
+.auth-form input:focus { border-color: #e53935; box-shadow: 0 2px 0 #e53935; }
+.auth-submit { min-height: 42px; margin-top: 9px; background: #e53935; box-shadow: 0 9px 18px rgba(229,57,53,.2); }
+.auth-submit:hover { background: #c92f2c; }
+.google-auth-button { max-width: 330px; min-height: 40px; margin-top: 18px; border-color: #dedfe3; background: rgba(255,255,255,.74); }
+.auth-divider { max-width: 330px; color: #999ba2; }
+.auth-switch { max-width: 330px; color: #50525a; }
+.auth-switch strong { color: #e53935; }
+.auth-field-row { gap: 14px; }
+@media (max-width: 640px) {
+  .auth-panel { width: min(100%, 560px); min-height: 390px; border-radius: 18px; }
+  .auth-form-flip-shell, .auth-form-flip-card, .auth-form-face { min-height: 388px; height: min(82vw, 410px); }
+  .auth-form-face-content { padding: 24px 17px 20px; }
+  .auth-form-face-content::after { right: -68px; width: 112px; }
+  .auth-form-panel h2 { font-size: 24px; }
+  .auth-panel-copy { font-size: 8px; }
+  .auth-form { gap: 8px; margin-top: 12px; }
+  .auth-form input { padding: 6px 1px; font-size: 10px; }
+  .auth-submit { min-height: 31px; margin-top: 5px; font-size: 9px; }
+  .google-auth-button { min-height: 29px; margin-top: 9px; font-size: 8px; }
+  .auth-divider { margin-top: 7px; font-size: 7px; }
+  .auth-switch { margin-top: 8px; font-size: 8px; }
+  .auth-welcome-content { margin: auto 8px auto 18px; padding: 24px 6px 24px 10px; }
+  .auth-welcome-content h2 { font-size: clamp(20px, 6vw, 29px); }
+  .auth-welcome-content p { font-size: 7px; }
+  .auth-field-row { gap: 7px; }
+}

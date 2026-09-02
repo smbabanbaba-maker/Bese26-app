@@ -87,16 +87,19 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
     <h2 id="auth-title">Create account</h2>
     <p className="auth-panel-copy">Set up your secure marketplace account.</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
-    <form onSubmit={submit} className="auth-form">
-      <label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label>
-      <label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label>
-      <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
-      <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="new-password" required /></label>
+    {isSupabaseConfigured && <>
+      <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
+      <div className="auth-divider"><span>or use email</span></div>
+    </>}
+    <form onSubmit={submit} className="auth-form auth-signup-form">
+      <div className="auth-field-row"><label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label>
+      <label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label></div>
+      <div className="auth-field-row"><label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
+      <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="new-password" required /></label></div>
       <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : 'Create account'}</button>
     </form>
     <button type="button" className="auth-switch" onClick={() => switchMode('signin')}>Already have an account? <strong>Login</strong></button>
   </div>;
-
   return <div className="auth-backdrop" onClick={onClose}>
     <section className="auth-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
       <button type="button" className="modal-close icon-button" onClick={onClose} aria-label="Close authentication"><X size={18} /></button>
