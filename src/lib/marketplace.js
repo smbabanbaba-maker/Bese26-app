@@ -123,7 +123,7 @@ export async function fetchVerificationApplications(userId) {
 export async function submitVerificationApplication(userId, values) {
   failIfUnavailable();
   const durationMonths = Math.min(12, Math.max(1, Number(values.duration_months) || 1));
-  const payload = { user_id: userId, verification_type: values.verification_type, duration_months: durationMonths, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
+  const payload = { user_id: userId, verification_type: values.verification_type, duration_months: durationMonths, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_registration_type: values.business_registration_type || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
   const { data, error } = await supabase.from('verification_applications').insert(payload).select().single();
   if (error) throw error;
   return data;
@@ -147,10 +147,9 @@ export async function reviewVerificationApplication({ id, userId, status, verifi
   const { data, error } = await supabase.from('verification_applications').update(updateValues).eq('id', id).select().single();
   if (error) throw error;
   if (status === 'approved') {
-    const { error: profileError } = await supabase.from('profiles').update({ is_verified: true, verification_expires_at: updateValues.expires_at }).eq('id', userId);
-    if (profileError) throw profileError;
     if (verificationType === 'business') {
-      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true, verification_expires_at: updateValues.expires_at }).eq('profile_id', userId);
+      const { data: application } = await supabase.from('verification_applications').select('business_registration_type').eq('id', id).maybeSingle();
+      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true, verification_kind: application?.business_registration_type === 'registered' ? 'registered' : 'unregistered', verification_expires_at: updateValues.expires_at }).eq('profile_id', userId);
       if (businessError) throw businessError;
     }
   }
@@ -543,7 +542,7 @@ export async function deleteSavedSearch(userId, searchId) {
 export async function getBusinessProfile(userId) {
   failIfUnavailable();
   if (!userId) return null;
-  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
+  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_kind,created_at,updated_at').eq('profile_id', userId).maybeSingle();
   if (error) throw error;
   return data;
 }
