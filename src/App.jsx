@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  Bell,
   Bookmark,
   CarFront,
   Check,
@@ -66,7 +65,7 @@ const navItems = [
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'business', label: 'Business', icon: Store },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
 
@@ -335,18 +334,7 @@ function BusinessDirectoryView({ onBack }) {
   return <div className="page-stack business-directory-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div><section className="business-directory-hero"><div className="eyebrow light">BESE26 BUSINESS</div><h1>Discover trusted local companies.</h1><p>Browse verified businesses, view their listings, and contact them directly through their public profile.</p></section><div className="search-box business-directory-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search company, category, or city" aria-label="Search businesses" /></div>{error && <div className="auth-status error">{error}</div>}{loading ? <div className="route-loading">Loading verified businesses…</div> : items.length ? <div className="business-directory-grid">{items.map((business) => { const location = [business.city, business.state].filter(Boolean).join(', '); return <article className="business-directory-card" key={business.profile_id}><div className="business-directory-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${business.business_name} logo`} /> : <Store size={26} />}</div><div className="business-directory-copy"><span className="eyebrow">{business.category || business.business_type || 'VERIFIED BUSINESS'}</span><h2>{business.business_name}</h2><strong>@{business.business_handle}</strong><p>{business.description || 'Explore this company’s public profile and available listings.'}</p><small>{location || 'Nigeria'}{business.delivery_available ? ' · Delivery' : ''}{business.pickup_available ? ' · Pickup' : ''}</small></div><a className="primary-button" href={`/@${business.business_handle}`}>View company <ArrowRight size={15} /></a></article>; })}</div> : <div className="empty-state"><Store size={26} /><h3>No verified businesses found</h3><p>{search ? 'Try another company name, category, or city.' : 'Verified companies will appear here after their profiles are approved.'}</p></div>}</div>;
 }
 
-export default function NotificationsView({ user, onAuthRequired }) {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(Boolean(user));
-  const [error, setError] = useState('');
-  const load = () => { if (!user) return; setLoading(true); setError(''); fetchNotifications(user.id).then(setItems).catch((requestError) => setError(requestError.message || 'Could not load notifications.')).finally(() => setLoading(false)); };
-  useEffect(() => { if (user) load(); }, [user?.id]);
-  const markRead = async (item) => { if (item.read_at) return; try { await markNotificationRead(item.id, user.id); setItems((current) => current.map((row) => row.id === item.id ? { ...row, read_at: new Date().toISOString() } : row)); } catch (requestError) { setError(requestError.message || 'Could not mark notification as read.'); } };
-  if (!user) return <div className="page-stack notifications-page"><section className="empty-state notifications-auth"><Bell size={28} /><h2>Stay up to date</h2><p>Sign in to see new listings, messages, account updates, and important marketplace notifications.</p><button type="button" className="primary-button" onClick={onAuthRequired}>Sign in</button></section></div>;
-  return <div className="page-stack notifications-page"><div className="section-heading"><div><div className="eyebrow">ACCOUNT UPDATES</div><h1>Notifications</h1></div><button type="button" className="secondary-button" onClick={load}>Refresh</button></div>{error && <div className="auth-status error">{error}</div>}{loading ? <div className="empty-state"><Bell size={25} /><h3>Loading notifications</h3><p>Getting your latest Bese26 updates.</p></div> : items.length ? <div className="notification-list">{items.map((item) => <button type="button" key={item.id} className={`notification-row ${item.read_at ? '' : 'unread'}`} onClick={() => markRead(item)}><span className="notification-row-icon"><Bell size={16} /></span><span><strong>{item.title || 'Bese26 update'}</strong><small>{item.body || 'Important marketplace update'}</small><small>{new Date(item.created_at).toLocaleString()}</small></span>{!item.read_at && <i aria-label="Unread" />}</button>)}</div> : <div className="empty-state"><Bell size={25} /><h3>No notifications yet</h3><p>New listings, messages, verification updates, and other important activity will appear here.</p></div>}</div>;
-}
-
-function App() {
+export default function App() {
   const publicHandle = typeof window !== 'undefined' ? window.location.pathname.match(/^\/@([a-z0-9-]+)\/?$/i)?.[1]?.toLowerCase() : null;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
   const [activeNav, setActiveNav] = useState('home');
@@ -484,7 +472,7 @@ function App() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Sign in to view your notifications.')} />;
+    if (activeNav === 'business') return <BusinessDirectoryView onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} />;
     if (activeNav === 'admin') return isAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => navigate('sell')} onEditListing={(listing) => { setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
