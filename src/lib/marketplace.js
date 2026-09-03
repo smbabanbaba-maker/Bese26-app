@@ -48,6 +48,7 @@ export function mapListing(row) {
     sellerDisplayName: business.business_name || seller.display_name || 'bese26 seller',
     sellerBusinessName: business.business_name || '',
     sellerBusinessHandle: business.business_handle || '',
+    publishedAsType: row.published_as_type || 'personal',
     sellerId: row.seller_id,
     sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
     sellerInitials: initials(business.business_name || seller.display_name),
@@ -265,17 +266,17 @@ export async function fetchSavedIds(userId) {
   return (data || []).map((item) => item.listing_id);
 }
 
-const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+const listingSelect = 'id,seller_id,business_profile_id,published_as_type,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
-  const sellerIds = [...new Set(rows.map((row) => row.seller_id).filter(Boolean))];
-  const { data: businessProfiles, error: businessError } = sellerIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active').in('profile_id', sellerIds).eq('is_active', true)
+  const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
+  const { data: businessProfiles, error: businessError } = businessIds.length
+    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active').in('profile_id', businessIds).eq('is_active', true)
     : { data: [], error: null };
   if (businessError) throw businessError;
-  const businessBySeller = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
+  const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
   const mediaByRow = rows.map((row) => ({
-    row: { ...row, business_profile: businessBySeller[row.seller_id] || null },
+    row: { ...row, business_profile: businessById[row.business_profile_id] || null },
     media: [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order),
   }));
   const signedEntries = mediaByRow.flatMap(({ row, media }) => (firstMediaOnly ? media.slice(0, 1) : media).map((item) => ({ key: `${row.id}:${item.storage_path}`, path: item.storage_path })));
@@ -763,6 +764,8 @@ export async function createListing({ sellerId, values }) {
     p_delivery_options: Array.isArray(values.delivery_options) ? values.delivery_options : [],
     p_contact_preference: values.contact_preference || 'chat',
     p_attributes: values.attributes || {},
+    p_business_profile_id: values.business_profile_id || null,
+    p_published_as_type: values.published_as_type || 'personal',
   });
   if (error) {
     if (error.message?.includes('ACTIVE_LISTING_LIMIT_REACHED') || error.message?.includes('FREE_POST_LIMIT_REACHED')) throw new Error('Your plan has reached its active listing limit. Choose a subscription plan to post more listings.');
