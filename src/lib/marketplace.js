@@ -170,13 +170,23 @@ export async function uploadVerificationDocument({ userId, file }) {
 
 export async function getProfile(userId) {
   failIfUnavailable();
-  const { data, error } = await supabase
+  const fullQuery = supabase
     .from('profiles')
     .select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
     .eq('id', userId)
     .maybeSingle();
-  if (error) throw error;
-  return data;
+  const { data, error } = await fullQuery;
+  if (!error) return data;
+  // account_type is an optional migration; keep profile data visible if an
+  // older production schema has not received that migration yet.
+  if (!/account_type|column .* does not exist|schema cache/i.test(error.message || '')) throw error;
+  const { data: fallback, error: fallbackError } = await supabase
+    .from('profiles')
+    .select('id,username,display_name,avatar_path,bio,city,state,country,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
+    .eq('id', userId)
+    .maybeSingle();
+  if (fallbackError) throw fallbackError;
+  return fallback ? { ...fallback, account_type: null } : null;
 }
 
 export async function updateProfile(userId, values) {
