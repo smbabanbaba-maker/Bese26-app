@@ -21,3 +21,10 @@ The repository already contains Supabase-backed profiles, one business profile p
 The pasted specification asks for multiple businesses per user, business team membership and permissions, dedicated store verification, business-specific follower analytics, event-based business analytics, dynamic server-rendered SEO/Open Graph metadata, domain/DNS configuration for `bese26.shop`, a KYC/liveness provider, and additional management operations such as pause/resume/delete/renew. Those are not claimed as complete here because the current schema and deployment credentials do not expose a verified migration/application path for all of them. They require additional migrations, backend authorization functions, storage policies, and a production domain/provider setup.
 
 No fake numbers, fake verification, public KYC documents, or automatic verification from payment were added.
+
+
+## Latest audit and repair
+
+The first deployment of the ownership migration exposed an important rollout problem: the live Supabase project had not yet applied the migration, so a read query for the new columns caused the Home page to show a database error. The marketplace read path was changed back to the existing schema until the migration is applied, and the RPC only sends the new ownership parameters when a business identity is explicitly selected. Existing Home, listing reads, and personal listing creation therefore remain compatible during rollout.
+
+The public business URL links were also corrected from the legacy `bese44.shop`/`@handle` format to the requested `bese26.shop/{business-slug}` format. The application still accepts legacy `@handle` paths for existing links.
