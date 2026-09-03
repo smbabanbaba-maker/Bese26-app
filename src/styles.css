@@ -1148,3 +1148,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .preview-actions span { flex: 1; padding: 8px; border: 1px solid #171717; border-radius: 6px; color: #171717; text-align: center; font-size: 11px; font-weight: 700; }
 .preview-actions span:last-child { color: #fff; background: #d71920; border-color: #d71920; }
 @media (max-width: 640px) { .company-link-page { max-width: none; } .public-page-preview { width: 100%; } .preview-stats { gap: 12px; } }
+.verification-extra-fields { display: grid; gap: 13px; padding: 13px; border-left: 3px solid #d71920; border-radius: 8px; background: #fffafa; }
+.verification-extra-fields label { display: grid; gap: 5px; color: #333; font-size: 12px; font-weight: 700; }
+.verification-extra-fields input, .verification-extra-fields textarea { width: 100%; border: 1px solid #171717; border-radius: 7px; padding: 10px 11px; font-size: 13px; }
+.verification-extra-fields textarea { min-height: 65px; resize: vertical; }

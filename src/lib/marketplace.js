@@ -123,7 +123,7 @@ export async function fetchVerificationApplications(userId) {
 export async function submitVerificationApplication(userId, values) {
   failIfUnavailable();
   const durationMonths = Math.min(12, Math.max(1, Number(values.duration_months) || 1));
-  const payload = { user_id: userId, verification_type: values.verification_type, duration_months: durationMonths, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_registration_type: values.business_registration_type || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
+  const payload = { user_id: userId, verification_type: values.verification_type, duration_months: durationMonths, full_name: values.full_name.trim(), phone: values.phone?.trim() || null, business_name: values.business_name?.trim() || null, business_registration_type: values.business_registration_type || null, registration_number: values.registration_number?.trim() || null, business_address: values.business_address?.trim() || null, personal_business_name: values.personal_business_name?.trim() || null, business_explanation: values.business_explanation?.trim() || null, business_handle: values.business_handle?.trim().toLowerCase() || null, notes: values.notes?.trim() || null, document_path: values.document_path || null, status: 'pending' };
   const { data, error } = await supabase.from('verification_applications').insert(payload).select().single();
   if (error) throw error;
   return data;
