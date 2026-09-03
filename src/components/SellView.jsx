@@ -75,7 +75,7 @@ function Toggle({ checked, onChange, label }) {
 }
 
 export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSubscription, initialListing = null }) {
-  const [form, setForm] = useState(() => { try { return { ...initialForm, ...JSON.parse(window.localStorage.getItem('bese26-sell-draft') || '{}') }; } catch { return initialForm; } });
+  const [form, setForm] = useState(initialForm);
   const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
   const [draftSaved, setDraftSaved] = useState(false);
@@ -162,7 +162,6 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   useEffect(() => {
     if (editMode) return undefined;
     const timeout = window.setTimeout(async () => {
-      window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form));
       if (isSupabaseConfigured && user) {
         try {
           const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
@@ -171,8 +170,6 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
         } catch {
           setDraftSaved(false);
         }
-      } else {
-        setDraftSaved(true);
       }
     }, 700);
     return () => window.clearTimeout(timeout);
@@ -195,19 +192,14 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const removeMedia = (id) => setMedia((current) => current.filter((item) => item.id !== id).map((item, index) => ({ ...item, cover: index === 0 ? true : item.cover })));
   const setCover = (id) => setMedia((current) => current.map((item) => ({ ...item, cover: item.id === id })));
   const saveDraft = async () => {
-    window.localStorage.setItem('bese26-sell-draft', JSON.stringify(form));
-    if (isSupabaseConfigured) {
-      if (!user) { onAuthRequired?.(); return; }
-      try {
-        const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
-        setDraftId(row.id);
-        setDraftSaved(true);
-        onDemoAction('Draft saved to your bese26 account.');
-      } catch (error) { onDemoAction(error.message || 'Could not save the draft.'); }
-      return;
-    }
-    setDraftSaved(true);
-    onDemoAction('Draft saved on this device.');
+    if (!isSupabaseConfigured) { onDemoAction('Draft saving is unavailable until the marketplace connection is configured.'); return; }
+    if (!user) { onAuthRequired?.(); return; }
+    try {
+      const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
+      setDraftId(row.id);
+      setDraftSaved(true);
+      onDemoAction('Draft saved to your Bese26 account.');
+    } catch (error) { onDemoAction(error.message || 'Could not save the draft.'); }
   };
   const validate = () => {
     const nextErrors = [];
@@ -239,7 +231,6 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       setPublishState('success');
       setDraftSaved(false);
       if (!editMode) fetchSellerEntitlement().then(setEntitlement).catch(() => {});
-      window.localStorage.removeItem('bese26-sell-draft');
       onDemoAction(editMode ? 'Listing changes submitted for bese26 moderation.' : 'Listing submitted for bese26 moderation.');
     } catch (error) {
       setPublishState('idle');
@@ -247,7 +238,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
-  const reset = () => { setEditMode(false); setForm(initialForm); setMedia([]); setDraftId(null); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.localStorage.removeItem('bese26-sell-draft'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const reset = () => { setEditMode(false); setForm(initialForm); setMedia([]); setDraftId(null); setPublishState('idle'); setDraftSaved(false); setErrors([]); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   const renderMedia = () => <section id="sell-media" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><Camera size={19} /></span><div><div className="eyebrow">PHOTOS</div><h2>Add at least 1 photo</h2><p>Add up to 6 clear photos. The first photo becomes the cover.</p></div><span className="media-count">{media.filter((item) => item.type === 'image').length}/6</span></div><div className="sell-upload-grid"><button type="button" className="sell-upload-tile" onClick={() => mediaInput.current?.click()}><span><Plus size={23} /></span><strong>Choose photos</strong><small>JPG, PNG, HEIC or WEBP</small></button><button type="button" className="sell-upload-tile camera-tile" onClick={() => cameraInput.current?.click()}><span><Camera size={21} /></span><strong>Use camera</strong><small>Take a clear cover photo</small></button>{media.map((item) => <div className={`sell-media-thumb ${item.cover ? 'is-cover' : ''}`} key={item.id}><img src={item.src} alt={item.name} /><div className="media-overlay"><button type="button" onClick={() => setCover(item.id)} aria-label={`Set ${item.name} as cover`}><Check size={13} /></button><button type="button" onClick={() => removeMedia(item.id)} aria-label={`Remove ${item.name}`}><Trash2 size={13} /></button></div>{item.cover && <span className="cover-label">Cover photo</span>}</div>)}</div><input ref={mediaInput} className="hidden-file-input" type="file" accept="image/*" multiple onChange={handleFiles} /><input ref={cameraInput} className="hidden-file-input" type="file" accept="image/*" capture="environment" onChange={handleFiles} /><div className="sell-helper"><ShieldCheck size={14} /><span>Only photos are accepted. The first photo is the cover.</span></div></section>;
   const renderDetails = () => <section id="sell-details" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon lavender"><Package size={19} /></span><div><div className="eyebrow">ITEM DETAILS</div><h2>Tell buyers about it</h2><p>Choose a category and only the relevant details will appear below.</p></div></div><div className="sell-form-grid"><Field label="Title*" value={form.title} onChange={(value) => update('title', value)} placeholder="e.g. iPhone 15 Pro Max 256GB" wide /><div className="sell-field"><span>Category*</span><select value={form.category} onChange={(event) => { const category = event.target.value; update('category', category); update('subcategory', categoryGroups[category][0]); }}>{Object.keys(categoryGroups).map((category) => <option key={category}>{category}</option>)}</select></div><div className="sell-field"><span>Subcategory</span><select value={form.subcategory} onChange={(event) => update('subcategory', event.target.value)}>{subcategories.map((item) => <option key={item}>{item}</option>)}</select></div>{categoryNeedsCondition && <div className="sell-field"><span>Condition*</span><select value={form.condition} onChange={(event) => update('condition', event.target.value)}>{['New', 'Like New', 'Used — Excellent', 'Used — Good', 'Used — Fair', 'Refurbished', 'For Parts / Repair', 'Not Applicable'].map((item) => <option key={item}>{item}</option>)}</select></div>}{fields.map(([key, label, placeholder, options]) => <Field key={key} label={label} value={form[key]} onChange={(value) => update(key, value)} placeholder={placeholder} options={options} />)}<Field label="Description*" value={form.description} onChange={(value) => update('description', value)} placeholder="Please provide a detailed description of your item or service..." type="textarea" wide /></div></section>;
@@ -260,5 +251,5 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const planUsageNote = !editMode && entitlement ? <div className={`sell-plan-usage ${entitlement.free_posts_remaining === 0 ? 'exhausted' : ''}`}><div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan · ${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used` : `${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used`}</strong><small>{entitlement.is_paid ? `${Math.max(entitlement.listing_limit - entitlement.free_posts_used, 0)} active listings remaining` : entitlement.free_posts_remaining ? `${entitlement.free_posts_remaining} active listing slot${entitlement.free_posts_remaining === 1 ? '' : 's'} remaining` : 'Your Free plan has reached its active listing limit.'}</small></div>{entitlement.free_posts_remaining === 0 && !entitlement.is_paid && <button type="button" className="text-action" onClick={onOpenSubscription}>View plans <ArrowRight size={14} /></button>}</div> : null;
   const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">SUBMITTED FOR REVIEW</div><h2>{editMode ? 'Your revised listing was submitted' : 'Your listing was submitted'}</h2><p>Your listing is saved in My Listings as pending. It will appear on Home after marketplace approval.</p><div className="publish-success-actions"><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>{editMode ? 'Ready to resubmit?' : 'Ready to post?'}</h2><p>Check your details above, then {editMode ? 'send your corrections back for review.' : 'publish your listing.'}</p></div></div>{planUsageNote}<div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : editMode ? 'Resubmit for review' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
 
-  return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new ad'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved on this device</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{renderMedia()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div></>}</div>;
+  return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new ad'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved to your Bese26 account</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{renderMedia()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div></>}</div>;
 }
