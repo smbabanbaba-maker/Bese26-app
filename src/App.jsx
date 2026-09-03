@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -380,8 +380,8 @@ export default function App() {
     if (!params.has('chat_listing') && !params.has('reference') && !params.has('payment')) setActiveNav('home');
   }, []);
 
-  const showToast = (message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); };
-  const requireAuth = (message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); };
+  const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
+  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); }, [showToast]);
   const toggleSave = (id) => {
     const wasSaved = savedIds.includes(id);
     if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to save listings for later.'); return; }
