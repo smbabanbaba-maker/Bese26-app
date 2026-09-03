@@ -408,25 +408,36 @@ export default function App() {
     if (!isSupabaseConfigured || !supabase) return undefined;
     let mounted = true;
     const loadBackend = async () => {
+      let session = null;
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data } = await supabase.auth.getSession();
+        session = data?.session || null;
         // Establish auth UI state before loading optional marketplace data. A
         // listings/categories error must never make a successful login look
         // like it failed.
         if (mounted) setSessionUser(session?.user || null);
+      } catch (error) {
+        if (mounted) showToast(error.message || 'Could not restore your session.');
+      }
+      try {
         const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
         if (mounted) {
-          setMarketListings(remoteListings);
-          setMarketCategories(remoteCategories);
-        }
-        if (session?.user) {
-          const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
-          if (mounted) { setSavedIds(remoteSaved); setIsAdmin(admin); }
-        } else if (mounted) {
-          setIsAdmin(false);
+          setMarketListings(remoteListings || []);
+          setMarketCategories(remoteCategories || []);
         }
       } catch (error) {
         if (mounted) showToast(error.message || 'Could not load live marketplace data.');
+      }
+      if (session?.user) {
+        try {
+          const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
+          if (mounted) { setSavedIds(remoteSaved || []); setIsAdmin(Boolean(admin)); }
+        } catch (error) {
+          if (mounted) { setSavedIds([]); setIsAdmin(false); }
+        }
+      } else if (mounted) {
+        setSavedIds([]);
+        setIsAdmin(false);
       }
     };
     loadBackend();
