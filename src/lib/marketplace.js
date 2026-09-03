@@ -266,7 +266,10 @@ export async function fetchSavedIds(userId) {
   return (data || []).map((item) => item.listing_id);
 }
 
-const listingSelect = 'id,seller_id,business_profile_id,published_as_type,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+// Keep reads compatible with the existing Supabase schema until the ownership
+// migration is applied. New ownership fields are hydrated automatically once
+// the migration is live.
+const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
@@ -747,7 +750,7 @@ export async function verifyPaystackPayment(reference) {
 export async function createListing({ sellerId, values }) {
   failIfUnavailable();
   if (!sellerId) throw new Error('Sign in before posting a listing.');
-  const { data, error } = await supabase.rpc('create_listing_with_plan', {
+  const payload = {
     p_category_id: values.category_id,
     p_subcategory_id: values.subcategory_id || null,
     p_title: values.title,
@@ -764,9 +767,12 @@ export async function createListing({ sellerId, values }) {
     p_delivery_options: Array.isArray(values.delivery_options) ? values.delivery_options : [],
     p_contact_preference: values.contact_preference || 'chat',
     p_attributes: values.attributes || {},
-    p_business_profile_id: values.business_profile_id || null,
-    p_published_as_type: values.published_as_type || 'personal',
-  });
+  };
+  if (values.published_as_type === 'business' && values.business_profile_id) {
+    payload.p_business_profile_id = values.business_profile_id;
+    payload.p_published_as_type = 'business';
+  }
+  const { data, error } = await supabase.rpc('create_listing_with_plan', payload);
   if (error) {
     if (error.message?.includes('ACTIVE_LISTING_LIMIT_REACHED') || error.message?.includes('FREE_POST_LIMIT_REACHED')) throw new Error('Your plan has reached its active listing limit. Choose a subscription plan to post more listings.');
     throw error;
