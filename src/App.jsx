@@ -399,6 +399,10 @@ export default function App() {
     const loadBackend = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        // Establish auth UI state before loading optional marketplace data. A
+        // listings/categories error must never make a successful login look
+        // like it failed.
+        if (mounted) setSessionUser(session?.user || null);
         const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
         if (mounted) {
           setMarketListings(remoteListings);
@@ -410,7 +414,6 @@ export default function App() {
         } else if (mounted) {
           setIsAdmin(false);
         }
-        if (mounted) setSessionUser(session?.user || null);
       } catch (error) {
         if (mounted) showToast(error.message || 'Could not load live marketplace data.');
       }
