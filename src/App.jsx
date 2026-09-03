@@ -366,7 +366,7 @@ function BusinessDirectoryView({ onBack }) {
   return <div className="page-stack business-directory-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div><section className="business-directory-hero"><div className="eyebrow light">BESE26 BUSINESS</div><h1>Discover trusted local companies.</h1><p>Find local companies, explore what they sell, and contact them directly through their public profile.</p></section><div className="search-box business-directory-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search company, category, or city" aria-label="Search businesses" /></div>{error && <div className="auth-status error">{error}</div>}{loading ? <div className="route-loading">Loading businesses…</div> : items.length ? <div className="business-directory-grid">{items.map((business) => { const location = [business.city, business.state].filter(Boolean).join(', '); return <article className="business-directory-card" key={business.profile_id}><div className="business-directory-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${business.business_name} logo`} /> : <Store size={26} />}</div><div className="business-directory-copy"><span className="eyebrow">{business.category || business.business_type || 'BUSINESS'}</span><h2>{business.business_name} {business.is_verified && <BadgeCheck size={17} className="business-verified-icon" aria-label={business.verification_kind === 'unregistered' ? 'Verified seller' : 'Verified business'} />}</h2><strong>@{business.business_handle}</strong><p>{business.description || 'Explore this company’s public profile and available listings.'}</p><small>{location || 'Nigeria'}{business.delivery_available ? ' · Delivery' : ''}{business.pickup_available ? ' · Pickup' : ''}</small></div><a className="primary-button" href={`/@${business.business_handle}`}>View company <ArrowRight size={15} /></a></article>; })}</div> : <div className="empty-state"><Store size={26} /><h3>No businesses found</h3><p>{search ? 'Try another company name, category, or city.' : 'Companies will appear here after they create an active business profile.'}</p></div>}</div>;
 }
 
-export default function App() {
+function AppContent() {
   const publicHandle = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1]?.toLowerCase() : null;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
   const [activeNav, setActiveNav] = useState('home');
@@ -533,4 +533,9 @@ export default function App() {
     <ListingModal listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
   </div>;
+}
+
+
+export default function App() {
+  return <AppErrorBoundary><AppContent /></AppErrorBoundary>;
 }
