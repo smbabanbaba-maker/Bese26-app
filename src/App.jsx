@@ -1,5 +1,6 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
@@ -46,6 +47,16 @@ const SellView = lazy(() => import('./components/SellView'));
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
 import { deleteListing, fetchActiveListings, fetchBusinessDirectory, fetchCategories, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, updateListing, verifyPaystackPayment } from './lib/marketplace';
+
+class AppErrorBoundary extends Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error) { console.error('Bese26 UI error', error); }
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    return <div className="route-error-card"><AlertCircle size={24} /><h2>Something went wrong loading this page</h2><p>Your account session is safe. Reload Bese26 to try again.</p><button type="button" className="primary-button" onClick={() => window.location.reload()}>Reload Bese26</button></div>;
+  }
+}
 
 const iconMap = {
   smartphone: Smartphone,
@@ -504,7 +515,7 @@ export default function App() {
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <main className="main-container"><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></main>
+    <main className="main-container"><AppErrorBoundary><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></AppErrorBoundary></main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); showToast('Signed in to bese26.'); }} />}
