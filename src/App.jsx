@@ -35,6 +35,8 @@ import {
   UserRound,
   WalletCards,
   Wrench,
+  Share2,
+  ZoomIn,
   X,
 } from 'lucide-react';
 
@@ -43,7 +45,7 @@ const AdminView = lazy(() => import('./components/AdminView'));
 const SellView = lazy(() => import('./components/SellView'));
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { fetchActiveListings, fetchBusinessDirectory, fetchCategories, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchSellerEntitlement, getOrCreateConversation, isAdminUser, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, verifyPaystackPayment } from './lib/marketplace';
+import { deleteListing, fetchActiveListings, fetchBusinessDirectory, fetchCategories, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, updateListing, verifyPaystackPayment } from './lib/marketplace';
 
 const iconMap = {
   smartphone: Smartphone,
@@ -279,33 +281,52 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
 
 
 
-function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAction, onAuthRequired, onStartChat }) {
+function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAction, onAuthRequired, onStartChat, onEditListing }) {
   const [activeImage, setActiveImage] = useState(0);
   const [message, setMessage] = useState('');
-  if (!listing) return null;
-  const gallery = listing.gallery?.length ? listing.gallery : [listing.image];
-  const specs = Object.entries(listing.attributes || {}).filter(([, value]) => value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)).slice(0, 6).map(([key, value]) => `${key.replace(/[_-]+/g, ' ')}: ${Array.isArray(value) ? value.join(', ') : value}`);
-  if (!specs.length) specs.push(listing.condition, listing.subcategory || listing.category).filter(Boolean);
-  const nextImage = () => setActiveImage((index) => (index + 1) % gallery.length);
+  const [zoomed, setZoomed] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [similar, setSimilar] = useState([]);
+  const [statusBusy, setStatusBusy] = useState(false);
+  const gallery = listing?.gallery?.length ? listing.gallery : [listing?.image].filter(Boolean);
+  const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)).map(([key, value]) => ({ key: key.replace(/[_-]+/g, ' '), value: Array.isArray(value) ? value.join(', ') : value }));
+  const owner = Boolean(user?.id && user.id === listing.sellerId);
+  const nextImage = () => setActiveImage((index) => (index + 1) % Math.max(gallery.length, 1));
   const previousImage = () => setActiveImage((index) => (index - 1 + gallery.length) % gallery.length);
   const startChat = () => onStartChat({ ...listing, initialMessage: message.trim() });
   const quickMessage = (text) => { setMessage(text); onDemoAction?.('Your message is ready. Tap Start chat to send it.'); };
+  useEffect(() => {
+    if (!listing) return undefined;
+    let mounted = true;
+    recordListingView(listing.id).catch(() => {});
+    fetchListingReviews(listing.id).then((items) => mounted && setReviews(items)).catch(() => {});
+    fetchSimilarListings(listing).then((items) => mounted && setSimilar(items)).catch(() => {});
+    return () => { mounted = false; };
+  }, [listing?.id]);
+  if (!listing) return null;
   const requestCallback = async () => {
     if (!user) { onAuthRequired?.('Sign in before requesting a callback.'); return; }
     if (!listing.sellerId || listing.sellerId === user.id) { onDemoAction?.('A callback can only be requested from another seller.'); return; }
-    try { await requestListingCallback({ listingId: listing.id, requesterId: user.id, sellerId: listing.sellerId, message: `Please call me about ${listing.title}.` }); onDemoAction?.('Callback request sent to the seller.'); }
-    catch (error) { onDemoAction?.(error.message || 'Could not send callback request.'); }
+    try { await requestListingCallback({ listingId: listing.id, requesterId: user.id, sellerId: listing.sellerId, message: `Please call me about ${listing.title}.` }); onDemoAction?.('Callback request sent to the seller.'); } catch (error) { onDemoAction?.(error.message || 'Could not send callback request.'); }
   };
   const report = async () => {
     if (!user) { onAuthRequired?.('Sign in before reporting a listing.'); return; }
-    try { await reportListing({ listingId: listing.id, reporterId: user.id, reason: 'other', details: 'Reported from listing detail.' }); onDemoAction?.('Report submitted for moderation review.'); }
-    catch (error) { onDemoAction?.(error.message || 'Could not submit report.'); }
+    try { await reportListing({ listingId: listing.id, reporterId: user.id, reason: 'other', details: 'Reported from listing detail.' }); onDemoAction?.('Report submitted for moderation review.'); } catch (error) { onDemoAction?.(error.message || 'Could not submit report.'); }
   };
-  return <div className="modal-backdrop" onClick={onClose}><div className="listing-modal listing-detail-inspired" onClick={(e) => e.stopPropagation()}><div className="listing-detail-header"><button className="icon-button" onClick={onClose} aria-label="Back"><ArrowLeft size={22} /></button><strong>Home page</strong><span className="listing-header-spacer" /><button className={`icon-button ${isSaved ? 'saved' : ''}`} onClick={() => onToggleSave(listing.id)} aria-label="Save listing"><Bookmark size={22} fill={isSaved ? 'currentColor' : 'none'} /></button><button className="icon-button" onClick={() => onDemoAction?.('More listing actions are coming soon.')} aria-label="More actions"><span className="more-dots">⋮</span></button></div><div className="modal-image-wrap"><img src={gallery[activeImage]} alt={`${listing.title} image ${activeImage + 1}`} /><div className="modal-image-count">{activeImage + 1} / {gallery.length}</div>{gallery.length > 1 && <><button className="gallery-control gallery-control-prev" onClick={previousImage} aria-label="Previous listing photo"><ArrowLeft size={18} /></button><button className="gallery-control gallery-control-next" onClick={nextImage} aria-label="Next listing photo"><ArrowRight size={18} /></button></>}</div>{gallery.length > 1 && <div className="modal-gallery-thumbs">{gallery.map((image, index) => <button key={`${image}-${index}`} className={activeImage === index ? 'active' : ''} onClick={() => setActiveImage(index)} aria-label={`View listing photo ${index + 1}`}><img src={image} alt="" /></button>)}</div>}<div className="listing-detail-body"><div className="listing-location-line"><MapPin size={16} /> {listing.location} <span>·</span> {listing.posted}</div><h1>{listing.title}</h1><div className="listing-detail-price">{listing.price}</div><div className="listing-primary-actions"><button className="secondary-contact-button" onClick={requestCallback}><Phone size={19} /> Request call back</button><button className="primary-contact-button" onClick={() => onStartChat(listing)}><Phone size={20} /> Call</button></div><section className="listing-chat-card"><h2>Chat with the seller</h2><div className="quick-message-row"><button onClick={() => quickMessage('I want to make an offer.')}>Make an offer</button><button onClick={() => quickMessage('Is this available?')}>Is this available</button><button onClick={() => quickMessage('What is your last price?')}>Last price</button></div><textarea value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Write your message here" /><button className="listing-start-chat" onClick={startChat}>Start chat <MessageCircle size={18} /></button></section><section className="listing-info-card"><h2>{listing.category || 'Other'}</h2><span>Type</span></section><section className="listing-info-card listing-store-card"><div><Store size={23} /><strong>Store Address</strong></div><button onClick={() => onDemoAction?.('The seller has not added a public store address yet.')}>Show <ChevronDown size={16} /></button></section><p className="listing-description listing-description-card">{listing.description || 'The seller has not added a description yet.'}</p><button className="make-offer-wide" onClick={() => quickMessage('I want to make an offer.')}> <MessageCircle size={19} /> Make an offer</button><section className="seller-profile-card"><div className="seller-profile-heading"><Avatar initials={listing.sellerInitials || 'BE'} tone="rose" /><div><strong>{listing.seller}</strong><span>{listing.verified && <><BadgeCheck size={14} /> Verified ID · </>}{listing.sellerRating ? `${listing.sellerRating.toFixed(1)} rating` : 'New seller'}</span><small>Typically replies within a day</small></div><button onClick={() => onDemoAction?.('Seller ads are available from the seller profile.')}>View ads <ChevronRight size={17} /></button></div><h3>Feedback about seller</h3><p className="seller-feedback-empty">Buyer feedback will appear here after completed marketplace transactions.</p></section><div className="listing-bottom-actions"><button onClick={() => onDemoAction?.('Listing marked unavailable for your view.')}>Mark unavailable</button><button className="report-action" onClick={report}>Report abuse</button></div><button className="post-similar-button" onClick={() => onDemoAction?.('Open Sell to post a similar ad.')}>Post ad like this</button></div></div></div>;
+  const manage = async (nextStatus) => {
+    if (!owner) return;
+    setStatusBusy(true);
+    try { await setListingStatus(listing.id, user.id, nextStatus); onDemoAction?.(`Listing ${nextStatus === 'active' ? 'resumed' : nextStatus}.`); } catch (error) { onDemoAction?.(error.message || 'Could not update listing.'); } finally { setStatusBusy(false); }
+  };
+  const remove = async () => {
+    if (!owner) return;
+    if (!window.confirm('Delete this listing permanently?')) return;
+    setStatusBusy(true);
+    try { await deleteListing(listing.id, user.id); onDemoAction?.('Listing deleted.'); onClose(); } catch (error) { onDemoAction?.(error.message || 'Could not delete listing.'); } finally { setStatusBusy(false); }
+  };
+  const share = async () => { const url = `${window.location.origin}/listing/${listing.id}`; try { if (navigator.share) await navigator.share({ title: listing.title, text: listing.description, url }); else { await navigator.clipboard?.writeText(url); onDemoAction?.('Listing link copied.'); } } catch (_) {} };
+  return <div className="modal-backdrop" onClick={onClose}><div className="listing-modal listing-detail-inspired" onClick={(e) => e.stopPropagation()}><div className="listing-detail-header"><button className="icon-button" onClick={onClose} aria-label="Back"><ArrowLeft size={22} /></button><strong>Listing details</strong><span className="listing-header-spacer" /><button className={`icon-button ${isSaved ? 'saved' : ''}`} onClick={() => onToggleSave(listing.id)} aria-label="Save listing"><Bookmark size={22} fill={isSaved ? 'currentColor' : 'none'} /></button><button className="icon-button" onClick={share} aria-label="Share listing"><Share2 size={19} /></button></div><div className={`modal-image-wrap ${zoomed ? 'zoomed' : ''}`} onTouchStart={(event) => { event.currentTarget.dataset.x = event.touches[0].clientX; }} onTouchEnd={(event) => { const startX = Number(event.currentTarget.dataset.x || 0); const delta = event.changedTouches[0].clientX - startX; if (Math.abs(delta) > 45) delta < 0 ? nextImage() : previousImage(); }}><img src={gallery[activeImage] || ''} alt={`${listing.title} image ${activeImage + 1}`} onClick={() => setZoomed((value) => !value)} /><button className="image-zoom-button" onClick={() => setZoomed((value) => !value)} aria-label="Zoom image"><ZoomIn size={17} /></button><div className="modal-image-count">{activeImage + 1} / {gallery.length}</div>{gallery.length > 1 && <><button className="gallery-control gallery-control-prev" onClick={previousImage} aria-label="Previous listing photo"><ArrowLeft size={18} /></button><button className="gallery-control gallery-control-next" onClick={nextImage} aria-label="Next listing photo"><ArrowRight size={18} /></button></>}</div>{gallery.length > 1 && <div className="modal-gallery-thumbs">{gallery.map((image, index) => <button key={`${image}-${index}`} className={activeImage === index ? 'active' : ''} onClick={() => setActiveImage(index)} aria-label={`View listing photo ${index + 1}`}><img src={image} alt="" /></button>)}</div>}<div className="listing-detail-body"><div className="listing-location-line"><MapPin size={16} /> {listing.location} <span>·</span> {listing.posted} {listing.raw?.updated_at && <span>· Updated {new Date(listing.raw.updated_at).toLocaleDateString()}</span>}</div><h1>{listing.title}</h1><div className="listing-detail-price">{listing.price}</div><div className="listing-detail-meta"><span>{listing.condition}</span><span>{listing.category}{listing.subcategory ? ` · ${listing.subcategory}` : ''}</span><span>{Number(listing.raw?.views_count || 0)} views</span></div><div className="listing-primary-actions"><button className="secondary-contact-button" onClick={requestCallback}><Phone size={19} /> Call</button><a className="secondary-contact-button" href={listing.raw?.contact_preference === 'whatsapp' ? `https://wa.me/${listing.raw?.seller_phone || ''}` : undefined} onClick={(event) => { if (!listing.raw?.seller_phone) { event.preventDefault(); onDemoAction?.('Seller contact details are not public.'); } }}><MessageCircle size={19} /> WhatsApp</a><button className="primary-contact-button" onClick={startChat}><MessageCircle size={20} /> Message Seller</button></div><section className="listing-info-card"><h2>Item details</h2>{specs.length ? <div className="listing-spec-grid">{specs.map((item) => <div key={item.key}><span>{item.key}</span><strong>{String(item.value)}</strong></div>)}</div> : <p>No additional category attributes were provided.</p>}</section><p className="listing-description listing-description-card">{listing.description || 'The seller has not added a description yet.'}</p><section className="seller-profile-card"><div className="seller-profile-heading"><Avatar initials={listing.sellerInitials || 'BE'} tone="rose" /><div><strong>{listing.sellerDisplayName || listing.seller}</strong><span>{listing.verified && <><BadgeCheck size={14} /> Verified · </>}{listing.sellerRating ? `${listing.sellerRating.toFixed(1)} rating` : 'No rating yet'}</span><small>{listing.sellerBusinessName ? listing.sellerBusinessName : 'Seller profile'} · {listing.raw?.views_count || 0} listing views</small></div></div><div className="listing-detail-actions"><button onClick={() => onDemoAction?.('More listings from this seller are available from their public profile.')}>View seller listings <ChevronRight size={17} /></button><button onClick={share}><Share2 size={16} /> Share</button><button className="report-action" onClick={report}>Report</button></div></section><section className="listing-info-card"><h2>Reviews & ratings</h2>{reviews.length ? reviews.map((review) => <div className="review-row" key={review.id}><strong>{review.reviewer?.display_name || 'Buyer'}</strong><span>{'★'.repeat(review.rating)} · {new Date(review.created_at).toLocaleDateString()}</span><p>{review.body || 'No written review.'}</p></div>) : <p>No published reviews yet.</p>}</section>{similar.length > 0 && <section className="listing-info-card"><h2>Similar listings</h2><div className="listing-similar-grid">{similar.map((item) => <button key={item.id} onClick={() => onDemoAction?.(`Open ${item.title} from the marketplace.`)}><strong>{item.title}</strong><span>{item.price} · {item.location}</span></button>)}</div></section>}{owner && <section className="listing-owner-controls"><div><strong>Manage your listing</strong><span>{Number(listing.raw?.views_count || 0)} real views · status: {listing.raw?.status || 'active'}</span></div><div><button onClick={() => onEditListing?.(listing)}>Edit</button><button disabled={statusBusy} onClick={() => manage(listing.raw?.status === 'paused' ? 'active' : 'paused')}>{listing.raw?.status === 'paused' ? 'Resume' : 'Pause'}</button><button disabled={statusBusy} onClick={() => manage('sold')}>Mark sold</button><button disabled={statusBusy} onClick={remove}>Delete</button></div></section>}</div></div></div>;
 }
-
-
-
 
 function PublicPersonalPage({ data }) {
   const { profile, listings } = data;
@@ -484,7 +505,7 @@ export default function App() {
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); showToast('Signed in to bese26.'); }} />}
-    <ListingModal listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} />
+    <ListingModal listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
   </div>;
 }

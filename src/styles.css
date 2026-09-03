@@ -1152,3 +1152,27 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .verification-extra-fields label { display: grid; gap: 5px; color: #333; font-size: 12px; font-weight: 700; }
 .verification-extra-fields input, .verification-extra-fields textarea { width: 100%; border: 1px solid #171717; border-radius: 7px; padding: 10px 11px; font-size: 13px; }
 .verification-extra-fields textarea { min-height: 65px; resize: vertical; }
+
+/* Listing detail enhancements use the existing Bese26 palette. */
+.modal-image-wrap img { transition: transform .2s ease; cursor: zoom-in; }
+.modal-image-wrap.zoomed img { transform: scale(1.75); cursor: zoom-out; }
+.image-zoom-button { position: absolute; right: 12px; top: 12px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(255,255,255,.7); border-radius: 50%; color: #fff; background: rgba(0,0,0,.48); }
+.listing-detail-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 9px 0 16px; color: #666; font-size: 11px; }
+.listing-detail-meta span { padding: 5px 8px; border: 1px solid #e5e5e5; border-radius: 999px; background: #fafafa; }
+.listing-primary-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.listing-primary-actions a { text-decoration: none; }
+.listing-spec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.listing-spec-grid > div { display: grid; gap: 3px; padding: 9px; border-radius: 7px; background: #f7f7f7; }
+.listing-spec-grid span, .review-row span, .listing-owner-controls span { color: #777; font-size: 10px; }
+.listing-spec-grid strong { color: #171717; font-size: 12px; text-transform: capitalize; }
+.listing-detail-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.listing-detail-actions button, .listing-similar-grid button { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #171717; border-radius: 7px; padding: 8px 10px; color: #171717; background: #fff; font-size: 11px; font-weight: 700; }
+.review-row { display: grid; gap: 3px; padding: 10px 0; border-top: 1px solid #eee; }
+.review-row p { margin: 2px 0 0; color: #555; font-size: 12px; line-height: 1.4; }
+.listing-similar-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.listing-similar-grid button { display: grid; justify-items: start; text-align: left; }
+.listing-similar-grid span { color: #666; font-size: 10px; }
+.listing-owner-controls { display: grid; gap: 10px; margin-top: 16px; padding: 12px; border: 1px solid #171717; border-radius: 9px; background: #fffaf0; }
+.listing-owner-controls > div:first-child { display: grid; gap: 3px; }
+.listing-owner-controls button { margin-right: 6px; border: 1px solid #171717; border-radius: 6px; padding: 7px 9px; color: #171717; background: #fff; font-size: 11px; font-weight: 700; }
+@media (max-width: 640px) { .listing-primary-actions { grid-template-columns: 1fr; } .listing-spec-grid, .listing-similar-grid { grid-template-columns: 1fr; } }

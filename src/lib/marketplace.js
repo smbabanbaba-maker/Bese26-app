@@ -297,6 +297,45 @@ export async function fetchListingDetails(listingId) {
   return listing || null;
 }
 
+export async function recordListingView(listingId) {
+  if (!supabase || !listingId) return null;
+  const { data, error } = await supabase.rpc('record_listing_view', { p_listing_id: listingId });
+  if (error && !error.message?.includes('record_listing_view')) throw error;
+  return data;
+}
+
+export async function fetchListingReviews(listingId) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('reviews').select('id,rating,body,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).eq('status', 'published').order('created_at', { ascending: false }).limit(20);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function fetchSimilarListings(listing) {
+  if (!supabase || !listing?.id) return [];
+  let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', listing.raw?.category_id || null).order('created_at', { ascending: false }).limit(4);
+  const { data, error } = await query;
+  if (error) return [];
+  return hydrateListingRows(data || [], { firstMediaOnly: true });
+}
+
+export async function updateListing(listingId, ownerId, values) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('listings').update(values).eq('id', listingId).eq('seller_id', ownerId).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteListing(listingId, ownerId) {
+  failIfUnavailable();
+  const { error } = await supabase.from('listings').delete().eq('id', listingId).eq('seller_id', ownerId);
+  if (error) throw error;
+}
+
+export async function setListingStatus(listingId, ownerId, status) {
+  return updateListing(listingId, ownerId, { status, updated_at: new Date().toISOString() });
+}
+
 export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
