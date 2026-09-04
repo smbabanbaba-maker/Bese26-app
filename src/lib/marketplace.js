@@ -129,6 +129,20 @@ export async function submitVerificationApplication(userId, values) {
   if (error) throw error;
   return data;
 }
+export async function submitBusinessVerification(values) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('submit_business_verification', {
+    p_business_name: values.business_name?.trim() || '',
+    p_business_address: values.business_address?.trim() || '',
+    p_registration_type: values.business_registration_type || 'unregistered',
+    p_registration_number: values.registration_number?.trim() || null,
+    p_phone: values.phone?.trim() || null,
+    p_notes: values.notes?.trim() || null,
+    p_document_path: values.document_path || null,
+  });
+  if (error) throw error;
+  return data;
+}
 const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,provider,provider_reference,provider_status,rejection_reason,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
 export async function fetchIdentityVerification(userId) {
   failIfUnavailable();
@@ -178,7 +192,7 @@ export async function submitIdentityVerification(applicationId) {
 }
 export async function fetchVerificationQueue() {
   failIfUnavailable();
-  const { data, error } = await supabase.from('verification_applications').select('*,profile:profiles!verification_applications_user_id_fkey(display_name,username)').eq('status', 'pending').order('created_at', { ascending: true });
+  const { data, error } = await supabase.from('verification_applications').select('*,profile:profiles!verification_applications_user_id_fkey(display_name,username)').in('status', ['pending', 'pending_review', 'under_review', 'requires_more_information']).neq('verification_type', 'identity').order('created_at', { ascending: true });
   if (error) throw error;
   return data || [];
 }
@@ -213,6 +227,13 @@ export async function reviewVerificationApplication({ id, userId, status, verifi
       if (businessError) throw businessError;
     }
   }
+  return data;
+}
+export async function reviewBusinessVerification({ id, status, reviewerNote = null }) {
+  failIfUnavailable();
+  if (!id || !['under_review', 'verified', 'rejected', 'requires_more_information', 'suspended'].includes(status)) throw new Error('Invalid business review status.');
+  const { data, error } = await supabase.rpc('review_business_verification', { p_application_id: id, p_status: status, p_reviewer_note: reviewerNote?.trim() || null });
+  if (error) throw error;
   return data;
 }
 export async function uploadVerificationDocument({ userId, file }) {
@@ -678,7 +699,10 @@ export async function deleteSavedSearch(userId, searchId) {
 export async function getBusinessProfile(userId) {
   failIfUnavailable();
   if (!userId) return null;
-  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
+  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
+  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
+  let { data, error } = await supabase.from('business_profiles').select(fields).eq('profile_id', userId).maybeSingle();
+  if (error && /verification_status|verified_at|suspended_at|suspension_reason/i.test(error.message || '')) ({ data, error } = await supabase.from('business_profiles').select(legacyFields).eq('profile_id', userId).maybeSingle());
   if (error) throw error;
   return data;
 }
@@ -713,7 +737,10 @@ export async function saveBusinessProfile(userId, values) {
   };
   if (!payload.business_name) throw new Error('Business name is required.');
   if (payload.business_handle && !/^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$/.test(payload.business_handle)) throw new Error('Use 3–30 lowercase letters, numbers, or hyphens for the business handle.');
-  const { data, error } = await supabase.from('business_profiles').upsert(payload).select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').single();
+  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
+  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
+  let { data, error } = await supabase.from('business_profiles').upsert(payload).select(fields).single();
+  if (error && /verification_status|verified_at|suspended_at|suspension_reason/i.test(error.message || '')) ({ data, error } = await supabase.from('business_profiles').upsert(payload).select(legacyFields).single());
   if (error) throw error;
   return data;
 }
