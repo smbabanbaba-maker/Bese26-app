@@ -1360,3 +1360,35 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .public-seller-trust-card b { color: var(--red); font-size: 11px; }
 .public-seller-trust-card small { color: #786b6b; font-size: 9px; }
 @media (max-width: 640px) { .public-seller-trust-card { align-items: flex-start; flex-direction: column; } .public-seller-trust-card > span { text-align: left; } .deal-form-row { grid-template-columns: 1fr; } }
+
+/* Simple one-account, two-modes Business upgrade flow. */
+.business-upgrade-page { max-width: 760px; }
+.business-mode-switcher { display: flex; align-items: center; gap: 9px; margin: 6px 0 14px; }
+.business-mode-card { display: grid; gap: 3px; flex: 1; min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--card); }
+.business-mode-card > span, .business-mode-card small { color: var(--muted); font-size: 9px; }
+.business-mode-card strong { overflow: hidden; color: var(--ink); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.business-mode-card.personal { border-top: 3px solid #252525; }
+.business-mode-card.business { border-top: 3px solid var(--red); }
+.business-mode-card.business svg { color: var(--red); }
+.business-upgrade-progress { display: flex; justify-content: space-between; gap: 8px; margin: 14px 0; }
+.business-upgrade-progress button { display: flex; align-items: center; gap: 6px; padding: 0; color: var(--muted); background: transparent; border: 0; font-size: 10px; font-weight: 800; }
+.business-upgrade-progress button b { width: 25px; height: 25px; display: grid; place-items: center; color: var(--muted); border: 1px solid var(--line); border-radius: 50%; background: var(--card); font-size: 9px; }
+.business-upgrade-progress button.active, .business-upgrade-progress button.complete { color: var(--red); }
+.business-upgrade-progress button.active b, .business-upgrade-progress button.complete b { color: #fff; background: var(--red); border-color: var(--red); }
+.business-upgrade-card { display: grid; gap: 12px; padding: 20px; }
+.business-upgrade-card h2 { margin-top: 3px; font-size: 20px; }
+.business-upgrade-card label { display: grid; gap: 6px; color: var(--ink); font-size: 10px; font-weight: 800; }
+.business-upgrade-card input, .business-upgrade-card textarea { width: 100%; padding: 11px 12px; color: var(--ink); background: var(--soft); border: 1px solid transparent; border-radius: 9px; outline: 0; font: inherit; font-size: 11px; }
+.business-upgrade-card textarea { min-height: 92px; resize: vertical; }
+.business-upgrade-card input:focus, .business-upgrade-card textarea:focus { border-color: #efaaa5; background: var(--card); box-shadow: 0 0 0 3px rgba(229,57,53,.08); }
+.company-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.business-upgrade-preview { display: flex; align-items: center; gap: 11px; padding: 14px; background: #fff8f7; border: 1px solid #f1c5c1; border-radius: 12px; }
+.business-upgrade-preview-logo { width: 48px; height: 48px; display: grid; place-items: center; flex: none; color: #fff; background: var(--red); border-radius: 12px; }
+.business-upgrade-preview > div:last-child { display: grid; gap: 3px; min-width: 0; }
+.business-upgrade-preview strong { color: var(--ink); font-size: 15px; }
+.business-upgrade-preview span { color: var(--red); font-size: 10px; }
+.business-upgrade-preview small { color: var(--muted); font-size: 9px; }
+.business-upgrade-summary { display: grid; gap: 8px; padding: 12px; background: var(--soft); border-radius: 10px; }
+.business-upgrade-summary span { color: var(--muted); font-size: 10px; line-height: 1.4; }
+.business-upgrade-summary b { color: var(--ink); }
+@media (max-width: 640px) { .business-mode-switcher { align-items: stretch; flex-direction: column; } .business-mode-switcher > svg { align-self: center; transform: rotate(90deg); } .business-upgrade-progress button { flex-direction: column; gap: 4px; font-size: 8px; } .company-form-grid { grid-template-columns: 1fr; } .business-upgrade-card { padding: 16px; } }
