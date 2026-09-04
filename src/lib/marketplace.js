@@ -477,6 +477,17 @@ export async function fetchBusinessDirectory(search = '') {
   return data || [];
 }
 
+export async function checkBusinessHandleAvailability(handle, userId = null) {
+  failIfUnavailable();
+  const normalized = String(handle || '').trim().replace(/^@/, '').toLowerCase();
+  if (!normalized) return { available: true, handle: normalized };
+  let query = supabase.from('business_profiles').select('profile_id').eq('business_handle', normalized).eq('is_active', true).limit(1);
+  if (userId) query = query.neq('profile_id', userId);
+  const { data, error } = await query.maybeSingle();
+  if (error) throw error;
+  return { available: !data, handle: normalized };
+}
+
 export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
   failIfUnavailable();
   if (!sellerId) return [];
