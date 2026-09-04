@@ -395,14 +395,14 @@ export async function fetchSimilarListings(listing) {
 
 export async function updateListing(listingId, ownerId, values) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('listings').update(values).eq('id', listingId).eq('seller_id', ownerId).select().single();
+  const { data, error } = await supabase.from('listings').update(values).eq('id', listingId).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function deleteListing(listingId, ownerId) {
   failIfUnavailable();
-  const { error } = await supabase.from('listings').delete().eq('id', listingId).eq('seller_id', ownerId);
+  const { error } = await supabase.from('listings').delete().eq('id', listingId);
   if (error) throw error;
 }
 
@@ -450,7 +450,17 @@ export async function fetchBusinessDirectory(search = '') {
 export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
   failIfUnavailable();
   if (!sellerId) return [];
-  let query = supabase.from('listings').select(listingSelect).eq('seller_id', sellerId).order('updated_at', { ascending: false }).limit(200);
+  let query;
+  try {
+    const { data: memberships, error: membershipError } = await supabase.from('business_team_members').select('business_profile_id').eq('user_id', sellerId).eq('is_active', true);
+    if (membershipError) throw membershipError;
+    const businessIds = [...new Set((memberships || []).map((row) => row.business_profile_id).filter(Boolean))];
+    query = businessIds.length
+      ? supabase.from('listings').select(`${listingSelect},business_profile_id,published_as_type`).or(`seller_id.eq.${sellerId},business_profile_id.in.(${businessIds.join(',')})`).order('updated_at', { ascending: false }).limit(200)
+      : supabase.from('listings').select(listingSelect).eq('seller_id', sellerId).order('updated_at', { ascending: false }).limit(200);
+  } catch {
+    query = supabase.from('listings').select(listingSelect).eq('seller_id', sellerId).order('updated_at', { ascending: false }).limit(200);
+  }
   if (status === 'active') query = query.eq('status', 'active');
   if (status === 'pending') query = query.in('status', ['draft', 'pending']);
   if (status === 'sold') query = query.eq('status', 'sold');

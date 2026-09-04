@@ -74,7 +74,7 @@ function Toggle({ checked, onChange, label }) {
   return <button type="button" className={`sell-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button>;
 }
 
-export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSubscription, initialListing = null }) {
+export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSubscription, initialListing = null, initialDraft = null }) {
   const [form, setForm] = useState(initialForm);
   const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
@@ -102,6 +102,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     setEditMode(true);
     setForm((current) => ({
       ...current,
+      ...(raw.attributes || {}),
       category: initialListing.category || current.category,
       subcategory: initialListing.subcategory || current.subcategory,
       title: raw.title || initialListing.title || '',
@@ -129,6 +130,15 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     })).filter((item) => item.src);
     setMedia(existingMedia);
   }, [initialListing]);
+
+  useEffect(() => {
+    if (!initialDraft?.payload) return;
+    const payload = initialDraft.payload.form || initialDraft.payload;
+    setDraftId(initialDraft.id);
+    setEditMode(false);
+    setForm((current) => ({ ...current, ...payload, title: payload.title || initialDraft.title || '', price: payload.price == null ? '' : String(payload.price), attributes: payload.attributes || current.attributes }));
+    if (Array.isArray(initialDraft.payload.media)) setMedia(initialDraft.payload.media.map((item) => ({ ...item, file: null, src: item.src || '' })));
+  }, [initialDraft]);
 
   useEffect(() => {
     if (user && !form.sellerName) {

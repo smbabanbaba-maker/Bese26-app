@@ -1264,3 +1264,36 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .listing-report-card label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; }
 .listing-report-card select, .listing-report-card textarea { width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 10px; font: inherit; }
 @media (max-width: 760px) { .listing-details-premium { width: 100vw; max-height: 100vh; border-radius: 0; } .listing-details-layout { display: block; padding: 14px; } .listing-gallery-frame { min-height: 250px; border-radius: 13px; } .listing-detail-body { margin-top: 17px; } .listing-primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } .listing-details-premium .listing-modal-header { padding: 13px 14px; } }
+
+/* My Listings management center */
+.listing-management-center { max-width: 1080px; margin: 0 auto; }
+.listing-management-hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.listing-management-hero h2 { margin: 4px 0; }
+.listing-management-hero p { color: var(--muted); font-size: 12px; }
+.listing-summary-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.listing-summary-grid > div { display: grid; gap: 3px; padding: 11px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); }
+.listing-summary-grid strong { font-size: 18px; color: var(--ink); }
+.listing-summary-grid span { color: var(--muted); font-size: 10px; }
+.listing-management-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.listing-management-toolbar .search-box { flex: 1; }
+.listing-management-tabs { margin-bottom: 14px; }
+.listing-management-tabs b { margin-left: 5px; }
+.listing-management-grid { display: grid; gap: 10px; }
+.management-card { position: relative; align-items: flex-start; }
+.management-card > img, .management-card > .managed-listing-placeholder { flex: 0 0 102px; width: 102px; height: 102px; object-fit: cover; border-radius: 11px; }
+.management-published-as { color: var(--muted); font-size: 11px; }
+.management-card-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.management-card-actions .primary-button, .management-card-actions .secondary-button { padding: 8px 10px; font-size: 11px; }
+.listing-action-menu { display: grid; position: absolute; right: 10px; bottom: 10px; z-index: 3; min-width: 190px; padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); box-shadow: var(--shadow); }
+.listing-action-menu button { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--ink); text-align: left; font-size: 12px; cursor: pointer; }
+.listing-action-menu button:hover { background: var(--soft); }
+.listing-action-menu .danger-text { color: var(--red); }
+.listing-price-editor { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; padding: 10px; border-radius: 9px; background: var(--soft); }
+.listing-price-editor input, .listing-price-editor select { min-width: 120px; padding: 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); color: var(--ink); }
+.listing-analytics-panel { position: fixed; right: 20px; bottom: 20px; z-index: 20; width: min(92vw, 380px); padding: 18px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); box-shadow: var(--shadow); }
+.listing-analytics-panel > .icon-button { float: right; }
+.listing-analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.listing-analytics-grid span { display: grid; gap: 4px; padding: 10px; border-radius: 9px; background: var(--soft); color: var(--muted); font-size: 11px; }
+.listing-analytics-grid strong { color: var(--ink); font-size: 16px; }
+@media (max-width: 800px) { .listing-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .listing-management-hero { align-items: flex-start; flex-direction: column; } .listing-management-hero .primary-button { width: 100%; justify-content: center; } .listing-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .listing-management-toolbar { align-items: stretch; flex-direction: column; } .listing-management-toolbar .secondary-button { justify-content: center; } .management-card > img, .management-card > .managed-listing-placeholder { flex-basis: 78px; width: 78px; height: 78px; } .management-card-actions .primary-button { flex: 1; } .listing-action-menu { position: static; margin-top: 9px; } }
