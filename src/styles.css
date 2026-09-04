@@ -1196,3 +1196,32 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .route-error-card svg { color: var(--red); }
 .route-error-card h2 { font-size: 21px; }
 .route-error-card p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+/* Selected icon-only B26 brand asset */
+.auth-welcome-mark img,
+.auth-panel-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.auth-welcome-mark,
+.auth-panel-mark { overflow: hidden; }
+.brand-mark-image {
+  width: 34px;
+  height: 34px;
+  display: block;
+  object-fit: cover;
+  border-radius: 10px;
+  flex: 0 0 auto;
+}
+.public-business-not-found .brand-mark-image {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 24px;
+  border-radius: 24px;
+}
+@media (max-width: 640px) {
+  .brand-mark-image { width: 30px; height: 30px; border-radius: 8px; }
+}
