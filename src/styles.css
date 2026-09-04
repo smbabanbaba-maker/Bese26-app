@@ -1409,3 +1409,12 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .business-onboarding-checklist span.complete { border-color: #171717; color: #171717; background: #fafafa; }
 .business-onboarding-checklist span.complete svg { color: #d71920; }
 @media (max-width: 620px) { .business-onboarding-checklist { grid-template-columns: 1fr; } .publish-success-actions { flex-wrap: wrap; } }
+
+/* First-visit guidance and actionable marketplace empty states. */
+.start-guide { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:16px 18px; border:1px solid #171717; border-radius:16px; background:#fff; box-shadow:var(--shadow); }
+.start-guide h2 { margin:2px 0 5px; font-size:18px; }
+.start-guide p { color:var(--muted); font-size:11px; line-height:1.45; max-width:520px; }
+.start-guide-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.start-guide-actions .icon-button { color:var(--muted); }
+.empty-state-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:4px; }
+@media (max-width: 700px) { .start-guide { align-items:flex-start; flex-direction:column; } .start-guide-actions { width:100%; } .start-guide-actions .primary-button, .start-guide-actions .secondary-button { flex:1; } }

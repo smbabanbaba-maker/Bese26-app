@@ -16,7 +16,7 @@ function WelcomeSide({ isSignin }) {
   </div>;
 }
 
-export default function AuthPanel({ onClose, onAuthenticated }) {
+export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const [mode, setMode] = useState('signin');
   const [form, setForm] = useState({ email: '', password: '', displayName: '', username: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
@@ -68,7 +68,7 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
     <div className="auth-panel-mark"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div>
     <div className="eyebrow">SAFE MARKETPLACE ACCESS</div>
     <h2 id="auth-title">Login</h2>
-    <p className="auth-panel-copy">Welcome back to your marketplace.</p>
+    <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
     {isSupabaseConfigured && <>
       <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
@@ -85,7 +85,7 @@ export default function AuthPanel({ onClose, onAuthenticated }) {
     <div className="auth-panel-mark"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div>
     <div className="eyebrow">JOIN BESE26</div>
     <h2 id="auth-title">Create account</h2>
-    <p className="auth-panel-copy">Set up your secure marketplace account.</p>
+    <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
     {isSupabaseConfigured && <>
       <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>

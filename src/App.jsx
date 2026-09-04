@@ -193,12 +193,17 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
 }
 
 function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+  const [showStartGuide, setShowStartGuide] = useState(() => {
+    try { return window.localStorage.getItem('bese26:first-visit-guide-dismissed') !== '1'; } catch { return true; }
+  });
+  const dismissStartGuide = () => { setShowStartGuide(false); try { window.localStorage.setItem('bese26:first-visit-guide-dismissed', '1'); } catch {} };
   return (
     <div className="page-stack home-page">
       <section className="discovery-banner">
         <div className="discovery-copy"><div className="eyebrow light">WELCOME TO BESE26</div><h1>Shop smarter.<br /><span>Sell with confidence.</span></h1><p>Discover everyday essentials from people and businesses near you.</p></div>
         <div className="discovery-actions"><div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div><button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button></div>
       </section>
+      {showStartGuide && <section className="start-guide" aria-label="Get started with Bese26"><div><div className="eyebrow">NEW HERE?</div><h2>What would you like to do?</h2><p>You can browse freely, or sign in when you are ready to sell and chat safely.</p></div><div className="start-guide-actions"><button type="button" className="primary-button" onClick={() => { dismissStartGuide(); onSearch(''); }}><Search size={15} /> Buy something</button><button type="button" className="secondary-button" onClick={() => { dismissStartGuide(); onNavigate('sell'); }}><Plus size={15} /> Sell something</button><button type="button" className="icon-button" aria-label="Dismiss getting started guide" onClick={dismissStartGuide}><X size={17} /></button></div></section>}
       <section className="search-section">
         <div className="search-box home-search">
           <Search size={18} />
@@ -210,7 +215,7 @@ function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSea
 
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
-        {marketListings.length ? <div className="product-grid">{marketListings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Approved listings from sellers will appear here.</p><button className="primary-button" onClick={() => onNavigate('sell')}>List an item</button></div>}
+        {marketListings.length ? <div className="product-grid">{marketListings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
       </section>
 
       <section className="trust-strip">
@@ -438,6 +443,7 @@ function AppContent() {
   const [sessionUser, setSessionUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [authReason, setAuthReason] = useState('');
   const [chatListing, setChatListing] = useState(null);
   const [editingListing, setEditingListing] = useState(null);
   const [editingDraft, setEditingDraft] = useState(null);
@@ -449,7 +455,7 @@ function AppContent() {
   }, []);
 
   const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
-  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setShowAuth(true); showToast(message); }, [showToast]);
+  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setAuthReason(message); setShowAuth(true); }, []);
   const toggleSave = (id) => {
     const wasSaved = savedIds.includes(id);
     if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to save listings for later.'); return; }
@@ -586,7 +592,7 @@ function AppContent() {
     <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></AppErrorBoundary></main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
 
-    {showAuth && <AuthPanel onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); showToast('Signed in to bese26.'); }} />}
+    {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     <ListingModal listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
   </div>;
