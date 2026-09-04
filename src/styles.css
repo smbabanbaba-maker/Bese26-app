@@ -1298,3 +1298,37 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .listing-analytics-grid strong { color: var(--ink); font-size: 16px; }
 @media (max-width: 800px) { .listing-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .listing-management-hero { align-items: flex-start; flex-direction: column; } .listing-management-hero .primary-button { width: 100%; justify-content: center; } .listing-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .listing-management-toolbar { align-items: stretch; flex-direction: column; } .listing-management-toolbar .secondary-button { justify-content: center; } .management-card > img, .management-card > .managed-listing-placeholder { flex-basis: 78px; width: 78px; height: 78px; } .management-card-actions .primary-button { flex: 1; } .listing-action-menu { position: static; margin-top: 9px; } }
+
+/* Trust-first marketplace layer: preserve Bese26 white, black, and red language. */
+.trust-summary-card { margin-top: 14px; padding: 14px; color: var(--ink); background: #fff8f7; border: 1px solid #f1c5c1; border-radius: 14px; }
+.trust-summary-heading { display: flex; align-items: flex-start; gap: 10px; }
+.trust-summary-icon { width: 34px; height: 34px; display: grid; place-items: center; flex: none; color: #fff; background: var(--red); border-radius: 10px; }
+.trust-summary-heading > div:last-child { display: grid; gap: 4px; }
+.trust-summary-heading strong { font-size: 13px; }
+.trust-summary-heading span { color: #6f6060; font-size: 10px; line-height: 1.45; }
+.trust-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 12px; padding-top: 11px; border-top: 1px solid #f0d9d6; }
+.trust-summary-grid span { display: grid; gap: 3px; color: #786b6b; font-size: 9px; line-height: 1.25; }
+.trust-summary-grid b { color: var(--ink); font-size: 10px; }
+.safe-deal-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 14px; color: #fff; background: #202124; border-radius: 14px; }
+.safe-deal-card > div { display: flex; align-items: flex-start; gap: 9px; }
+.safe-deal-card > div > svg { flex: none; color: #ff8179; }
+.safe-deal-card strong { display: block; font-size: 12px; }
+.safe-deal-card p { max-width: 470px; margin-top: 4px; color: #d6d2d2; font-size: 10px; line-height: 1.45; }
+.safe-deal-card button { display: inline-flex; align-items: center; gap: 5px; flex: none; padding: 9px 11px; color: #fff; background: var(--red); border: 0; border-radius: 8px; font-size: 9px; font-weight: 800; }
+.listing-details-premium .secondary-contact-button, .listing-details-premium .make-offer-wide { color: var(--red); border-color: var(--red); }
+.listing-details-premium .primary-contact-button { background: var(--red); }
+.sell-step-progress { position: relative; display: flex; justify-content: space-between; gap: 8px; padding: 4px 4px 10px; }
+.sell-step-progress::before { content: ''; position: absolute; top: 17px; left: 10%; right: 10%; height: 1px; background: var(--line); }
+.sell-step-progress button { position: relative; z-index: 1; display: flex; align-items: center; gap: 7px; padding: 0 5px; color: var(--muted); background: var(--bg); border: 0; font-size: 10px; font-weight: 800; }
+.sell-step-progress button b { width: 26px; height: 26px; display: grid; place-items: center; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 50%; font-size: 9px; }
+.sell-step-progress button.active { color: var(--red); }
+.sell-step-progress button.active b, .sell-step-progress button.complete b { color: #fff; background: var(--red); border-color: var(--red); }
+.sell-step-progress button.complete { color: var(--red); }
+@media (max-width: 640px) {
+  .trust-summary-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .safe-deal-card { align-items: flex-start; flex-direction: column; }
+  .safe-deal-card button { width: 100%; justify-content: center; }
+  .sell-step-progress { overflow-x: auto; justify-content: space-around; }
+  .sell-step-progress button { flex-direction: column; gap: 4px; font-size: 9px; }
+  .sell-step-progress::before { top: 17px; left: 15%; right: 15%; }
+}

@@ -84,6 +84,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const [entitlement, setEntitlement] = useState(null);
   const [businessProfile, setBusinessProfile] = useState(null);
   const [publishAs, setPublishAs] = useState('personal');
+  const [sellStep, setSellStep] = useState(1);
   const [editMode, setEditMode] = useState(Boolean(initialListing));
   const mediaInput = useRef(null);
   const cameraInput = useRef(null);
@@ -236,6 +237,26 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     setErrors(nextErrors);
     return nextErrors;
   };
+  const validateStep = (step) => {
+    const nextErrors = [];
+    if (step === 1) {
+      if (media.length < 1) nextErrors.push('Add at least one clear photo before continuing.');
+    }
+    if (step === 2) {
+      if (!form.title.trim()) nextErrors.push('Add a short, searchable title.');
+      if (!form.category) nextErrors.push('Choose a category.');
+      if (!form.description.trim()) nextErrors.push('Add a description so buyers understand the listing.');
+      if (!form.price || Number(form.price) <= 0) nextErrors.push('Enter a valid price greater than zero.');
+    }
+    if (step === 3 && (!form.state || !form.city)) nextErrors.push('Choose a state and city for the listing.');
+    setErrors(nextErrors);
+    return nextErrors;
+  };
+  const nextStep = () => {
+    if (validateStep(sellStep).length === 0) setSellStep((current) => Math.min(3, current + 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const previousStep = () => { setErrors([]); setSellStep((current) => Math.max(1, current - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const publish = async () => {
     if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (isSupabaseConfigured && !user) { onAuthRequired?.(); return; }
@@ -284,5 +305,6 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const planUsageNote = !editMode && entitlement ? <div className={`sell-plan-usage ${entitlement.free_posts_remaining === 0 ? 'exhausted' : ''}`}><div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan · ${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used` : `${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used`}</strong><small>{entitlement.is_paid ? `${Math.max(entitlement.listing_limit - entitlement.free_posts_used, 0)} active listings remaining` : entitlement.free_posts_remaining ? `${entitlement.free_posts_remaining} active listing slot${entitlement.free_posts_remaining === 1 ? '' : 's'} remaining` : 'Your Free plan has reached its active listing limit.'}</small></div>{entitlement.free_posts_remaining === 0 && !entitlement.is_paid && <button type="button" className="text-action" onClick={onOpenSubscription}>View plans <ArrowRight size={14} /></button>}</div> : null;
   const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">SUBMITTED FOR REVIEW</div><h2>{editMode ? 'Your revised listing was submitted' : 'Your listing was submitted'}</h2><p>Your listing is saved in My Listings as pending. It will appear on Home after marketplace approval.</p><div className="publish-success-actions"><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>{editMode ? 'Ready to resubmit?' : 'Ready to post?'}</h2><p>Check your details above, then {editMode ? 'send your corrections back for review.' : 'publish your listing.'}</p></div></div>{planUsageNote}<div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : editMode ? 'Resubmit for review' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
 
-  return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new ad'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved to your Bese26 account</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{renderMedia()}{renderPublishAs()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div></>}</div>;
+  const stepLabels = ['Photos', 'Details', 'Publish'];
+  return <div className="page-stack sell-page intelligent-sell-page vertical-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new ad'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div><div className="sell-step-progress" aria-label="Sell progress">{stepLabels.map((label, index) => <button type="button" key={label} className={`${sellStep === index + 1 ? 'active' : ''} ${sellStep > index + 1 ? 'complete' : ''}`} onClick={() => index + 1 <= sellStep && setSellStep(index + 1)}><b>{sellStep > index + 1 ? <Check size={13} /> : index + 1}</b><span>{label}</span></button>)}</div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved to your Bese26 account</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <><div className="vertical-sell-sections">{sellStep === 1 && renderMedia()}{sellStep === 2 && <>{renderPublishAs()}{renderDetails()}{renderPricing()}</>}{sellStep === 3 && <>{renderLocation()}{renderPublish()}</>}</div>{sellStep < 3 && <div className="sell-step-actions"><span>Step {sellStep} of 3</span><button type="button" className="primary-button" onClick={nextStep}>Continue <ArrowRight size={15} /></button></div>}{sellStep === 3 && <div className="sell-step-actions"><button type="button" className="back-step-button" onClick={previousStep}><ArrowLeft size={15} /> Back</button><span>Step 3 of 3</span></div>}</>}</div>;
 }
