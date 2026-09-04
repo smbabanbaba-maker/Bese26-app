@@ -319,7 +319,7 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const [statusBusy, setStatusBusy] = useState(false);
   const gallery = listing?.gallery?.length ? listing.gallery : [listing?.image].filter(Boolean);
   const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)).map(([key, value]) => ({ key: key.replace(/[_-]+/g, ' '), value: Array.isArray(value) ? value.join(', ') : value }));
-  const owner = Boolean(user?.id && user.id === listing.sellerId);
+  const owner = Boolean(user?.id && user.id === listing?.sellerId);
   const nextImage = () => setActiveImage((index) => (index + 1) % Math.max(gallery.length, 1));
   const previousImage = () => setActiveImage((index) => (index - 1 + gallery.length) % gallery.length);
   const startChat = () => onStartChat({ ...listing, initialMessage: message.trim() });
