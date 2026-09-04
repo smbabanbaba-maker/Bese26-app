@@ -1228,6 +1228,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 @media (max-width: 640px) { .verification-review-grid { grid-template-columns: 1fr; } .verification-upload-row { align-items: flex-start; flex-direction: column; } }
 
 /* Premium listing details: preserves Bese26 white / black / red language. */
+.listing-modal-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 24px; overflow: auto; background: rgba(20,22,26,.58); backdrop-filter: blur(7px); animation: fadeIn .2s ease; }
 .listing-details-premium { max-width: 1120px; width: min(96vw, 1120px); max-height: 94vh; overflow: auto; background: #fff; color: #111; }
 .listing-details-premium .listing-modal-header { position: sticky; top: 0; z-index: 4; background: rgba(255,255,255,.96); border-bottom: 1px solid #eee; }
 .listing-details-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); gap: 24px; padding: 22px; }
@@ -1263,7 +1264,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .listing-report-card .icon-button { justify-self: end; }
 .listing-report-card label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; }
 .listing-report-card select, .listing-report-card textarea { width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 10px; font: inherit; }
-@media (max-width: 760px) { .listing-details-premium { width: 100vw; max-height: 100vh; border-radius: 0; } .listing-details-layout { display: block; padding: 14px; } .listing-gallery-frame { min-height: 250px; border-radius: 13px; } .listing-detail-body { margin-top: 17px; } .listing-primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } .listing-details-premium .listing-modal-header { padding: 13px 14px; } }
+@media (max-width: 760px) { .listing-modal-backdrop { align-items: start; padding: 0; } .listing-details-premium { width: 100vw; max-height: 100vh; border-radius: 0; } .listing-details-layout { display: block; padding: 14px; } .listing-gallery-frame { min-height: 250px; border-radius: 13px; } .listing-detail-body { margin-top: 17px; } .listing-primary-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } .listing-details-premium .listing-modal-header { padding: 13px 14px; } }
 
 /* My Listings management center */
 .listing-management-center { max-width: 1080px; margin: 0 auto; }
