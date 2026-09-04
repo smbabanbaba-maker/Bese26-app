@@ -72,7 +72,7 @@ class AppErrorBoundary extends Component {
   retry = () => this.setState({ hasError: false, error: null });
   render() {
     if (!this.state.hasError) return this.props.children;
-    return <div className="route-error-card"><AlertCircle size={24} /><h2>Something went wrong loading this page</h2><p>Your account session is safe. Try the page again or reload Bese26 if your connection changed.</p><div className="route-error-actions"><button type="button" className="secondary-button" onClick={this.retry}>Try again</button><button type="button" className="primary-button" onClick={() => window.location.reload()}>Reload Bese26</button></div></div>;
+    const message = this.state.error?.message || 'Unknown UI error'; return <div className="route-error-card"><AlertCircle size={24} /><h2>Something went wrong loading this page</h2><p>Your account session is safe. Try the page again or reload Bese26 if your connection changed.</p><div className="route-error-detail" role="alert"><strong>Technical detail</strong><code>{message}</code></div><div className="route-error-actions"><button type="button" className="secondary-button" onClick={this.retry}>Try again</button><button type="button" className="primary-button" onClick={() => window.location.reload()}>Reload Bese26</button></div></div>;
   }
 }
 
