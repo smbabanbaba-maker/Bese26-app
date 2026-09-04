@@ -343,7 +343,7 @@ const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
   const { data: businessProfiles, error: businessError } = businessIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active').in('profile_id', businessIds).eq('is_active', true)
+    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
     : { data: [], error: null };
   if (businessError) throw businessError;
   const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
@@ -362,7 +362,12 @@ export async function fetchListingDetails(listingId) {
   if (!listingId) return null;
   const { data, error } = await supabase.from('listings').select(listingSelect).eq('id', listingId).maybeSingle();
   if (error) throw error;
-  const [listing] = await hydrateListingRows(data ? [data] : []);
+  let detail = data;
+  if (detail) {
+    const optionalOwnership = await supabase.from('listings').select('business_profile_id,published_as_type').eq('id', listingId).maybeSingle();
+    if (!optionalOwnership.error) detail = { ...detail, ...optionalOwnership.data };
+  }
+  const [listing] = await hydrateListingRows(detail ? [detail] : []);
   return listing || null;
 }
 
@@ -989,9 +994,11 @@ export async function reportListing({ listingId, reporterId, reason = 'other', d
   failIfUnavailable();
   if (!reporterId) throw new Error('Sign in before reporting a listing.');
   if (!listingId) throw new Error('Listing is required.');
+  const reasonMap = { fake_product: 'fake_information', counterfeit: 'fake_information', wrong_information: 'fake_information', fake_identity: 'fake_information', suspicious_activity: 'scam' };
+  const normalizedReason = reasonMap[reason] || reason;
   const allowedReasons = ['scam', 'prohibited_item', 'fake_information', 'harassment', 'other'];
-  if (!allowedReasons.includes(reason)) throw new Error('Choose a valid report reason.');
-  const { data, error } = await supabase.from('listing_reports').insert({ listing_id: listingId, reporter_id: reporterId, reason, details: details?.trim() || null }).select('id,status,created_at').single();
+  if (!allowedReasons.includes(normalizedReason)) throw new Error('Choose a valid report reason.');
+  const { data, error } = await supabase.from('listing_reports').insert({ listing_id: listingId, reporter_id: reporterId, reason: normalizedReason, details: details?.trim() || null }).select('id,status,created_at').single();
   if (error) throw error;
   return data;
 }
