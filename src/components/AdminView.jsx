@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, CheckCircle2, Clock3, MapPin, Package, RefreshCw, ShieldCheck, X } from 'lucide-react';
-import { fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, reviewVerificationApplication } from '../lib/marketplace';
+import { fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, reviewIdentityVerification, reviewVerificationApplication } from '../lib/marketplace';
 
 function formatDate(value) {
   if (!value) return 'Recently submitted';
@@ -26,15 +26,17 @@ export default function AdminView({ user, onBack, onNotice }) {
   const [rejectingId, setRejectingId] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [verificationItems, setVerificationItems] = useState([]);
+  const [identityItems, setIdentityItems] = useState([]);
 
   const load = async () => {
     setLoading(true);
     setError('');
     try {
-      const [pendingRows, historyRows, verificationRows] = await Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue()]);
+      const [pendingRows, historyRows, verificationRows, identityRows] = await Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue(), fetchIdentityVerificationQueue().catch(() => [])]);
       setItems(pendingRows);
       setHistory(historyRows);
       setVerificationItems(verificationRows);
+      setIdentityItems(identityRows);
     } catch (requestError) {
       setError(requestError.message || 'Could not load moderation data.');
     } finally {
@@ -44,12 +46,13 @@ export default function AdminView({ user, onBack, onNotice }) {
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue()])
-      .then(([pendingRows, historyRows, verificationRows]) => {
+    Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue(), fetchIdentityVerificationQueue().catch(() => [])])
+      .then(([pendingRows, historyRows, verificationRows, identityRows]) => {
         if (!mounted) return;
         setItems(pendingRows);
         setHistory(historyRows);
         setVerificationItems(verificationRows);
+        setIdentityItems(identityRows);
       })
       .catch((requestError) => mounted && setError(requestError.message || 'Could not load moderation data.'))
       .finally(() => mounted && setLoading(false));
@@ -105,6 +108,7 @@ export default function AdminView({ user, onBack, onNotice }) {
     }
   };
   const reviewVerification = async (item, status) => { try { await reviewVerificationApplication({ id: item.id, userId: item.user_id, status, verificationType: item.verification_type, durationMonths: item.duration_months || 1, reviewerNote: status === 'approved' ? 'Approved after moderation review.' : 'Please provide clearer information or an acceptable document and submit again.' }); setVerificationItems((current) => current.filter((row) => row.id !== item.id)); onNotice?.(`Verification application ${status.replace('_', ' ')}.`); } catch (reviewError) { setError(reviewError.message || 'Could not update verification application.'); } };
+  const reviewIdentity = async (item, status) => { try { await reviewIdentityVerification({ id: item.id, status, reviewerNote: status === 'verified' ? 'Identity verified after authorized review.' : status === 'rejected' ? 'Please provide clearer information and resubmit.' : 'More information is required before a decision can be made.' }); setIdentityItems((current) => current.filter((row) => row.id !== item.id)); onNotice?.(`Identity verification marked ${status.replaceAll('_', ' ')}.`); } catch (reviewError) { setError(reviewError.message || 'Could not update identity verification.'); } };
 
   if (!user) return <div className="page-stack admin-page"><div className="profile-subpage-header"><button className="icon-button" onClick={onBack} aria-label="Back"><ArrowLeft size={18} /></button><div><div className="eyebrow">ADMIN CENTER</div><h1>Sign in required</h1></div></div><div className="empty-state"><ShieldCheck size={28} /><h3>Admin access required</h3><p>Sign in with the authorized Bese26 admin account to review listings.</p></div></div>;
 
@@ -112,6 +116,7 @@ export default function AdminView({ user, onBack, onNotice }) {
     <div className="profile-subpage-header"><button className="icon-button" onClick={onBack} aria-label="Back from moderation"><ArrowLeft size={18} /></button><div><div className="eyebrow">ADMIN CENTER</div><h1>Moderation</h1></div><span className="admin-access-badge"><ShieldCheck size={14} /> Moderator access</span></div>
     <div className="admin-intro"><div><strong>Review seller listings</strong><p>Keep every approved listing accurate, safe, and ready for buyers.</p></div><button className="secondary-button" onClick={load} disabled={loading}><RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh</button></div>
     {verificationItems.length > 0 && <section className="admin-verification-queue"><div className="admin-intro"><div><strong>Verification applications</strong><p>Review personal/seller and business verification requests.</p></div><span className="status-pill pending">{verificationItems.length} pending</span></div>{verificationItems.map((item) => <article className="admin-verification-card" key={item.id}><div><span className="status-pill pending">{item.verification_type}</span><h2>{item.full_name}</h2><p>{item.business_name ? `${item.business_name} · ` : ''}{item.phone || 'Phone not provided'}</p><small>{item.notes || 'No additional notes.'}</small><small>{item.duration_months || 1} month{(item.duration_months || 1) === 1 ? '' : 's'} · ₦{Number((item.total_fee_kobo ?? 350000 * (item.duration_months || 1)) / 100).toLocaleString('en-NG')}</small></div><div className="admin-listing-actions"><button className="primary-button" onClick={() => reviewVerification(item, 'approved')}>Approve</button><button className="danger-outline-button" onClick={() => reviewVerification(item, 'action_required')}>Request changes</button><button className="danger-button" onClick={() => reviewVerification(item, 'rejected')}>Reject</button></div></article>)}</section>}
+    {identityItems.length > 0 && <section className="admin-verification-queue"><div className="admin-intro"><div><strong>Identity verification queue</strong><p>Review sensitive identity requests privately. Government ID values and documents are never shown in public listing data.</p></div><span className="status-pill pending">{identityItems.length} requests</span></div>{identityItems.map((item) => <article className="admin-verification-card" key={item.id}><div><span className="status-pill pending">{item.status.replaceAll('_', ' ')}</span><h2>{item.profile?.display_name || item.full_name || 'Bese26 member'}</h2><p>{[item.legal_first_name, item.legal_middle_name, item.legal_last_name].filter(Boolean).join(' ') || 'Legal name supplied'} · {item.document_type?.replaceAll('_', ' ') || 'ID type not supplied'}</p><small>{item.country || 'Country not supplied'} · Submitted {formatDate(item.submitted_at || item.created_at)}</small><small>Front document: {item.document_front_path ? 'uploaded privately' : 'missing'} · Liveness: {item.liveness_status || 'not configured'}</small></div><div className="admin-listing-actions"><button className="primary-button" onClick={() => reviewIdentity(item, 'verified')}>Approve identity</button><button className="danger-outline-button" onClick={() => reviewIdentity(item, 'requires_more_information')}>Request information</button><button className="danger-button" onClick={() => reviewIdentity(item, 'rejected')}>Reject</button></div></article>)}</section>}
     <div className="admin-status-tabs" role="tablist" aria-label="Moderation status"><button className={activeTab === 'pending' ? 'active' : ''} onClick={() => setActiveTab('pending')} role="tab" aria-selected={activeTab === 'pending'}><Clock3 size={15} /> Pending <b>{counts.pending}</b></button><button className={activeTab === 'approved' ? 'active' : ''} onClick={() => setActiveTab('approved')} role="tab" aria-selected={activeTab === 'approved'}><CheckCircle2 size={15} /> Approved <b>{counts.approved}</b></button><button className={activeTab === 'rejected' ? 'active' : ''} onClick={() => setActiveTab('rejected')} role="tab" aria-selected={activeTab === 'rejected'}><X size={15} /> Rejected <b>{counts.rejected}</b></button></div>
     {error && <div className="auth-status error">{error}</div>}
     {loading ? <div className="empty-state compact-empty"><Package size={24} /><h3>Loading moderation</h3><p>Getting listing statuses from Supabase.</p></div> : activeTab === 'pending' ? items.length ? <div className="admin-queue">{items.map((listing) => <article className="admin-listing-card" key={listing.id}>

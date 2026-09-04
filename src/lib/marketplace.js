@@ -129,11 +129,71 @@ export async function submitVerificationApplication(userId, values) {
   if (error) throw error;
   return data;
 }
+const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,provider,provider_reference,provider_status,rejection_reason,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
+export async function fetchIdentityVerification(userId) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('verification_applications').select(identityVerificationFields).eq('user_id', userId).eq('verification_type', 'identity').order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+function maskDocumentNumber(value) {
+  const normalized = String(value || '').replace(/\s+/g, '').trim();
+  if (!normalized) return null;
+  return normalized.length <= 4 ? `****${normalized}` : `****${normalized.slice(-4)}`;
+}
+export async function saveIdentityVerificationDraft(userId, values) {
+  failIfUnavailable();
+  const payload = { user_id: userId, verification_type: 'identity', full_name: [values.legal_first_name, values.legal_middle_name, values.legal_last_name].filter(Boolean).join(' ').trim() || 'Identity verification applicant', status: 'draft', legal_first_name: values.legal_first_name?.trim() || null, legal_middle_name: values.legal_middle_name?.trim() || null, legal_last_name: values.legal_last_name?.trim() || null, date_of_birth: values.date_of_birth || null, gender: values.gender || null, country: values.country?.trim() || null, state: values.state?.trim() || null, city: values.city?.trim() || null, residential_address: values.residential_address?.trim() || null, document_type: values.document_type || null, document_number_reference: maskDocumentNumber(values.document_number_reference), document_country: values.document_country?.trim() || null, document_expiry: values.document_expiry || null, document_front_path: values.document_front_path || null, document_back_path: values.document_back_path || null, selfie_path: values.selfie_path || null, accuracy_confirmed: Boolean(values.accuracy_confirmed) };
+  if (values.id) {
+    const { data, error } = await supabase.from('verification_applications').update(payload).eq('id', values.id).eq('user_id', userId).eq('verification_type', 'identity').select(identityVerificationFields).single();
+    if (error) throw error;
+    return data;
+  }
+  const { data, error } = await supabase.from('verification_applications').insert(payload).select(identityVerificationFields).single();
+  if (error) throw error;
+  return data;
+}
+export async function uploadIdentityDocument({ userId, applicationId, kind, file }) {
+  failIfUnavailable();
+  if (!userId || !applicationId || !file) throw new Error('Choose a document first.');
+  if (!['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type)) throw new Error('Use JPG, PNG, WEBP, or PDF format.');
+  if (file.size > 8000000) throw new Error('The document must be smaller than 8 MB.');
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const path = `${userId}/identity/${applicationId}/${kind}-${crypto.randomUUID()}-${safeName || 'document'}`;
+  const { error } = await supabase.storage.from('verification-documents').upload(path, file, { upsert: false, contentType: file.type });
+  if (error) throw error;
+  return path;
+}
+export async function deleteIdentityDocument(path) {
+  failIfUnavailable();
+  if (!path) return;
+  const { error } = await supabase.storage.from('verification-documents').remove([path]);
+  if (error) throw error;
+}
+export async function submitIdentityVerification(applicationId) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('submit_identity_verification', { p_application_id: applicationId });
+  if (error) throw error;
+  return data;
+}
 export async function fetchVerificationQueue() {
   failIfUnavailable();
   const { data, error } = await supabase.from('verification_applications').select('*,profile:profiles!verification_applications_user_id_fkey(display_name,username)').eq('status', 'pending').order('created_at', { ascending: true });
   if (error) throw error;
   return data || [];
+}
+export async function fetchIdentityVerificationQueue() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('verification_applications').select(`${identityVerificationFields},profile:profiles!verification_applications_user_id_fkey(display_name,username)`).eq('verification_type', 'identity').in('status', ['pending_review', 'under_review', 'requires_more_information', 'rejected', 'verified']).order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+export async function reviewIdentityVerification({ id, status, reviewerNote = null }) {
+  failIfUnavailable();
+  if (!['under_review', 'verified', 'rejected', 'requires_more_information'].includes(status)) throw new Error('Invalid identity review status.');
+  const { data, error } = await supabase.rpc('review_identity_verification', { p_application_id: id, p_status: status, p_reviewer_note: reviewerNote?.trim() || null });
+  if (error) throw error;
+  return data;
 }
 export async function reviewVerificationApplication({ id, userId, status, verificationType = 'seller', reviewerNote, durationMonths = 1 }) {
   failIfUnavailable();
@@ -149,8 +209,7 @@ export async function reviewVerificationApplication({ id, userId, status, verifi
   if (error) throw error;
   if (status === 'approved') {
     if (verificationType === 'business') {
-      const { data: application } = await supabase.from('verification_applications').select('business_registration_type').eq('id', id).maybeSingle();
-      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true, verification_kind: application?.business_registration_type === 'registered' ? 'registered' : 'unregistered', verification_expires_at: updateValues.expires_at }).eq('profile_id', userId);
+      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true }).eq('profile_id', userId);
       if (businessError) throw businessError;
     }
   }
@@ -595,7 +654,7 @@ export async function deleteSavedSearch(userId, searchId) {
 export async function getBusinessProfile(userId) {
   failIfUnavailable();
   if (!userId) return null;
-  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_kind,created_at,updated_at').eq('profile_id', userId).maybeSingle();
+  const { data, error } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at').eq('profile_id', userId).maybeSingle();
   if (error) throw error;
   return data;
 }
