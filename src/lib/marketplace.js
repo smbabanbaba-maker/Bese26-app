@@ -979,6 +979,51 @@ export async function sendMessage({ conversationId, senderId, body, attachmentPa
   return data;
 }
 
+export async function fetchConversationDeals(conversationId) {
+  failIfUnavailable();
+  if (!conversationId) return { offers: [], meetings: [] };
+  const [{ data: offers, error: offerError }, { data: meetings, error: meetingError }] = await Promise.all([
+    supabase.from('chat_offers').select('id,conversation_id,listing_id,buyer_id,seller_id,amount,message,status,expires_at,created_at,updated_at').eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(30),
+    supabase.from('chat_meetings').select('id,conversation_id,proposed_by,meeting_date,meeting_time,area,status,notes,created_at,updated_at').eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(30),
+  ]);
+  if (offerError) throw offerError;
+  if (meetingError) throw meetingError;
+  return { offers: offers || [], meetings: meetings || [] };
+}
+
+export async function createChatOffer({ conversationId, listingId, buyerId, sellerId, amount, message = null }) {
+  failIfUnavailable();
+  const numericAmount = Number(amount);
+  if (!conversationId || !buyerId || !sellerId || !Number.isFinite(numericAmount) || numericAmount <= 0) throw new Error('Enter a valid offer amount.');
+  const { data, error } = await supabase.from('chat_offers').insert({ conversation_id: conversationId, listing_id: listingId || null, buyer_id: buyerId, seller_id: sellerId, amount: numericAmount, message: message?.trim() || null }).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateChatOffer(offerId, status) {
+  failIfUnavailable();
+  if (!offerId || !['accepted', 'rejected', 'countered', 'cancelled', 'expired'].includes(status)) throw new Error('Choose a valid offer status.');
+  const { data, error } = await supabase.from('chat_offers').update({ status, updated_at: new Date().toISOString() }).eq('id', offerId).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createChatMeeting({ conversationId, proposedBy, meetingDate, meetingTime, area, notes = null }) {
+  failIfUnavailable();
+  if (!conversationId || !proposedBy || !meetingDate || !meetingTime || !area?.trim()) throw new Error('Choose a date, time, and general meeting area.');
+  const { data, error } = await supabase.from('chat_meetings').insert({ conversation_id: conversationId, proposed_by: proposedBy, meeting_date: meetingDate, meeting_time: meetingTime, area: area.trim(), notes: notes?.trim() || null }).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateChatMeeting(meetingId, status) {
+  failIfUnavailable();
+  if (!meetingId || !['accepted', 'declined', 'completed', 'cancelled'].includes(status)) throw new Error('Choose a valid meeting status.');
+  const { data, error } = await supabase.from('chat_meetings').update({ status, updated_at: new Date().toISOString() }).eq('id', meetingId).select().single();
+  if (error) throw error;
+  return data;
+}
+
 export function subscribeToMessages(conversationId, onMessage) {
   if (!supabase || !conversationId) return () => {};
   const channel = supabase.channel(`conversation-${conversationId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => onMessage(payload.new)).subscribe();
