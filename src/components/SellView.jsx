@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { createListing, fetchCategories, fetchSellerEntitlement, getBusinessProfile, getProfile, reviseRejectedListing, saveListingDraft, uploadListingMedia } from '../lib/marketplace';
+import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getBusinessProfile, getProfile, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
 import nigeriaLocations from '../data/nigeriaLocations.json';
 
 const nigeriaStates = Object.keys(nigeriaLocations).sort((a, b) => a.localeCompare(b));
@@ -249,9 +249,17 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       if (!categoryRow) throw new Error('This category is not available yet. Please choose another category.');
       const attributes = Object.fromEntries((dynamicFields[form.category] || []).map(([key]) => [key, form[key] || null]).filter(([, value]) => value !== null && value !== ''));
       const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: 'NGN', pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: form.city, state: form.state, country: 'Nigeria', delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
-      const listing = editMode ? await reviseRejectedListing({ listingId: initialListing.id, values: { categoryId: listingValues.category_id, subcategoryId: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricingType: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, deliveryOptions: listingValues.delivery_options, contactPreference: listingValues.contact_preference, attributes: listingValues.attributes } }) : await createListing({ sellerId: user.id, values: listingValues });
+      const revisionValues = { category_id: listingValues.category_id, subcategory_id: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricing_type: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, delivery_options: listingValues.delivery_options, contact_preference: listingValues.contact_preference, attributes: listingValues.attributes, status: 'pending', moderation_status: 'pending', rejection_reason: null, published_at: null, updated_at: new Date().toISOString() };
+      const listing = editMode ? (initialListing.raw?.status === 'rejected' ? await reviseRejectedListing({ listingId: initialListing.id, values: { categoryId: listingValues.category_id, subcategoryId: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricingType: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, deliveryOptions: listingValues.delivery_options, contactPreference: listingValues.contact_preference, attributes: listingValues.attributes } }) : await updateListing(initialListing.id, user.id, revisionValues)) : await createListing({ sellerId: user.id, values: listingValues });
+      if (editMode) {
+        const persistedMedia = initialListing.raw?.listing_media || [];
+        const currentIds = new Set(media.map((item) => item.id));
+        await Promise.all(persistedMedia.filter((item) => !currentIds.has(item.id)).map((item) => deleteListingMedia({ listingId: listing.id, mediaId: item.id, storagePath: item.storage_path })));
+        const orderedExisting = media.filter((item) => !item.file);
+        await Promise.all(orderedExisting.map((item) => updateListingMediaOrder({ listingId: listing.id, mediaId: item.id, sortOrder: media.indexOf(item) })));
+      }
       const uploadableMedia = media.filter((item) => item.file);
-      await Promise.all(uploadableMedia.map((item, index) => uploadListingMedia({ userId: user.id, listingId: listing.id, file: item.file, sortOrder: item.cover ? 0 : index + 1 })));
+      await Promise.all(uploadableMedia.map((item) => uploadListingMedia({ userId: user.id, listingId: listing.id, file: item.file, sortOrder: media.indexOf(item) })));
       setPublishState('success');
       setDraftSaved(false);
       if (!editMode) fetchSellerEntitlement().then(setEntitlement).catch(() => {});

@@ -59,6 +59,10 @@ with check (owner_id = auth.uid() and exists (select 1 from public.listings l wh
 drop policy if exists listing_media_owner_delete on public.listing_media;
 create policy listing_media_owner_delete on public.listing_media for delete to authenticated
 using (owner_id = auth.uid() or exists (select 1 from public.listings l where l.id = listing_id and public.user_business_listing_role(l.business_profile_id, l.id) in ('owner','admin','manager','seller')));
+drop policy if exists listing_media_owner_update on public.listing_media;
+create policy listing_media_owner_update on public.listing_media for update to authenticated
+using (owner_id = auth.uid() or exists (select 1 from public.listings l where l.id = listing_id and public.user_business_listing_role(l.business_profile_id, l.id) in ('owner','admin','manager','seller')))
+with check (owner_id = auth.uid() or exists (select 1 from public.listings l where l.id = listing_id and public.user_business_listing_role(l.business_profile_id, l.id) in ('owner','admin','manager','seller')));
 drop policy if exists listing_media_public_or_owner_read on public.listing_media;
 create policy listing_media_public_or_owner_read on public.listing_media for select to anon, authenticated
 using (exists (select 1 from public.listings l where l.id = listing_id and ((l.status = 'active' and l.moderation_status = 'approved') or l.seller_id = auth.uid() or public.user_business_listing_role(l.business_profile_id, l.id) is not null)));

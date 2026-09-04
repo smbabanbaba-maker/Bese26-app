@@ -309,14 +309,20 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
   if (!supabase) return [];
   let query = supabase
     .from('listings')
-    .select(listingSelect)
+    .select(listingSelectWithOwnership)
     .eq('status', 'active')
     .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
     .limit(24);
   if (search.trim()) query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
   if (category && category !== 'All') query = query.eq('category.name', category);
-  const { data, error } = await query;
+  let { data, error } = await query;
+  if (error && /business_profile_id|published_as_type|column/i.test(error.message || '')) {
+    let fallback = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(24);
+    if (search.trim()) fallback = fallback.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
+    if (category && category !== 'All') fallback = fallback.eq('category.name', category);
+    ({ data, error } = await fallback);
+  }
   if (error) throw error;
   return hydrateListingRows(data || [], { firstMediaOnly: true });
 }
@@ -339,6 +345,7 @@ export async function fetchSavedIds(userId) {
 // migration is applied. New ownership fields are hydrated automatically once
 // the migration is live.
 const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+const listingSelectWithOwnership = `${listingSelect},business_profile_id,published_as_type`;
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
@@ -419,7 +426,8 @@ export async function fetchPublicBusiness(handle) {
   if (!business) return null;
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
-  const { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
+  let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
+  if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
   const listings = await hydrateListingRows(rows || [], { firstMediaOnly: true });
   return { business, ownerProfile, listings };
@@ -432,7 +440,8 @@ export async function fetchPublicProfile(username) {
   const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
   if (profileError) throw profileError;
   if (!profile) return null;
-  const { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
+  let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
+  if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
   return { profile, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
 }
@@ -913,6 +922,18 @@ export async function uploadListingMedia({ userId, listingId, file, sortOrder = 
   const { data, error } = await supabase.from('listing_media').insert({ listing_id: listingId, owner_id: userId, storage_path: path, media_type: mediaType, mime_type: file.type, file_size_bytes: file.size, sort_order: sortOrder }).select().single();
   if (error) throw error;
   return data;
+}
+export async function updateListingMediaOrder({ listingId, mediaId, sortOrder }) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('listing_media').update({ sort_order: sortOrder, updated_at: new Date().toISOString() }).eq('id', mediaId).eq('listing_id', listingId).select().single();
+  if (error) throw error;
+  return data;
+}
+export async function deleteListingMedia({ listingId, mediaId, storagePath }) {
+  failIfUnavailable();
+  const { error } = await supabase.from('listing_media').delete().eq('id', mediaId).eq('listing_id', listingId);
+  if (error) throw error;
+  if (storagePath) await supabase.storage.from('listing-media').remove([storagePath]).catch(() => {});
 }
 
 export async function getOrCreateConversation({ listingId, buyerId, sellerId }) {
