@@ -1446,3 +1446,47 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .listing-question-pills button:hover { border-color:var(--red); background:#fff0ee; }
 .listing-detail-actions button svg { flex:0 0 auto; }
 @media (max-width: 760px) { .listing-question-pills { display:grid; grid-template-columns:1fr 1fr; } .listing-question-pills button { min-height:38px; } }
+
+/* Mobile product-page redesign: dense, scannable, and action-first in Bese26 colors. */
+.callback-contact-button { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:9px 12px; border:1px solid var(--red); border-radius:8px; color:var(--red); background:#fff; font-size:11px; font-weight:800; }
+.listing-inline-chat { display:grid; gap:10px; padding:15px; border:1px solid #ececec; border-radius:14px; background:#fff; }
+.listing-inline-chat h2 { margin:2px 0 0; font-size:16px; }
+.listing-inline-chat textarea { width:100%; min-height:66px; resize:vertical; border:1px solid #d9d9d9; border-radius:9px; padding:11px; color:#111; background:#fff; font:inherit; font-size:12px; }
+.listing-start-chat { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; border:0; border-radius:8px; color:#fff; background:var(--red); font-size:12px; font-weight:800; }
+@media (max-width: 760px) {
+  .listing-modal-backdrop { align-items:stretch; background:#eef1f4; backdrop-filter:none; }
+  .listing-details-premium { display:flex; flex-direction:column; width:100vw; height:100dvh; max-height:none; overflow:hidden; border-radius:0; background:#eef1f4; }
+  .listing-details-premium .listing-modal-header { flex:0 0 auto; display:flex; min-height:54px; padding:8px 13px; background:#fff; border-bottom:1px solid #e8e8e8; }
+  .listing-details-premium .listing-modal-header .eyebrow { color:#151515; font-size:14px; letter-spacing:0; text-transform:none; font-weight:800; }
+  .listing-details-premium .listing-modal-header-actions { gap:4px; }
+  .listing-details-layout { flex:1; min-height:0; overflow-y:auto; display:block; padding:0 0 92px; }
+  .listing-gallery-panel { background:#101113; }
+  .listing-gallery-frame { aspect-ratio: .98 / 1; min-height:0; max-height:none; border-radius:0; background:#151515; }
+  .gallery-main-button img { object-fit:cover; }
+  .listing-gallery-frame .modal-image-count { left:12px; bottom:12px; padding:4px 7px; border-radius:5px; color:#fff; background:rgba(0,0,0,.56); font-size:10px; }
+  .listing-gallery-frame .image-zoom-button { right:12px; bottom:12px; color:#fff; background:rgba(0,0,0,.56); }
+  .modal-gallery-thumbs { display:none; }
+  .listing-detail-body { gap:0; margin-top:0; padding:0; }
+  .listing-detail-body > * { margin:9px 9px 0; padding:15px; border:1px solid #e6e9eb; border-radius:12px; background:#fff; }
+  .listing-detail-body > .listing-location-line { display:flex; align-items:center; gap:4px; margin:9px 9px 0; padding:10px 12px 0; border:0; border-radius:0; color:#667078; background:transparent; font-size:11px; }
+  .listing-detail-body > h1 { margin-top:0; padding:3px 12px 0; border:0; border-radius:0; color:#171717; background:transparent; font-size:18px; line-height:1.2; }
+  .listing-detail-body > .listing-price-row { margin-top:3px; padding:0 12px 5px; border:0; border-radius:0; background:transparent; }
+  .listing-detail-price { color:var(--red); font-size:21px; font-weight:900; }
+  .listing-pricing-type { padding:0; border:0; color:#6d7478; font-size:11px; }
+  .listing-detail-meta { margin:0 9px; padding:0 12px 8px; border:0; background:transparent; }
+  .listing-detail-meta span { padding:4px 7px; border-color:#e2e5e7; background:#f7f8f8; font-size:10px; }
+  .trust-summary-card { margin-top:8px !important; }
+  .trust-summary-grid { grid-template-columns:repeat(3,1fr); }
+  .listing-primary-actions { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:9px !important; padding:13px !important; }
+  .listing-primary-actions button { min-height:45px; font-size:11px; }
+  .listing-primary-actions .primary-contact-button { background:var(--red); }
+  .listing-primary-actions .secondary-contact-button { color:#171717; border-color:#171717; background:#fff; }
+  .listing-inline-chat { margin-top:9px !important; }
+  .listing-question-card { display:none; }
+  .safe-deal-card { margin-top:9px !important; }
+  .listing-info-card, .seller-profile-card, .listing-owner-controls { margin-top:9px !important; }
+  .listing-info-card h2, .seller-profile-card strong { font-size:15px; }
+  .listing-spec-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .listing-detail-actions { gap:6px; }
+  .listing-detail-actions button { flex:1 1 auto; justify-content:center; min-height:38px; }
+}
