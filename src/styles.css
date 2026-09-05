@@ -1568,3 +1568,40 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .admin-mini-form { display:grid; grid-template-columns:1.5fr .7fr 1fr 1fr auto; gap:7px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
 .admin-mini-form input, .admin-mini-form select { min-width:0; min-height:34px; padding:7px; border:1px solid var(--line); border-radius:7px; background:var(--soft); color:var(--ink); font-size:10px; }
 @media (max-width:900px) { .admin-mini-form { grid-template-columns:1fr 1fr; } .admin-mini-form .primary-button { grid-column:span 2; } }
+
+
+/* Public business storefront enhancements */
+.public-business-top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.public-business-top-actions .secondary-button, .public-owner-row .secondary-button { display: inline-flex; align-items: center; gap: 6px; }
+.public-business-top-actions .is-following, .public-owner-row .is-following { color: #a7382c; border-color: #e3b0a9; background: #fff4f2; }
+.public-business-notice { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 16px; padding: 11px 14px; border: 1px solid #e6c0ba; border-radius: 13px; background: #fff4f2; color: #7a2d24; font-size: 13px; }
+.public-business-notice .icon-button { min-width: 28px; min-height: 28px; }
+.public-business-follow-meta { display: inline-flex; align-items: center; gap: 6px; margin-top: 13px; color: #8a625c; font-size: 12px; }
+.public-business-info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 20px 0; }
+.public-business-info-card { min-width: 0; padding: 18px; border: 1px solid #eadfdb; border-radius: 18px; background: #fff; box-shadow: 0 10px 24px rgba(43, 25, 22, .045); }
+.public-business-info-card > strong { display: block; margin: 7px 0 12px; color: #2a2524; font-size: 14px; line-height: 1.4; }
+.public-business-hours-list { display: grid; gap: 7px; }
+.public-business-hours-list span { display: flex; justify-content: space-between; gap: 12px; color: #716965; font-size: 12px; }
+.public-business-hours-list b { color: #39312e; font-weight: 700; text-align: right; }
+.public-business-option-list, .public-business-socials { display: flex; flex-wrap: wrap; gap: 7px; }
+.public-business-option-list span, .public-business-socials a { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border-radius: 9px; background: #fff4f2; color: #8e3c32; font-size: 12px; }
+.public-business-socials a { text-decoration: none; text-transform: capitalize; }
+.public-business-socials a:hover { background: #f9e0dc; }
+.public-business-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .public-business-info-grid { grid-template-columns: 1fr; } .public-business-top-actions { justify-content: flex-start; } }
+@media (max-width: 640px) { .public-business-topbar { align-items: flex-start; gap: 12px; flex-direction: column; } .public-business-top-actions { width: 100%; } .public-business-top-actions .secondary-button { flex: 1; justify-content: center; } .public-owner-row { align-items: flex-start; flex-wrap: wrap; } .public-owner-row .secondary-button { width: 100%; justify-content: center; } .public-business-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
+/* Business Center editor fields */
+.business-editor-section { margin: 8px 0 4px; padding: 18px; border: 1px solid #eadfdb; border-radius: 16px; background: #fffaf8; }
+.business-editor-section h3 { margin: 5px 0 4px; font-size: 16px; color: #332a28; }
+.business-hours-editor { display: grid; gap: 8px; margin-top: 14px; }
+.business-hours-row { display: grid; grid-template-columns: 104px 74px minmax(100px, 1fr) auto minmax(100px, 1fr); align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid #f0e6e2; }
+.business-hours-row:first-child { border-top: 0; }
+.business-hours-row > strong { font-size: 12px; color: #423a37; }
+.business-hours-row input[type="time"] { width: 100%; min-width: 0; }
+.business-hours-row > span { color: #8b7d77; font-size: 12px; text-align: center; }
+.business-hours-closed { display: inline-flex; align-items: center; gap: 5px; color: #8b7d77; font-size: 11px; white-space: nowrap; }
+.business-hours-closed input { accent-color: #b33c31; }
+.business-social-editor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+@media (max-width: 640px) { .business-hours-row { grid-template-columns: 1fr 74px; gap: 7px; } .business-hours-row > strong { grid-column: 1 / 2; } .business-hours-row > span { display: none; } .business-hours-row input[type="time"] { grid-column: 1 / 2; } .business-hours-row input[type="time"] + span + input[type="time"] { grid-column: 2 / 3; } .business-social-editor { grid-template-columns: 1fr; } }
