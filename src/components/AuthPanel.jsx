@@ -9,7 +9,7 @@ function WelcomeSide({ isSignin }) {
     <div className="auth-welcome-shape auth-welcome-shape-two" />
     <div className="auth-welcome-content">
       <span className="auth-welcome-kicker">BESE26 MARKETPLACE</span>
-      <span className="auth-welcome-mark"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></span>
+      <span className="auth-welcome-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></span>
       <h2>{isSignin ? 'WELCOME\nBACK!' : 'JOIN THE\nMARKETPLACE'}</h2>
       <p>{isSignin ? 'Save listings, post items, and chat with sellers securely.' : 'Create your profile and start buying or selling with confidence.'}</p>
     </div>
@@ -65,7 +65,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
 
   const isSignin = mode === 'signin';
   const renderSignin = () => <div className="auth-form-panel auth-form-face-content">
-    <div className="auth-panel-mark"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div>
+    <div className="auth-panel-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></div>
     <div className="eyebrow">SAFE MARKETPLACE ACCESS</div>
     <h2 id="auth-title">Login</h2>
     <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
@@ -82,7 +82,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <button type="button" className="auth-switch" onClick={() => switchMode('signup')}>Don’t have an account? <strong>Sign up</strong></button>
   </div>;
   const renderSignup = () => <div className="auth-form-panel auth-form-face-content">
-    <div className="auth-panel-mark"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div>
+    <div className="auth-panel-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></div>
     <div className="eyebrow">JOIN BESE26</div>
     <h2 id="auth-title">Create account</h2>
     <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
