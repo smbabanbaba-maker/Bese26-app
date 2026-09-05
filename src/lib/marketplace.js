@@ -340,6 +340,62 @@ export async function fetchAdminControlOverview() {
   return data || { counts: {}, recent_users: [], reports: [], listing_reports: [], support: [] };
 }
 
+export async function fetchAdminMarketplaceOperations() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_marketplace_operations');
+  if (error) throw error;
+  return data || { categories: [], boost_packages: [], reviews: [], callbacks: [], active_boosts: [], payment_summary: {}, analytics: {} };
+}
+
+export async function fetchAdminDirectoryControls() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_directory_controls');
+  if (error) throw error;
+  return data || { businesses: [], listings: [] };
+}
+
+export async function adminSetListingLifecycle(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_set_listing_lifecycle', { p_listing_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpdateReview(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_review', { p_review_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpdateCallback(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_callback', { p_callback_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpdateBoost(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_boost', { p_boost_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminSetCategoryActive(id, isActive) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_set_category_active', { p_category_id: id, p_is_active: isActive });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpsertBoostPackage(values) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_upsert_boost_package', { p_id: values.id || null, p_name: values.name, p_duration_days: Number(values.duration_days), p_price_kobo: Number(values.price_kobo), p_placement: values.placement, p_is_active: Boolean(values.is_active) });
+  if (error) throw error;
+  return data;
+}
+
 export async function adminUpdateReport(id, status) {
   failIfUnavailable();
   const { data, error } = await supabase.rpc('admin_update_report', { p_report_id: id, p_status: status });

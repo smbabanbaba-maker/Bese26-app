@@ -1559,3 +1559,12 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .admin-row-actions .status-pill { font-size:8px; }
 @media (max-width:900px) { .admin-metric-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .admin-operations-grid { grid-template-columns:1fr; } }
 @media (max-width:520px) { .admin-metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .admin-operation-row { align-items:flex-start; flex-direction:column; } .admin-row-actions { width:100%; justify-content:space-between; } }
+
+/* Catalog, promotion, trust, and operations controls. */
+.admin-operation-suite { display:grid; gap:14px; padding:18px; border:1px solid var(--line); border-radius:16px; background:#fff; }
+.admin-ops-summary { display:flex; flex-wrap:wrap; gap:8px; }
+.admin-ops-summary span { padding:9px 11px; border:1px solid var(--line); border-radius:8px; background:var(--soft); color:var(--muted); font-size:10px; }
+.admin-ops-summary b { color:var(--ink); font-size:15px; margin-right:4px; }
+.admin-mini-form { display:grid; grid-template-columns:1.5fr .7fr 1fr 1fr auto; gap:7px; margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+.admin-mini-form input, .admin-mini-form select { min-width:0; min-height:34px; padding:7px; border:1px solid var(--line); border-radius:7px; background:var(--soft); color:var(--ink); font-size:10px; }
+@media (max-width:900px) { .admin-mini-form { grid-template-columns:1fr 1fr; } .admin-mini-form .primary-button { grid-column:span 2; } }
