@@ -492,6 +492,14 @@ function AppContent() {
         // listings/categories error must never make a successful login look
         // like it failed.
         if (mounted) setSessionUser(session?.user || null);
+        if (session?.user) {
+          const { data: accessProfile, error: accessError } = await supabase.from('profiles').select('admin_suspended').eq('id', session.user.id).maybeSingle();
+          if (!accessError && accessProfile?.admin_suspended) {
+            await supabase.auth.signOut();
+            if (mounted) { setSessionUser(null); setIsAdmin(false); showToast('This account is currently suspended. Contact Bese26 support.'); }
+            return;
+          }
+        }
       } catch (error) {
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }

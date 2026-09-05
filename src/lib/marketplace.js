@@ -333,6 +333,48 @@ export async function fetchActiveAdCampaigns({ placement = 'home_banner' } = {})
   return data || [];
 }
 
+export async function fetchAdminControlOverview() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_control_overview');
+  if (error) throw error;
+  return data || { counts: {}, recent_users: [], reports: [], listing_reports: [], support: [] };
+}
+
+export async function adminUpdateReport(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_report', { p_report_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpdateListingReport(id, status) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_listing_report', { p_report_id: id, p_status: status });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminUpdateSupportTicket(id, status, priority = null) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_support_ticket', { p_ticket_id: id, p_status: status, p_priority: priority });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminSetUserAccess(id, suspended, reason = null) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_set_user_access', { p_user_id: id, p_suspended: suspended, p_reason: reason });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminSetBusinessVisibility(id, isActive) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_set_business_visibility', { p_profile_id: id, p_is_active: isActive });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchAdminAdCampaigns() {
   failIfUnavailable();
   const { data, error } = await supabase.from('ad_campaigns').select('*').order('status').order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(100);
