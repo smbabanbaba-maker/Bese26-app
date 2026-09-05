@@ -193,10 +193,6 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
 }
 
 function HomeView({ marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
-  const [showStartGuide, setShowStartGuide] = useState(() => {
-    try { return window.localStorage.getItem('bese26:first-visit-guide-dismissed') !== '1'; } catch { return true; }
-  });
-  const dismissStartGuide = () => { setShowStartGuide(false); try { window.localStorage.setItem('bese26:first-visit-guide-dismissed', '1'); } catch {} };
   const fallbackPromos = [{ eyebrow: 'B26 FEATURED', title: 'Put your business in front of more buyers.', body: 'Create your public store and share one simple link with customers.', action: 'Set up Business', onAction: () => onNavigate('profile') }, { eyebrow: 'SELL WITH CONFIDENCE', title: 'Your next customer is already browsing.', body: 'List a product with clear photos and let buyers chat safely before they meet.', action: 'List an item', onAction: () => onNavigate('sell') }, { eyebrow: 'PROMOTE YOUR STORE', title: 'Be seen in the places buyers search.', body: 'Featured businesses and sponsored listings will appear here as the marketplace grows.', action: 'Explore businesses', onAction: () => onNavigate('business') }];
   const promoSlides = adCampaigns.length ? adCampaigns.map((campaign) => ({ eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } })) : fallbackPromos;
   const [promoIndex, setPromoIndex] = useState(0);
@@ -206,11 +202,6 @@ function HomeView({ marketListings, adCampaigns = [], onOpenListing, savedIds, o
   return (
     <div className="page-stack home-page">
       <section className={`home-ad-banner home-ad-slide-${promoIndex}`} aria-label="Featured promotion"><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className="home-ad-art" aria-hidden="true"><img src={promo.image_url || "/images/bese26-official-logo.png"} alt="" /></div><div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.eyebrow} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div></section>
-      <section className="discovery-banner">
-        <div className="discovery-copy"><img className="home-brand-logo" src="/images/bese26-official-logo.png" alt="B26" /><div className="eyebrow light">WELCOME TO BESE26</div><h1>Shop smarter.<br /><span>Sell with confidence.</span></h1><p>Discover everyday essentials from people and businesses near you.</p></div>
-        <div className="discovery-actions"><div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div><button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button></div>
-      </section>
-      {showStartGuide && <section className="start-guide" aria-label="Get started with Bese26"><div><div className="eyebrow">NEW HERE?</div><h2>What would you like to do?</h2><p>You can browse freely, or sign in when you are ready to sell and chat safely.</p></div><div className="start-guide-actions"><button type="button" className="primary-button" onClick={() => { dismissStartGuide(); onSearch(''); }}><Search size={15} /> Buy something</button><button type="button" className="secondary-button" onClick={() => { dismissStartGuide(); onNavigate('sell'); }}><Plus size={15} /> Sell something</button><button type="button" className="icon-button" aria-label="Dismiss getting started guide" onClick={dismissStartGuide}><X size={17} /></button></div></section>}
       <section className="search-section">
         <div className="search-box home-search">
           <Search size={18} />
