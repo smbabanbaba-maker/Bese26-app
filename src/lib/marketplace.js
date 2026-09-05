@@ -326,6 +326,45 @@ export async function removeAvatar({ userId, path }) {
   return updateProfile(userId, { avatar_path: null });
 }
 
+export async function fetchActiveAdCampaigns({ placement = 'home_banner' } = {}) {
+  if (!supabase) return [];
+  const { data, error } = await supabase.from('ad_campaigns').select('id,title,body,image_url,cta_label,cta_target,placement,status,priority,starts_at,ends_at').eq('placement', placement).eq('status', 'active').lte('starts_at', new Date().toISOString()).or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`).order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(12);
+  if (error) return [];
+  return data || [];
+}
+
+export async function fetchAdminAdCampaigns() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('ad_campaigns').select('*').order('status').order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createAdminAdCampaign(userId, values) {
+  failIfUnavailable();
+  const payload = { created_by: userId, title: values.title.trim(), body: values.body.trim(), image_url: values.image_url?.trim() || null, cta_label: values.cta_label?.trim() || 'Learn more', cta_target: values.cta_target?.trim() || '/', placement: values.placement || 'home_banner', status: values.status || 'draft', priority: Math.max(0, Math.min(1000, Number(values.priority) || 0)), max_impressions: values.max_impressions ? Math.max(1, Number(values.max_impressions)) : null, starts_at: values.starts_at || new Date().toISOString(), ends_at: values.ends_at || null };
+  const { data, error } = await supabase.from('ad_campaigns').insert(payload).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAdminAdCampaign(id, values) {
+  failIfUnavailable();
+  const payload = { ...values };
+  delete payload.id; delete payload.created_by; delete payload.created_at; delete payload.updated_at;
+  if (payload.title) payload.title = payload.title.trim();
+  if (payload.body) payload.body = payload.body.trim();
+  const { data, error } = await supabase.from('ad_campaigns').update(payload).eq('id', id).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminAdCampaign(id) {
+  failIfUnavailable();
+  const { error } = await supabase.from('ad_campaigns').delete().eq('id', id);
+  if (error) throw error;
+}
+
 export async function fetchActiveListings({ search = '', category = '' } = {}) {
   if (!supabase) return [];
   let query = supabase

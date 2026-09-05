@@ -64,7 +64,7 @@ const AdminView = lazyWithRetry(() => import('./components/AdminView'), 'admin')
 const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import { isSupabaseConfigured, supabase } from './lib/supabase';
-import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, verifyPaystackPayment } from './lib/marketplace';
 
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
@@ -192,19 +192,20 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
   return <div className="page-stack subscription-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Payments & services</span></div><section className="subscription-hero"><div><div className="eyebrow light">BESE26 SELLER PLANS</div><h1>Grow when your business is ready.</h1><p>Start free with 3 active listings, then upgrade when you need more capacity or visibility.</p></div><span className="subscription-hero-mark"><Sparkles size={22} /></span></section>{user && entitlement && <section className="subscription-usage"><div><div className="eyebrow">YOUR CURRENT ACCESS</div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan` : 'Free plan'}</strong><span>{`${entitlement.free_posts_used || 0} of ${entitlement.listing_limit} active listings used · ${Math.max((entitlement.listing_limit || 3) - (entitlement.free_posts_used || 0), 0)} remaining`}</span></div><div className="subscription-usage-track"><span style={{ width: `${entitlement.is_paid ? 100 : Math.max(0, (entitlement.free_posts_remaining / entitlement.free_posts_limit) * 100)}%` }} /></div></section>}<div className="subscription-section-heading"><div><div className="eyebrow">SIMPLE START</div><h2>Choose the right level</h2></div><span>Monthly · no hidden balance</span></div><div className="subscription-plan-grid">{subscriptionPlans.map((plan) => <SubscriptionPlanCard plan={plan} key={plan.key} expanded={expanded === plan.key} onToggle={setExpanded} onChoose={choose} currentPlan={entitlement?.is_paid ? entitlement.plan_key : 'free'} busyPlan={busyPlan} />)}</div><p className="subscription-disclaimer"><ShieldCheck size={15} /> Paystack checkout opens securely after server configuration. Plan access is granted only after the server verifies the payment reference, amount, and currency.</p></div>;
 }
 
-function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   const [showStartGuide, setShowStartGuide] = useState(() => {
     try { return window.localStorage.getItem('bese26:first-visit-guide-dismissed') !== '1'; } catch { return true; }
   });
   const dismissStartGuide = () => { setShowStartGuide(false); try { window.localStorage.setItem('bese26:first-visit-guide-dismissed', '1'); } catch {} };
-  const promoSlides = [{ eyebrow: 'B26 FEATURED', title: 'Put your business in front of more buyers.', body: 'Create your public store and share one simple link with customers.', action: 'Set up Business', onAction: () => onNavigate('profile') }, { eyebrow: 'SELL WITH CONFIDENCE', title: 'Your next customer is already browsing.', body: 'List a product with clear photos and let buyers chat safely before they meet.', action: 'List an item', onAction: () => onNavigate('sell') }, { eyebrow: 'PROMOTE YOUR STORE', title: 'Be seen in the places buyers search.', body: 'Featured businesses and sponsored listings will appear here as the marketplace grows.', action: 'Explore businesses', onAction: () => onNavigate('business') }];
+  const fallbackPromos = [{ eyebrow: 'B26 FEATURED', title: 'Put your business in front of more buyers.', body: 'Create your public store and share one simple link with customers.', action: 'Set up Business', onAction: () => onNavigate('profile') }, { eyebrow: 'SELL WITH CONFIDENCE', title: 'Your next customer is already browsing.', body: 'List a product with clear photos and let buyers chat safely before they meet.', action: 'List an item', onAction: () => onNavigate('sell') }, { eyebrow: 'PROMOTE YOUR STORE', title: 'Be seen in the places buyers search.', body: 'Featured businesses and sponsored listings will appear here as the marketplace grows.', action: 'Explore businesses', onAction: () => onNavigate('business') }];
+  const promoSlides = adCampaigns.length ? adCampaigns.map((campaign) => ({ eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } })) : fallbackPromos;
   const [promoIndex, setPromoIndex] = useState(0);
   useEffect(() => { const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
   const promo = promoSlides[promoIndex];
   const sponsoredListings = marketListings.filter((listing) => listing.promoted).slice(0, 3);
   return (
     <div className="page-stack home-page">
-      <section className={`home-ad-banner home-ad-slide-${promoIndex}`} aria-label="Featured promotion"><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className="home-ad-art" aria-hidden="true"><img src="/images/bese26-official-logo.png" alt="" /></div><div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.eyebrow} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div></section>
+      <section className={`home-ad-banner home-ad-slide-${promoIndex}`} aria-label="Featured promotion"><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className="home-ad-art" aria-hidden="true"><img src={promo.image_url || "/images/bese26-official-logo.png"} alt="" /></div><div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.eyebrow} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div></section>
       <section className="discovery-banner">
         <div className="discovery-copy"><img className="home-brand-logo" src="/images/bese26-official-logo.png" alt="B26" /><div className="eyebrow light">WELCOME TO BESE26</div><h1>Shop smarter.<br /><span>Sell with confidence.</span></h1><p>Discover everyday essentials from people and businesses near you.</p></div>
         <div className="discovery-actions"><div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div><button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button></div>
@@ -451,6 +452,7 @@ function AppContent() {
   const [chatTargetId, setChatTargetId] = useState(null);
   const [marketListings, setMarketListings] = useState([]);
   const [marketCategories, setMarketCategories] = useState([]);
+  const [adCampaigns, setAdCampaigns] = useState([]);
   const [sessionUser, setSessionUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -494,10 +496,11 @@ function AppContent() {
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }
       try {
-        const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
+        const [remoteListings, remoteCategories, remoteAds] = await Promise.all([fetchActiveListings(), fetchCategories(), fetchActiveAdCampaigns()]);
         if (mounted) {
           setMarketListings(remoteListings || []);
           setMarketCategories(remoteCategories || []);
+          setAdCampaigns(remoteAds || []);
         }
       } catch (error) {
         if (mounted) showToast(error.message || 'Could not load live marketplace data.');
@@ -587,7 +590,7 @@ function AppContent() {
   }, [sessionUser]);
 
   const renderView = () => {
-    if (activeNav === 'home') return <HomeView marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'home') return <HomeView adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;

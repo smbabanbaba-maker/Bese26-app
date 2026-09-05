@@ -1517,3 +1517,22 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .sponsored-listings-section { padding:16px; border:1px solid #f0d8d6; border-radius:16px; background:linear-gradient(135deg,#fff8f7,#fff); }
 .sponsored-listings-section .section-heading { margin-bottom:12px; }
 .sponsored-listings-section .eyebrow { color:var(--red); }
+
+/* Admin advertising control panel. */
+.admin-ad-manager { display:grid; gap:14px; padding:18px; border:1px solid #ead8d6; border-radius:16px; background:linear-gradient(135deg,#fffaf9,#fff); }
+.admin-ad-manager .admin-intro strong { display:flex; align-items:center; gap:7px; }
+.admin-ad-form { display:grid; gap:14px; padding:16px; border:1px solid var(--line); border-radius:13px; background:var(--card); }
+.admin-ad-form-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.admin-ad-form-heading h2 { margin:4px 0 0; font-size:17px; }
+.admin-ad-form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; }
+.admin-ad-form-grid label { display:grid; gap:6px; color:var(--muted); font-size:10px; font-weight:700; }
+.admin-ad-form-grid input, .admin-ad-form-grid select, .admin-ad-form-grid textarea { width:100%; min-height:38px; padding:10px; border:1px solid var(--line); border-radius:8px; color:var(--ink); background:var(--soft); font:inherit; }
+.admin-ad-form-grid textarea { min-height:72px; resize:vertical; }
+.admin-ad-form-wide { grid-column:span 2; }
+.admin-ad-list { display:grid; gap:9px; }
+.admin-ad-card { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+.admin-ad-card-copy { min-width:0; }
+.admin-ad-card-copy h3 { margin:8px 0 4px; font-size:14px; }
+.admin-ad-card-copy p { color:var(--muted); font-size:11px; line-height:1.45; }
+.admin-ad-card-copy small { display:block; margin-top:7px; color:var(--muted); font-size:10px; }
+@media (max-width:700px) { .admin-ad-form-grid { grid-template-columns:1fr; } .admin-ad-form-wide { grid-column:auto; } .admin-ad-form-heading, .admin-ad-card { align-items:flex-start; flex-direction:column; } .admin-ad-card .admin-listing-actions { width:100%; } }
