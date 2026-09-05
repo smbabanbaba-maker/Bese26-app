@@ -345,7 +345,17 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     ({ data, error } = await fallback);
   }
   if (error) throw error;
-  return hydrateListingRows(data || [], { firstMediaOnly: true });
+  const listings = await hydrateListingRows(data || [], { firstMediaOnly: true });
+  try {
+    const ids = listings.map((item) => item.id).filter(Boolean);
+    if (!ids.length) return listings;
+    const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
+    if (boostError) return listings;
+    const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
+    return listings.map((item) => ({ ...item, promoted: promoted.has(item.id) }));
+  } catch {
+    return listings;
+  }
 }
 
 export async function fetchCategories() {

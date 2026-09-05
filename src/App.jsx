@@ -197,8 +197,14 @@ function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSea
     try { return window.localStorage.getItem('bese26:first-visit-guide-dismissed') !== '1'; } catch { return true; }
   });
   const dismissStartGuide = () => { setShowStartGuide(false); try { window.localStorage.setItem('bese26:first-visit-guide-dismissed', '1'); } catch {} };
+  const promoSlides = [{ eyebrow: 'B26 FEATURED', title: 'Put your business in front of more buyers.', body: 'Create your public store and share one simple link with customers.', action: 'Set up Business', onAction: () => onNavigate('profile') }, { eyebrow: 'SELL WITH CONFIDENCE', title: 'Your next customer is already browsing.', body: 'List a product with clear photos and let buyers chat safely before they meet.', action: 'List an item', onAction: () => onNavigate('sell') }, { eyebrow: 'PROMOTE YOUR STORE', title: 'Be seen in the places buyers search.', body: 'Featured businesses and sponsored listings will appear here as the marketplace grows.', action: 'Explore businesses', onAction: () => onNavigate('business') }];
+  const [promoIndex, setPromoIndex] = useState(0);
+  useEffect(() => { const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
+  const promo = promoSlides[promoIndex];
+  const sponsoredListings = marketListings.filter((listing) => listing.promoted).slice(0, 3);
   return (
     <div className="page-stack home-page">
+      <section className={`home-ad-banner home-ad-slide-${promoIndex}`} aria-label="Featured promotion"><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className="home-ad-art" aria-hidden="true"><img src="/images/bese26-official-logo.png" alt="" /></div><div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.eyebrow} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div></section>
       <section className="discovery-banner">
         <div className="discovery-copy"><img className="home-brand-logo" src="/images/bese26-official-logo.png" alt="B26" /><div className="eyebrow light">WELCOME TO BESE26</div><h1>Shop smarter.<br /><span>Sell with confidence.</span></h1><p>Discover everyday essentials from people and businesses near you.</p></div>
         <div className="discovery-actions"><div className="discovery-stat"><strong>{marketListings.length}</strong><span><Package size={12} /> live listings</span></div><button className="discovery-cta" onClick={() => onSearch('')}>Explore listings <ArrowRight size={16} /></button></div>
@@ -214,6 +220,7 @@ function HomeView({ marketListings, onOpenListing, savedIds, onToggleSave, onSea
       </section>
       <section className="popular-categories"><SectionHeading eyebrow="START BROWSING" title="Popular near you" action="All categories" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', House, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Sprout, 'tone-green'], ['Services', Wrench, 'tone-peach'], ['Food', ShoppingBasket, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)}><span><Icon size={19} /></span><strong>{label}</strong></button>)}</div></section>
 
+      {sponsoredListings.length > 0 && <section className="sponsored-listings-section"><SectionHeading eyebrow="SPONSORED" title="Featured for you" action="See all" onAction={() => onNavigate('search')} /><div className="product-grid">{sponsoredListings.map((listing) => <ProductCard key={`sponsored-${listing.id}`} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div></section>}
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
         {marketListings.length ? <div className="product-grid">{marketListings.slice(0, 4).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
@@ -245,6 +252,7 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
     let result = marketListings.filter((listing) => !term || `${listing.title} ${listing.location} ${listing.category} ${listing.sellerDisplayName || listing.seller}`.toLowerCase().includes(term));
     if (activeCategory !== 'All') result = result.filter((listing) => listing.category === activeCategory);
     if (verifiedOnly) result = result.filter((listing) => listing.verified === true);
+    if (sort === 'Recommended') result = [...result].sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
     if (sort === 'Price low → high') result = [...result].sort((a, b) => a.numericPrice - b.numericPrice);
     if (sort === 'Price high → low') result = [...result].sort((a, b) => b.numericPrice - a.numericPrice);
     return result;
