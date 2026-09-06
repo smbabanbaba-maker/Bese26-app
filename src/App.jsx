@@ -280,12 +280,15 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
   const [activeCategory, setActiveCategory] = useState('All');
   const [sort, setSort] = useState('Recommended');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const hasFilters = Boolean(search.trim() || activeCategory !== 'All' || verifiedOnly || sort !== 'Recommended');
+  const clearFilters = () => { setSearch(''); setActiveCategory('All'); setVerifiedOnly(false); setSort('Recommended'); };
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let result = marketListings.filter((listing) => !term || `${listing.title} ${listing.location} ${listing.category} ${listing.sellerDisplayName || listing.seller}`.toLowerCase().includes(term));
+    let result = marketListings.filter((listing) => !term || `${listing.title} ${listing.description || ''} ${listing.location} ${listing.category} ${listing.sellerDisplayName || listing.seller}`.toLowerCase().includes(term));
     if (activeCategory !== 'All') result = result.filter((listing) => listing.category === activeCategory);
     if (verifiedOnly) result = result.filter((listing) => listing.verified === true);
     if (sort === 'Recommended') result = [...result].sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
+    if (sort === 'Newest') result = [...result].sort((a, b) => new Date(b.raw?.created_at || b.created_at || 0) - new Date(a.raw?.created_at || a.created_at || 0));
     if (sort === 'Price low → high') result = [...result].sort((a, b) => a.numericPrice - b.numericPrice);
     if (sort === 'Price high → low') result = [...result].sort((a, b) => b.numericPrice - a.numericPrice);
     return result;
@@ -295,11 +298,11 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
     <div className="page-stack search-page">
       <div className="back-row"><button className="icon-button" onClick={onBack}><ArrowLeft size={18} /></button><span>Discover listings</span></div>
       <div className="page-title-row"><div><div className="eyebrow">SEARCH & DISCOVER</div><h1>Find something great.</h1></div><div className="results-count">{filtered.length} results</div></div>
-      <div className="search-box large-search"><Search size={19} /><input autoFocus value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Try “phones in Kano”" /><button className="search-clear" onClick={() => setSearch('')}><X size={16} /></button></div>
-      <div className="filter-toolbar"><div className="filter-scroll"><button className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All listings</button>{categories.filter((category) => !category.parent_id).slice(0, 6).map((category) => <button key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}<button type="button" className={`filter-chip verified-filter-chip ${verifiedOnly ? 'active' : ''}`} aria-pressed={verifiedOnly} onClick={() => setVerifiedOnly((value) => !value)}><ShieldCheck size={14} /> Verified sellers only</button></div></div>
+      <div className="search-box large-search"><Search size={19} /><input type="search" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search phones, cars, Kano…" /><button className="search-clear" onClick={() => setSearch('')} aria-label="Clear search" disabled={!search}><X size={16} /></button></div>
+      <div className="filter-toolbar"><div className="filter-toolbar-heading"><strong>Filter by category</strong>{hasFilters && <button type="button" className="clear-filter-button" onClick={clearFilters}>Clear all</button>}</div><div className="filter-scroll"><button type="button" className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All listings</button>{categories.filter((category) => !category.parent_id).map((category) => <button type="button" key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}<button type="button" className={`filter-chip verified-filter-chip ${verifiedOnly ? 'active' : ''}`} aria-pressed={verifiedOnly} onClick={() => setVerifiedOnly((value) => !value)}><ShieldCheck size={14} /> Verified only</button></div></div>
 
       <div className="search-result-head"><span>Recommended for you</span><select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recommended</option><option>Newest</option><option>Price low → high</option><option>Price high → low</option></select></div>
-      {filtered.length ? <div className="product-grid search-grid">{filtered.map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off the verified-only filter or search another category.' : 'Try a different search term or browse all categories.'}</p><button className="primary-button" onClick={() => { setSearch(''); setActiveCategory('All'); setVerifiedOnly(false); }}>Clear filters</button></div>}
+      {filtered.length ? <div className="product-grid search-grid">{filtered.map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off Verified only or choose another category.' : 'Try a different search word or clear the filters.'}</p><button className="primary-button" onClick={clearFilters}>Clear filters</button></div>}
     </div>
   );
 }
