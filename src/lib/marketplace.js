@@ -478,12 +478,12 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     .eq('status', 'active')
     .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
-    .limit(24);
+    .limit(50);
   if (search.trim()) query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
   if (category && category !== 'All') query = query.eq('category.name', category);
   let { data, error } = await query;
   if (error && /business_profile_id|published_as_type|column/i.test(error.message || '')) {
-    let fallback = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(24);
+    let fallback = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(50);
     if (search.trim()) fallback = fallback.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
     if (category && category !== 'All') fallback = fallback.eq('category.name', category);
     ({ data, error } = await fallback);
