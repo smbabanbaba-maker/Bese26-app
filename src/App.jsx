@@ -95,6 +95,7 @@ const iconMap = {
 
 const navItems = [
   { key: 'home', label: 'Home', icon: House },
+  { key: 'search', label: 'Search', icon: Search },
   { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
