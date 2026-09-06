@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
+  Bell,
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
@@ -64,7 +65,7 @@ const AdminView = lazyWithRetry(() => import('./components/AdminView'), 'admin')
 const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
-import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, verifyPaystackPayment } from './lib/marketplace';
 
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
@@ -94,6 +95,7 @@ const iconMap = {
 
 const navItems = [
   { key: 'home', label: 'Home', icon: House },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
@@ -198,6 +200,14 @@ function QuickAction({ icon: Icon, label, note, tone, onClick }) {
 
 function UnavailableView({ icon: Icon, eyebrow, title, description, onBack, backLabel = 'Back to Home' }) {
   return <div className="page-stack unavailable-page"><section className="unavailable-card"><span className="unavailable-icon"><Icon size={24} /></span><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{description}</p><button className="primary-button" onClick={onBack}>{backLabel}<ArrowRight size={16} /></button></section></div>;
+}
+
+function NotificationsView({ user, onAuthRequired, onBack, onNotice }) {
+  const [items, setItems] = useState([]); const [loading, setLoading] = useState(Boolean(user));
+  useEffect(() => { let mounted = true; if (!user) { setLoading(false); return undefined; } fetchNotifications(user.id).then((rows) => mounted && setItems(rows || [])).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user, onNotice]);
+  const open = async (item) => { if (!item.read_at) { try { await markNotificationRead(item.id, user.id); setItems((current) => current.map((row) => row.id === item.id ? { ...row, read_at: new Date().toISOString() } : row)); } catch {} } };
+  if (!user) return <div className="page-stack notifications-page"><section className="notifications-empty"><Bell size={30} /><div className="eyebrow">YOUR NOTIFICATIONS</div><h1>Stay up to date</h1><p>Sign in to see listing updates, messages, offers, and safety alerts.</p><button className="primary-button" onClick={onAuthRequired}>Login to continue</button><button className="text-action" onClick={onBack}>Back to Home</button></section></div>;
+  return <div className="page-stack notifications-page"><div className="notifications-heading"><div><div className="eyebrow">YOUR ACTIVITY</div><h1>Notifications</h1><p>Important updates from your Bese26 account.</p></div><Bell size={24} /></div>{loading ? <div className="empty-state">Loading notifications…</div> : items.length ? <div className="notification-list">{items.map((item) => <button type="button" className={`notification-item ${item.read_at ? '' : 'unread'}`} key={item.id} onClick={() => open(item)}><span className="notification-dot"><Bell size={15} /></span><span><strong>{item.title || 'Bese26 update'}</strong><small>{item.body || item.message || 'You have a new update.'}</small><em>{item.created_at ? new Date(item.created_at).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' }) : ''}</em></span></button>)}</div> : <div className="notifications-empty compact"><Bell size={26} /><h2>You’re all caught up</h2><p>New messages, listing updates, and account alerts will appear here.</p></div>}</div>;
 }
 
 const subscriptionPlans = [
@@ -490,6 +500,7 @@ function AppContent() {
   const [adCampaigns, setAdCampaigns] = useState([]);
   const [sessionUser, setSessionUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
   const [chatListing, setChatListing] = useState(null);
@@ -505,7 +516,13 @@ function AppContent() {
   }, []);
 
   const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
-  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setAuthReason(message); setShowAuth(true); }, []);
+  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setAuthReason(message); setShowAuth(true); }, []);  useEffect(() => {
+    let mounted = true;
+    if (!sessionUser) { setUnreadNotifications(0); return undefined; }
+    fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
+    return () => { mounted = false; };
+  }, [sessionUser]);
+
   const toggleSave = (id) => {
     const wasSaved = savedIds.includes(id);
     if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to save listings for later.'); return; }
@@ -637,6 +654,7 @@ function AppContent() {
   const renderView = () => {
     if (activeNav === 'home') return <HomeView adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
+    if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={() => navigate('home')} onNotice={showToast} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
@@ -649,7 +667,7 @@ function AppContent() {
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
     <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></AppErrorBoundary></main>
-    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{label}</span></button>)}</nav>
+    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     <ListingModal listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />

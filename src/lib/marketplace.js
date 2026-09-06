@@ -86,6 +86,13 @@ export async function signIn({ email, password }) {
   if (error) throw error;
   return data;
 }
+export async function requestPasswordReset(email) {
+  failIfUnavailable();
+  const value = String(email || '').trim();
+  if (!value) throw new Error('Enter your email first.');
+  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: window.location.origin });
+  if (error) throw error;
+}
 export async function signInWithGoogle() {
   failIfUnavailable();
   const { data, error } = await supabase.auth.signInWithOAuth({

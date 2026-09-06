@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, LockKeyhole, Mail, UserRound, X } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { signIn, signInWithGoogle, signUp } from '../lib/marketplace';
+import { requestPasswordReset, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
 
 function WelcomeSide({ isSignin }) {
   return <div className="auth-welcome-panel">
@@ -21,6 +21,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const [form, setForm] = useState({ email: '', password: '', displayName: '', username: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const switchMode = (nextMode) => {
@@ -52,6 +53,15 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
       setLoading(false);
     }
   };
+  const resetPassword = async () => {
+    setStatus({ type: '', message: '' });
+    if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email, then tap Forgot password.' }); return; }
+    setResetting(true);
+    try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset instructions sent. Check your email.' }); }
+    catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send reset instructions.' }); }
+    finally { setResetting(false); }
+  };
+
   const continueWithGoogle = async () => {
     setStatus({ type: '', message: '' });
     setLoading(true);
@@ -77,7 +87,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <form onSubmit={submit} className="auth-form">
       <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
       <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="current-password" required /></label>
-      <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : 'Login'}</button>
+      <button type="submit" className="primary-button auth-submit" disabled={loading || resetting}>{loading ? 'Signing in…' : 'Login'}</button><button type="button" className="auth-forgot" onClick={resetPassword} disabled={loading || resetting}>{resetting ? 'Sending reset link…' : 'Forgot password?'}</button>
     </form>
     <button type="button" className="auth-switch" onClick={() => switchMode('signup')}>Don’t have an account? <strong>Sign up</strong></button>
   </div>;
