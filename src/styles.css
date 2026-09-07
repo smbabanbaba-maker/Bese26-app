@@ -1608,3 +1608,19 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .help-contact-card strong { font-size:12px; }
 .help-contact-card p { margin-top:4px; color:var(--muted); font-size:11px; line-height:1.45; }
 @media (max-width:640px) { .help-guide-hero { align-items:flex-start; flex-direction:column; padding:18px; } .help-guide-hero h2 { font-size:20px; } .help-guide-grid { grid-template-columns:1fr; } }
+.auth-loading-overlay { position:absolute; inset:0; z-index:6; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); animation:authLoadingIn .2s ease both; }
+.auth-loading-orbit { position:relative; width:74px; height:74px; display:grid; place-items:center; margin-bottom:7px; }
+.auth-loading-orbit img { width:39px; height:39px; border-radius:12px; box-shadow:0 8px 18px rgba(229,57,53,.24); animation:authLogoPulse 1.7s ease-in-out infinite; }
+.auth-loading-orbit span { position:absolute; inset:1px; border:2px solid transparent; border-top-color:var(--red); border-right-color:#171717; border-radius:50%; animation:authOrbit 1.15s linear infinite; }
+.auth-loading-orbit span:nth-child(2) { inset:8px; border-top-color:#171717; border-right-color:var(--red); animation-duration:1.6s; animation-direction:reverse; }
+.auth-loading-orbit span:nth-child(3) { inset:15px; border-top-color:#f2b338; border-right-color:transparent; animation-duration:2s; }
+.auth-loading-overlay strong { color:#171717; font:800 14px Manrope,sans-serif; }
+.auth-loading-overlay small { color:#717782; font-size:10px; }
+.auth-loading-spinner { margin-top:7px; color:var(--red); animation:authOrbit .8s linear infinite; }
+.google-auth-button { box-shadow:0 6px 16px rgba(20,20,22,.05); }
+.google-auth-button:hover { border-color:#bfc2c8; box-shadow:0 9px 20px rgba(20,20,22,.09); }
+.google-logo { width:20px; height:20px; object-fit:contain; border-radius:50%; }
+@keyframes authLoadingIn { from { opacity:0; } to { opacity:1; } }
+@keyframes authOrbit { to { transform:rotate(360deg); } }
+@keyframes authLogoPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .auth-loading-orbit span, .auth-loading-orbit img, .auth-loading-spinner { animation:none; } }

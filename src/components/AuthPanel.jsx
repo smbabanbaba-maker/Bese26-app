@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, LockKeyhole, Mail, UserRound, X } from 'lucide-react';
+import { CheckCircle2, LockKeyhole, LoaderCircle, Mail, UserRound, X } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { requestPasswordReset, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
 
@@ -14,6 +14,10 @@ function WelcomeSide({ isSignin }) {
       <p>{isSignin ? 'Save listings, post items, and chat with sellers securely.' : 'Create your profile and start buying or selling with confidence.'}</p>
     </div>
   </div>;
+}
+
+function AuthLoading({ label }) {
+  return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>;
 }
 
 export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
@@ -81,7 +85,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
     {isSupabaseConfigured && <>
-      <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
+      <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><img className="google-logo" src="/images/google-logo.jpg" alt="" /> Continue with Google</button>
       <div className="auth-divider"><span>or use email</span></div>
     </>}
     <form onSubmit={submit} className="auth-form">
@@ -98,7 +102,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /> <span>{status.message}</span></div>}
     {isSupabaseConfigured && <>
-      <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><span className="google-logo" aria-hidden="true"><i>G</i></span> Continue with Google</button>
+      <button type="button" className="google-auth-button" onClick={continueWithGoogle} disabled={loading}><img className="google-logo" src="/images/google-logo.jpg" alt="" /> Continue with Google</button>
       <div className="auth-divider"><span>or use email</span></div>
     </>}
     <form onSubmit={submit} className="auth-form auth-signup-form">
@@ -113,6 +117,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   return <div className="auth-backdrop" onClick={onClose}>
     <section className="auth-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
       <button type="button" className="modal-close icon-button" onClick={onClose} aria-label="Close authentication"><X size={18} /></button>
+      {loading && <AuthLoading label={isSignin ? 'Signing you in…' : 'Creating your account…'} />}
       <div className={`auth-form-flip-shell ${isSignin ? '' : 'is-flipped'}`}>
         <div className="auth-form-flip-card">
           <div className="auth-form-face auth-form-front">
