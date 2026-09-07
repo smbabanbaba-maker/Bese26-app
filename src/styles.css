@@ -1668,10 +1668,11 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 @keyframes authLogoFloat { 0%,100% { transform:translateY(0) rotate(0); } 50% { transform:translateY(-5px) rotate(2deg); } }
 @media (max-width:760px) {
   .auth-backdrop { align-items:flex-end; padding:0; }
-  .auth-panel { width:100%; max-height:96dvh; min-height:0; border-radius:25px 25px 0 0; }
-  .auth-form-flip-shell { min-height:680px; height:680px; overflow:hidden; }
-  .auth-form-flip-card { min-height:680px; height:680px; }
-  .auth-form-face { display:flex; flex-direction:column; min-height:680px; height:680px; overflow-y:auto; }
+  .auth-panel { width:100%; max-height:96dvh; min-height:0; border-radius:25px 25px 0 0; overflow-y:auto; }
+  .auth-form-flip-shell { height:auto; min-height:0; overflow:visible; perspective:none; }
+  .auth-form-flip-card { height:auto; min-height:0; display:block; transform:none !important; }
+  .auth-form-face { position:relative; inset:auto; display:none; flex-direction:column; min-height:0; height:auto; overflow:visible; }
+  .auth-form-flip-shell:not(.is-flipped) .auth-form-front, .auth-form-flip-shell.is-flipped .auth-form-back { display:flex; }
   .auth-form-panel { order:1; padding:32px 24px 25px; }
   .auth-welcome-panel { order:2; min-height:145px; }
   .auth-welcome-content { padding:22px 24px 25px; max-width:none; }
@@ -1689,8 +1690,6 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .auth-form-panel { padding:28px 18px 22px; }
   .auth-form-panel h2 { font-size:31px; }
   .auth-field-row { grid-template-columns:1fr; gap:15px; }
-  .auth-form-flip-shell { min-height:720px; height:720px; }
-  .auth-form-flip-card, .auth-form-face { min-height:720px; height:720px; }
   .google-auth-button { margin-top:20px; }
   .auth-welcome-panel { min-height:132px; }
   .auth-welcome-content { padding:19px 20px 21px; }
