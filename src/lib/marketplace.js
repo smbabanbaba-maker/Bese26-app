@@ -1167,7 +1167,29 @@ export async function fetchMessages(conversationId) {
   failIfUnavailable();
   const { data, error } = await supabase.from('messages').select('id,conversation_id,sender_id,body,attachment_path,created_at,read_at').eq('conversation_id', conversationId).order('created_at', { ascending: true }).limit(200);
   if (error) throw error;
-  return data || [];
+  const rows = data || [];
+  const paths = rows.map((item) => item.attachment_path).filter(Boolean);
+  if (!paths.length) return rows;
+  const { data: signed, error: signedError } = await supabase.storage.from('chat-media').createSignedUrls(paths, 3600);
+  if (signedError) return rows;
+  const urlMap = Object.fromEntries((signed || []).map((item) => [item.path, item.signedUrl]));
+  return rows.map((item) => ({ ...item, attachment_url: item.attachment_path ? urlMap[item.attachment_path] || '' : '' }));
+}
+
+export async function uploadChatMedia({ userId, conversationId, file }) {
+  failIfUnavailable();
+  if (!userId || !conversationId || !file) throw new Error('Choose an image or voice note first.');
+  if (file.size > 8 * 1024 * 1024) throw new Error('Chat attachments must be smaller than 8 MB.');
+  const allowed = file.type.startsWith('image/') || file.type.startsWith('audio/');
+  if (!allowed) throw new Error('Only images and voice notes can be sent in chat.');
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-') || 'attachment';
+  const path = `${userId}/${conversationId}/${crypto.randomUUID()}-${safeName}`;
+  const contentType = file.type.split(';')[0];
+  const { error } = await supabase.storage.from('chat-media').upload(path, file, { cacheControl: '3600', upsert: false, contentType });
+  if (error) throw error;
+  const { data: signed, error: signedError } = await supabase.storage.from('chat-media').createSignedUrl(path, 3600);
+  if (signedError) throw signedError;
+  return { path, url: signed.signedUrl, kind: file.type.startsWith('audio/') ? 'audio' : 'image' };
 }
 
 export async function sendMessage({ conversationId, senderId, body, attachmentPath = null }) {

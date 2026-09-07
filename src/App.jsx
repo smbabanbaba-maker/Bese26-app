@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   Bell,
@@ -18,6 +18,7 @@ import {
   House,
   Image as ImageIcon,
   Laptop,
+  Mic,
   MapPin,
   MessageCircle,
   Moon,
@@ -65,7 +66,7 @@ const AdminView = lazyWithRetry(() => import('./components/AdminView'), 'admin')
 const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
-import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
@@ -334,6 +335,12 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
   const [meetingTime, setMeetingTime] = useState('');
   const [meetingArea, setMeetingArea] = useState('');
   const [busy, setBusy] = useState(false);
+  const [attachment, setAttachment] = useState(null);
+  const [attachmentPreview, setAttachmentPreview] = useState('');
+  const [mediaBusy, setMediaBusy] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
   const selectedConversation = conversations.find((conversation) => conversation.id === initialMessageId) || null;
   const liveMode = Boolean(isSupabaseConfigured && user && selectedConversation);
   const isSeller = Boolean(selectedConversation?.seller_id === user?.id);
@@ -356,10 +363,29 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
     return () => { mounted = false; unsubscribe(); };
   }, [selectedConversation?.id, liveMode, onDemoAction]);
 
-  const send = async (message = text) => {
-    if (!message.trim() || !liveMode) return;
-    try { await sendMessage({ conversationId: selectedConversation.id, senderId: user.id, body: message.trim() }); setText(''); }
-    catch (error) { onDemoAction(error.message || 'Could not send this message.'); }
+  const send = async (message = text, file = attachment) => {
+    if ((!message.trim() && !file) || !liveMode || mediaBusy) return;
+    setMediaBusy(Boolean(file));
+    try {
+      const uploaded = file ? await uploadChatMedia({ userId: user.id, conversationId: selectedConversation.id, file }) : null;
+      const sent = await sendMessage({ conversationId: selectedConversation.id, senderId: user.id, body: message.trim() || null, attachmentPath: uploaded?.path || null });
+      setLiveMessages((items) => [...items, { ...sent, attachment_url: uploaded?.url || '' }]);
+      setText(''); setAttachment(null); setAttachmentPreview('');
+    } catch (error) { onDemoAction(error.message || 'Could not send this message.'); }
+    finally { setMediaBusy(false); }
+  };
+  const chooseAttachment = (event) => { const file = event.target.files?.[0]; if (!file) return; setAttachment(file); setAttachmentPreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : ''); event.target.value = ''; };
+  const stopRecording = () => mediaRecorderRef.current?.stop();
+  const startRecording = async () => {
+    if (!liveMode || recording || !navigator.mediaDevices?.getUserMedia) { if (!navigator.mediaDevices?.getUserMedia) onDemoAction('Voice notes are not supported by this browser.'); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recordedChunksRef.current = []; mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (event) => event.data.size && recordedChunksRef.current.push(event.data);
+      recorder.onstop = () => { stream.getTracks().forEach((track) => track.stop()); const blob = new Blob(recordedChunksRef.current, { type: recorder.mimeType || 'audio/webm' }); setAttachment(new File([blob], `voice-note-${Date.now()}.webm`, { type: blob.type })); setAttachmentPreview(''); setRecording(false); mediaRecorderRef.current = null; };
+      recorder.start(); setRecording(true);
+    } catch (error) { onDemoAction(error.message || 'Microphone permission was not granted.'); }
   };
   const submitOffer = async (event) => {
     event.preventDefault();
@@ -385,7 +411,7 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
   const listingImage = liveMode ? liveListing?.image : null;
   const personInitials = liveMode ? ((otherProfile?.display_name || 'BE').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()) : 'BE';
   return <div className="page-stack messages-page"><div className="page-title-row"><div><div className="eyebrow">KEEP IT MOVING</div><h1>Messages</h1></div><span className="unread-pill">{liveMode ? 'Deal workspace' : 'Secure chat'}</span></div><div className="message-layout"><div className="conversation-list">{conversationLoading ? <div className="empty-state compact-empty"><MessageCircle size={24} /><h3>Loading conversations</h3><p>Getting your secure conversations.</p></div> : conversations.length ? conversations.map((conversation) => { const other = conversation.buyer_id === user?.id ? conversation.seller : conversation.buyer; const name = other?.display_name || 'bese26 member'; return <button key={conversation.id} className={`conversation-row ${conversation.id === initialMessageId ? 'active' : ''}`} type="button" onClick={() => onSelectConversation?.(conversation)}><Avatar initials={name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()} tone="rose" /><div className="conversation-copy"><strong>{name}</strong><span>{conversation.listing?.title || 'Marketplace listing'}</span></div><div className="conversation-meta"><small>{conversation.last_message_at ? new Date(conversation.last_message_at).toLocaleDateString() : 'New'}</small></div></button>; }) : <div className="empty-state compact-empty"><MessageCircle size={24} /><h3>No conversations yet</h3><p>When you chat with a seller, your messages will appear here.</p></div>}</div><div className="chat-panel"><div className="chat-header"><div className="chat-person"><Avatar initials={personInitials} tone="rose" /><div><strong>{personName}</strong><span><span className="online-dot" /> {liveMode ? 'Protected conversation' : 'Start a conversation from a listing'}</span></div></div></div><div className="chat-context">{listingImage ? <img src={listingImage} alt="" /> : <div className="chat-context-placeholder"><Package size={17} /></div>}<div><span>About this listing</span><strong>{listingTitle}</strong></div></div>{liveMode && <><div className="chat-safety-note"><ShieldCheck size={15} /><span>Never share OTPs, passwords, or private bank details. Inspect the item before paying.</span></div><div className="chat-quick-actions"><button type="button" onClick={() => send('I am interested in this listing. Is it still available?')}>I’m interested</button><button type="button" onClick={() => setDealPanel('offer')} disabled={isSeller}>Make an offer</button><button type="button" onClick={() => setDealPanel('meeting')}>Plan a meeting</button></div>{dealPanel === 'offer' && <form className="deal-form" onSubmit={submitOffer}><strong>Make an offer</strong><input type="number" min="1" value={offerAmount} onChange={(event) => setOfferAmount(event.target.value)} placeholder="Offer amount in NGN" required /><input value={offerNote} onChange={(event) => setOfferNote(event.target.value)} placeholder="Optional note" /><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send offer'}</button></div></form>}{dealPanel === 'meeting' && <form className="deal-form" onSubmit={submitMeeting}><strong>Suggest a safe meeting</strong><div className="deal-form-row"><input type="date" value={meetingDate} onChange={(event) => setMeetingDate(event.target.value)} required /><input type="time" value={meetingTime} onChange={(event) => setMeetingTime(event.target.value)} required /></div><input value={meetingArea} onChange={(event) => setMeetingArea(event.target.value)} placeholder="General public area, not an exact address" required /><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send proposal'}</button></div></form>}{deals.offers.map((offer) => <div className="deal-status-card" key={offer.id}><div><strong>Offer · ₦{Number(offer.amount).toLocaleString('en-NG')}</strong><span>{offer.status}</span></div>{isSeller && offer.status === 'pending' && <div><button type="button" onClick={() => updateOffer(offer, 'accepted')}>Accept</button><button type="button" onClick={() => updateOffer(offer, 'rejected')}>Decline</button></div>}</div>)}{deals.meetings.map((meeting) => <div className="deal-status-card" key={meeting.id}><div><strong>Meeting · {meeting.meeting_date} at {meeting.meeting_time}</strong><span>{meeting.area} · {meeting.status}</span></div>{meeting.status === 'proposed' && meeting.proposed_by !== user.id && <div><button type="button" onClick={() => updateMeeting(meeting, 'accepted')}>Accept</button><button type="button" onClick={() => updateMeeting(meeting, 'declined')}>Decline</button></div>}</div>)}</>}
-  <div className="chat-messages">{liveMode ? (liveLoading ? <div className="chat-empty-note">Loading messages…</div> : liveMessages.length ? liveMessages.map((item) => <div className={`message-bubble ${item.sender_id === user.id ? 'mine' : 'other'}`} key={item.id}>{item.body || 'Attachment'}<small>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {item.sender_id === user.id && <Check size={12} />}</small></div>) : <div className="chat-empty-note">Start the conversation with a clear question about the listing.</div>) : <div className="chat-empty-note">Select a listing to start a real conversation.</div>}</div><div className="chat-composer"><button className="icon-button" aria-label="Attach image" disabled><ImageIcon size={18} /></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Write a message..." disabled={!liveMode} /><button className="send-button" onClick={() => send()} disabled={!liveMode}><Send size={16} /></button></div></div></div></div>;
+  <div className="chat-messages">{liveMode ? (liveLoading ? <div className="chat-empty-note">Loading messages…</div> : liveMessages.length ? liveMessages.map((item) => <div className={`message-bubble ${item.sender_id === user.id ? 'mine' : 'other'}`} key={item.id}>{item.attachment_url && (item.attachment_path?.match(/\.(webm|ogg|mp3|m4a|wav)$/i) ? <audio controls src={item.attachment_url} className="message-audio" /> : <a href={item.attachment_url} target="_blank" rel="noreferrer"><img src={item.attachment_url} alt="Chat attachment" className="message-image" /></a>)}{item.body && <span>{item.body}</span>}{!item.body && !item.attachment_url && 'Attachment'}<small>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {item.sender_id === user.id && <Check size={12} />}</small></div>) : <div className="chat-empty-note">Start the conversation with a clear question about the listing.</div>) : <div className="chat-empty-note">Select a listing to start a real conversation.</div>}</div>{attachment && <div className="chat-attachment-preview">{attachmentPreview ? <img src={attachmentPreview} alt="Selected preview" /> : <Mic size={16} />}<span>{attachment.name}</span><button type="button" onClick={() => { setAttachment(null); setAttachmentPreview(''); }} aria-label="Remove attachment"><X size={15} /></button></div>}<div className="chat-composer"><input id="chat-image-input" className="chat-file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={chooseAttachment} /><label htmlFor="chat-image-input" className="icon-button" aria-label="Attach image"><ImageIcon size={18} /></label><button type="button" className={`icon-button chat-record-button ${recording ? 'recording' : ''}`} aria-label={recording ? 'Stop recording' : 'Record voice note'} onClick={recording ? stopRecording : startRecording} disabled={!liveMode || mediaBusy}><Mic size={18} /></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder={recording ? 'Recording voice note…' : 'Write a message...'} disabled={!liveMode || recording || mediaBusy} /><button className="send-button" onClick={() => send()} disabled={!liveMode || mediaBusy || (!text.trim() && !attachment)}>{mediaBusy ? '…' : <Send size={16} />}</button></div></div></div></div>;
 }
 
 
