@@ -90,7 +90,7 @@ export async function requestPasswordReset(email) {
   failIfUnavailable();
   const value = String(email || '').trim();
   if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: window.location.origin });
+  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: 'https://bese26.shop' });
   if (error) throw error;
 }
 export async function signInWithGoogle() {
