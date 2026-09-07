@@ -1796,3 +1796,42 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 }
 @media (prefers-reduced-motion: reduce) { .dashboard-welcome-card, .dashboard-orbit-art, .dashboard-orbit-art img, .dashboard-orbit { animation:none; }
 }
+
+/* Modern color and motion layer for authentication and the signed-in dashboard. */
+.auth-backdrop { background:radial-gradient(circle at 8% 15%,rgba(255,114,91,.24),transparent 28%),radial-gradient(circle at 92% 84%,rgba(112,87,255,.2),transparent 30%),rgba(13,15,20,.72); }
+.auth-panel { border-color:rgba(255,255,255,.68); }
+.auth-form-panel { background:linear-gradient(145deg,#fff 0%,#fff 64%,#fff8f7 100%); }
+.auth-form-panel::after { content:''; position:absolute; right:-90px; bottom:-110px; width:210px; height:210px; border-radius:50%; background:radial-gradient(circle,rgba(255,126,92,.12),transparent 68%); pointer-events:none; animation:authWarmGlow 5s ease-in-out infinite; }
+.auth-welcome-panel { background:linear-gradient(130deg,#0e1016 0%,#171a2a 45%,#351c35 74%,#6d272b 100%); background-size:180% 180%; animation:authGradientShift 12s ease infinite; }
+.auth-welcome-panel::after { background:linear-gradient(125deg,rgba(76,205,255,.1),transparent 33%,rgba(255,111,96,.16) 76%,transparent); mix-blend-mode:screen; }
+.auth-welcome-shape-one { border-color:rgba(255,189,103,.33); box-shadow:0 0 0 22px rgba(255,128,98,.08),0 0 0 45px rgba(93,111,255,.07); animation:authShapeDrift 8s ease-in-out infinite; }
+.auth-welcome-shape-two { border-color:rgba(96,218,255,.16); background:linear-gradient(135deg,#20253b,#281c2c); animation:authShapeDrift 10s 1s ease-in-out infinite reverse; }
+.auth-welcome-kicker { color:#ffc1a7; }
+.auth-welcome-note > span { background:#5ff0a1; box-shadow:0 0 0 5px rgba(95,240,161,.12),0 0 18px rgba(95,240,161,.7); }
+.google-auth-button { background:linear-gradient(110deg,#fff,#f8f9ff,#fff); }
+.auth-submit { background:linear-gradient(105deg,#11131a,#292040 55%,#b52f43); background-size:180% 100%; }
+.auth-submit:hover { background-position:100% 0; }
+.dashboard-welcome-card { background:linear-gradient(120deg,#11131b 0%,#202548 42%,#3a2051 70%,#7d2931 100%); background-size:180% 180%; animation:dashboardWelcomeIn .55s ease both,dashboardGradientShift 14s ease-in-out infinite; }
+.dashboard-welcome-card::after { content:''; position:absolute; top:-85px; right:21%; width:190px; height:190px; border-radius:50%; background:radial-gradient(circle,rgba(85,214,255,.22),transparent 68%); filter:blur(2px); animation:dashboardGlowDrift 8s ease-in-out infinite; pointer-events:none; }
+.dashboard-primary-action { background:linear-gradient(105deg,#ef4c56,#ff795d); background-size:170% 100%; }
+.dashboard-primary-action:hover { background-position:100% 0; }
+.dashboard-secondary-action { border-color:rgba(116,218,255,.4); background:linear-gradient(110deg,rgba(255,255,255,.1),rgba(115,91,255,.18)); }
+.dashboard-metrics span { padding-left:10px; border-left:2px solid rgba(255,155,148,.65); animation:dashboardMetricIn .5s both; }
+.dashboard-metrics span:nth-child(2) { border-color:rgba(104,213,255,.72); animation-delay:.12s; }
+.dashboard-metrics span:nth-child(3) { border-color:rgba(255,207,110,.8); animation-delay:.24s; }
+.dashboard-orbit-art { background:linear-gradient(145deg,rgba(73,214,255,.15),rgba(255,103,124,.16)); box-shadow:inset 0 0 35px rgba(102,103,255,.2),0 14px 32px rgba(0,0,0,.2); }
+.dashboard-orbit-one { border-top-color:#ff7e83; border-left-color:#62e3ff; }
+.dashboard-orbit-two { border-right-color:#ffd36e; border-bottom-color:rgba(125,103,255,.6); }
+@keyframes authGradientShift { 0%,100% { background-position:0% 30%; } 50% { background-position:100% 70%; } }
+@keyframes authWarmGlow { 0%,100% { transform:translate(0,0) scale(1); opacity:.7; } 50% { transform:translate(-20px,-14px) scale(1.16); opacity:1; } }
+@keyframes authShapeDrift { 0%,100% { transform:translate3d(0,0,0) rotate(0); } 50% { transform:translate3d(-10px,12px,0) rotate(8deg); } }
+@keyframes dashboardGradientShift { 0%,100% { background-position:0% 45%; } 50% { background-position:100% 55%; } }
+@keyframes dashboardGlowDrift { 0%,100% { transform:translate(0,0) scale(1); opacity:.65; } 50% { transform:translate(55px,35px) scale(1.2); opacity:1; } }
+@keyframes dashboardMetricIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@media (max-width:760px) {
+  .auth-form-panel::after { right:-125px; bottom:-90px; }
+  .dashboard-welcome-card::after { right:-45px; top:-50px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-welcome-panel, .auth-form-panel::after, .auth-welcome-shape-one, .auth-welcome-shape-two, .dashboard-welcome-card, .dashboard-welcome-card::after, .dashboard-metrics span { animation:none; }
+}
