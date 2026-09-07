@@ -7,14 +7,19 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --red: #e53935;
-  --dark-red: #c62828;
-  --ink: #171717;
+  --dark-red: #b71c1c;
+  --ink: #111214;
   --muted: #717782;
-  --soft: #f4f5f6;
-  --line: #e7e8eb;
+  --soft: #f8f9fa;
+  --line: #e6e7ea;
   --card: #fff;
-  --shadow: 0 12px 36px rgba(25, 30, 42, .06);
-  --shadow-lg: 0 24px 70px rgba(30, 24, 24, .14);
+  --gold: #d99a22;
+  --green: #2e9b70;
+  --blue: #4f73c9;
+  --purple: #7564d8;
+  --cream: #fff7f5;
+  --shadow: 0 12px 36px rgba(17, 18, 20, .07);
+  --shadow-lg: 0 24px 70px rgba(17, 18, 20, .16);
   --ease: cubic-bezier(.23, 1, .32, 1);
 }
 * { box-sizing: border-box; }
@@ -1984,3 +1989,69 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .chat-messages { min-height: 360px; background: #eef5fa; }
 .chat-composer { background: #fff; border-top: 1px solid #dce5eb; }
 @media (max-width: 699px) { .chat-panel { margin: 0 -4px; border-radius: 0; border-left: 0; border-right: 0; } .chat-messages { min-height: calc(100vh - 390px); } }
+
+
+/* Bese26 brand system: red, black, and white lead; accent colors communicate meaning. */
+:root {
+  --brand-gradient: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+  --dark-gradient: linear-gradient(135deg, #111214 0%, #24262b 100%);
+  --gold-gradient: linear-gradient(135deg, #d99a22, #f0c766);
+  --purple-gradient: linear-gradient(135deg, #7564d8, #a78bf0);
+}
+body { background: var(--soft); }
+::selection { color:#fff; background:var(--red); }
+button, a, input, textarea, select { -webkit-tap-highlight-color:transparent; }
+button:not(:disabled), a, .product-card, .category-tile, .seller-card, .quick-action, .icon-button { transition: color .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s var(--ease); }
+button:not(:disabled):active, .icon-button:active { transform:scale(.97); }
+.topbar { border-bottom-color:#e9e9eb; box-shadow:0 2px 18px rgba(17,18,20,.04); }
+.brand-mark { background:var(--brand-gradient); box-shadow:0 8px 18px rgba(229,57,53,.26); animation:brandMarkFloat 4s ease-in-out infinite; }
+.brand-name { color:var(--ink); }
+.topbar-search:focus-within { border-color:#eaa09d; box-shadow:0 0 0 4px rgba(229,57,53,.08); }
+.primary-button, .publish-button, .send-button, .home-ad-cta { background:var(--brand-gradient); box-shadow:0 8px 18px rgba(229,57,53,.16); }
+.primary-button:hover, .publish-button:hover, .home-ad-cta:hover { background:var(--dark-red); transform:translateY(-2px); box-shadow:0 12px 24px rgba(229,57,53,.24); }
+.dark-button, .sell-nav .nav-icon { background:var(--dark-gradient); }
+.category-tile { border-color:#ececef; box-shadow:0 5px 15px rgba(17,18,20,.03); }
+.category-tile:hover { border-color:#e8b4b1; box-shadow:0 9px 22px rgba(229,57,53,.1); transform:translateY(-3px); }
+.category-tile:nth-child(2) .category-icon { color:var(--blue); background:#eff4ff; }
+.category-tile:nth-child(3) .category-icon { color:var(--gold); background:#fff7df; }
+.category-tile:nth-child(4) .category-icon { color:var(--purple); background:#f4efff; }
+.category-tile:nth-child(5) .category-icon { color:var(--green); background:#ecfaf3; }
+.product-card, .seller-card, .quick-action { border-color:#e6e7ea; box-shadow:0 5px 18px rgba(17,18,20,.035); }
+.product-card:hover { border-color:#f0b5b1; box-shadow:0 15px 32px rgba(17,18,20,.1); transform:translateY(-5px); }
+.product-price, .modal-price, .wallet-balance { color:var(--red); }
+.product-meta svg, .location-row svg { color:var(--blue); }
+.verified-badge { color:var(--green); background:#ecfaf3; border:1px solid #d4f0e3; }
+.product-foot .seller-stats, .seller-stats { color:var(--gold); }
+.results-count, .count-bubble, .unread-pill { border:1px solid #f5d0cd; }
+.filter-chip.active, .filter-button:hover { color:var(--red); border-color:#efa29e; background:var(--cream); }
+.trust-card { background:linear-gradient(135deg,#fff7f5,#fff); border-color:#f4d4d0; }
+.trust-card-icon { background:var(--brand-gradient); }
+.recommendation-banner { background:linear-gradient(115deg,#f5f1ff,#fff7f5); border-color:#e5ddfb; }
+.wallet-card { background:var(--brand-gradient); }
+.wallet-actions button:first-child { color:var(--red); }
+.wallet-promo-icon { color:#8b641b; background:#fff0bf; }
+.notification-icon { color:var(--blue); background:#eff4ff; }
+.notification-row.unread .notification-icon { color:var(--red); background:var(--cream); }
+.toast { border-left:3px solid var(--green); }
+.auth-panel { box-shadow:0 30px 90px rgba(17,18,20,.22); }
+.auth-kicker, .auth-panel .eyebrow { color:var(--red); }
+.auth-panel .google-button { border-color:#dfe2e7; }
+.auth-panel .google-button:hover { border-color:#bcb4ef; background:#faf9ff; box-shadow:0 8px 20px rgba(117,100,216,.12); transform:translateY(-2px); }
+.dashboard-welcome { background:var(--dark-gradient); box-shadow:0 18px 34px rgba(17,18,20,.18); }
+.dashboard-welcome strong, .dashboard-stat strong { color:var(--gold); }
+.quick-action:hover { border-color:#d8d0ff; background:#fbfaff; box-shadow:0 10px 22px rgba(117,100,216,.12); transform:translateY(-3px); }
+.quick-action:nth-child(2) .quick-action-icon { color:var(--blue); background:#eff4ff; }
+.quick-action:nth-child(3) .quick-action-icon { color:var(--green); background:#ecfaf3; }
+.quick-action:nth-child(4) .quick-action-icon { color:var(--gold); background:#fff7df; }
+.bottom-nav button.active { color:var(--red); }
+.bottom-nav button:nth-child(2).active { color:var(--blue); }
+.bottom-nav button:nth-child(6).active { color:var(--purple); }
+.bottom-nav button:nth-child(7).active { color:var(--green); }
+.message-bubble.mine { background:var(--purple-gradient); }
+.chat-context-placeholder { color:var(--purple); background:#f1edff; }
+.chat-safety-note { color:var(--green); border-color:#d4f0e3; background:#f1fcf7; }
+.chat-record-button.recording { background:var(--red); }
+input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0 0 4px rgba(117,100,216,.09); }
+@keyframes brandMarkFloat { 0%,100% { transform:translateY(0) rotate(0); } 50% { transform:translateY(-2px) rotate(-2deg); } }
+@keyframes brandShimmer { from { background-position:0 0; } to { background-position:180% 0; } }
+@media (prefers-reduced-motion: reduce) { .brand-mark { animation:none; } }
