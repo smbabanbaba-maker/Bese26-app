@@ -86,18 +86,24 @@ export async function signIn({ email, password }) {
   if (error) throw error;
   return data;
 }
+
+function getAuthRedirectUrl() {
+  if (typeof window !== 'undefined' && window.location.origin) return window.location.origin;
+  return 'https://bese26.shop';
+}
+
 export async function requestPasswordReset(email) {
   failIfUnavailable();
   const value = String(email || '').trim();
   if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: 'https://bese26.shop' });
+  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: getAuthRedirectUrl() });
   if (error) throw error;
 }
 export async function signInWithGoogle() {
   failIfUnavailable();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: 'https://bese26.shop' },
+    options: { redirectTo: getAuthRedirectUrl() },
   });
   if (error) throw error;
   return data;
