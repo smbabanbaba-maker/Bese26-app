@@ -11,6 +11,7 @@ import {
   Phone,
   Plus,
   ShieldCheck,
+  Sparkles,
   Tag,
   Trash2,
   WalletCards,
