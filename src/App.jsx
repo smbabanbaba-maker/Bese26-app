@@ -327,6 +327,8 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
   const [text, setText] = useState('');
   const [liveMessages, setLiveMessages] = useState([]);
   const [liveLoading, setLiveLoading] = useState(false);
+  const [messageSearch, setMessageSearch] = useState('');
+  const [messageFilter, setMessageFilter] = useState('All');
   const [deals, setDeals] = useState({ offers: [], meetings: [] });
   const [dealPanel, setDealPanel] = useState('');
   const [offerAmount, setOfferAmount] = useState('');
@@ -405,6 +407,18 @@ function MessagesView({ user, liveListing, onDemoAction, initialMessageId, onSel
   };
   const updateOffer = async (offer, status) => { try { const updated = await updateChatOffer(offer.id, status); setDeals((current) => ({ ...current, offers: current.offers.map((item) => item.id === offer.id ? updated : item) })); onDemoAction(`Offer ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the offer.'); } };
   const updateMeeting = async (meeting, status) => { try { const updated = await updateChatMeeting(meeting.id, status); setDeals((current) => ({ ...current, meetings: current.meetings.map((item) => item.id === meeting.id ? updated : item) })); onDemoAction(`Meeting ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the meeting.'); } };
+  if (!selectedConversation) {
+    const filteredConversations = conversations.filter((conversation) => {
+      const other = conversation.buyer_id === user?.id ? conversation.seller : conversation.buyer;
+      const name = other?.display_name || 'Bese26 member';
+      const title = conversation.listing?.title || 'Marketplace listing';
+      const query = messageSearch.trim().toLowerCase();
+      const matchesSearch = !query || `${name} ${title}`.toLowerCase().includes(query);
+      const isUnanswered = conversation.seller_id === user?.id && !conversation.last_message_at;
+      return matchesSearch && (messageFilter === 'All' || (messageFilter === 'Unanswered' && isUnanswered) || messageFilter === 'Unread');
+    });
+    return <div className="messages-inbox-page"><header className="messages-inbox-header"><div className="messages-inbox-title"><div className="eyebrow">YOUR CONVERSATIONS</div><h1>Messages</h1></div><span className="message-count">{conversations.length}</span></header><div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search in Messages" aria-label="Search messages" /></div><div className="message-filter-tabs" role="tablist">{['All', 'Unread', 'Unanswered', 'Spam'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}</button>)}</div>{conversationLoading ? <div className="message-inbox-empty"><MessageCircle size={30} /><strong>Loading conversations…</strong><span>Getting your secure conversations.</span></div> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => { const other = conversation.buyer_id === user?.id ? conversation.seller : conversation.buyer; const name = other?.display_name || 'Bese26 member'; const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase(); return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}><Avatar initials={initials} tone="rose" size="lg" /><span className="message-inbox-copy"><strong>{name}</strong><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{conversation.last_message_at ? 'Open your conversation' : 'New conversation'}</small></span><time>{conversation.last_message_at ? new Date(conversation.last_message_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time><ChevronRight size={17} /></button>; })}</div> : <div className="message-inbox-empty"><MessageCircle size={30} /><strong>{messageSearch ? 'No matching conversations' : 'No conversations yet'}</strong><span>When you message a seller, the conversation will appear here.</span></div>}</div>;
+  }
   const otherProfile = selectedConversation && (selectedConversation.buyer_id === user?.id ? selectedConversation.seller : selectedConversation.buyer);
   const personName = liveMode ? (otherProfile?.display_name || 'bese26 member') : 'Marketplace chat';
   const listingTitle = liveMode ? (selectedConversation.listing?.title || 'Listing no longer available') : 'No listing selected';
