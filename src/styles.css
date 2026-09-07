@@ -2084,3 +2084,25 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 @keyframes emojiPickerIn { from { opacity:0; transform:translateY(8px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
 @media (max-width:700px) { .emoji-picker { right:8px; bottom:67px; width:calc(100vw - 28px); max-width:320px; } .emoji-grid { grid-template-columns:repeat(6,1fr); } .message-reaction { right:-4px; } }
 @media (prefers-reduced-motion: reduce) { .emoji-picker { animation:none; } }
+
+/* Soft red refinement: calm brick red instead of bright primary red. */
+:root {
+  --red: #b84b4b;
+  --dark-red: #8f3038;
+  --brand-gradient: linear-gradient(135deg, #c45a5a 0%, #8f3038 100%);
+  --cream: #fff8f7;
+}
+.brand-mark, .primary-button, .publish-button, .send-button, .home-ad-cta, .wallet-card { background:var(--brand-gradient); }
+.brand-mark { box-shadow:0 8px 18px rgba(184,75,75,.2); }
+.primary-button, .publish-button, .send-button, .home-ad-cta { box-shadow:0 8px 18px rgba(184,75,75,.14); }
+.primary-button:hover, .publish-button:hover, .home-ad-cta:hover { background:var(--dark-red); box-shadow:0 12px 24px rgba(184,75,75,.2); }
+.topbar-search:focus-within { border-color:#d7a1a1; box-shadow:0 0 0 4px rgba(184,75,75,.07); }
+.category-tile:hover { border-color:#dfb7b7; box-shadow:0 9px 22px rgba(184,75,75,.07); }
+.auth-backdrop { background:radial-gradient(circle at 50% 0%, rgba(184,75,75,.11), transparent 42%), rgba(16,18,22,.68); }
+.auth-form input:focus { border-color:var(--red); box-shadow:0 0 0 4px rgba(184,75,75,.07); }
+.auth-welcome-panel::before { box-shadow:0 0 0 18px rgba(184,75,75,.06),0 0 0 44px rgba(255,255,255,.04); }
+.auth-welcome-mark::after, .auth-panel-mark::after { box-shadow:0 0 0 0 rgba(184,75,75,.28); }
+.dashboard-primary-action { background:var(--red); box-shadow:0 9px 19px rgba(184,75,75,.16); }
+.chat-record-button.recording { background:var(--red); }
+.message-bubble.mine { background:var(--brand-gradient); }
+.message-reaction:hover, .message-reaction.selected { color:var(--red); border-color:var(--red); }
