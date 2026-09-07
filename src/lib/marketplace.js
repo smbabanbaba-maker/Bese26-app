@@ -97,7 +97,7 @@ export async function signInWithGoogle() {
   failIfUnavailable();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin },
+    options: { redirectTo: 'https://bese26.shop' },
   });
   if (error) throw error;
   return data;
