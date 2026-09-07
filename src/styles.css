@@ -2178,3 +2178,29 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .reminder-card p { margin: 4px 0 8px; color: #666; font-size: 11px; line-height: 1.4; }
 .reminder-card div button { padding: 0; border: 0; color: #d71920; background: transparent; font-size: 11px; font-weight: 800; }
 .reminder-dismiss { position: absolute; top: 9px; right: 8px; display: grid; place-items: center; width: 25px; height: 25px; border: 0; border-radius: 50%; color: #777; background: transparent; }
+
+/* Final mobile-first chat screen: reference proportions with Bese26 red/black/white branding. */
+.messages-selected-page .chat-panel { background:#edf4fa; border:0; box-shadow:none; }
+.messages-selected-page .chat-header { background:#fff; border-bottom:1px solid #dce3e7; }
+.messages-selected-page .chat-header::before { display:none; }
+.messages-selected-page .chat-context { margin:0; min-height:70px; border-radius:0; padding:10px 25px; background:#fff; }
+.messages-selected-page .chat-safety-note { margin:10px 14px 6px; color:#9b3c35; border-color:#e8a12f; background:#fff7e9; }
+.messages-selected-page .chat-quick-actions { display:flex; gap:10px; padding:7px 14px 10px; overflow-x:auto; background:#edf4fa; scrollbar-width:none; }
+.messages-selected-page .chat-quick-actions::-webkit-scrollbar { display:none; }
+.messages-selected-page .chat-quick-actions button { flex:0 0 auto; min-height:38px; padding:8px 13px; border:1.5px solid #23782b; border-radius:11px; color:#17651e; background:#fff; font-size:11px; font-weight:700; }
+.messages-selected-page .chat-messages { min-height:calc(100vh - 405px); padding:18px 14px 14px; background:#edf4fa; }
+.messages-selected-page .message-bubble { max-width:78%; padding:11px 13px 7px; border-radius:16px 16px 16px 4px; font-size:14px; }
+.messages-selected-page .message-bubble.mine { border-radius:16px 16px 4px 16px; background:#d8f3d5; color:#203226; }
+.messages-selected-page .message-bubble.other { background:#fff; }
+.messages-selected-page .chat-composer { position:sticky; bottom:0; z-index:4; padding:9px 12px 12px; background:#fff; }
+.messages-selected-page .chat-composer input { height:48px; border-radius:25px; padding:0 15px; background:#fff; }
+.messages-selected-page .chat-composer .icon-button { width:34px; height:34px; border:0; background:transparent; }
+.messages-selected-page .chat-composer .send-button { width:42px; height:42px; border-radius:50%; }
+@media (max-width:699px) {
+  .messages-selected-page .chat-panel { min-height:calc(100vh - 64px); margin:0 -13px; }
+  .messages-selected-page .chat-header { min-height:76px; padding:10px 12px; }
+  .messages-selected-page .chat-person strong { font-size:16px; }
+  .messages-selected-page .chat-context { padding:8px 25px; }
+  .messages-selected-page .chat-messages { min-height:calc(100vh - 405px); }
+  .messages-selected-page .chat-quick-actions button { min-height:36px; }
+}
