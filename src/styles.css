@@ -2322,3 +2322,31 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
   .messages-page.messages-selected-page .chat-panel { overflow:hidden; }
 }
 
+
+/* Professional dynamic listing form */
+.sell-phone-card { display:flex; align-items:center; gap:10px; margin:0 0 16px; padding:11px 12px; border:1px solid var(--line); border-radius:13px; background:var(--soft); }
+.sell-phone-card.needs-phone { border-color:#f0c3bf; background:#fff8f7; }
+.sell-phone-icon { width:31px; height:31px; display:grid; place-items:center; flex:none; border-radius:9px; color:var(--red); background:#fff0ee; }
+.sell-phone-card > div { min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+.sell-phone-card strong { font-size:10px; }
+.sell-phone-card small { color:var(--muted); font-size:8px; line-height:1.35; }
+.sell-phone-ok { color:#2d8d6d; flex:none; }
+.sell-phone-card .text-action { display:inline-flex; align-items:center; gap:4px; flex:none; color:var(--red); font-size:9px; font-weight:800; }
+.contact-preferences { display:flex; flex-wrap:wrap; gap:8px; }
+.contact-preferences label { flex-direction:row; align-items:center; gap:5px; min-height:34px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; background:var(--card); color:var(--ink); font-size:9px; }
+.contact-preferences label.contact-disabled { color:#a8abb1; background:var(--soft); }
+.contact-preferences input { accent-color:var(--red); padding:0; }
+.sell-form-grid > .sell-field:has(select option[value="Unlocked"]) { border-top:2px solid #fff0ee; }
+@media (max-width:640px) {
+  .sell-phone-card { align-items:flex-start; padding:10px; }
+  .sell-phone-card .text-action { margin-top:3px; }
+  .contact-preferences { display:grid; grid-template-columns:1fr 1fr; }
+  .contact-preferences label:first-child { grid-column:1 / -1; }
+}
+
+.sell-category-guide { display:flex; align-items:center; gap:9px; margin-bottom:16px; padding:10px 11px; border:1px solid #f0d3d0; border-radius:11px; background:#fff8f7; }
+.sell-category-guide > span { width:27px; height:27px; display:grid; place-items:center; flex:none; border-radius:8px; color:var(--red); background:#ffe8e5; }
+.sell-category-guide > div { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.sell-category-guide strong { font-size:10px; color:#8f3531; }
+.sell-category-guide small { color:#a17673; font-size:8px; line-height:1.35; }
+@media (max-width:640px) { .sell-category-guide { align-items:flex-start; } }
