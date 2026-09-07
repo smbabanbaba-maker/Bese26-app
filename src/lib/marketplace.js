@@ -1180,8 +1180,8 @@ export async function uploadChatMedia({ userId, conversationId, file }) {
   failIfUnavailable();
   if (!userId || !conversationId || !file) throw new Error('Choose an image or voice note first.');
   if (file.size > 8 * 1024 * 1024) throw new Error('Chat attachments must be smaller than 8 MB.');
-  const allowed = file.type.startsWith('image/') || file.type.startsWith('audio/');
-  if (!allowed) throw new Error('Only images and voice notes can be sent in chat.');
+  const allowed = file.type.startsWith('image/') || file.type.startsWith('audio/') || file.type === 'application/pdf';
+  if (!allowed) throw new Error('Only images, PDFs, and voice notes can be sent in chat.');
   const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-') || 'attachment';
   const path = `${userId}/${conversationId}/${crypto.randomUUID()}-${safeName}`;
   const contentType = file.type.split(';')[0];
