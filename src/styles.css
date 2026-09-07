@@ -1703,7 +1703,7 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 /* Mobile auth reference polish: generous touch targets, clear hierarchy, and a consistent signup layout. */
 @media (max-width:760px) {
   .auth-panel { background:#fff; box-shadow:0 -18px 50px rgba(0,0,0,.2); }
-  .auth-form-panel { flex:none; width:100%; padding:31px 21px 28px; }
+  .auth-form-panel { order:2; flex:none; width:100%; padding:31px 21px 28px; animation:authMobileFormIn .55s .12s both; }
   .auth-panel-mark { width:43px; height:43px; margin-bottom:20px; }
   .auth-form-panel .eyebrow { font-size:10px; letter-spacing:2px; }
   .auth-form-panel h2 { margin-top:12px; margin-bottom:7px; font-size:34px; }
@@ -1716,17 +1716,17 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .auth-submit { min-height:53px; margin-top:10px; border-radius:999px; font-size:13px; }
   .auth-forgot { margin-top:11px; font-size:11px; }
   .auth-switch { margin-top:20px; font-size:11px; }
-  .auth-welcome-panel { flex:none; width:100%; min-height:222px; border-radius:0; background:linear-gradient(135deg,#17181c 0%,#1a1b20 54%,#2e171b 100%); }
+  .auth-welcome-panel { order:1; flex:none; width:100%; min-height:222px; border-radius:0; background:linear-gradient(135deg,#17181c 0%,#1a1b20 54%,#2e171b 100%); animation:authMobileWelcomeIn .6s both; }
   .auth-welcome-panel::after { background:linear-gradient(115deg,rgba(255,255,255,.05),transparent 48%); }
   .auth-welcome-panel::before { width:270px; height:270px; right:-132px; bottom:-164px; border-color:rgba(255,255,255,.14); box-shadow:0 0 0 17px rgba(229,57,53,.09),0 0 0 39px rgba(255,255,255,.04); }
   .auth-welcome-shape-one { right:-204px; top:-86px; width:270px; height:270px; background:transparent; border-color:rgba(255,255,255,.12); box-shadow:0 0 0 18px rgba(229,57,53,.1),0 0 0 38px rgba(255,255,255,.04); }
   .auth-welcome-shape-two { left:-230px; bottom:-210px; width:300px; height:300px; background:#202126; border-color:rgba(255,255,255,.08); }
-  .auth-welcome-content { z-index:2; padding:24px 22px 27px; }
+  .auth-welcome-content { z-index:2; padding:24px 22px 27px; animation:authWelcomeCopyIn .65s .18s both; }
   .auth-welcome-kicker { margin-bottom:15px; color:#e5aaa6; font-size:9px; letter-spacing:1.8px; }
   .auth-welcome-mark { width:38px; height:38px; margin-bottom:15px; border-radius:11px; }
   .auth-welcome-content h2 { margin-bottom:10px; font-size:31px; line-height:.96; }
   .auth-welcome-content p { max-width:285px; color:#c5c6ca; font-size:10px; line-height:1.5; }
-  .auth-welcome-note { margin-top:20px; font-size:9px; }
+  .auth-welcome-note { margin-top:20px; font-size:9px; animation:authNotePulse 2.4s 1s ease-in-out infinite; }
 }
 @media (max-width:460px) {
   .auth-form-panel { padding:28px 20px 25px; }
@@ -1735,3 +1735,9 @@ button:disabled { cursor: not-allowed; opacity: .65; }
   .auth-welcome-panel { min-height:215px; }
   .auth-welcome-content { padding:22px 20px 24px; }
 }
+
+@keyframes authMobileWelcomeIn { from { opacity:0; transform:translateY(-18px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes authMobileFormIn { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes authWelcomeCopyIn { from { opacity:0; transform:translateX(-14px); } to { opacity:1; transform:translateX(0); } }
+@keyframes authNotePulse { 0%,100% { opacity:.78; } 50% { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .auth-mobile-welcome, .auth-form-panel, .auth-welcome-content, .auth-welcome-note { animation:none; } }
