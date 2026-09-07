@@ -2300,3 +2300,25 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 @keyframes profileLoadingPulse { 0%,100% { opacity:.45; box-shadow:0 0 0 0 rgba(229,57,53,.3); } 50% { opacity:1; box-shadow:0 0 0 6px rgba(229,57,53,0); } }
 @media (max-width:640px) { .profile-quick-grid { grid-template-columns:1fr; } .profile-quick-heading { align-items:flex-start; flex-direction:column; gap:4px; } .profile-quick-grid button { min-height:49px; } }
 
+/* Keep an opened chat inside the visible mobile viewport */
+@media (max-width:640px) {
+  .messages-page.messages-selected-page {
+    position:fixed;
+    top:61px;
+    right:0;
+    bottom:93px;
+    left:0;
+    z-index:10;
+    overflow:hidden;
+    padding:8px 13px 0;
+    gap:0;
+    background:var(--bg, #f8f9fa);
+  }
+  .messages-page.messages-selected-page .message-layout,
+  .messages-page.messages-selected-page .chat-panel {
+    height:100%;
+    min-height:0;
+  }
+  .messages-page.messages-selected-page .chat-panel { overflow:hidden; }
+}
+
