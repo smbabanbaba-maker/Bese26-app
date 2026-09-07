@@ -2140,3 +2140,33 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .messages-selected-page .chat-messages { min-height: calc(100vh - 370px); padding: 18px 14px; }
 .messages-selected-page .chat-composer { padding: 10px 14px 14px; }
 @media (max-width: 699px) { .messages-selected-page .chat-panel { margin: 0; } .messages-selected-page .chat-messages { min-height: calc(100vh - 365px); } }
+
+
+/* Final red audit: keep every red accent consistent and intentionally restrained. */
+.message-count { background:var(--red); box-shadow:0 4px 10px rgba(184,75,75,.12); }
+.message-filter-tabs button.active, .message-inbox-copy small { color:var(--red); }
+.message-filter-tabs button.active::after { background:var(--red); }
+.message-inbox-empty svg { color:#c47777; }
+.chat-quick-actions button { border-color:#d7a1a1; color:var(--dark-red); }
+.chat-attachment-preview button:hover { color:var(--red); background:#fff8f7; }
+.auth-loading-orbit img { box-shadow:0 8px 18px rgba(184,75,75,.18); }
+.auth-backdrop { background:radial-gradient(circle at 50% 0%, rgba(184,75,75,.11), transparent 42%), rgba(16,18,22,.68); }
+.dashboard-welcome-card::before { background:linear-gradient(110deg,rgba(255,255,255,.08),transparent 35%,rgba(184,75,75,.06)); }
+/* Override older declarations that predate the soft-red palette. */
+:root { --brand-gradient:linear-gradient(135deg,#c45a5a 0%,#8f3038 100%); }
+.brand-mark { background:var(--brand-gradient); }
+.primary-button, .publish-button, .send-button, .home-ad-cta { background:var(--brand-gradient); }
+.message-bubble.mine { background:var(--brand-gradient); }
+
+/* Business and verification pages use the same restrained red language. */
+.business-verified-icon, .verification-readiness-card > div:first-child svg, .business-logo-upload span,
+.company-link-page .eyebrow, .company-preview-link, .preview-badge, .verification-center-card-icon { color:var(--red); }
+.verification-readiness-card, .verification-extra-fields { border-left-color:var(--red); }
+.verification-readiness-card { background:#fff8f7; }
+.business-setup-mark, .company-save-button, .preview-actions span:last-child { background:var(--brand-gradient); }
+.company-link-form input:focus, .company-link-form textarea:focus { border-color:var(--red); box-shadow:0 0 0 2px rgba(184,75,75,.08); }
+.company-link-status { border-left-color:var(--red); }
+.business-owner-actions button:last-child { color:var(--red); border-color:var(--red); }
+.preview-badge, .verification-checklist span { background:#fff8f7; }
+.verification-choice button.selected { border-color:var(--red); background:#fff8f7; color:var(--red); box-shadow:0 0 0 2px rgba(184,75,75,.07); }
+.verification-center-card-icon { background:#fff8f7; }
