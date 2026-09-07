@@ -2106,3 +2106,16 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .chat-record-button.recording { background:var(--red); }
 .message-bubble.mine { background:var(--brand-gradient); }
 .message-reaction:hover, .message-reaction.selected { color:var(--red); border-color:var(--red); }
+/* Selected Messages workspace: people rail above the active conversation */
+.messages-workspace-pill { display: inline-flex; align-items: center; min-height: 36px; padding: 0 13px; border: 1px solid #d7d4f8; border-radius: 10px; color: #5f50ac; background: #f3f1ff; font-size: 12px; font-weight: 800; }
+.messages-selected-page .message-layout { display: grid; gap: 0; }
+.messages-selected-page .conversation-list { display: flex; gap: 10px; padding: 12px 0 14px; overflow-x: auto; border: 0; background: transparent; }
+.messages-selected-page .conversation-row { display: grid; flex: 0 0 92px; justify-items: center; gap: 5px; min-height: 101px; padding: 9px 6px; border: 1px solid #eee; border-radius: 15px; background: #fff; text-align: center; }
+.messages-selected-page .conversation-row.active { border-color: #d71920; box-shadow: 0 4px 15px rgba(215,25,32,.12); }
+.messages-selected-page .conversation-row .avatar { width: 48px; height: 48px; font-size: 14px; }
+.messages-selected-page .conversation-copy { display: grid; width: 100%; gap: 2px; }
+.messages-selected-page .conversation-copy strong, .messages-selected-page .conversation-copy span { overflow: hidden; max-width: 100%; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.messages-selected-page .conversation-copy span { color: #7b858c; }
+.messages-selected-page .conversation-meta { position: absolute; margin: 0; font-size: 9px; transform: translate(28px, -34px); }
+.messages-selected-page .chat-panel { min-width: 0; }
+@media (max-width: 699px) { .messages-selected-page { margin-top: -4px; } .messages-selected-page .page-title-row { padding: 10px 2px 8px; } .messages-selected-page .page-title-row h1 { font-size: 25px; } .messages-selected-page .conversation-list { margin: 0 -10px; padding: 10px 10px 14px; } .messages-selected-page .chat-panel { margin: 0 -10px; } .messages-selected-page .chat-messages { min-height: calc(100vh - 440px); } }
