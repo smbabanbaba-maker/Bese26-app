@@ -1755,3 +1755,44 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 @media (prefers-reduced-motion: reduce) {
   .auth-welcome-mark, .auth-welcome-mark::before, .auth-welcome-mark::after, .auth-panel-mark::before, .auth-panel-mark::after, .auth-welcome-mark img, .auth-panel-mark img { animation:none; }
 }
+
+/* Post-login dashboard moment: a warm welcome, useful next steps, and lightweight motion. */
+.dashboard-welcome-card { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:18px; min-height:205px; overflow:hidden; padding:25px 28px 62px; border:1px solid #34363d; border-radius:20px; color:#fff; background:linear-gradient(120deg,#15161a 0%,#22242a 57%,#3b1d20 100%); box-shadow:0 18px 38px rgba(20,20,24,.14); animation:dashboardWelcomeIn .55s ease both; }
+.dashboard-welcome-card::before { content:''; position:absolute; inset:0; background:linear-gradient(110deg,rgba(255,255,255,.08),transparent 35%,rgba(229,57,53,.1)); pointer-events:none; }
+.dashboard-welcome-copy { position:relative; z-index:2; }
+.dashboard-welcome-copy .eyebrow { color:#f0aaa5; }
+.dashboard-welcome-copy h1 { max-width:620px; margin:8px 0 6px; color:#fff; font-size:clamp(22px,3vw,34px); line-height:1.08; letter-spacing:-.045em; }
+.dashboard-welcome-copy h1 span { color:#ff9b94; }
+.dashboard-welcome-copy p { color:#c7c8cc; font-size:12px; line-height:1.5; }
+.dashboard-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:17px; }
+.dashboard-primary-action, .dashboard-secondary-action { display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:9px 13px; border-radius:9px; font-size:11px; font-weight:800; transition:transform .2s ease,box-shadow .2s ease,background .2s ease; }
+.dashboard-primary-action { color:#fff; background:var(--red); box-shadow:0 9px 19px rgba(229,57,53,.22); }
+.dashboard-secondary-action { border:1px solid rgba(255,255,255,.25); color:#fff; background:rgba(255,255,255,.07); }
+.dashboard-primary-action:hover, .dashboard-secondary-action:hover { transform:translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.18); }
+.dashboard-orbit-art { position:relative; z-index:1; display:grid; place-items:center; align-self:center; width:158px; height:158px; margin:auto; border-radius:48px; background:rgba(255,255,255,.06); transform:rotate(8deg); animation:dashboardArtFloat 5s ease-in-out infinite; }
+.dashboard-orbit-art img { position:relative; z-index:2; width:76px; height:76px; border-radius:22px; object-fit:cover; transform:rotate(-8deg); box-shadow:0 15px 28px rgba(0,0,0,.3); animation:dashboardLogoPulse 3s ease-in-out infinite; }
+.dashboard-orbit { position:absolute; border:1px solid rgba(255,255,255,.25); border-radius:50%; transform:rotate(-8deg); }
+.dashboard-orbit-one { inset:9px; animation:dashboardOrbitSpin 9s linear infinite; border-top-color:#ff7c75; }
+.dashboard-orbit-two { inset:-8px; animation:dashboardOrbitSpin 13s linear infinite reverse; border-right-color:rgba(255,255,255,.55); }
+.dashboard-metrics { position:absolute; z-index:2; right:24px; bottom:17px; left:28px; display:flex; gap:25px; }
+.dashboard-metrics span { display:grid; gap:2px; }
+.dashboard-metrics strong { color:#fff; font:800 16px Manrope,sans-serif; }
+.dashboard-metrics small { color:#aeb0b5; font-size:9px; text-transform:uppercase; letter-spacing:.08em; }
+@keyframes dashboardWelcomeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes dashboardArtFloat { 0%,100% { transform:rotate(8deg) translateY(0); } 50% { transform:rotate(5deg) translateY(-7px); } }
+@keyframes dashboardLogoPulse { 0%,100% { transform:rotate(-8deg) scale(1); } 50% { transform:rotate(-5deg) scale(1.06); } }
+@keyframes dashboardOrbitSpin { to { transform:rotate(352deg); } }
+@media (max-width:700px) {
+  .dashboard-welcome-card { grid-template-columns:minmax(0,1fr); min-height:250px; padding:21px 18px 67px; border-radius:17px; }
+  .dashboard-welcome-copy { max-width:76%; }
+  .dashboard-welcome-copy h1 { font-size:23px; }
+  .dashboard-welcome-copy p { font-size:10px; }
+  .dashboard-actions { display:grid; gap:7px; }
+  .dashboard-primary-action, .dashboard-secondary-action { justify-content:center; min-height:40px; }
+  .dashboard-orbit-art { position:absolute; right:-35px; top:35px; width:145px; height:145px; opacity:.78; }
+  .dashboard-metrics { right:18px; bottom:16px; left:18px; justify-content:space-between; gap:8px; }
+  .dashboard-metrics strong { font-size:14px; }
+  .dashboard-metrics small { font-size:8px; }
+}
+@media (prefers-reduced-motion: reduce) { .dashboard-welcome-card, .dashboard-orbit-art, .dashboard-orbit-art img, .dashboard-orbit { animation:none; }
+}
