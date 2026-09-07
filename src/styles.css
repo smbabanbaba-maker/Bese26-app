@@ -2119,3 +2119,24 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .messages-selected-page .conversation-meta { position: absolute; margin: 0; font-size: 9px; transform: translate(28px, -34px); }
 .messages-selected-page .chat-panel { min-width: 0; }
 @media (max-width: 699px) { .messages-selected-page { margin-top: -4px; } .messages-selected-page .page-title-row { padding: 10px 2px 8px; } .messages-selected-page .page-title-row h1 { font-size: 25px; } .messages-selected-page .conversation-list { margin: 0 -10px; padding: 10px 10px 14px; } .messages-selected-page .chat-panel { margin: 0 -10px; } .messages-selected-page .chat-messages { min-height: calc(100vh - 440px); } }
+/* Exact single-chat mode: remove inbox chrome once a conversation is open */
+.messages-selected-page { max-width: none; margin: 0; }
+.messages-selected-page .page-title-row, .messages-selected-page .conversation-list { display: none; }
+.messages-selected-page .message-layout { display: block; }
+.messages-selected-page .chat-panel { min-height: calc(100vh - 78px); border: 0; border-radius: 0; }
+.messages-selected-page .chat-header { min-height: 78px; padding: 13px 12px; }
+.messages-selected-page .chat-back-button { display: grid; place-items: center; flex: 0 0 34px; width: 34px; height: 40px; margin-right: 3px; border: 0; background: transparent; color: #26343b; }
+.messages-selected-page .chat-header .chat-person { flex: 1; }
+.messages-selected-page .chat-header-actions { display: flex; align-items: center; gap: 4px; }
+.messages-selected-page .chat-header-icon { display: grid; place-items: center; width: 38px; height: 38px; border: 0; background: transparent; color: #26343b; }
+.messages-selected-page .chat-person .avatar { width: 45px; height: 45px; }
+.messages-selected-page .chat-person strong { font-size: 16px; }
+.messages-selected-page .chat-person > div > span { font-size: 11px; }
+.messages-selected-page .chat-context { min-height: 70px; padding: 10px 25px; }
+.messages-selected-page .chat-safety-note { margin: 0 14px 10px; border-color: #e6a02c; border-radius: 18px; color: #58471f; background: #fff8e9; }
+.messages-selected-page .chat-quick-actions { display: flex; gap: 10px; padding: 8px 14px 12px; background: #eef5fa; }
+.messages-selected-page .chat-quick-actions button { min-height: 43px; padding: 0 14px; border: 2px solid #217a2a; border-radius: 16px; color: #176d21; background: #fff; font-size: 13px; white-space: nowrap; }
+.messages-selected-page .chat-quick-actions button:disabled { opacity: .45; }
+.messages-selected-page .chat-messages { min-height: calc(100vh - 370px); padding: 18px 14px; }
+.messages-selected-page .chat-composer { padding: 10px 14px 14px; }
+@media (max-width: 699px) { .messages-selected-page .chat-panel { margin: 0; } .messages-selected-page .chat-messages { min-height: calc(100vh - 365px); } }
