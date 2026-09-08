@@ -602,7 +602,7 @@ export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const { data: business, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at').eq('business_handle', normalized).eq('is_active', true).maybeSingle();
+  const { data: business, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at').eq('business_handle', normalized).eq('is_active', true).maybeSingle();
   if (businessError) throw businessError;
   if (!business) return null;
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
@@ -870,8 +870,8 @@ export async function deleteSavedSearch(userId, searchId) {
 export async function getBusinessProfile(userId) {
   failIfUnavailable();
   if (!userId) return null;
-  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
-  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
+  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
+  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
   let { data, error } = await supabase.from('business_profiles').select(fields).eq('profile_id', userId).maybeSingle();
   if (error && /verification_status|verified_at|suspended_at|suspension_reason/i.test(error.message || '')) ({ data, error } = await supabase.from('business_profiles').select(legacyFields).eq('profile_id', userId).maybeSingle());
   if (error) throw error;
@@ -890,6 +890,7 @@ export async function saveBusinessProfile(userId, values) {
     description: values.description || null,
     phone: values.phone || null,
     whatsapp: values.whatsapp || null,
+    contact_preference: ['whatsapp', 'call', 'both'].includes(values.contact_preference) ? values.contact_preference : 'both',
     email: values.email || null,
     country: values.country || 'Nigeria',
     state: values.state || null,
@@ -908,8 +909,8 @@ export async function saveBusinessProfile(userId, values) {
   };
   if (!payload.business_name) throw new Error('Business name is required.');
   if (payload.business_handle && !/^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?$/.test(payload.business_handle)) throw new Error('Use 3–30 lowercase letters, numbers, or hyphens for the business handle.');
-  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
-  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
+  const fields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,verification_status,verified_at,suspended_at,suspension_reason,created_at,updated_at';
+  const legacyFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,registration_number,delivery_available,pickup_available,years_in_business,is_active,public_contact,location_visibility,is_verified,created_at,updated_at';
   let { data, error } = await supabase.from('business_profiles').upsert(payload).select(fields).single();
   if (error && /verification_status|verified_at|suspended_at|suspension_reason/i.test(error.message || '')) ({ data, error } = await supabase.from('business_profiles').upsert(payload).select(legacyFields).single());
   if (error) throw error;
