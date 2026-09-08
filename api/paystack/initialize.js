@@ -4,10 +4,12 @@ import { callbackUrl, createBoostPayment, getPlan, paystackRequest, readJson, re
 export default async function handler(req, res) {
   if (req.method !== 'POST') return sendJson(res, 405, { error: 'Method not allowed.' });
   let reference = null;
+  let requestMode = 'subscription';
   try {
     const { supabase, user } = await requireUser(req);
     const body = await readJson(req);
     const mode = String(body.mode || 'subscription').toLowerCase();
+    requestMode = mode;
     reference = `bese26_${user.id.slice(0, 8)}_${crypto.randomUUID()}`;
     let amountKobo;
     let metadata;
@@ -38,7 +40,7 @@ export default async function handler(req, res) {
       message: error.message || 'unknown error',
       providerStatusCode: error.providerStatusCode || null,
       providerStatus: error.providerStatus ?? null,
-      mode: String(body?.mode || 'subscription').toLowerCase(),
+      mode: requestMode,
     });
     return sendJson(res, error.message?.includes('session') || error.message?.includes('Sign in') ? 401 : 400, { error: error.message || 'Could not start Paystack checkout.', reference });
   }
