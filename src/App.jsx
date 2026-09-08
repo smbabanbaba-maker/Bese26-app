@@ -64,7 +64,7 @@ function lazyWithRetry(importer, chunkName) {
 }
 
 const ProfileView = lazyWithRetry(() => import('./components/ProfileView'), 'profile');
-const BusinessOwnerView = lazyWithRetry(() => import('./components/ProfileView').then((module) => ({ default: module.MinimalBusinessSetupPage })), 'business-owner');
+const BusinessOwnerView = lazyWithRetry(() => import('./components/ProfileView').then((module) => ({ default: module.BusinessProfilePage })), 'business-owner');
 const AdminView = lazyWithRetry(() => import('./components/AdminView'), 'admin');
 const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
@@ -551,7 +551,7 @@ function PublicListingRoute({ listingId }) {
 }
 
 function AppContent() {
-  const publicHandle = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1]?.toLowerCase() : null;
+  const publicHandle = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || window.location.pathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
   const publicListingId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?listing\/([^/]+)\/?$/i)?.[1] : null;
   if (publicListingId) return <PublicListingRoute listingId={publicListingId} />;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
@@ -733,7 +733,7 @@ function AppContent() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'business') return sessionUser && businessOwnerProfile ? <BusinessOwnerView user={sessionUser} onBack={() => navigate('home')} onNotice={showToast} onOpenVerification={() => navigate('profile')} onNavigate={navigate} /> : <BusinessDirectoryView onBack={() => navigate('home')} />;
+    if (activeNav === 'business') return sessionUser && businessOwnerProfile ? <BusinessOwnerView user={sessionUser} onBack={() => navigate('home')} onNotice={showToast} onOpenSubscription={() => navigate('subscription')} onOpenVerification={() => navigate('profile')} onNavigate={navigate} /> : <BusinessDirectoryView onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} initialDraft={editingDraft} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} initialMessageId={chatTargetId} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); }} onBackToInbox={() => setChatTargetId(null)} />;
     if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => { setEditingDraft(null); navigate('sell'); }} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
