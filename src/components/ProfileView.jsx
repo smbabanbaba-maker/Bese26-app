@@ -400,6 +400,7 @@ export function BusinessProfilePage({ user, onBack, onNotice, onOpenSubscription
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState('');
   const [error, setError] = useState('');
+  const [handleStatus, setHandleStatus] = useState('idle');
   useEffect(() => { let mounted = true; getBusinessProfile(user.id).then((data) => { if (!mounted) return; if (data) setForm((current) => ({ ...current, ...data, email: data.email || user.email || '' })); }).catch((requestError) => mounted && setError(requestError.message || 'Could not load business profile.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id, user.email]);
   useEffect(() => { let mounted = true; Promise.all([fetchSellerEntitlement(), fetchMyListings({ sellerId: user.id, status: 'active' }), fetchSellerStats(user.id)]).then(([access, listings, stats]) => { if (mounted) { setEntitlement(access); setActiveListings(listings.length); setBusinessStats(stats || null); } }).catch(() => {}); return () => { mounted = false; }; }, [user.id]);
   useEffect(() => () => { if (logoPreview?.startsWith('blob:')) URL.revokeObjectURL(logoPreview); }, [logoPreview]);
