@@ -70,6 +70,14 @@ import AuthPanel from './components/AuthPanel';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
+function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
+  return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
+    <div className="brand-loader-orbit" aria-hidden="true"><span className="brand-loader-ring" /><img src="/images/bese26-logo-icon.png" alt="" /></div>
+    <strong>{offline ? 'Checking your connection…' : message}</strong>
+    <small>{offline ? 'Please wait while Bese26 reconnects.' : 'Your marketplace is getting ready.'}</small>
+  </div>;
+}
+
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -77,7 +85,7 @@ class AppErrorBoundary extends Component {
   retry = () => this.setState({ hasError: false, error: null });
   render() {
     if (!this.state.hasError) return this.props.children;
-    const message = this.state.error?.message || 'Unknown UI error'; return <div className="route-error-card"><AlertCircle size={24} /><h2>Something went wrong loading this page</h2><p>Your account session is safe. Try the page again or reload Bese26 if your connection changed.</p><div className="route-error-detail" role="alert"><strong>Technical detail</strong><code>{message}</code></div><div className="route-error-actions"><button type="button" className="secondary-button" onClick={this.retry}>Try again</button><button type="button" className="primary-button" onClick={() => window.location.reload()}>Reload Bese26</button></div></div>;
+    const message = this.state.error?.message || 'Unknown UI error'; const offline = /network|fetch|load|connection|chunk/i.test(message); return <div className="route-error-card"><BrandLoader message={offline ? 'Reconnecting to Bese26…' : 'Bese26 needs a moment…'} offline={offline} compact /><h2>Something went wrong loading this page</h2><p>Your account session is safe. Try the page again or reload Bese26 if your connection changed.</p><div className="route-error-detail" role="alert"><strong>Technical detail</strong><code>{message}</code></div><div className="route-error-actions"><button type="button" className="secondary-button" onClick={this.retry}>Try again</button><button type="button" className="primary-button" onClick={() => window.location.reload()}>Reload Bese26</button></div></div>;
   }
 }
 
@@ -534,7 +542,7 @@ function PublicListingRoute({ listingId }) {
   const [loading, setLoading] = useState(true);
   useEffect(() => { let mounted = true; fetchListingDetails(listingId).then((data) => mounted && setListing(data)).catch(() => mounted && setListing(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [listingId]);
   useEffect(() => { if (!listing) return undefined; const previous = { title: document.title, description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '' }; document.title = `${listing.title} | Bese26`; let description = document.querySelector('meta[name="description"]'); if (!description) { description = document.createElement('meta'); description.name = 'description'; document.head.appendChild(description); } description.content = `${listing.title} — ${listing.price} in ${listing.location}. View details on Bese26.`; let canonical = document.querySelector('link[rel="canonical"]'); if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); } canonical.href = `https://bese26.shop/listing/`; const tags = [['og:title', `${listing.title} | Bese26`], ['og:description', description.content], ['og:image', listing.image || `https://bese26.shop/images/bese26-official-logo.png`], ['twitter:card', 'summary_large_image'], ['twitter:title', `${listing.title} | Bese26`], ['twitter:description', description.content]]; tags.forEach(([name, content]) => { const selector = name.startsWith('og:') ? `meta[property="${name}"]` : `meta[name="${name}"]`; let tag = document.querySelector(selector); if (!tag) { tag = document.createElement('meta'); tag.setAttribute(name.startsWith('og:') ? 'property' : 'name', name); document.head.appendChild(tag); } tag.content = content; }); return () => { document.title = previous.title; if (description) description.content = previous.description; }; }, [listing]);
-  if (loading) return <div className="route-loading" role="status">Loading listing details…</div>;
+  if (loading) return <BrandLoader message="Loading listing…" compact />;
   if (!listing) return <div className="empty-state listing-not-found"><Package size={30} /><h1>Listing not found</h1><p>This listing is no longer available or is not public.</p><a className="primary-button" href="/">Back to Bese26</a></div>;
   return <ListingModal listing={listing} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={() => window.location.assign(`/?chat_listing=${listing.id}`)} />;
 }
@@ -708,6 +716,10 @@ function AppContent() {
     }).catch((error) => showToast(error.message || 'Could not open the business message.'));
   }, [sessionUser]);
 
+  const [showStartupLoader, setShowStartupLoader] = useState(true);
+  useEffect(() => { const timer = window.setTimeout(() => setShowStartupLoader(false), 2000); return () => window.clearTimeout(timer); }, []);
+  if (showStartupLoader) return <BrandLoader message="Loading Bese26…" />;
+
   const renderView = () => {
     if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
@@ -723,7 +735,7 @@ function AppContent() {
   };
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
-    <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<div className="route-loading" role="status">Loading bese26…</div>}>{renderView()}</Suspense></AppErrorBoundary></main>
+    <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<BrandLoader message="Loading page…" compact />}>{renderView()}</Suspense></AppErrorBoundary></main>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
