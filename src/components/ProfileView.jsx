@@ -557,7 +557,7 @@ export default function ProfileView({ user, onAuthRequired, onSignOut, onDemoAct
   if (subPage === 'following') return <RelationsPage user={user} onBack={() => setSubPage('main')} />;
   if (subPage === 'blocked') return <BlockedUsersPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
   if (subPage === 'reports') return <ReportsPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
-  if (subPage === 'business') return <MinimalBusinessSetupPage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} onOpenVerification={() => setSubPage('verification')} onNavigate={onNavigate} />;
+  if (subPage === 'business') return <BusinessProfilePage user={user} onBack={() => setSubPage('main')} onNotice={onDemoAction} onOpenSubscription={onOpenSubscription} onOpenVerification={() => setSubPage('verification')} onNavigate={onNavigate} />;
   if (subPage === 'verification') return <VerificationPage user={user} profile={profileRecord} onBack={() => setSubPage('main')} onNotice={onDemoAction} />;
   if (['language', 'notification-settings', 'privacy', 'communication', 'appearance'].includes(subPage)) return <SettingsPage page={{ ...pageDefinitions[subPage], key: subPage }} user={user} onBack={() => setSubPage('main')} isDark={isDark} onToggleTheme={onToggleTheme} onNotice={onDemoAction} />;
   if (subPage === 'help') return <HelpPage onBack={() => setSubPage('main')} />;
