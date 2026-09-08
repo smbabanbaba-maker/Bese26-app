@@ -551,6 +551,11 @@ function PublicListingRoute({ listingId }) {
 }
 
 function AppContent() {
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app')) {
+    const canonicalUrl = `https://www.bese26.shop${window.location.pathname}${window.location.search}${window.location.hash}`;
+    window.location.replace(canonicalUrl);
+    return <BrandLoader message="Opening Bese26…" compact />;
+  }
   const publicHandle = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || window.location.pathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
   const publicListingId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?listing\/([^/]+)\/?$/i)?.[1] : null;
   if (publicListingId) return <PublicListingRoute listingId={publicListingId} />;

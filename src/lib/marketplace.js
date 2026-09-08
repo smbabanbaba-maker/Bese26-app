@@ -88,7 +88,6 @@ export async function signIn({ email, password }) {
 }
 
 function getAuthRedirectUrl() {
-  if (typeof window !== 'undefined' && window.location.origin) return window.location.origin;
   return 'https://www.bese26.shop';
 }
 
