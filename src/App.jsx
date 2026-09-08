@@ -255,7 +255,6 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
   const [promoIndex, setPromoIndex] = useState(0);
   useEffect(() => { const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
   const promo = promoSlides[promoIndex];
-  const sponsoredListings = marketListings.filter((listing) => listing.promoted).slice(0, 3);
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   return (
     <div className="page-stack home-page">
@@ -271,7 +270,6 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
       </section>
       <section className="popular-categories"><SectionHeading eyebrow="START BROWSING" title="Popular near you" action="All categories" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', House, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Sprout, 'tone-green'], ['Services', Wrench, 'tone-peach'], ['Food', ShoppingBasket, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)}><span><Icon size={19} /></span><strong>{label}</strong></button>)}</div></section>
 
-      {sponsoredListings.length > 0 && <section className="sponsored-listings-section"><SectionHeading eyebrow="SPONSORED" title="Featured for you" action="See all" onAction={() => onNavigate('search')} /><div className="product-grid">{sponsoredListings.map((listing) => <ProductCard key={`sponsored-${listing.id}`} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div></section>}
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
         {marketListings.length ? <><div className="product-grid">{marketListings.slice(0, 50).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
