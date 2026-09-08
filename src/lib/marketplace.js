@@ -89,7 +89,7 @@ export async function signIn({ email, password }) {
 
 function getAuthRedirectUrl() {
   if (typeof window !== 'undefined' && window.location.origin) return window.location.origin;
-  return 'https://bese26.shop';
+  return 'https://www.bese26.shop';
 }
 
 export async function requestPasswordReset(email) {
@@ -602,7 +602,10 @@ export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const { data: business, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at').eq('business_handle', normalized).eq('is_active', true).maybeSingle();
+  const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
+  const legacyBusinessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
+  let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle();
+  if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle());
   if (businessError) throw businessError;
   if (!business) return null;
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
