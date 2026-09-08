@@ -2400,3 +2400,21 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 @media (prefers-reduced-motion: reduce) {
   .brand-loader-orbit, .brand-loader-ring { animation: none; }
 }
+
+/* Business analytics: clear real totals with a calm, mobile-friendly hierarchy. */
+.business-analytics-panel { margin-top: 1.25rem; padding: 1.35rem; border: 1px solid var(--line, #e7e4df); border-radius: 1.35rem; background: linear-gradient(145deg, #fff 0%, #fbf8f5 100%); box-shadow: 0 18px 44px rgba(31, 25, 24, .07); }
+.business-analytics-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.business-analytics-heading h2 { margin: .25rem 0 .3rem; font-size: clamp(1.15rem, 2vw, 1.55rem); }
+.business-analytics-heading p { margin: 0; color: var(--muted, #756e69); font-size: .9rem; }
+.business-analytics-heading > svg { color: var(--red, #b84b4b); flex: 0 0 auto; }
+.business-analytics-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; margin-top: 1.15rem; }
+.business-analytics-grid > div { min-width: 0; padding: .95rem; border-radius: 1rem; background: #fff; border: 1px solid rgba(184, 75, 75, .13); display: grid; gap: .3rem; }
+.business-analytics-grid svg { color: var(--red, #b84b4b); }
+.business-analytics-grid strong { font-size: 1.45rem; color: var(--ink, #171719); }
+.business-analytics-grid span { color: var(--muted, #756e69); font-size: .78rem; line-height: 1.25; }
+.business-analytics-summary { margin-top: 1rem; padding: .9rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-radius: 1rem; background: #171719; color: #fff; }
+.business-analytics-summary div { display: grid; gap: .2rem; }
+.business-analytics-summary strong { font-size: .95rem; }
+.business-analytics-summary span { color: rgba(255,255,255,.7); font-size: .8rem; }
+.business-analytics-summary .secondary-button { background: #fff; color: #171719; border-color: #fff; white-space: nowrap; }
+@media (max-width: 680px) { .business-analytics-panel { padding: 1rem; border-radius: 1.1rem; } .business-analytics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .business-analytics-summary { align-items: flex-start; flex-direction: column; } .business-analytics-summary .secondary-button { width: 100%; justify-content: center; } }
