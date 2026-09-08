@@ -141,3 +141,43 @@
   .public-business-hero::after { animation: publicGlow 7s ease-in-out infinite alternate; }
   @keyframes publicGlow { from { opacity: .42; transform: translate3d(0,0,0) scale(.96); } to { opacity: .78; transform: translate3d(-10px,8px,0) scale(1.04); } }
 }
+
+/* Brand alignment and tasteful micro-motion. */
+.public-business-topbar { width: 100%; max-width: none; padding-left: 22px; padding-right: 22px; }
+.public-brand { gap: 7px; justify-content: flex-start; }
+.public-brand-logo { flex: none; transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease; }
+.public-brand:hover .public-brand-logo { transform: rotate(-4deg) scale(1.06); box-shadow: 0 9px 20px rgba(229,57,53,.28); }
+.public-brand strong { white-space: nowrap; }
+.public-business-nav { margin-left: 28px; }
+.public-business-nav a { position: relative; padding: 8px 0; }
+.public-business-nav a::after { content: ''; position: absolute; left: 0; right: 100%; bottom: 2px; height: 2px; background: #e53935; transition: right .22s ease; }
+.public-business-nav a:hover::after { right: 0; }
+.public-share-button { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.public-share-button:active, .public-business-actions a:active, .public-business-actions button:active { transform: scale(.96); }
+.public-business-listings .product-card { transition: transform .24s cubic-bezier(.23,1,.32,1), box-shadow .24s ease, border-color .24s ease; }
+.public-business-listings .product-card:hover { transform: translateY(-5px); border-color: #efb0ad; }
+.public-business-listings .product-image { transition: transform .45s cubic-bezier(.23,1,.32,1); }
+.public-business-listings .product-card:hover .product-image { transform: scale(1.045); }
+.public-business-listings .public-card-action svg { transition: transform .2s ease; }
+.public-business-listings .product-card:hover .public-card-action svg { transform: translateX(4px); }
+@media (max-width: 760px) {
+  .public-business-topbar { padding-left: 10px; padding-right: 12px; }
+  .public-business-nav { margin-left: auto; }
+  .public-business-nav a { display: none; }
+  .public-brand { gap: 6px; }
+  .public-brand-logo { width: 35px; height: 35px; border-radius: 10px; }
+  .public-brand strong { font-size: 17px; }
+  .public-share-button { margin-left: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .public-brand { animation: brandSlideIn .42s cubic-bezier(.23,1,.32,1) both; }
+  .public-share-button { animation: shareFadeIn .42s .08s ease both; }
+  .public-business-listings .product-card:nth-child(1) { animation: cardLiftIn .42s .08s both; }
+  .public-business-listings .product-card:nth-child(2) { animation: cardLiftIn .42s .13s both; }
+  .public-business-listings .product-card:nth-child(3) { animation: cardLiftIn .42s .18s both; }
+  .public-business-listings .product-card:nth-child(4) { animation: cardLiftIn .42s .23s both; }
+  .public-business-listings .product-card:nth-child(5) { animation: cardLiftIn .42s .28s both; }
+  @keyframes brandSlideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes shareFadeIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes cardLiftIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+}
