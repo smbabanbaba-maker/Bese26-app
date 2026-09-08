@@ -34,6 +34,12 @@ export default async function handler(req, res) {
     });
     return sendJson(res, 200, { authorization_url: data.authorization_url, access_code: data.access_code, reference, mode });
   } catch (error) {
+    console.error('[paystack.initialize]', {
+      message: error.message || 'unknown error',
+      providerStatusCode: error.providerStatusCode || null,
+      providerStatus: error.providerStatus ?? null,
+      mode: String(body?.mode || 'subscription').toLowerCase(),
+    });
     return sendJson(res, error.message?.includes('session') || error.message?.includes('Sign in') ? 401 : 400, { error: error.message || 'Could not start Paystack checkout.', reference });
   }
 }
