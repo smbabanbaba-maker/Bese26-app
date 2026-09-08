@@ -2419,3 +2419,33 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .business-analytics-summary span { color: rgba(255,255,255,.7); font-size: .8rem; }
 .business-analytics-summary .secondary-button { background: #fff; color: #171719; border-color: #fff; white-space: nowrap; }
 @media (max-width: 680px) { .business-analytics-panel { padding: 1rem; border-radius: 1.1rem; } .business-analytics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .business-analytics-summary { align-items: flex-start; flex-direction: column; } .business-analytics-summary .secondary-button { width: 100%; justify-content: center; } }
+
+
+/* Miniweb signature layer: cover, welcome, trust, and featured product polish. */
+.miniweb-cover-banner { position: relative; min-height: 210px; overflow: hidden; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 18px; padding: 28px; border-radius: 24px; background: linear-gradient(120deg, #17181b, #342124); background-size: cover; background-position: center; color: white; box-shadow: 0 18px 38px rgba(25,20,20,.18); }
+.miniweb-cover-banner::after { content: ''; position: absolute; inset: auto -8% -55% 42%; width: 360px; height: 230px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; transform: rotate(-18deg); animation: miniwebOrbit 10s ease-in-out infinite; }
+.miniweb-cover-copy, .miniweb-cover-mark { position: relative; z-index: 1; }
+.miniweb-cover-copy { max-width: 720px; }
+.miniweb-cover-copy .eyebrow { color: #eab6a9; }
+.miniweb-cover-copy h2 { max-width: 680px; margin: 9px 0 16px; color: #fff; font: 800 clamp(24px, 4vw, 42px)/1.05 Manrope, sans-serif; letter-spacing: -.04em; }
+.miniweb-cover-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.miniweb-cover-pills span, .miniweb-trust-strip span { display: inline-flex; align-items: center; gap: 6px; }
+.miniweb-cover-pills span { padding: 7px 10px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(255,255,255,.08); color: #f8e8e4; font-size: 12px; }
+.miniweb-cover-mark { display: grid; place-items: center; width: 94px; height: 94px; flex: 0 0 auto; border: 1px solid rgba(255,255,255,.18); border-radius: 24px; background: rgba(255,255,255,.1); backdrop-filter: blur(10px); animation: miniwebFloat 4.5s ease-in-out infinite; }
+.miniweb-cover-mark span { color: #f5c1b5; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.miniweb-welcome-card { display: flex; align-items: flex-start; gap: 13px; margin: 20px 0 12px; padding: 18px 20px; border: 1px solid #eadfdb; border-radius: 18px; background: linear-gradient(135deg, #fff, #fff8f6); box-shadow: 0 10px 24px rgba(43,25,22,.045); }
+.miniweb-welcome-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border-radius: 12px; background: #f3d7d0; color: #8e3c32; }
+.miniweb-welcome-card p { margin: 7px 0 0; color: #5f5551; font-size: 14px; line-height: 1.6; }
+.miniweb-trust-strip { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+.miniweb-trust-strip span { padding: 9px 11px; border: 1px solid #eadfdb; border-radius: 999px; background: #fff; color: #6d5d58; font-size: 11px; font-weight: 700; }
+.miniweb-trust-strip span svg { color: #a7382c; }
+.miniweb-category-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: -5px 0 17px; }
+.miniweb-category-chips span { padding: 7px 11px; border: 1px solid #eadfdb; border-radius: 999px; background: #fff; color: #806b65; font-size: 11px; font-weight: 700; }
+.miniweb-category-chips span:first-child { border-color: #b84b4b; background: #b84b4b; color: white; }
+.miniweb-product-card { position: relative; transition: transform .24s ease, box-shadow .24s ease; }
+.miniweb-product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(43,25,22,.1); }
+.miniweb-featured-badge { position: absolute; z-index: 2; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 999px; background: rgba(24,20,21,.84); color: #fff; font-size: 10px; font-weight: 800; }
+@keyframes miniwebOrbit { 0%,100% { transform: translate3d(0,0,0) rotate(-18deg); } 50% { transform: translate3d(-14px,-10px,0) rotate(-12deg); } }
+@keyframes miniwebFloat { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(2deg); } }
+@media (max-width: 640px) { .miniweb-cover-banner { min-height: 300px; align-items: flex-end; padding: 21px; border-radius: 20px; } .miniweb-cover-mark { position: absolute; top: 18px; right: 18px; width: 70px; height: 70px; } .miniweb-cover-copy h2 { font-size: 28px; } .miniweb-trust-strip span { flex: 1 1 calc(50% - 8px); justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .miniweb-cover-banner::after, .miniweb-cover-mark { animation: none; } .miniweb-product-card { transition: none; } }
