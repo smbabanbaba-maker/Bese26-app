@@ -274,3 +274,41 @@
   .public-business-listings .product-card, .public-business-listings .product-image, .public-business-listings .product-price { transition: none; }
   .public-business-listings .product-card::after, .public-business-listings .product-image-wrap::after { animation: none !important; }
 }
+
+/* About this store panel. */
+.public-business-about {
+  margin-top: 16px;
+  padding: 22px 24px;
+  border: 1px solid #e4e6ea;
+  border-radius: 20px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 12px 28px rgba(25,30,42,.045);
+}
+.public-about-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.public-about-heading > svg { color: #d93632; }
+.public-about-heading h2 { margin-top: 4px; font-size: 22px; letter-spacing: -.6px; }
+.public-about-description { max-width: 760px; margin: 13px 0 17px; color: #686e77; font-size: 13px; line-height: 1.6; }
+.public-about-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.public-about-item { display: flex; align-items: flex-start; gap: 9px; min-width: 0; padding: 12px; border: 1px solid #eceef1; border-radius: 13px; background: #fafbfc; color: #707680; font-size: 11px; line-height: 1.45; }
+.public-about-item > svg { flex: none; margin-top: 1px; color: #d93632; }
+.public-about-item span { min-width: 0; }
+.public-about-item b { display: block; margin-bottom: 3px; color: #282c32; font-size: 11px; }
+.public-about-item em { display: block; color: #707680; font-style: normal; }
+.public-about-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; color: #c92e2b; font-size: 12px; font-weight: 800; text-decoration: none; }
+.public-about-link:hover { color: #8f211f; }
+@media (max-width: 900px) { .public-about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .public-business-about { margin-top: 12px; padding: 18px 16px; border-radius: 17px; }
+  .public-about-heading h2 { font-size: 20px; }
+  .public-about-description { margin: 10px 0 14px; font-size: 12px; }
+  .public-about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .public-about-item { padding: 10px 9px; font-size: 10px; }
+  .public-about-item b { font-size: 10px; }
+}
+@media (max-width: 390px) { .public-about-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) {
+  .public-business-about { animation: aboutRiseIn .4s .06s cubic-bezier(.23,1,.32,1) both; }
+  .public-about-item { transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+  .public-about-item:hover { transform: translateY(-2px); border-color: #efc2bf; background: #fffafa; }
+  @keyframes aboutRiseIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+}
