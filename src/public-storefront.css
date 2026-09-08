@@ -103,3 +103,41 @@
   @keyframes publicHeroIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes publicRiseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 }
+
+/* Final compact storefront polish. */
+.public-business-main { padding-top: 24px; }
+.public-business-hero { grid-template-columns: 124px minmax(0, 1fr); gap: 24px; min-height: 252px; padding: 28px 32px; border-radius: 22px; }
+.public-business-hero::after { width: 300px; height: 300px; right: -105px; top: -145px; opacity: .7; }
+.public-business-logo { width: 124px; height: 124px; border-width: 5px; border-radius: 24px; }
+.public-business-identity h1 { font-size: clamp(32px, 5vw, 52px); letter-spacing: -1.8px; }
+.public-business-identity p { margin: 12px 0 9px; font-size: 13px; line-height: 1.45; }
+.public-business-actions { margin-top: 16px; }
+.public-business-actions .primary-button, .public-business-actions .secondary-button { min-height: 38px; padding: 0 14px; font-size: 11px; }
+.public-business-listings { margin-top: 30px; }
+@media (max-width: 760px) {
+  .public-business-main { padding: 16px 14px 46px; }
+  .public-business-hero { grid-template-columns: 76px minmax(0, 1fr); gap: 15px; min-height: 0; padding: 20px 17px 18px; border-radius: 19px; }
+  .public-business-hero::after { width: 210px; height: 210px; right: -100px; top: -115px; }
+  .public-business-logo { width: 76px; height: 76px; border-width: 4px; border-radius: 18px; }
+  .public-business-identity h1 { font-size: clamp(29px, 9vw, 42px); letter-spacing: -1.4px; }
+  .public-business-identity .eyebrow { margin-bottom: 6px; font-size: 8px; }
+  .public-business-handle { margin-top: 7px; font-size: 13px; }
+  .public-business-identity p { grid-column: 1 / -1; margin: 14px 0 6px; font-size: 12px; }
+  .public-business-location { grid-column: 1 / -1; font-size: 11px; }
+  .public-business-actions { grid-column: 1 / -1; display: flex; gap: 7px; margin-top: 12px; }
+  .public-business-actions .primary-button, .public-business-actions .secondary-button { flex: 1; min-height: 36px; padding: 0 8px; font-size: 10px; }
+  .public-business-listings { margin-top: 23px; }
+  .public-business-listings .section-heading { padding-bottom: 12px; }
+  .public-business-listings .section-heading h2 { font-size: 22px; }
+}
+@media (max-width: 390px) {
+  .public-business-hero { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 17px 14px 15px; }
+  .public-business-logo { width: 64px; height: 64px; border-radius: 15px; }
+  .public-business-identity h1 { font-size: 28px; }
+  .public-business-actions .primary-button, .public-business-actions .secondary-button { font-size: 9px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .public-business-hero { animation: publicHeroIn .32s cubic-bezier(.23,1,.32,1) both; }
+  .public-business-hero::after { animation: publicGlow 7s ease-in-out infinite alternate; }
+  @keyframes publicGlow { from { opacity: .42; transform: translate3d(0,0,0) scale(.96); } to { opacity: .78; transform: translate3d(-10px,8px,0) scale(1.04); } }
+}
