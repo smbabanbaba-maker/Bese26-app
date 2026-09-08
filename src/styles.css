@@ -2449,3 +2449,21 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 @keyframes miniwebFloat { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(2deg); } }
 @media (max-width: 640px) { .miniweb-cover-banner { min-height: 300px; align-items: flex-end; padding: 21px; border-radius: 20px; } .miniweb-cover-mark { position: absolute; top: 18px; right: 18px; width: 70px; height: 70px; } .miniweb-cover-copy h2 { font-size: 28px; } .miniweb-trust-strip span { flex: 1 1 calc(50% - 8px); justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .miniweb-cover-banner::after, .miniweb-cover-mark { animation: none; } .miniweb-product-card { transition: none; } }
+
+.business-admin-tools { margin-top: 1rem; padding: 1.2rem; border: 1px solid rgba(184,75,75,.16); border-radius: 1.2rem; background: linear-gradient(135deg, #fff, #fff8f7); }
+.business-admin-tools-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+.business-admin-tools-heading h2 { margin:.25rem 0 .3rem; }
+.business-admin-tools-heading p { margin:0; color:var(--muted,#756e69); font-size:.86rem; }
+.business-admin-tools-heading > svg { color:var(--red,#b84b4b); }
+.business-admin-tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+.business-admin-tool-grid button { display:flex; align-items:flex-start; gap:.65rem; text-align:left; padding:.85rem; border:1px solid rgba(184,75,75,.14); border-radius:.9rem; background:#fff; color:var(--ink,#171719); cursor:pointer; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.business-admin-tool-grid button:hover, .business-admin-tool-grid button.active { transform:translateY(-2px); border-color:var(--red,#b84b4b); box-shadow:0 8px 20px rgba(184,75,75,.1); }
+.business-admin-tool-grid button > svg { flex:0 0 auto; color:var(--red,#b84b4b); margin-top:.1rem; }
+.business-admin-tool-grid span { display:grid; gap:.2rem; }
+.business-admin-tool-grid strong { font-size:.86rem; }
+.business-admin-tool-grid small { color:var(--muted,#756e69); font-size:.74rem; line-height:1.3; }
+.business-admin-inline-note { display:flex; align-items:flex-start; gap:.65rem; margin-top:1rem; padding:.85rem 1rem; border-radius:.85rem; background:#171719; color:#fff; }
+.business-admin-inline-note > svg { color:#f08b82; flex:0 0 auto; }
+.business-admin-inline-note span { display:grid; gap:.25rem; }
+.business-admin-inline-note small { color:rgba(255,255,255,.72); line-height:1.4; }
+@media (max-width:680px) { .business-admin-tools { padding:1rem; } .business-admin-tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .business-admin-tool-grid button { padding:.75rem; } }
