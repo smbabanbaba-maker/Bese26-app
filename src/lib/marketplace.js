@@ -437,6 +437,12 @@ export async function adminSetUserAccess(id, suspended, reason = null) {
   return data;
 }
 
+export async function adminDeleteUser(id, reason) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_delete_user', { p_user_id: id, p_reason: reason });
+  if (error) throw error;
+  return data;
+}
 export async function adminSetBusinessVisibility(id, isActive) {
   failIfUnavailable();
   const { data, error } = await supabase.rpc('admin_set_business_visibility', { p_profile_id: id, p_is_active: isActive });
