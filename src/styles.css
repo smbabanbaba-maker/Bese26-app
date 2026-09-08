@@ -2473,3 +2473,11 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .profile-signin-prompt span { color:var(--muted); font-size:9px; line-height:1.45; }
 .profile-signin-prompt .primary-button { flex:none; min-height:38px; }
 @media (max-width:640px) { .profile-signin-prompt { align-items:stretch; flex-direction:column; } .profile-signin-prompt .primary-button { width:100%; } }
+
+/* Every carousel slide uses the same footprint as the welcome dashboard. */
+.home-ad-banner { min-height: 205px; }
+.home-ad-banner:not(.dashboard-welcome-card) { padding-top: 25px; padding-bottom: 62px; }
+@media (max-width: 700px) {
+  .home-ad-banner { min-height: 250px; }
+  .home-ad-banner:not(.dashboard-welcome-card) { padding: 21px 18px 67px; border-radius: 17px; }
+}
