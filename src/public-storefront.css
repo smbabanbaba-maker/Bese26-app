@@ -312,3 +312,36 @@
   .public-about-item:hover { transform: translateY(-2px); border-color: #efc2bf; background: #fffafa; }
   @keyframes aboutRiseIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 }
+
+/* Device-adaptive final layout: two cards on phones, compact information blocks. */
+.storefront-listings-clean .product-grid,
+.public-business-listings .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.storefront-listings-clean .public-listing-card .product-image-wrap,
+.public-business-listings .product-image-wrap { aspect-ratio: 1.18 / 1; height: auto; }
+.public-business-about { margin-bottom: 26px; }
+.public-about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.public-about-hours { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .public-business-main { padding-left: clamp(10px, 3.2vw, 16px); padding-right: clamp(10px, 3.2vw, 16px); }
+  .public-business-hero.storefront-hero-clean { padding: clamp(14px, 4vw, 18px); }
+  .public-business-about { margin-top: 10px; margin-bottom: 18px; padding: 12px; }
+  .public-about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .public-about-hours { grid-column: 1 / -1; }
+  .storefront-listings-clean .product-grid,
+  .public-business-listings .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2.7vw, 12px); }
+  .storefront-listings-clean .public-listing-card .product-image-wrap,
+  .public-business-listings .product-image-wrap { aspect-ratio: 1.08 / 1; }
+  .storefront-listings-clean .public-listing-card .product-info { padding: clamp(8px, 2.5vw, 11px); }
+  .storefront-listings-clean .public-listing-card .product-price { font-size: clamp(12px, 3.8vw, 15px); }
+  .storefront-listings-clean .public-listing-card .product-info h3 { font-size: clamp(10px, 3.1vw, 12px); }
+}
+@media (max-width: 350px) {
+  .public-business-main { padding-left: 8px; padding-right: 8px; }
+  .storefront-listings-clean .product-grid,
+  .public-business-listings .product-grid { gap: 7px; }
+  .public-about-grid { gap: 5px; }
+  .public-about-item { padding: 7px 6px; gap: 5px; font-size: 9px; }
+  .public-about-item b { font-size: 9px; }
+  .storefront-listings-clean .public-listing-card .product-info { padding: 7px; }
+  .storefront-listings-clean .public-card-action { font-size: 9px; }
+}
