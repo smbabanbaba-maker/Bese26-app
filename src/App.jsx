@@ -292,6 +292,12 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
         </div>
       </section>}
 
+      <section className="public-trust-section" aria-label="About Bese26">
+        <div className="public-trust-copy"><div className="eyebrow">ABOUT BESE26</div><h2>A trusted Nigerian marketplace for everyday trade.</h2><p>Bese26 connects buyers and sellers for personal and business transactions. Discover products, chat with sellers, and make informed decisions through a secure digital marketplace.</p></div>
+        <div className="public-trust-grid"><article id="how-it-works"><strong>How it works</strong><span>Browse approved listings, open the details, and message a seller before you meet.</span></article><article id="safety"><strong>Marketplace safety</strong><span>Use verified profiles, keep conversations on Bese26, and report suspicious listings.</span></article><article id="refunds"><strong>Refunds & support</strong><span>For payment or marketplace concerns, contact our support team for help.</span></article></div>
+      </section>
+      <section className="public-policy-section" aria-label="Bese26 policies"><div id="terms"><strong>Terms of Service</strong><span>Use Bese26 lawfully, provide accurate information, and respect other marketplace members.</span></div><div id="privacy"><strong>Privacy</strong><span>We use account and listing information to provide marketplace, messaging, safety, and support features.</span></div><div id="refund-policy"><strong>Refund policy</strong><span>Payment concerns are reviewed case by case. Contact <a href="mailto:info@bese26.shop">info@bese26.shop</a> with your reference and details.</span></div></section>
+
     </div>
   );
 }
@@ -742,6 +748,7 @@ function AppContent() {
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
     <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<BrandLoader message="Loading page…" compact />}>{renderView()}</Suspense></AppErrorBoundary></main>
+    <footer className="site-footer"><div><strong>Bese26<span>.shop</span></strong><p>Nigerian online marketplace for personal and business transactions.</p></div><nav aria-label="Public information"><a href="/#terms">Terms</a><a href="/#privacy">Privacy</a><a href="/#refund-policy">Refunds</a><a href="/#safety">Safety</a><a href="mailto:info@bese26.shop">info@bese26.shop</a></nav></footer>
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{label}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}

@@ -2540,3 +2540,21 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
   .listing-details-premium .listing-detail-body > .listing-price-row,
   .listing-details-premium .listing-detail-meta { background:transparent; }
 }
+
+/* Public trust and compliance content: white surfaces, black hierarchy, Bese26 red accents. */
+.public-trust-section { display:grid; gap:22px; margin-top:30px; padding:24px; border:1px solid #eadfdd; border-radius:22px; background:linear-gradient(135deg,#fff8f7,#fff); }
+.public-trust-copy { max-width:680px; }
+.public-trust-copy h2 { margin:6px 0 9px; color:#141518; font-size:clamp(25px,4vw,40px); line-height:1.05; letter-spacing:-.04em; }
+.public-trust-copy p { max-width:650px; margin:0; color:#64666c; font-size:14px; line-height:1.65; }
+.public-trust-grid, .public-policy-section { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.public-trust-grid article, .public-policy-section > div { display:flex; flex-direction:column; gap:7px; padding:15px; border:1px solid #eee8e6; border-radius:15px; background:#fff; }
+.public-trust-grid strong, .public-policy-section strong { color:#17181b; font-size:13px; }
+.public-trust-grid span, .public-policy-section span { color:#73757a; font-size:11px; line-height:1.55; }
+.public-policy-section { margin-top:12px; }
+.public-policy-section a, .site-footer a { color:#c8202b; font-weight:700; text-decoration:none; }
+.site-footer { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; max-width:1120px; margin:30px auto 104px; padding:24px 20px 28px; border-top:1px solid #e7e7e9; color:#686a70; }
+.site-footer strong { color:#16171a; font-size:18px; letter-spacing:-.03em; }
+.site-footer strong span { color:#d71920; }
+.site-footer p { max-width:330px; margin:7px 0 0; font-size:11px; line-height:1.5; }
+.site-footer nav { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px 16px; font-size:11px; }
+@media (max-width:700px) { .public-trust-section { padding:18px; } .public-trust-grid, .public-policy-section { grid-template-columns:1fr; } .site-footer { display:grid; margin-bottom:95px; padding-inline:16px; } .site-footer nav { justify-content:flex-start; } }
