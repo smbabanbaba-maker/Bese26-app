@@ -2558,3 +2558,16 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .site-footer p { max-width:330px; margin:7px 0 0; font-size:11px; line-height:1.5; }
 .site-footer nav { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px 16px; font-size:11px; }
 @media (max-width:700px) { .public-trust-section { padding:18px; } .public-trust-grid, .public-policy-section { grid-template-columns:1fr; } .site-footer { display:grid; margin-bottom:95px; padding-inline:16px; } .site-footer nav { justify-content:flex-start; } }
+
+/* Smart sell form: compact category-first flow with red, black, and white hierarchy. */
+.sell-category-picker { display:flex; gap:8px; overflow-x:auto; padding:2px 1px 9px; margin:0 0 15px; scrollbar-width:thin; }
+.sell-category-picker button { display:inline-flex; align-items:center; gap:7px; flex:none; padding:9px 11px; border:1px solid var(--line); border-radius:11px; background:var(--card); color:var(--muted); font-size:10px; font-weight:800; white-space:nowrap; transition:.18s ease; }
+.sell-category-picker button span { display:grid; place-items:center; width:22px; height:22px; border-radius:7px; background:var(--soft); color:var(--red); font-size:12px; }
+.sell-category-picker button:hover { border-color:#efaaa6; color:var(--ink); transform:translateY(-1px); }
+.sell-category-picker button.selected { border-color:var(--red); background:#fff5f4; color:#9d2422; box-shadow:0 5px 15px rgba(229,57,53,.12); }
+.sell-category-picker button.selected span { background:#ffe1de; }
+.sell-category-select-field { display:none; }
+.sell-work-card .sell-form-grid { gap:12px; }
+.sell-work-card .sell-form-grid .sell-field > span { color:#24262b; font-size:10px; font-weight:800; }
+.sell-work-card .sell-form-grid textarea { min-height:105px; }
+@media (max-width:640px) { .sell-category-picker { margin-inline:-2px; padding-inline:2px; } .sell-category-picker button { padding:8px 10px; } }
