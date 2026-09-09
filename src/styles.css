@@ -2611,3 +2611,11 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .clean-sell-page .sell-form-grid .sell-field select { min-height:44px; }
 .sell-category-picker { display:none !important; }
 @media (min-width:641px) { .clean-sell-page .sell-form-grid { max-width:720px; } }
+
+/* Compact seller plan cards with animated benefits drawer. */
+.subscription-plan-card .subscription-features { max-height:0; opacity:0; overflow:hidden; transform:translateY(-7px); padding-top:0; border-top-color:transparent; transition:max-height .34s ease, opacity .24s ease, transform .34s ease, padding-top .34s ease, border-color .24s ease; }
+.subscription-plan-card .subscription-features.is-expanded { max-height:520px; opacity:1; transform:translateY(0); padding-top:9px; border-top-color:rgba(125,95,90,.14); }
+.subscription-plan-card .subscription-more-button { width:100%; margin-top:8px; padding:8px 2px 2px; border:0; background:transparent; }
+.subscription-plan-card .subscription-more-button span { font-size:10px; font-weight:800; letter-spacing:.1px; }
+.subscription-plan-card .subscription-more-button:hover { color:var(--red); }
+.subscription-plan-card .subscription-more-button svg { transition:transform .3s ease; }
