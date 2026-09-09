@@ -2792,3 +2792,31 @@ input:focus, textarea:focus, select:focus { border-color: #9fc2e8; box-shadow: 0
 .business-mode-card.business { border-top-color: var(--blue); }
 .business-mode-card.business svg, .business-upgrade-progress button.active, .business-upgrade-progress button.complete { color: var(--blue); }
 .business-upgrade-progress button.active b, .business-upgrade-progress button.complete b { background: var(--blue); border-color: var(--blue); }
+
+
+/* Low-red refinement: use red only for the Bese26 mark and critical status; blue leads the interface. */
+.product-price, .modal-price, .wallet-balance { color: var(--blue); }
+.bottom-nav button:nth-child(1).active { color: var(--blue); }
+.results-count, .count-bubble, .unread-pill { border-color: var(--blue-line); }
+.product-foot .seller-stats, .seller-stats { color: var(--blue); }
+.notification-row.unread .notification-icon { color: var(--blue); background: var(--blue-soft); }
+.category-tile:nth-child(1) .category-icon { color: var(--blue); background: var(--blue-soft); }
+.business-verified-icon { color: var(--blue); }
+.business-setup-mark { background: var(--blue); color: #fff; }
+.business-logo-upload span { background: transparent; color: var(--blue); }
+.sell-step-icon.coral { color: var(--blue); background: var(--blue-soft); }
+.sell-error { color: #245d99; background: #f0f6ff; border-color: var(--blue-line); }
+
+/* Public storefront: blue carries links, prices, underlines and hover states. */
+.public-brand strong span, .public-business-footer strong span { color: #2f6fbb; }
+.public-business-nav a:hover { color: #2f6fbb; }
+.public-business-nav a::after { background: #2f6fbb; }
+.public-share-button:hover { border-color: #9fc2e8; color: #245d99; }
+.public-business-listings .public-card-action,
+.public-business-listings .product-price,
+.public-about-heading > svg,
+.public-about-item > svg,
+.public-about-link { color: #2f6fbb; }
+.public-business-listings .product-card:hover { border-color: #c9dcf3; }
+.public-business-listings .product-card:hover .product-price { color: #245d99; }
+.public-about-item:hover { border-color: #c9dcf3; background: #f7fbff; }
