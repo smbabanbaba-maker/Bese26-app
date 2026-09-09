@@ -2588,3 +2588,18 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .sell-business-preview strong { color:#24262b; font-size:11px; }
 .sell-business-preview span { text-align:right; }
 @media (max-width:640px) { .sell-publish-identity-switch { grid-template-columns:1fr; } .sell-business-preview { align-items:flex-start; flex-direction:column; } .sell-business-preview span { text-align:left; } }
+
+/* Clean vertical Sell flow: one calm page, no Continue wizard. */
+.clean-sell-page { max-width:880px; margin-inline:auto; gap:18px; }
+.clean-sell-sections { display:flex; flex-direction:column; gap:18px; }
+.clean-sell-sections .sell-work-card { margin:0; box-shadow:0 8px 24px rgba(17,18,20,.045); }
+.clean-sell-sections .sell-work-heading { margin-bottom:17px; }
+.clean-sell-sections .sell-work-heading h2 { font-size:20px; }
+.clean-sell-sections .sell-work-heading p { max-width:560px; }
+.clean-sell-page .sell-mobile-header { position:sticky; top:0; z-index:5; margin:0 -4px; padding:9px 4px 13px; background:linear-gradient(#f8f9fa 78%,transparent); }
+.clean-sell-page .sell-form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.clean-sell-page .sell-form-grid .wide { grid-column:1 / -1; }
+.clean-sell-page .sell-category-guide { margin-bottom:14px; }
+.clean-sell-page .sell-upload-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.clean-sell-page .publish-step-card { border-color:#f0d1cd; }
+@media (max-width:640px) { .clean-sell-page { gap:12px; } .clean-sell-page .sell-form-grid { grid-template-columns:1fr; } .clean-sell-page .sell-form-grid .wide { grid-column:auto; } .clean-sell-page .sell-upload-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .clean-sell-page .sell-upload-tile { min-height:108px; } }
