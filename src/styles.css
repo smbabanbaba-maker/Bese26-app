@@ -2622,3 +2622,14 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 
 .site-footer nav a { display:inline-flex; align-items:center; min-height:28px; transition:color .2s ease, transform .2s ease; }
 .site-footer nav a:hover, .site-footer nav a:focus-visible { color:#a91520; transform:translateY(-1px); text-decoration:underline; text-underline-offset:3px; }
+
+/* Business Center view-first experience: details stay quiet until Edit is requested. */
+.business-edit-summary { display:grid; gap:18px; padding:20px; margin-top:16px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#fff,#fff8f7); box-shadow:0 12px 30px rgba(22,23,26,.05); }
+.business-edit-summary h2 { margin:4px 0 6px; font-size:20px; }
+.business-edit-summary p { max-width:620px; margin:0; color:var(--muted); font-size:12px; line-height:1.55; }
+.business-edit-summary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.business-edit-summary-grid span { display:grid; gap:4px; padding:12px; border:1px solid #eee3e1; border-radius:12px; background:#fff; }
+.business-edit-summary-grid small { color:var(--muted); font-size:9px; }
+.business-edit-summary-grid strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.business-edit-button { width:max-content; }
+@media (max-width:700px) { .business-edit-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .business-edit-button { width:100%; justify-content:center; } }
