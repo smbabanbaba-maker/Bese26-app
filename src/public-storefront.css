@@ -388,3 +388,9 @@
 .public-business-identity .eyebrow { color: #a8caef; }
 .public-card-action { color: #2f6fbb; }
 .public-business-stats > div:hover { border-color: #c9dcf3; box-shadow: 0 10px 26px rgba(47,111,187,.10); }
+
+
+/* Final low-red guard: storefront stylesheet is loaded after the app stylesheet. */
+.product-price, .public-card-action, .public-about-heading > svg, .public-about-item > svg, .public-about-link { color: #2f6fbb !important; }
+.public-business-listings .product-card:hover .product-price { color: #245d99 !important; }
+.public-business-nav a::after { background: #2f6fbb !important; }
