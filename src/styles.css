@@ -2657,3 +2657,65 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .meeting-status-card > div:last-child { display:flex; flex-wrap:wrap; gap:6px; }
 .meeting-status-card button { border:1px solid var(--line); border-radius:7px; background:#fff; color:var(--ink); padding:6px 8px; font-size:10px; font-weight:800; }
 @media (max-width:640px) { .chat-quick-actions { overflow-x:auto; flex-wrap:nowrap; padding-bottom:2px; } .chat-quick-actions button { flex:none; } .meeting-status-card { align-items:flex-start; flex-direction:column; } }
+/* Responsive public storefront: compact hero/about and predictable listing cards. */
+.public-business-main { max-width: 920px; padding: 28px 20px 60px; }
+.public-business-topbar { height: 58px; max-width: 920px; padding: 0 20px; }
+.public-business-topbar .public-business-nav { display:flex; align-items:center; gap:16px; margin-left:auto; }
+.public-business-topbar .public-business-nav a { color:#656970; font-size:11px; font-weight:800; text-decoration:none; }
+.public-business-topbar .public-business-nav a:hover { color:#c8202b; }
+.public-business-topbar .public-share-button { min-height:34px; padding:7px 10px; font-size:10px; }
+.public-business-hero.storefront-hero-clean { grid-template-columns:88px minmax(0,1fr); gap:18px; padding:20px; border-radius:18px; }
+.public-business-hero.storefront-hero-clean .public-business-logo { width:88px; height:88px; border-radius:20px; font-size:34px; }
+.public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size:clamp(25px,4vw,38px); }
+.public-business-hero.storefront-hero-clean .public-business-identity p { margin:10px 0 8px; font-size:12px; line-height:1.45; }
+.public-business-hero.storefront-hero-clean .public-business-actions { margin-top:13px; }
+.public-business-hero.storefront-hero-clean .public-business-actions .primary-button,
+.public-business-hero.storefront-hero-clean .public-business-actions .secondary-button { min-height:34px; padding:7px 10px; font-size:10px; }
+.public-business-about { margin:16px 0 24px; padding:16px; border:1px solid #e7e8eb; border-radius:16px; background:#fff; box-shadow:0 8px 24px rgba(25,30,42,.045); }
+.public-about-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.public-about-heading h2 { margin:3px 0 0; font-size:18px; }
+.public-about-heading > svg { color:#c8202b; }
+.public-about-description { margin:8px 0 12px; color:#73757a; font-size:11px; line-height:1.45; }
+.public-about-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.public-about-item { display:flex; align-items:flex-start; gap:8px; min-width:0; padding:10px; border:1px solid #eef0f2; border-radius:11px; background:#fbfbfc; }
+.public-about-item > svg { flex:none; color:#c8202b; }
+.public-about-item span { display:grid; gap:3px; min-width:0; color:#73757a; font-size:10px; line-height:1.35; }
+.public-about-item b { color:#27292d; font-size:10px; }
+.public-about-item em { font-style:normal; }
+.public-about-hours { grid-column:1 / -1; }
+.public-about-link { display:inline-flex; align-items:center; gap:6px; margin-top:12px; color:#b51f29; font-size:11px; font-weight:800; text-decoration:none; }
+.storefront-listings-clean .section-heading { margin-bottom:12px; }
+.storefront-listings-clean .section-heading h2 { font-size:clamp(20px,3vw,28px); letter-spacing:-.035em; }
+.storefront-listings-clean .product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.storefront-listings-clean .public-listing-card { min-width:0; overflow:hidden; border-color:#e5d1cf; border-radius:16px; background:#fff; box-shadow:0 8px 22px rgba(43,25,22,.06); }
+.storefront-listings-clean .public-listing-card .product-image-wrap { height:auto; aspect-ratio:1.45 / 1; }
+.storefront-listings-clean .public-listing-card .product-info { padding:12px; }
+.storefront-listings-clean .public-listing-card .product-price { font-size:15px; }
+.storefront-listings-clean .public-listing-card .product-info h3 { display:-webkit-box; overflow:hidden; -webkit-line-clamp:2; -webkit-box-orient:vertical; min-height:2.45em; font-size:12px; line-height:1.25; }
+.storefront-listings-clean .public-listing-card .product-meta { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; }
+.storefront-listings-clean .public-listing-card .product-foot { font-size:9px; }
+.storefront-listings-clean .public-card-action { display:inline-flex; align-items:center; gap:5px; margin-top:9px; color:#b51f29; font-size:10px; font-weight:800; }
+@media (max-width:640px) {
+  .public-business-topbar { height:54px; padding:0 14px; }
+  .public-business-topbar .public-business-nav { display:none; }
+  .public-business-topbar .public-share-button { min-height:31px; padding:6px 8px; }
+  .public-business-main { padding:16px 12px 48px; }
+  .public-business-hero.storefront-hero-clean { grid-template-columns:64px minmax(0,1fr); gap:12px; padding:15px; border-radius:16px; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { width:64px; height:64px; border-radius:15px; font-size:25px; }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size:24px; line-height:1.05; }
+  .public-business-hero.storefront-hero-clean .public-business-handle { font-size:11px; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { margin:7px 0 6px; font-size:10px; }
+  .public-business-hero.storefront-hero-clean .public-business-actions { gap:6px; margin-top:9px; }
+  .public-business-hero.storefront-hero-clean .public-business-actions .primary-button,
+  .public-business-hero.storefront-hero-clean .public-business-actions .secondary-button { min-height:30px; padding:6px 8px; font-size:9px; }
+  .public-business-about { margin:12px 0 20px; padding:13px; border-radius:14px; }
+  .public-about-heading h2 { font-size:16px; }
+  .public-about-description { margin:6px 0 9px; font-size:10px; }
+  .public-about-grid { grid-template-columns:1fr; gap:6px; }
+  .public-about-item { padding:8px; }
+  .public-about-hours { grid-column:auto; }
+  .storefront-listings-clean .product-grid { grid-template-columns:1fr; gap:12px; }
+  .storefront-listings-clean .public-listing-card .product-image-wrap { aspect-ratio:1.55 / 1; }
+  .storefront-listings-clean .public-listing-card .product-info { padding:11px; }
+}
+@media (min-width:641px) and (max-width:900px) { .public-business-main, .public-business-topbar { max-width:760px; } }
