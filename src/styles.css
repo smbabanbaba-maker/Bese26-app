@@ -2619,3 +2619,6 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .subscription-plan-card .subscription-more-button span { font-size:10px; font-weight:800; letter-spacing:.1px; }
 .subscription-plan-card .subscription-more-button:hover { color:var(--red); }
 .subscription-plan-card .subscription-more-button svg { transition:transform .3s ease; }
+
+.site-footer nav a { display:inline-flex; align-items:center; min-height:28px; transition:color .2s ease, transform .2s ease; }
+.site-footer nav a:hover, .site-footer nav a:focus-visible { color:#a91520; transform:translateY(-1px); text-decoration:underline; text-underline-offset:3px; }
