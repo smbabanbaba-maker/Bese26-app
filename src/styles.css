@@ -2633,3 +2633,5 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .business-edit-summary-grid strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
 .business-edit-button { width:max-content; }
 @media (max-width:700px) { .business-edit-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .business-edit-button { width:100%; justify-content:center; } }
+
+@media (prefers-reduced-motion: reduce) { .subscription-plan-card .subscription-features, .subscription-plan-card .subscription-more-button svg { transition:none; } }
