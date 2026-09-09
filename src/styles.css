@@ -2603,3 +2603,11 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .clean-sell-page .sell-upload-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .clean-sell-page .publish-step-card { border-color:#f0d1cd; }
 @media (max-width:640px) { .clean-sell-page { gap:12px; } .clean-sell-page .sell-form-grid { grid-template-columns:1fr; } .clean-sell-page .sell-form-grid .wide { grid-column:auto; } .clean-sell-page .sell-upload-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .clean-sell-page .sell-upload-tile { min-height:108px; } }
+
+/* Final Sell direction: one vertical column and one native category dropdown. */
+.clean-sell-page .sell-form-grid { grid-template-columns:1fr; }
+.clean-sell-page .sell-form-grid .wide { grid-column:auto; }
+.clean-sell-page .sell-form-grid select, .clean-sell-page .sell-form-grid input, .clean-sell-page .sell-form-grid textarea { width:100%; }
+.clean-sell-page .sell-form-grid .sell-field select { min-height:44px; }
+.sell-category-picker { display:none !important; }
+@media (min-width:641px) { .clean-sell-page .sell-form-grid { max-width:720px; } }
