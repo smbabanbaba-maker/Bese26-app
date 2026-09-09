@@ -174,3 +174,40 @@ end;
 $$;
 revoke all on function public.redeem_free_boost_credit(uuid) from public, anon;
 grant execute on function public.redeem_free_boost_credit(uuid) to authenticated;
+
+
+-- Keep approved verification tied to the active paid plan period.
+create or replace function public.sync_verification_expiry_to_subscription()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, private
+as $$
+declare
+  v_expiry timestamptz := coalesce(new.current_period_end, now() + interval '1 month');
+begin
+  if new.status = 'active' and new.plan_key in ('premium', 'business') then
+    update public.profiles
+       set verification_expires_at = v_expiry
+     where id = new.profile_id and is_verified = true;
+    update public.business_profiles
+       set verification_expires_at = v_expiry
+     where profile_id = new.profile_id and is_verified = true;
+  else
+    update public.profiles
+       set verification_expires_at = least(coalesce(verification_expires_at, now()), now())
+     where id = new.profile_id and is_verified = true;
+    update public.business_profiles
+       set verification_expires_at = least(coalesce(verification_expires_at, now()), now())
+     where profile_id = new.profile_id and is_verified = true;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists sync_verification_expiry_on_subscription on public.seller_subscriptions;
+create trigger sync_verification_expiry_on_subscription
+after insert or update of plan_key, status, current_period_end on public.seller_subscriptions
+for each row execute procedure public.sync_verification_expiry_to_subscription();
+
+revoke all on function public.sync_verification_expiry_to_subscription() from public, anon, authenticated;

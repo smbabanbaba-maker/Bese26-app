@@ -23,6 +23,10 @@ function initials(value = 'bese26 user') {
   return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
 }
 
+function verificationIsCurrent(record = {}) {
+  return Boolean(record.is_verified && (!record.verification_expires_at || new Date(record.verification_expires_at).getTime() > Date.now()));
+}
+
 export function mapListing(row) {
   const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
   const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
@@ -53,7 +57,7 @@ export function mapListing(row) {
     sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
     sellerInitials: initials(business.business_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
-    verified: Boolean(seller.is_verified || business.is_verified),
+    verified: verificationIsCurrent(seller) || verificationIsCurrent(business),
     promoted: false,
     description: row.description || '',
     attributes: row.attributes || {},
@@ -531,13 +535,13 @@ export async function fetchSavedIds(userId) {
 // Keep reads compatible with the existing Supabase schema until the ownership
 // migration is applied. New ownership fields are hydrated automatically once
 // the migration is live.
-const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,display_name,avatar_path,is_verified,verification_expires_at,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 const listingSelectWithOwnership = `${listingSelect},business_profile_id,published_as_type`;
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
   const { data: businessProfiles, error: businessError } = businessIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
+    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
     : { data: [], error: null };
   if (businessError) throw businessError;
   const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
@@ -608,42 +612,42 @@ export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
+  const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,verification_expires_at,is_active,created_at';
   const legacyBusinessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
   let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle();
   if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle());
   if (businessError) throw businessError;
   if (!business) return null;
-  const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
+  const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
   let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
   const listings = await hydrateListingRows(rows || [], { firstMediaOnly: true });
-  return { business, ownerProfile, listings };
+  return { business: { ...business, is_verified: verificationIsCurrent(business) }, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
 }
 
 export async function fetchPublicProfile(username) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
   if (profileError) throw profileError;
   if (!profile) return null;
   let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
-  return { profile, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
+  return { profile: { ...profile, is_verified: verificationIsCurrent(profile) }, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
 }
 
 export async function fetchBusinessDirectory(search = '') {
   failIfUnavailable();
-  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,is_active,public_contact').eq('is_active', true).order('business_name').limit(60);
+  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,verification_expires_at,is_active,public_contact').eq('is_active', true).order('business_name').limit(60);
   const value = String(search || '').trim();
   if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+  return (data || []).map((business) => ({ ...business, is_verified: verificationIsCurrent(business) }));
 }
 
 export async function checkBusinessHandleAvailability(handle, userId = null) {
