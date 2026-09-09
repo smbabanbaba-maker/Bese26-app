@@ -376,3 +376,15 @@
 @media (prefers-reduced-motion: reduce) {
   .storefront-listings-clean .public-listing-card, .public-business-listings .public-listing-card { opacity: 1; animation: none; }
 }
+
+/* Balanced public storefront palette: navy structure with restrained Bese26 red accents. */
+.public-business-shell::before { background: radial-gradient(circle at 12% 0%, rgba(47,111,187,.12), transparent 35%), linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%); }
+.public-brand-logo { box-shadow: 0 7px 15px rgba(47,111,187,.18); }
+.public-brand strong span, .public-business-footer strong span { color: #c84b50; }
+.public-business-nav a:hover { color: #2f6fbb; }
+.public-share-button:hover { border-color: #9fc2e8; color: #245d99; }
+.public-business-hero { background: linear-gradient(125deg, #142b47 0%, #1d456f 56%, #63363f 100%); }
+.public-business-hero::after { background: radial-gradient(circle, rgba(47,111,187,.78) 0%, rgba(47,111,187,.18) 44%, transparent 70%); }
+.public-business-identity .eyebrow { color: #a8caef; }
+.public-card-action { color: #2f6fbb; }
+.public-business-stats > div:hover { border-color: #c9dcf3; box-shadow: 0 10px 26px rgba(47,111,187,.10); }
