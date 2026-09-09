@@ -1053,6 +1053,14 @@ export async function fetchSellerEntitlement() {
   return data?.[0] || { plan_key: 'free', subscription_status: 'inactive', is_paid: false, free_posts_limit: 3, free_posts_used: 0, free_posts_remaining: 3, listing_limit: 3, current_period_end: null };
 }
 
+export async function redeemFreeBoostCredit(listingId) {
+  failIfUnavailable();
+  if (!listingId) throw new Error('Choose a listing to boost.');
+  const { data, error } = await supabase.rpc('redeem_free_boost_credit', { p_listing_id: listingId });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchPaymentHistory(userId) {
   failIfUnavailable();
   if (!userId) return [];
