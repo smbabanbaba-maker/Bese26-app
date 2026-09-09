@@ -2571,3 +2571,20 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .sell-work-card .sell-form-grid .sell-field > span { color:#24262b; font-size:10px; font-weight:800; }
 .sell-work-card .sell-form-grid textarea { min-height:105px; }
 @media (max-width:640px) { .sell-category-picker { margin-inline:-2px; padding-inline:2px; } .sell-category-picker button { padding:8px 10px; } }
+
+/* Business-first seller identity in Sell. */
+.sell-publish-identity-switch { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.sell-publish-identity-switch > button { display:flex; align-items:center; gap:10px; min-width:0; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--card); text-align:left; color:var(--muted); transition:.18s ease; }
+.sell-publish-identity-switch > button:hover { border-color:#efaaa6; transform:translateY(-1px); }
+.sell-publish-identity-switch > button.active { border-color:var(--red); background:#fff5f4; color:var(--ink); box-shadow:0 7px 18px rgba(229,57,53,.11); }
+.sell-publish-identity-switch > button > span:nth-child(2) { display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+.sell-publish-identity-switch strong { overflow:hidden; color:inherit; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.sell-publish-identity-switch small { color:var(--muted); font-size:9px; }
+.sell-identity-avatar { display:grid; place-items:center; width:34px; height:34px; flex:none; border-radius:10px; background:var(--ink); color:#fff; font:800 15px Manrope,sans-serif; }
+.sell-identity-avatar.personal { background:#fff0ee; color:var(--red); }
+.sell-publish-identity-switch > button.active > svg { flex:none; color:var(--red); }
+.sell-business-preview { display:flex; justify-content:space-between; gap:14px; margin-top:11px; padding:11px 13px; border:1px solid #ead8d6; border-radius:12px; background:#fffaf9; color:#73757a; font-size:10px; }
+.sell-business-preview > div { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.sell-business-preview strong { color:#24262b; font-size:11px; }
+.sell-business-preview span { text-align:right; }
+@media (max-width:640px) { .sell-publish-identity-switch { grid-template-columns:1fr; } .sell-business-preview { align-items:flex-start; flex-direction:column; } .sell-business-preview span { text-align:left; } }
