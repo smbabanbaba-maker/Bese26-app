@@ -2650,3 +2650,10 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .public-info-support strong { color:var(--ink); }
 .public-info-support a { color:var(--red); font-weight:800; }
 @media (max-width:700px) { .public-info-hero { padding:20px; } .public-info-sections { grid-template-columns:1fr; } }
+.safe-meeting-form small { display:block; color:var(--muted); font-size:10px; line-height:1.45; margin:-2px 0 3px; }
+.safe-meeting-form label { display:grid; gap:5px; color:var(--muted); font-size:10px; font-weight:700; }
+.safe-meeting-form label input { width:100%; }
+.meeting-status-card { border-color:#d7e6df; background:#f7fcf9; }
+.meeting-status-card > div:last-child { display:flex; flex-wrap:wrap; gap:6px; }
+.meeting-status-card button { border:1px solid var(--line); border-radius:7px; background:#fff; color:var(--ink); padding:6px 8px; font-size:10px; font-weight:800; }
+@media (max-width:640px) { .chat-quick-actions { overflow-x:auto; flex-wrap:nowrap; padding-bottom:2px; } .chat-quick-actions button { flex:none; } .meeting-status-card { align-items:flex-start; flex-direction:column; } }
