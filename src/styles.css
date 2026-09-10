@@ -2820,3 +2820,176 @@ input:focus, textarea:focus, select:focus { border-color: #ffb3b3; box-shadow: 0
 .public-business-listings .product-card:hover { border-color: #ffbcbc; }
 .public-business-listings .product-card:hover .product-price { color: #b00000; }
 .public-about-item:hover { border-color: #ffbcbc; background: #ffffff; }
+
+
+/* Bese26 premium clarity theme: warm white surfaces, charcoal hierarchy, and
+   restrained soft-brick accents. This keeps the red/black/white identity while
+   preventing loud red pages and unreadable dark cards. */
+:root {
+  --red: #b84f4f;
+  --dark-red: #7f3030;
+  --ink: #17191c;
+  --muted: #697078;
+  --soft: #f7f5f3;
+  --line: #e5e0dc;
+  --card: #ffffff;
+  --gold: #b9832e;
+  --green: #318567;
+  --blue: #b84f4f;
+  --purple: #b84f4f;
+  --success-soft: #eef8f2;
+  --warning-soft: #fff8e8;
+  --danger-soft: #fff2f2;
+  --cream: #fbfaf9;
+  --shadow: 0 12px 34px rgba(24, 26, 29, .065);
+  --shadow-lg: 0 24px 65px rgba(24, 26, 29, .13);
+}
+body { background: var(--cream); color: var(--ink); }
+.app-shell { background: var(--cream); color: var(--ink); }
+.app-shell.theme-dark {
+  --ink: #f8f7f6;
+  --muted: #b5b8bd;
+  --soft: #242629;
+  --line: #3a3d41;
+  --card: #1d1f22;
+  --cream: #151719;
+  background: #151719;
+  color: #f8f7f6;
+}
+.topbar { background: rgba(255,255,255,.94); border-color: var(--line); }
+.app-shell.theme-dark .topbar,
+.app-shell.theme-dark .bottom-nav { background: rgba(29,31,34,.96); border-color: var(--line); }
+.brand-mark { background: var(--red); color: #fff; box-shadow: 0 8px 18px rgba(184,79,79,.2); }
+.primary-button,
+.publish-button,
+.send-button,
+.home-ad-cta,
+.search-submit,
+.home-search .search-submit {
+  background: var(--red);
+  color: #fff;
+  border: 1px solid var(--red);
+  box-shadow: 0 8px 18px rgba(184,79,79,.14);
+}
+.primary-button:hover,
+.publish-button:hover,
+.send-button:hover,
+.home-ad-cta:hover,
+.search-submit:hover,
+.home-search .search-submit:hover { background: var(--dark-red); border-color: var(--dark-red); }
+.secondary-button,
+.outline-button,
+.back-step-button { background: var(--card); color: var(--ink); border-color: var(--line); }
+.secondary-button:hover,
+.outline-button:hover,
+.back-step-button:hover { border-color: var(--red); color: var(--dark-red); background: var(--soft); }
+.hero-panel,
+.discovery-banner,
+.home-ad-banner,
+.dashboard-welcome {
+  background: linear-gradient(135deg, #202225 0%, #2d2526 100%);
+  color: #fff;
+}
+.hero-panel p,
+.discovery-copy p,
+.home-ad-banner p { color: #d4d1cf; }
+.hero-panel h1 span,
+.discovery-copy h1 span { color: #e58d8d; }
+.hero-cta,
+.discovery-cta { background: #fff; color: var(--ink); }
+.orb-one { background: radial-gradient(circle at 34% 30%, #e68b8b, #b84f4f 46%, #6b2929 78%); }
+.search-box,
+.topbar-search,
+input,
+textarea,
+select,
+.sell-field input,
+.sell-field select,
+.sell-field textarea {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line);
+}
+input:focus,
+textarea:focus,
+select:focus,
+.search-box:focus-within,
+.topbar-search:focus-within { border-color: var(--red); box-shadow: 0 0 0 3px rgba(184,79,79,.12); }
+.settings-card,
+.sell-card,
+.sell-work-card,
+.profile-menu-card,
+.business-admin-tools,
+.business-analytics-panel,
+.public-business-about,
+.public-trust-section,
+.public-trust-grid article,
+.public-policy-section > div,
+.listing-question-card,
+.listing-info-card,
+.seller-profile-card,
+.listing-description-card,
+.listing-inline-chat,
+.safe-deal-card {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+.category-tile,
+.popular-category,
+.business-live-preview,
+.business-onboarding-card,
+.start-guide,
+.business-edit-summary,
+.sell-business-preview { background: var(--card); border-color: var(--line); }
+.category-icon,
+.sell-step-icon,
+.notification-row-icon,
+.profile-location-icon { background: var(--soft); color: var(--red); }
+.tone-coral,
+.tone-lavender,
+.tone-blue,
+.tone-gold,
+.tone-mint,
+.tone-navy { background: var(--card); border-color: var(--line); }
+.text-button,
+.inline-link,
+.text-action,
+.clear-sell-button,
+.product-price,
+.modal-price,
+.listing-detail-price,
+.public-business-listings .product-price { color: var(--red); }
+.product-card:hover,
+.category-tile:hover,
+.profile-menu-card:hover { border-color: #d99b9b; box-shadow: 0 12px 28px rgba(184,79,79,.1); }
+.notification-dot { background: var(--red); }
+.listing-modal-backdrop { background: rgba(23,25,28,.68); }
+.listing-details-premium { background: var(--card); color: var(--ink); border-color: var(--line); }
+.listing-details-premium .listing-gallery-panel,
+.listing-details-premium .listing-gallery-frame { background: var(--soft); }
+.listing-details-premium .listing-detail-body > *,
+.listing-details-premium .listing-detail-meta span,
+.listing-details-premium .listing-spec-grid > div { background: var(--card); color: var(--ink); border-color: var(--line); }
+.listing-details-premium .safe-deal-card { background: var(--soft); color: var(--ink); border-color: var(--line); }
+.listing-details-premium .listing-primary-actions { background: var(--card); border-color: var(--line); }
+.listing-details-premium .primary-contact-button,
+.listing-details-premium .listing-start-chat { background: var(--red); color: #fff; }
+.listing-details-premium .secondary-contact-button,
+.listing-details-premium .callback-contact-button { background: var(--danger-soft); color: var(--dark-red); border-color: #dfa4a4; }
+.listing-details-premium .secondary-contact-button:hover,
+.listing-details-premium .callback-contact-button:hover { background: var(--red); color: #fff; }
+.miniweb-cover-banner,
+.public-info-hero { background: linear-gradient(120deg, #202225, #4a2929); color: #fff; }
+.miniweb-welcome-card,
+.miniweb-trust-strip span,
+.miniweb-category-chips span { background: var(--card); border-color: var(--line); color: var(--ink); }
+.miniweb-category-chips span:first-child { background: var(--red); border-color: var(--red); color: #fff; }
+.business-analytics-summary,
+.business-admin-inline-note { background: #202225; color: #fff; }
+.auth-form input { background: var(--card); color: var(--ink); border-color: var(--line); }
+@media (max-width: 760px) {
+  .listing-details-premium { background: var(--soft); }
+  .listing-details-premium .listing-detail-body > * { background: var(--card); }
+}
