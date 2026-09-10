@@ -1,4 +1,4 @@
-/* Premium public mini-site layer: Bese26 white / black / red identity. */
+/* Premium public mini-site layer: Bese26 white / black / blue identity. */
 .public-business-shell {
   min-height: 100vh;
   background: #f5f6f8;
@@ -41,14 +41,14 @@
 .storefront-shell-intro { display: flex; align-items: center; gap: 8px; margin: 4px 0 18px; color: #767b84; font-size: 11px; font-weight: 700; letter-spacing: .02em; }
 .storefront-shell-intro > span:not(.storefront-live-dot) { color: #c7cbd1; }
 .storefront-live-dot { width: 7px; height: 7px; background: #32a574; border-radius: 50%; box-shadow: 0 0 0 4px rgba(50,165,116,.12); }
-.public-business-hero { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; align-items: center; min-height: 360px; padding: 42px; overflow: hidden; border: 1px solid #30333a; border-radius: 28px; background: linear-gradient(125deg, #15171b 0%, #24262b 56%, #321e21 100%); box-shadow: 0 24px 60px rgba(20,22,28,.17); }
+.public-business-hero { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; align-items: center; min-height: 360px; padding: 42px; overflow: hidden; border: 1px solid #30333a; border-radius: 28px; background: linear-gradient(125deg, #15171b 0%, #24262b 56%, #0b3d91 100%); box-shadow: 0 24px 60px rgba(20,22,28,.17); }
 .public-business-hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -145px; top: -180px; border-radius: 50%; background: radial-gradient(circle, rgba(44,44,255,.78) 0%, rgba(44,44,255,.16) 44%, transparent 70%); pointer-events: none; }
 .public-business-logo { position: relative; z-index: 1; width: 170px; height: 170px; border: 7px solid rgba(255,255,255,.13); border-radius: 30px; background: #fff; box-shadow: 0 17px 34px rgba(0,0,0,.27); }
 .public-business-logo img { object-fit: cover; }
 .public-business-identity { position: relative; z-index: 1; min-width: 0; }
-.public-business-identity .eyebrow { color: #f49b96; margin-bottom: 12px; }
+.public-business-identity .eyebrow { color: #bfc5ff; margin-bottom: 12px; }
 .public-business-identity h1 { max-width: 700px; font-size: clamp(34px, 6vw, 66px); line-height: .98; letter-spacing: -2.5px; }
-.public-business-handle { display: inline-block; margin-top: 12px; color: #f4cc74; font-size: 15px; }
+.public-business-handle { display: inline-block; margin-top: 12px; color: #c9ceff; font-size: 15px; }
 .public-business-identity p { max-width: 610px; margin: 20px 0 12px; color: #c8cbd1; font-size: 14px; line-height: 1.65; }
 .public-business-location { color: #dfe1e5; font-size: 12px; }
 .public-business-actions { gap: 10px; margin-top: 24px; }
@@ -64,7 +64,7 @@
 .public-business-listings .product-card { border-color: #e3e6ea; box-shadow: 0 10px 28px rgba(25,30,42,.045); }
 .public-business-listings .product-card:hover { box-shadow: 0 18px 36px rgba(25,30,42,.11); }
 .public-business-listings .product-image-wrap { height: 210px; }
-.public-business-listings .public-card-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 13px; color: #d3332f; font-size: 11px; font-weight: 800; }
+.public-business-listings .public-card-action { display: inline-flex; align-items: center; gap: 5px; margin-top: 13px; color: #2C2CFF; font-size: 11px; font-weight: 800; }
 .public-business-listings .empty-state { min-height: 260px; display: grid; place-items: center; align-content: center; gap: 9px; padding: 30px; border: 1px dashed #d9dde3; border-radius: 22px; background: rgba(255,255,255,.75); text-align: center; }
 .public-business-footer { position: relative; z-index: 1; width: min(1120px, 100%); margin: 0 auto; padding: 22px 28px 34px; display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #e1e4e9; color: #8a9099; font-size: 11px; }
 .public-business-footer strong { color: #23262b; font-size: 13px; }

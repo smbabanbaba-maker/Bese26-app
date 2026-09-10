@@ -6,17 +6,17 @@
   background: #f8f9fa;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --red: #a5c5e5;
-  --dark-red: #9fbbd7;
+  --red: #2C2CFF;
+  --dark-red: #0b3d91;
   --ink: #111214;
   --muted: #717782;
-  --soft: #f8f9fa;
-  --line: #e6e7ea;
+  --soft: #f5f7ff;
+  --line: #dfe3f0;
   --card: #fff;
-  --gold: #98badc;
+  --gold: #2C2CFF;
   --green: #2e9b70;
-  --blue: #4f73c9;
-  --purple: #7564d8;
+  --blue: #2C2CFF;
+  --purple: #2C2CFF;
   --success-soft: #ecfdf3;
   --warning-soft: #fff7e6;
   --danger-soft: #ffffff;
@@ -32,7 +32,7 @@ button { border: 0; background: none; color: inherit; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgba(44,44,255,.24); outline-offset: 2px; }
 button:not(:disabled) { cursor: pointer; }
 .app-shell { min-height: 100vh; background: #f8f9fa; color: var(--ink); padding-bottom: 104px; transition: background .25s ease, color .25s ease; }
-.app-shell.theme-dark { --ink: #000000; --muted: #a4a8b2; --soft: #232528; --line: #35383e; --card: #1b1d20; --success-soft: #123126; --warning-soft: #697a8a; --danger-soft: #465564; background: #121416; color: #000000; }
+.app-shell.theme-dark { --ink: #ffffff; --muted: #c4c9d6; --soft: #17174a; --line: #30306f; --card: #10102f; --success-soft: #17174a; --warning-soft: #17174a; --danger-soft: #17174a; background: #080820; color: #ffffff; }
 .app-shell.theme-dark .topbar { background: rgba(18,20,22,.88); border-color: #292c31; }
 .app-shell.theme-dark .bottom-nav { background: rgba(27,29,32,.94); border-color: #30333a; }
 .app-shell.theme-dark .product-meta, .app-shell.theme-dark .product-foot, .app-shell.theme-dark .location-row, .app-shell.theme-dark .seller-card-copy .seller-stats { color: #a4a8b2; }
