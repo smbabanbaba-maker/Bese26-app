@@ -2987,3 +2987,89 @@ select:focus,
   .primary-button,
   .publish-button { min-height: 42px; }
 }
+
+
+/* Contrast correction: remove black-on-black and red wrapper surfaces from every
+   interactive panel. Images may keep their own pixels, but all UI containers are
+   white with black readable text. */
+.listing-modal-backdrop,
+.listing-details-premium,
+.listing-details-premium .listing-gallery-panel,
+.listing-details-premium .listing-gallery-frame,
+.listing-details-premium .listing-detail-body,
+.listing-details-premium .safe-deal-card,
+.listing-details-premium .listing-spec-grid > div,
+.listing-details-premium .listing-detail-meta span,
+.listing-details-premium .listing-owner-controls,
+.business-analytics-summary,
+.business-admin-inline-note,
+.miniweb-cover-banner,
+.public-info-hero,
+.home-ad-banner,
+.home-ad-slide-1,
+.home-ad-slide-2 {
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+.listing-details-premium .listing-gallery-panel,
+.listing-details-premium .listing-gallery-frame { min-height: 0; }
+.listing-details-premium .listing-detail-body > *,
+.listing-details-premium .listing-detail-body > .listing-location-line,
+.listing-details-premium .listing-detail-meta,
+.listing-details-premium .listing-detail-meta span,
+.listing-details-premium .safe-deal-card,
+.listing-details-premium .listing-spec-grid > div {
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+.listing-details-premium .listing-detail-meta span,
+.listing-details-premium .listing-spec-grid > div strong,
+.listing-details-premium .listing-spec-grid > div span,
+.listing-details-premium .safe-deal-card h2,
+.listing-details-premium .safe-deal-card p,
+.listing-details-premium .safe-deal-card li {
+  color: var(--ink) !important;
+}
+.listing-details-premium .listing-gallery-frame .modal-image-count,
+.listing-details-premium .listing-gallery-frame .image-zoom-button {
+  background: rgba(255,255,255,.94) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+}
+.business-analytics-summary span,
+.business-admin-inline-note small,
+.business-admin-inline-note span,
+.miniweb-cover-copy h2,
+.miniweb-cover-copy .eyebrow,
+.miniweb-cover-pills span,
+.miniweb-cover-mark span,
+.public-info-hero h2,
+.public-info-hero p,
+.home-ad-banner h2,
+.home-ad-banner p { color: var(--ink) !important; }
+.miniweb-cover-pills span,
+.miniweb-cover-mark { background: #ffffff !important; border-color: var(--line) !important; }
+.business-analytics-summary .secondary-button,
+.business-admin-inline-note .secondary-button { background: #ffffff !important; color: var(--ink) !important; border-color: var(--ink) !important; }
+.auth-form input,
+.auth-form textarea,
+.auth-form select {
+  background: #ffffff !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+.auth-form input::placeholder,
+.auth-form textarea::placeholder { color: var(--muted) !important; }
+.business-live-preview-logo,
+.sell-identity-avatar,
+.popular-category.tone-coral > span { background: #ffffff !important; color: var(--ink) !important; border: 1px solid var(--line); }
+.business-onboarding-checklist span.complete { background: #ffffff !important; color: var(--ink) !important; border-color: var(--line) !important; }
+@media (max-width: 760px) {
+  .listing-modal-backdrop,
+  .listing-details-premium { background: #ffffff !important; }
+  .listing-details-premium .listing-gallery-panel,
+  .listing-details-premium .listing-gallery-frame { background: #ffffff !important; }
+  .listing-details-premium .listing-detail-body > * { border-color: var(--line) !important; }
+}
