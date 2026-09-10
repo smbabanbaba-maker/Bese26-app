@@ -2747,14 +2747,14 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 
 /* Bese26 blue theme: blue is the primary brand accent with black and white neutrals. */
 :root {
-  --red: #0d6efd;
+  --red: #000071;
   --dark-red: #0b3d91;
-  --blue: #0d6efd;
+  --blue: #000071;
   --navy: #0b3d91;
   --blue-soft: #eaf3ff;
   --blue-line: #b8d4ff;
-  --brand-gradient: linear-gradient(135deg, #0d6efd 0%, #0b3d91 100%);
-  --dark-gradient: linear-gradient(135deg, #0b3d91 0%, #1769c2 100%);
+  --brand-gradient: linear-gradient(135deg, #000071 0%, #0b3d91 100%);
+  --dark-gradient: linear-gradient(135deg, #0b3d91 0%, #000071 100%);
 }
 body { background: #f4f7fb; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline-color: rgba(13,110,253,.28); }
@@ -2808,15 +2808,15 @@ input:focus, textarea:focus, select:focus { border-color: #8fc1ff; box-shadow: 0
 .sell-error { color: #0958b9; background: #f0f6ff; border-color: var(--blue-line); }
 
 /* Public storefront: blue carries links, prices, underlines and hover states. */
-.public-brand strong span, .public-business-footer strong span { color: #0d6efd; }
-.public-business-nav a:hover { color: #0d6efd; }
-.public-business-nav a::after { background: #0d6efd; }
+.public-brand strong span, .public-business-footer strong span { color: #000071; }
+.public-business-nav a:hover { color: #000071; }
+.public-business-nav a::after { background: #000071; }
 .public-share-button:hover { border-color: #8fc1ff; color: #0958b9; }
 .public-business-listings .public-card-action,
 .public-business-listings .product-price,
 .public-about-heading > svg,
 .public-about-item > svg,
-.public-about-link { color: #0d6efd; }
+.public-about-link { color: #000071; }
 .public-business-listings .product-card:hover { border-color: #b8d4ff; }
 .public-business-listings .product-card:hover .product-price { color: #0958b9; }
 .public-about-item:hover { border-color: #b8d4ff; background: #f7fbff; }
