@@ -12,7 +12,7 @@
   height: 360px;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(circle at 12% 0%, rgba(13,110,253,.11), transparent 35%), linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%);
+  background: radial-gradient(circle at 12% 0%, rgba(0,0,113,.11), transparent 35%), linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%);
 }
 .public-business-topbar {
   position: sticky;
@@ -30,7 +30,7 @@
   backdrop-filter: blur(20px);
 }
 .public-brand { gap: 10px; font-size: 19px; letter-spacing: -.5px; }
-.public-brand-logo { width: 38px; height: 38px; object-fit: contain; border-radius: 11px; box-shadow: 0 7px 15px rgba(13,110,253,.18); }
+.public-brand-logo { width: 38px; height: 38px; object-fit: contain; border-radius: 11px; box-shadow: 0 7px 15px rgba(0,0,113,.18); }
 .public-brand strong span, .public-business-footer strong span { color: #000071; }
 .public-business-nav { display: flex; align-items: center; gap: 25px; margin-left: auto; }
 .public-business-nav a { color: #6e737b; text-decoration: none; font-size: 12px; font-weight: 700; transition: color .18s ease; }
@@ -42,7 +42,7 @@
 .storefront-shell-intro > span:not(.storefront-live-dot) { color: #c7cbd1; }
 .storefront-live-dot { width: 7px; height: 7px; background: #32a574; border-radius: 50%; box-shadow: 0 0 0 4px rgba(50,165,116,.12); }
 .public-business-hero { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; align-items: center; min-height: 360px; padding: 42px; overflow: hidden; border: 1px solid #30333a; border-radius: 28px; background: linear-gradient(125deg, #15171b 0%, #24262b 56%, #321e21 100%); box-shadow: 0 24px 60px rgba(20,22,28,.17); }
-.public-business-hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -145px; top: -180px; border-radius: 50%; background: radial-gradient(circle, rgba(13,110,253,.78) 0%, rgba(13,110,253,.16) 44%, transparent 70%); pointer-events: none; }
+.public-business-hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -145px; top: -180px; border-radius: 50%; background: radial-gradient(circle, rgba(0,0,113,.78) 0%, rgba(0,0,113,.16) 44%, transparent 70%); pointer-events: none; }
 .public-business-logo { position: relative; z-index: 1; width: 170px; height: 170px; border: 7px solid rgba(255,255,255,.13); border-radius: 30px; background: #fff; box-shadow: 0 17px 34px rgba(0,0,0,.27); }
 .public-business-logo img { object-fit: cover; }
 .public-business-identity { position: relative; z-index: 1; min-width: 0; }
@@ -146,7 +146,7 @@
 .public-business-topbar { width: 100%; max-width: none; padding-left: 22px; padding-right: 22px; }
 .public-brand { gap: 7px; justify-content: flex-start; }
 .public-brand-logo { flex: none; transition: transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s ease; }
-.public-brand:hover .public-brand-logo { transform: rotate(-4deg) scale(1.06); box-shadow: 0 9px 20px rgba(13,110,253,.28); }
+.public-brand:hover .public-brand-logo { transform: rotate(-4deg) scale(1.06); box-shadow: 0 9px 20px rgba(0,0,113,.28); }
 .public-brand strong { white-space: nowrap; }
 .public-business-nav { margin-left: 28px; }
 .public-business-nav a { position: relative; padding: 8px 0; }
@@ -206,7 +206,7 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .public-business-topbar { animation: topbarDrop .35s cubic-bezier(.23,1,.32,1) both; }
-  .public-share-button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(13,110,253,.13); }
+  .public-share-button:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,113,.13); }
   @keyframes topbarDrop { from { opacity: 0; transform: translateY(-7px); } to { opacity: 1; transform: translateY(0); } }
 }
 
@@ -224,7 +224,7 @@
   z-index: 2;
   pointer-events: none;
   border-radius: inherit;
-  box-shadow: 0 0 0 1px rgba(13,110,253,0) inset, 0 0 0 rgba(13,110,253,0);
+  box-shadow: 0 0 0 1px rgba(0,0,113,0) inset, 0 0 0 rgba(0,0,113,0);
   transition: box-shadow .26s ease;
 }
 .public-business-listings .product-card::after {
@@ -241,10 +241,10 @@
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
 }
 .public-business-listings .product-card:hover {
-  box-shadow: 0 20px 42px rgba(25,30,42,.13), 0 0 22px rgba(13,110,253,.11);
+  box-shadow: 0 20px 42px rgba(25,30,42,.13), 0 0 22px rgba(0,0,113,.11);
 }
 .public-business-listings .product-card:hover::before {
-  box-shadow: 0 0 0 1px rgba(13,110,253,.3) inset, 0 0 22px rgba(13,110,253,.08);
+  box-shadow: 0 0 0 1px rgba(0,0,113,.3) inset, 0 0 22px rgba(0,0,113,.08);
 }
 .public-business-listings .product-card:hover::after { opacity: 1; animation: cardShine .72s cubic-bezier(.23,1,.32,1) both; }
 .public-business-listings .product-image-wrap { position: relative; overflow: hidden; }
@@ -256,7 +256,7 @@
   pointer-events: none;
   opacity: .34;
   filter: blur(13px);
-  background: rgba(13,110,253,.25);
+  background: rgba(0,0,113,.25);
   border-radius: 50%;
   transition: opacity .25s ease, transform .25s ease;
 }
@@ -378,16 +378,16 @@
 }
 
 /* Balanced public storefront palette: navy structure with restrained Bese26 red accents. */
-.public-business-shell::before { background: radial-gradient(circle at 12% 0%, rgba(13,110,253,.12), transparent 35%), linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%); }
-.public-brand-logo { box-shadow: 0 7px 15px rgba(13,110,253,.18); }
+.public-business-shell::before { background: radial-gradient(circle at 12% 0%, rgba(0,0,113,.12), transparent 35%), linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0) 100%); }
+.public-brand-logo { box-shadow: 0 7px 15px rgba(0,0,113,.18); }
 .public-brand strong span, .public-business-footer strong span { color: #000071; }
 .public-business-nav a:hover { color: #000071; }
 .public-share-button:hover { border-color: #8fc1ff; color: #0958b9; }
 .public-business-hero { background: linear-gradient(125deg, #142b47 0%, #1d456f 56%, #63363f 100%); }
-.public-business-hero::after { background: radial-gradient(circle, rgba(13,110,253,.78) 0%, rgba(13,110,253,.18) 44%, transparent 70%); }
+.public-business-hero::after { background: radial-gradient(circle, rgba(0,0,113,.78) 0%, rgba(0,0,113,.18) 44%, transparent 70%); }
 .public-business-identity .eyebrow { color: #a8caef; }
 .public-card-action { color: #000071; }
-.public-business-stats > div:hover { border-color: #b8d4ff; box-shadow: 0 10px 26px rgba(13,110,253,.10); }
+.public-business-stats > div:hover { border-color: #b8d4ff; box-shadow: 0 10px 26px rgba(0,0,113,.10); }
 
 
 /* Final low-red guard: storefront stylesheet is loaded after the app stylesheet. */
