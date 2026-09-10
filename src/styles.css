@@ -3464,3 +3464,48 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .premium-profile .profile-account-actions button { border-radius:11px !important; }
 .premium-profile .profile-signin-prompt { border:1px solid #e6e7ea !important; background:#fff !important; box-shadow:0 8px 20px rgba(20,20,40,.05) !important; }
 @media (max-width:700px) { .premium-profile .profile-cover { min-height:300px !important; padding:20px !important; } .premium-profile .profile-heading { left:20px !important; right:20px !important; bottom:22px !important; } .premium-profile .profile-cover-bottom { left:20px !important; right:20px !important; } }
+
+/* Cross-page vision pass: every feature page uses the same dashboard language. */
+.intelligent-sell-hero, .sell-hero, .listing-management-hero, .business-directory-hero, .business-analytics-summary, .subscription-hero, .wallet-card, .public-business-hero {
+  color:#fff !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; border-color:#27315b !important; box-shadow:0 16px 34px rgba(20,20,40,.14) !important;
+}
+.intelligent-sell-hero *, .sell-hero *, .listing-management-hero *, .business-directory-hero *, .business-analytics-summary *, .subscription-hero *, .wallet-card *, .public-business-hero * { color:#fff; }
+.intelligent-sell-hero p, .sell-hero p, .business-directory-hero p, .subscription-hero p, .wallet-card small { color:#d6d9e5 !important; }
+.sell-card, .sell-work-card, .business-onboarding-card, .business-live-preview, .business-admin-tools, .business-analytics-panel,
+.business-upgrade-card, .listing-info-card, .listing-description-card, .listing-question-card, .listing-chat-card,
+.listing-store-card, .listing-report-card, .notification-item, .notification-panel, .subscription-plan-card,
+.subscription-usage, .wallet-transaction, .public-trust-section, .public-info-sections > section,
+.public-seller-card, .public-business-about, .public-business-info-card { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; box-shadow:0 6px 18px rgba(20,20,40,.04) !important; }
+.sell-card h2, .sell-work-card h2, .business-onboarding-card h2, .business-live-preview h2, .business-admin-tools h2,
+.listing-info-card h2, .listing-description-card h2, .listing-question-card h2, .notification-item strong,
+.subscription-plan-card h3, .public-trust-copy h2, .public-seller-card strong { color:#171717 !important; }
+.sell-card p, .sell-work-card p, .business-onboarding-card p, .business-live-preview p, .business-admin-tools p,
+.listing-info-card p, .listing-description-card p, .listing-question-card p, .notification-item small,
+.subscription-plan-summary, .public-trust-copy p, .public-seller-card span { color:#5f6873 !important; }
+.sell-work-card input, .sell-work-card textarea, .sell-work-card select, .sell-card input, .sell-card textarea, .sell-card select,
+.business-onboarding-card input, .business-onboarding-card textarea, .company-link-form input, .company-link-form textarea,
+.auth-form input, .auth-form textarea, .auth-form select { background:#fff !important; color:#171717 !important; border-color:#cfd5dc !important; }
+.auth-form input::placeholder, .company-link-form input::placeholder, .company-link-form textarea::placeholder { color:#7b8490 !important; }
+.auth-form input:focus, .company-link-form input:focus, .company-link-form textarea:focus { border-color:#7564d8 !important; box-shadow:0 0 0 3px rgba(117,100,216,.14) !important; }
+.auth-form-panel { background:#fff !important; color:#171717 !important; }
+.auth-form-panel h2, .auth-form-panel label, .auth-form-panel .auth-field-label { color:#171717 !important; }
+.auth-form-panel .auth-panel-copy, .auth-form-panel .auth-switch, .auth-form-panel .auth-forgot { color:#5f6873 !important; }
+.google-auth-button { color:#171717 !important; background:#fff !important; border-color:#d7dce3 !important; }
+.listing-details-premium, .listing-modal, .listing-modal-header, .listing-detail-body { background:#fff !important; color:#171717 !important; }
+.listing-details-premium .listing-detail-price, .listing-details-premium .listing-price-row { color:#171717 !important; }
+.listing-details-premium .listing-gallery-panel, .listing-gallery-frame { background:#eef1f6 !important; }
+.listing-primary-actions button, .listing-bottom-actions button { background:#fff !important; color:#171717 !important; border-color:#d4dbe4 !important; }
+.listing-primary-actions button:first-child, .listing-bottom-actions button:first-child { background:linear-gradient(105deg,#ef4c56,#ff795d) !important; color:#fff !important; border-color:transparent !important; }
+.business-directory-card, .business-directory-search, .business-edit-summary, .business-edit-summary-grid, .business-management-card { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; }
+.business-directory-card strong, .business-edit-summary strong { color:#171717 !important; }
+.messages-page .page-title-row h1, .notifications-heading h1, .subscription-page h1, .wallet-page h1 { color:#171717 !important; }
+.messages-inbox-page, .messages-page, .notifications-page, .wallet-page, .subscription-page { background:#fff !important; }
+.messages-inbox-header, .messages-search, .message-filter-tabs, .conversation-list { background:#fff !important; border-color:#e6e7ea !important; }
+.message-inbox-row, .conversation-row { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; }
+.message-inbox-copy strong, .conversation-copy strong { color:#171717 !important; }
+.message-inbox-copy b, .conversation-copy span, .message-inbox-row time { color:#5f6873 !important; }
+.chat-panel, .chat-header, .chat-context, .chat-composer { background:#fff !important; }
+.chat-messages { background:#eef5fa !important; }
+.chat-composer input { background:#fff !important; color:#171717 !important; }
+.reminder-card { background:#fffafa !important; color:#171717 !important; }
+@media (max-width:700px) { .intelligent-sell-hero, .sell-hero, .listing-management-hero, .business-directory-hero, .subscription-hero, .wallet-card { border-radius:17px !important; } .sell-card, .sell-work-card, .business-onboarding-card, .listing-info-card, .subscription-plan-card { border-radius:15px !important; } }
