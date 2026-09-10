@@ -3286,3 +3286,50 @@ select {
   .chat-messages,
   .chat-composer { background: #ffffff !important; background-image: none !important; }
 }
+
+/* Final Bese26 brand lock: white + black + red only. */
+:root {
+  --red: #ff2c2c;
+  --dark-red: #990000;
+  --ink: #000000;
+  --muted: rgba(0,0,0,.64);
+  --soft: #ffffff;
+  --line: #b00808;
+  --card: #ffffff;
+  --gold: #ff2c2c;
+  --blue: #ff2c2c;
+  --purple: #ff2c2c;
+  --green: #ff2c2c;
+  --blue-soft: #fff0f0;
+  --blue-line: #ffbcbc;
+  --dark-gradient: linear-gradient(135deg, #000000 0%, #242424 100%);
+  --gold-gradient: linear-gradient(135deg, #990000, #ff2c2c);
+  --purple-gradient: linear-gradient(135deg, #990000, #ff2c2c);
+}
+body, .app-shell { background:#ffffff !important; color:#000000 !important; }
+.dashboard-welcome-card,
+.dashboard-welcome,
+.hero-panel,
+.discovery-banner,
+.home-ad-banner:not(.dashboard-welcome-card),
+.auth-welcome-panel,
+.miniweb-cover-banner,
+.public-info-hero { background:linear-gradient(135deg,#000000 0%,#252525 100%) !important; background-image:none !important; color:#ffffff !important; }
+.dashboard-welcome-card *, .dashboard-welcome *, .hero-panel *, .discovery-banner *, .home-ad-banner:not(.dashboard-welcome-card) *, .auth-welcome-panel *, .miniweb-cover-banner *, .public-info-hero * { color:#ffffff; }
+.dashboard-welcome-card h1 span, .hero-panel h1 span, .discovery-copy h1 span { color:#ff2c2c !important; }
+.dashboard-welcome-card .eyebrow, .hero-panel .eyebrow, .discovery-banner .eyebrow { color:#ff9b9b !important; }
+.dashboard-primary-action, .primary-button, .publish-button, .send-button, .search-submit, .home-search .search-submit, .home-ad-cta { background:#ff2c2c !important; border-color:#ff2c2c !important; color:#ffffff !important; }
+.dashboard-secondary-action, .hero-cta, .discovery-cta { background:#ffffff !important; border-color:#ffffff !important; color:#000000 !important; }
+.category-tile, .popular-category, .quick-action, .seller-card, .product-card, .profile-menu-card { background:#ffffff !important; color:#000000 !important; border-color:#1c1c1c !important; }
+.category-tile *, .popular-category *, .quick-action *, .seller-card *, .product-card *, .profile-menu-card * { color:inherit; }
+.category-tile .category-icon, .quick-action .quick-action-icon, .notification-icon, .profile-menu-card-icon { color:#ff2c2c !important; background:#fff0f0 !important; }
+.category-tile:nth-child(n) .category-icon, .quick-action:nth-child(n) .quick-action-icon { color:#ff2c2c !important; background:#fff0f0 !important; }
+.category-tile:hover, .product-card:hover, .profile-menu-card:hover, .quick-action:hover { border-color:#ff2c2c !important; box-shadow:0 10px 24px rgba(255,44,44,.12) !important; }
+.product-price, .modal-price, .listing-detail-price, .text-button, .inline-link, .text-action, .results-count, .product-foot .seller-stats, .seller-stats, .product-meta svg, .location-row svg, .field-label svg { color:#ff2c2c !important; }
+.bottom-nav button.active, .bottom-nav button:nth-child(n).active { color:#ff2c2c !important; }
+.bottom-nav, .topbar, .search-box, .topbar-search, input, textarea, select, .settings-card, .sell-card, .sell-work-card { background:#ffffff !important; color:#000000 !important; }
+.bottom-nav { border-color:#b00808 !important; }
+.orb-one, .orb-two, .hero-orb, .discovery-accent, .profile-cover-shape, .auth-welcome-shape-one, .auth-welcome-shape-two { background:#ff2c2c !important; }
+.dashboard-orbit { border-color:rgba(255,44,44,.55) !important; }
+.dashboard-metrics strong { color:#ff2c2c !important; }
+@media (prefers-reduced-motion: reduce) { .dashboard-welcome-card *, .category-tile *, .product-card * { animation:none !important; transition:none !important; } }
