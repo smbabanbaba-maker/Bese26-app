@@ -3333,3 +3333,20 @@ body, .app-shell { background:#ffffff !important; color:#000000 !important; }
 .dashboard-orbit { border-color:rgba(255,44,44,.55) !important; }
 .dashboard-metrics strong { color:#ff2c2c !important; }
 @media (prefers-reduced-motion: reduce) { .dashboard-welcome-card *, .category-tile *, .product-card * { animation:none !important; transition:none !important; } }
+
+/* Original Bese26 vision restoration: navy-purple dashboard, coral actions, and multicolor accents. */
+:root { --red:#e53935; --dark-red:#b71c1c; --brand-gradient:linear-gradient(135deg,#e53935 0%,#b71c1c 100%); }
+.brand-mark { background:var(--brand-gradient); box-shadow:0 8px 18px rgba(229,57,53,.26); }
+.primary-button, .publish-button, .send-button, .home-ad-cta { background:var(--brand-gradient); box-shadow:0 8px 18px rgba(229,57,53,.16); }
+.primary-button:hover, .publish-button:hover, .home-ad-cta:hover { background:var(--dark-red); }
+.message-bubble.mine { background:var(--brand-gradient); }
+.dashboard-primary-action { background:linear-gradient(105deg,#ef4c56,#ff795d); box-shadow:0 9px 19px rgba(229,57,53,.22); }
+.chat-quick-actions button { border-color:#197a26; color:#176d21; background:#fff; }
+.message-count, .nav-badge { background:var(--red); }
+.message-filter-tabs button.active, .message-inbox-copy small { color:var(--red); }
+.message-filter-tabs button.active::after { background:var(--red); }
+.auth-backdrop { background:radial-gradient(circle at 8% 15%,rgba(255,114,91,.24),transparent 28%),radial-gradient(circle at 92% 84%,rgba(112,87,255,.2),transparent 30%),rgba(13,15,20,.72); }
+.verification-readiness-card { background:#fff8f7; border-left-color:var(--red); }
+.verification-choice button.selected { border-color:var(--red); background:#fff8f7; color:var(--red); }
+.business-setup-mark, .company-save-button { background:var(--brand-gradient); }
+@media (max-width:700px) { .main-container { padding:20px 16px 16px; } .home-page { gap:22px; } .dashboard-welcome-card { border-radius:17px; } .section-heading h2 { font-size:21px; } }
