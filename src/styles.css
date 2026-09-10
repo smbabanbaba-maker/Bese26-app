@@ -3400,3 +3400,31 @@ html, body, #root, .app-shell, .main-container, .page-stack { background:#ffffff
 .chat-quick-actions button { border-color:#197a26 !important; color:#176d21 !important; background:#fff !important; }
 .orb-one, .orb-two, .hero-orb { display:block !important; }
 @media (max-width:700px) { .main-container { padding:20px 16px 16px; } .home-page { gap:22px; } .dashboard-welcome-card { border-radius:17px; } }
+
+/* Contrast cleanup: deep hero backgrounds, readable text, and no text lost in overlays. */
+.dashboard-welcome-card, .hero-panel, .discovery-banner, .home-ad-banner:not(.dashboard-welcome-card),
+.auth-welcome-panel, .miniweb-cover-banner, .public-info-hero, .public-business-hero {
+  background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important;
+  background-size:180% 180% !important; border-color:#27315b !important;
+}
+.dashboard-welcome-card::before, .dashboard-welcome-card::after { opacity:.45 !important; }
+.dashboard-welcome-card *, .hero-panel *, .discovery-banner *, .home-ad-banner:not(.dashboard-welcome-card) *,
+.auth-welcome-panel *, .miniweb-cover-banner *, .public-info-hero *, .public-business-hero * { text-shadow:none !important; }
+.dashboard-welcome-copy h1, .hero-panel h1, .discovery-copy h1, .home-ad-copy h2 { color:#ffffff !important; }
+.dashboard-welcome-copy h1 span, .hero-panel h1 span, .discovery-copy h1 span { color:#ff9b94 !important; }
+.dashboard-welcome-copy p, .hero-panel p, .discovery-copy p, .home-ad-copy p { color:#d6d9e5 !important; }
+.dashboard-welcome-copy .eyebrow, .hero-panel .eyebrow, .discovery-banner .eyebrow, .home-ad-copy .eyebrow { color:#ffb6aa !important; }
+.dashboard-primary-action { color:#ffffff !important; background:linear-gradient(105deg,#d95358,#f47765) !important; }
+.dashboard-secondary-action { color:#ffffff !important; }
+.dashboard-metrics strong { color:#ffffff !important; }
+.dashboard-metrics small { color:#c4c9d7 !important; }
+.section-heading h2, .browse-heading h2, .popular-categories h2, .product-card h3, .page-title-row h1,
+.form-section-title h2, .profile-section-label h2, .notifications-heading h1, .subscription-section-heading h2 { color:#171717 !important; }
+.eyebrow { color:#68717d; }
+.product-info, .product-card, .category-tile, .popular-category, .quick-action, .seller-card, .profile-menu-card,
+.settings-card, .sell-card, .sell-work-card, .notification-item, .listing-info-card, .listing-description-card { color:#171717 !important; }
+.product-card p, .product-meta, .product-foot, .location-row, .quick-action small, .seller-card-copy span,
+.field-help, .form-section-title p, .notifications-heading p { color:#5f6873 !important; }
+input::placeholder, textarea::placeholder { color:#7b8490 !important; opacity:1 !important; }
+label, .field-label, .form-label { color:#303843 !important; }
+button:disabled { color:#8a929b !important; opacity:.72; }
