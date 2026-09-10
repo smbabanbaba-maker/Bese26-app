@@ -3103,3 +3103,186 @@ select:focus,
   .chat-messages,
   .chat-composer { background-color: #ffffff !important; background-image: none !important; }
 }
+
+/* Final global color system: pure white surfaces and near-black text. Red is
+   reserved for compact actions, links, icons, borders, badges, and hover states. */
+:root {
+  --red: #b84f4f;
+  --dark-red: #8f3b3b;
+  --ink: #111111;
+  --muted: #5f6368;
+  --soft: #ffffff;
+  --line: #dedede;
+  --card: #ffffff;
+  --cream: #ffffff;
+  --danger-soft: #ffffff;
+  --warning-soft: #ffffff;
+  --success-soft: #ffffff;
+}
+html,
+body,
+#root,
+.app-shell,
+.main-container,
+.page-stack,
+.profile-subpage,
+.messages-page,
+.message-layout,
+.listing-page,
+.sell-page,
+.dashboard-page,
+.business-page,
+.admin-page {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111111 !important;
+}
+.topbar,
+.bottom-nav,
+.settings-card,
+.sell-card,
+.sell-work-card,
+.profile-list-card,
+.managed-listings,
+.history-list,
+.language-list,
+.location-choice-list,
+.appearance-options,
+.profile-menu-card,
+.analytics-card,
+.performance-list,
+.notification-panel,
+.modal-content,
+.listing-modal,
+.listing-details-premium,
+.conversation-list,
+.chat-panel,
+.chat-header,
+.chat-context,
+.chat-quick-actions,
+.chat-messages,
+.chat-composer,
+.listing-info-card,
+.seller-profile-card,
+.listing-description-card,
+.listing-inline-chat,
+.safe-deal-card,
+.business-analytics-panel,
+.business-admin-tools,
+.public-business-about,
+.public-trust-section,
+.public-trust-grid article,
+.public-policy-section > div,
+form,
+input,
+textarea,
+select {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111111 !important;
+  border-color: var(--line) !important;
+}
+.profile-cover,
+.hero-panel,
+.discovery-banner,
+.dashboard-welcome,
+.home-ad-banner,
+.sell-hero,
+.promo-summary,
+.miniweb-cover-banner,
+.public-info-hero,
+.public-business-hero,
+.auth-welcome-panel,
+.business-analytics-summary,
+.business-admin-inline-note {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111111 !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+.profile-cover *,
+.hero-panel *,
+.discovery-banner *,
+.dashboard-welcome *,
+.home-ad-banner *,
+.sell-hero *,
+.promo-summary *,
+.miniweb-cover-banner *,
+.public-info-hero *,
+.public-business-hero *,
+.auth-welcome-panel *,
+.business-analytics-summary *,
+.business-admin-inline-note * {
+  color: #111111 !important;
+}
+.profile-cover .profile-heading .seller-stats,
+.profile-cover .profile-heading .verified-badge,
+.profile-cover .profile-cover-bottom .verified-badge { color: var(--red) !important; }
+.profile-cover .profile-heading .outline-button { color: #111111 !important; background: #ffffff !important; border-color: #111111 !important; }
+.hero-panel h1 span,
+.discovery-copy h1 span,
+.text-button,
+.inline-link,
+.text-action,
+.product-price,
+.modal-price,
+.listing-detail-price,
+.public-business-listings .product-price,
+.field-label svg,
+.notification-dot { color: var(--red) !important; }
+.orb-one,
+.orb-two,
+.hero-orb,
+.discovery-accent,
+.profile-cover-shape,
+.public-business-hero::after,
+.auth-welcome-shape-one,
+.auth-welcome-shape-two { display: none !important; }
+.primary-button,
+.publish-button,
+.send-button,
+.search-submit,
+.home-search .search-submit,
+.home-ad-cta { background: var(--red) !important; color: #ffffff !important; border-color: var(--red) !important; }
+.primary-button:hover,
+.publish-button:hover,
+.send-button:hover,
+.search-submit:hover,
+.home-search .search-submit:hover,
+.home-ad-cta:hover { background: var(--dark-red) !important; color: #ffffff !important; }
+.chat-quick-actions button,
+.chat-messages .message-bubble,
+.chat-empty-note,
+.listing-preview,
+.listing-detail-meta span,
+.listing-spec-grid > div,
+.miniweb-welcome-card,
+.miniweb-trust-strip span,
+.miniweb-category-chips span,
+.business-live-preview,
+.business-onboarding-card,
+.public-business-stats > div,
+.public-business-listings .product-card,
+.public-business-listings .empty-state {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #111111 !important;
+  border-color: var(--line) !important;
+}
+.chat-messages .message-bubble.mine { background: #f7e7e7 !important; color: #111111 !important; }
+.chat-quick-actions button:hover,
+.miniweb-category-chips span:first-child { background: var(--red) !important; color: #ffffff !important; border-color: var(--red) !important; }
+@media (max-width: 760px) {
+  .listing-modal-backdrop,
+  .listing-details-premium,
+  .listing-details-layout,
+  .listing-gallery-panel,
+  .listing-gallery-frame,
+  .messages-page,
+  .message-layout,
+  .conversation-list,
+  .chat-panel,
+  .chat-messages,
+  .chat-composer { background: #ffffff !important; background-image: none !important; }
+}

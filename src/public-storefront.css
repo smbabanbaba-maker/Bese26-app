@@ -394,3 +394,45 @@
 .product-price, .public-card-action, .public-about-heading > svg, .public-about-item > svg, .public-about-link { color: #FF2C2C !important; }
 .public-business-listings .product-card:hover .product-price { color: #b00000 !important; }
 .public-business-nav a::after { background: #FF2C2C !important; }
+
+/* Public storefront color system: white surfaces, near-black text, restrained red accents. */
+.public-business-shell,
+.public-business-main,
+.public-business-footer,
+.public-business-topbar,
+.public-business-hero,
+.public-business-stats > div,
+.public-business-listings,
+.public-business-listings .product-card,
+.public-business-listings .empty-state,
+.public-business-about,
+.public-about-item,
+.public-info-hero,
+.public-trust-section,
+.public-trust-grid article {
+  background: #FFFFFF !important;
+  background-image: none !important;
+  color: #111111 !important;
+  border-color: #DEDEDE !important;
+}
+.public-business-hero *,
+.public-business-identity h1,
+.public-business-identity .eyebrow,
+.public-business-handle,
+.public-business-identity p,
+.public-business-location,
+.public-business-footer,
+.public-business-footer strong,
+.storefront-shell-intro,
+.storefront-shell-intro > span:not(.storefront-live-dot) { color: #111111 !important; }
+.public-business-hero::after { display: none !important; }
+.public-business-actions .secondary-button { color: #111111 !important; background: #FFFFFF !important; border-color: #DEDEDE !important; }
+.public-business-listings .section-heading { border-color: #DEDEDE !important; }
+.public-business-listings .public-card-action,
+.public-business-listings .product-price,
+.public-about-heading > svg,
+.public-about-item > svg,
+.public-about-link,
+.public-share-button:hover { color: #B84F4F !important; }
+.public-business-listings .product-card:hover,
+.public-about-item:hover { border-color: #B84F4F !important; background: #FFFFFF !important; }
