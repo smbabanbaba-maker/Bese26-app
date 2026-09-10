@@ -36,19 +36,19 @@
 .public-business-nav a { color: #6e737b; text-decoration: none; font-size: 12px; font-weight: 700; transition: color .18s ease; }
 .public-business-nav a:hover { color: #FF2C2C; }
 .public-share-button { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; color: #17191d; background: #fff; border-color: #dfe2e7; box-shadow: 0 5px 14px rgba(22,25,30,.05); }
-.public-share-button:hover { border-color: #FF2C2C; color: #0b3d91; }
+.public-share-button:hover { border-color: #FF2C2C; color: #990000; }
 .public-business-main { position: relative; z-index: 1; width: min(1120px, 100%); margin: 0 auto; padding: 28px 28px 72px; }
 .storefront-shell-intro { display: flex; align-items: center; gap: 8px; margin: 4px 0 18px; color: #767b84; font-size: 11px; font-weight: 700; letter-spacing: .02em; }
 .storefront-shell-intro > span:not(.storefront-live-dot) { color: #c7cbd1; }
 .storefront-live-dot { width: 7px; height: 7px; background: #32a574; border-radius: 50%; box-shadow: 0 0 0 4px rgba(50,165,116,.12); }
-.public-business-hero { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; align-items: center; min-height: 360px; padding: 42px; overflow: hidden; border: 1px solid #30333a; border-radius: 28px; background: linear-gradient(125deg, #15171b 0%, #24262b 56%, #0b3d91 100%); box-shadow: 0 24px 60px rgba(20,22,28,.17); }
+.public-business-hero { position: relative; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 34px; align-items: center; min-height: 360px; padding: 42px; overflow: hidden; border: 1px solid #30333a; border-radius: 28px; background: linear-gradient(125deg, #15171b 0%, #24262b 56%, #990000 100%); box-shadow: 0 24px 60px rgba(20,22,28,.17); }
 .public-business-hero::after { content: ''; position: absolute; width: 420px; height: 420px; right: -145px; top: -180px; border-radius: 50%; background: radial-gradient(circle, rgba(255,44,44,.78) 0%, rgba(255,44,44,.16) 44%, transparent 70%); pointer-events: none; }
 .public-business-logo { position: relative; z-index: 1; width: 170px; height: 170px; border: 7px solid rgba(255,255,255,.13); border-radius: 30px; background: #fff; box-shadow: 0 17px 34px rgba(0,0,0,.27); }
 .public-business-logo img { object-fit: cover; }
 .public-business-identity { position: relative; z-index: 1; min-width: 0; }
-.public-business-identity .eyebrow { color: #bfc5ff; margin-bottom: 12px; }
+.public-business-identity .eyebrow { color: #ffcaca; margin-bottom: 12px; }
 .public-business-identity h1 { max-width: 700px; font-size: clamp(34px, 6vw, 66px); line-height: .98; letter-spacing: -2.5px; }
-.public-business-handle { display: inline-block; margin-top: 12px; color: #c9ceff; font-size: 15px; }
+.public-business-handle { display: inline-block; margin-top: 12px; color: #ffd0d0; font-size: 15px; }
 .public-business-identity p { max-width: 610px; margin: 20px 0 12px; color: #c8cbd1; font-size: 14px; line-height: 1.65; }
 .public-business-location { color: #dfe1e5; font-size: 12px; }
 .public-business-actions { gap: 10px; margin-top: 24px; }
@@ -382,15 +382,15 @@
 .public-brand-logo { box-shadow: 0 7px 15px rgba(255,44,44,.18); }
 .public-brand strong span, .public-business-footer strong span { color: #FF2C2C; }
 .public-business-nav a:hover { color: #FF2C2C; }
-.public-share-button:hover { border-color: #8fc1ff; color: #0958b9; }
+.public-share-button:hover { border-color: #ffb3b3; color: #b00000; }
 .public-business-hero { background: linear-gradient(125deg, #142b47 0%, #1d456f 56%, #63363f 100%); }
 .public-business-hero::after { background: radial-gradient(circle, rgba(255,44,44,.78) 0%, rgba(255,44,44,.18) 44%, transparent 70%); }
 .public-business-identity .eyebrow { color: #a8caef; }
 .public-card-action { color: #FF2C2C; }
-.public-business-stats > div:hover { border-color: #b8d4ff; box-shadow: 0 10px 26px rgba(255,44,44,.10); }
+.public-business-stats > div:hover { border-color: #ffbcbc; box-shadow: 0 10px 26px rgba(255,44,44,.10); }
 
 
 /* Final low-red guard: storefront stylesheet is loaded after the app stylesheet. */
 .product-price, .public-card-action, .public-about-heading > svg, .public-about-item > svg, .public-about-link { color: #FF2C2C !important; }
-.public-business-listings .product-card:hover .product-price { color: #0958b9 !important; }
+.public-business-listings .product-card:hover .product-price { color: #b00000 !important; }
 .public-business-nav a::after { background: #FF2C2C !important; }

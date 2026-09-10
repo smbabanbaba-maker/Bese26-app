@@ -7,7 +7,7 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --red: #FF2C2C;
-  --dark-red: #0b3d91;
+  --dark-red: #990000;
   --ink: #000000;
   --muted: rgba(0,0,0,.64);
   --soft: #ffffff;
@@ -90,11 +90,11 @@ h1, h2, h3 { font-family: Manrope, sans-serif; letter-spacing: -.04em; }
 .category-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 .category-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 11px; }
 .category-chevron { margin-left: auto; color: #9da2aa; }
-.tone-coral { background: #ffffff; border-color: #ffffff; } .tone-coral .category-icon { background:#000000; color:#5b95ce; }
+.tone-coral { background: #ffffff; border-color: #ffffff; } .tone-coral .category-icon { background:#000000; color:#FF2C2C; }
 .tone-lavender { background: #f4f0ff; border-color: #ebe3ff; } .tone-lavender .category-icon { background:#e1d7ff; color:#745ac9; }
 .tone-blue { background: #edf6ff; border-color: #dcecff; } .tone-blue .category-icon { background:#d6eaff; color:#3478bb; }
 .tone-sand { background: #fff8e9; border-color: #f6ebca; } .tone-sand .category-icon { background:#ffedbb; color:#89abcd; }
-.tone-pink { background: #ffffff; border-color: #ffffff; } .tone-pink .category-icon { background:#ffffff; color:#3973ac; }
+.tone-pink { background: #ffffff; border-color: #ffffff; } .tone-pink .category-icon { background:#ffffff; color:#FF2C2C; }
 .tone-green { background: #effbf3; border-color: #def2e3; } .tone-green .category-icon { background:#d5f0dc; color:#438d5b; }
 .tone-peach { background: #ffffff; border-color: #ffffff; } .tone-peach .category-icon { background:#ffffff; color:#538dc6; }
 .tone-mint { background: #eefbf9; border-color: #daf2ed; } .tone-mint .category-icon { background:#d1eee8; color:#278a7d; }
@@ -125,7 +125,7 @@ h1, h2, h3 { font-family: Manrope, sans-serif; letter-spacing: -.04em; }
 .product-card-compact .product-info { padding: 11px; }
 .product-card-compact .product-info h3 { font-size: 12px; }
 .product-card-compact .product-foot, .product-card-compact .verified-badge { display: none; }
-.trust-card { border: 1px solid #0a6dd0; background: #ffffff; border-radius: 18px; padding: 25px; position: relative; overflow: hidden; }
+.trust-card { border: 1px solid #FF2C2C; background: #ffffff; border-radius: 18px; padding: 25px; position: relative; overflow: hidden; }
 .trust-card:after { content: ''; width: 110px; height: 110px; border-radius: 50%; position: absolute; right: -30px; bottom: -45px; background: #000000; }
 .trust-card-icon { width: 45px; height: 45px; display: grid; place-items: center; background: var(--red); color: white; border-radius: 14px; margin-bottom: 26px; position: relative; z-index: 1; }
 .trust-card h3 { font-size: 24px; margin-bottom: 9px; }
@@ -1389,11 +1389,11 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .popular-category.tone-lavender > span { background:#e1d7ff; color:#745ac9; }
 .popular-category.tone-blue > span { background:#d6eaff; color:#3478bb; }
 .popular-category.tone-sand > span { background:#ffedbb; color:#89abcd; }
-.popular-category.tone-pink > span { background:#ffffff; color:#3973ac; }
+.popular-category.tone-pink > span { background:#ffffff; color:#FF2C2C; }
 .popular-category.tone-green > span { background:#d5f0dc; color:#438d5b; }
 .popular-category.tone-peach > span { background:#ffffff; color:#538dc6; }
 .popular-category.tone-gold > span { background:#ffecbc; color:#789fc6; }
-.popular-category.tone-coral > span { background:#000000; color:#5b95ce; }
+.popular-category.tone-coral > span { background:#000000; color:#FF2C2C; }
 @media (max-width: 760px) { .popular-category-rail { display:flex; } .popular-category { flex:0 0 94px; } }
 
 /* Listing Details conversion layer: buyer prompts, trust, and store discovery. */
@@ -2092,8 +2092,8 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 /* Soft blue refinement: calm brick red instead of bright primary red. */
 :root {
   --red: #FF2C2C;
-  --dark-red: #0b3d91;
-  --brand-gradient: linear-gradient(135deg, #FF2C2C 0%, #0b3d91 100%);
+  --dark-red: #990000;
+  --brand-gradient: linear-gradient(135deg, #FF2C2C 0%, #990000 100%);
   --cream: #ffffff;
 }
 .brand-mark, .primary-button, .publish-button, .send-button, .home-ad-cta, .wallet-card { background:var(--brand-gradient); }
@@ -2157,7 +2157,7 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .auth-backdrop { background:radial-gradient(circle at 50% 0%, rgba(255,44,44,.11), transparent 42%), rgba(16,18,22,.68); }
 .dashboard-welcome-card::before { background:linear-gradient(110deg,rgba(255,255,255,.08),transparent 35%,rgba(255,44,44,.06)); }
 /* Override older declarations that predate the soft-red palette. */
-:root { --brand-gradient:linear-gradient(135deg,#FF2C2C 0%,#0b3d91 100%); }
+:root { --brand-gradient:linear-gradient(135deg,#FF2C2C 0%,#990000 100%); }
 .brand-mark { background:var(--brand-gradient); }
 .primary-button, .publish-button, .send-button, .home-ad-cta { background:var(--brand-gradient); }
 .message-bubble.mine { background:var(--brand-gradient); }
@@ -2748,32 +2748,32 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 /* Bese26 blue theme: blue is the primary brand accent with black and white neutrals. */
 :root {
   --red: #FF2C2C;
-  --dark-red: #0b3d91;
+  --dark-red: #990000;
   --blue: #FF2C2C;
-  --navy: #0b3d91;
-  --blue-soft: #eaf3ff;
-  --blue-line: #b8d4ff;
-  --brand-gradient: linear-gradient(135deg, #FF2C2C 0%, #0b3d91 100%);
-  --dark-gradient: linear-gradient(135deg, #0b3d91 0%, #FF2C2C 100%);
+  --navy: #990000;
+  --blue-soft: #fff0f0;
+  --blue-line: #ffbcbc;
+  --brand-gradient: linear-gradient(135deg, #FF2C2C 0%, #990000 100%);
+  --dark-gradient: linear-gradient(135deg, #990000 0%, #FF2C2C 100%);
 }
 body { background: #ffffff; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline-color: rgba(255,44,44,.28); }
 .brand-mark { background: var(--brand-gradient); box-shadow: 0 8px 18px rgba(255,44,44,.22); }
 .primary-button, .publish-button, .send-button { background: var(--dark-gradient); box-shadow: 0 8px 18px rgba(255,44,44,.18); }
-.primary-button:hover, .publish-button:hover, .send-button:hover { background: #0958b9; box-shadow: 0 12px 24px rgba(255,44,44,.25); }
+.primary-button:hover, .publish-button:hover, .send-button:hover { background: #b00000; box-shadow: 0 12px 24px rgba(255,44,44,.25); }
 .home-ad-cta { background: var(--brand-gradient); box-shadow: 0 8px 18px rgba(255,44,44,.16); }
 .home-ad-cta:hover { background: var(--dark-red); }
 .search-submit, .home-search .search-submit { background: var(--blue); }
-.search-submit:hover, .home-search .search-submit:hover { background: #0958b9; }
+.search-submit:hover, .home-search .search-submit:hover { background: #b00000; }
 .text-button, .inline-link { color: var(--blue); }
-.topbar-search:focus-within { border-color: #8fc1ff; box-shadow: 0 0 0 4px rgba(255,44,44,.10); }
+.topbar-search:focus-within { border-color: #ffb3b3; box-shadow: 0 0 0 4px rgba(255,44,44,.10); }
 .category-tile:hover { border-color: var(--blue-line); box-shadow: 0 9px 22px rgba(255,44,44,.12); }
 .category-tile:nth-child(1) .category-icon { color: var(--red); background: #ffffff; }
 .category-tile:nth-child(2) .category-icon { color: var(--blue); background: var(--blue-soft); }
 .product-card:hover { border-color: var(--blue-line); box-shadow: 0 15px 32px rgba(28,72,116,.12); }
 .product-meta svg, .location-row svg { color: var(--blue); }
-.filter-chip.active, .filter-button:hover { color: var(--blue); border-color: #8fc1ff; background: var(--blue-soft); }
-.trust-card { background: linear-gradient(135deg, #eaf3ff, #fff); border-color: #d6e5f6; }
+.filter-chip.active, .filter-button:hover { color: var(--blue); border-color: #ffb3b3; background: var(--blue-soft); }
+.trust-card { background: linear-gradient(135deg, #fff0f0, #fff); border-color: #d6e5f6; }
 .trust-card-icon { background: var(--dark-gradient); }
 .wallet-card { background: var(--dark-gradient); }
 .notification-icon { color: var(--blue); background: var(--blue-soft); }
@@ -2785,7 +2785,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .bottom-nav button.active { color: var(--blue); }
 .bottom-nav button:nth-child(1).active { color: var(--red); }
 .bottom-nav button:nth-child(6).active { color: var(--blue); }
-input:focus, textarea:focus, select:focus { border-color: #8fc1ff; box-shadow: 0 0 0 4px rgba(255,44,44,.10); }
+input:focus, textarea:focus, select:focus { border-color: #ffb3b3; box-shadow: 0 0 0 4px rgba(255,44,44,.10); }
 .chat-header::before { background: var(--blue); }
 .chat-quick-actions button { border-color: var(--blue-line); color: var(--blue); }
 .sell-upload-tile > span { background: var(--blue); }
@@ -2805,18 +2805,18 @@ input:focus, textarea:focus, select:focus { border-color: #8fc1ff; box-shadow: 0
 .business-setup-mark { background: var(--blue); color: #fff; }
 .business-logo-upload span { background: transparent; color: var(--blue); }
 .sell-step-icon.coral { color: var(--blue); background: var(--blue-soft); }
-.sell-error { color: #0958b9; background: #f0f6ff; border-color: var(--blue-line); }
+.sell-error { color: #b00000; background: #f0f6ff; border-color: var(--blue-line); }
 
 /* Public storefront: blue carries links, prices, underlines and hover states. */
 .public-brand strong span, .public-business-footer strong span { color: #FF2C2C; }
 .public-business-nav a:hover { color: #FF2C2C; }
 .public-business-nav a::after { background: #FF2C2C; }
-.public-share-button:hover { border-color: #8fc1ff; color: #0958b9; }
+.public-share-button:hover { border-color: #ffb3b3; color: #b00000; }
 .public-business-listings .public-card-action,
 .public-business-listings .product-price,
 .public-about-heading > svg,
 .public-about-item > svg,
 .public-about-link { color: #FF2C2C; }
-.public-business-listings .product-card:hover { border-color: #b8d4ff; }
-.public-business-listings .product-card:hover .product-price { color: #0958b9; }
-.public-about-item:hover { border-color: #b8d4ff; background: #f7fbff; }
+.public-business-listings .product-card:hover { border-color: #ffbcbc; }
+.public-business-listings .product-card:hover .product-price { color: #b00000; }
+.public-about-item:hover { border-color: #ffbcbc; background: #f7fbff; }
