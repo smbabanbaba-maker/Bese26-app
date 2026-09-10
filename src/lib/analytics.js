@@ -6,6 +6,13 @@ function handleTrackedClick(event) {
   if (!link) return;
   const href = link.getAttribute('href') || '';
   const label = (link.getAttribute('aria-label') || link.textContent || '').trim().slice(0, 100);
+  trackEvent('app_click', {
+    element_type: link.tagName.toLowerCase(),
+    element_text: label || 'unlabelled',
+    element_id: link.id || undefined,
+    element_class: typeof link.className === 'string' ? link.className.slice(0, 100) : undefined,
+    link_url: href || undefined,
+  });
   if (href.startsWith('https://wa.me/') || href.includes('whatsapp.com')) {
     trackEvent('whatsapp_click', { link_url: href, link_text: label });
   } else if (href.startsWith('tel:')) {
@@ -17,6 +24,16 @@ function handleTrackedClick(event) {
   } else if (link instanceof HTMLAnchorElement && link.download) {
     trackEvent('file_download', { file_name: link.download || href, link_url: href });
   }
+}
+
+function handleTrackedChange(event) {
+  const field = event.target;
+  if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) return;
+  const name = field.name || field.id || field.getAttribute('aria-label') || field.placeholder || 'unnamed_field';
+  trackEvent('app_field_change', {
+    field_name: name.slice(0, 80),
+    field_type: field.type || field.tagName.toLowerCase(),
+  });
 }
 
 export function initAnalytics() {
@@ -35,6 +52,7 @@ export function initAnalytics() {
     document.head.appendChild(script);
   }
   document.addEventListener('click', handleTrackedClick, true);
+  document.addEventListener('change', handleTrackedChange, true);
 }
 
 export function trackPageView(path = window.location.pathname + window.location.search + window.location.hash) {
