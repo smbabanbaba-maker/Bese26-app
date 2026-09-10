@@ -3031,3 +3031,75 @@ select:focus,
 .auth-welcome-panel p,
 .auth-welcome-panel .auth-welcome-kicker { color:#ffffff !important; }
 .auth-welcome-panel .auth-welcome-kicker { color:#f1b0b0 !important; }
+
+/* Messages white workspace: all page, panel, preview, quick-action and chat
+   body surfaces are explicitly white. Red remains limited to accents/borders. */
+.messages-page,
+.messages-inbox-page,
+.messages-selected-page,
+.message-layout,
+.conversation-list,
+.chat-panel,
+.chat-header,
+.chat-context,
+.chat-safety-note,
+.chat-quick-actions,
+.chat-messages,
+.chat-empty-note,
+.chat-composer,
+.deal-form,
+.deal-status-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+}
+.conversation-list,
+.chat-panel,
+.chat-context,
+.chat-quick-actions,
+.chat-messages,
+.chat-composer,
+.deal-form,
+.deal-status-card { border-color: var(--line) !important; }
+.chat-context,
+.chat-quick-actions,
+.chat-messages,
+.chat-composer,
+.chat-empty-note,
+.deal-form,
+.deal-status-card { box-shadow: none !important; }
+.conversation-list::before,
+.conversation-copy span,
+.conversation-meta small,
+.chat-person span,
+.chat-context span,
+.chat-context strong,
+.chat-quick-actions button,
+.chat-empty-note { color: var(--ink) !important; }
+.conversation-row,
+.conversation-row.active,
+.conversation-row:hover,
+.chat-header,
+.chat-context,
+.chat-quick-actions button,
+.chat-empty-note,
+.deal-form,
+.deal-status-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+.chat-quick-actions button { border-color: var(--line) !important; }
+.chat-quick-actions button:hover { background: var(--red) !important; color: #ffffff !important; border-color: var(--red) !important; }
+.chat-messages .message-bubble.mine { background: #f9e4e4 !important; color: var(--dark-red) !important; box-shadow: none !important; }
+.chat-messages .message-bubble.other { background: #ffffff !important; color: var(--ink) !important; border-color: var(--line) !important; }
+.chat-composer input { background: #ffffff !important; }
+@media (max-width:700px) {
+  .messages-page,
+  .messages-inbox-page,
+  .messages-selected-page,
+  .message-layout,
+  .conversation-list,
+  .chat-panel,
+  .chat-messages,
+  .chat-composer { background-color: #ffffff !important; background-image: none !important; }
+}
