@@ -2993,3 +2993,41 @@ select:focus,
   .listing-details-premium { background: var(--soft); }
   .listing-details-premium .listing-detail-body > * { background: var(--card); }
 }
+
+/* Readability guardrails for dark brand surfaces: keep their white hierarchy
+   explicit so later component rules cannot turn text dark on dark backgrounds. */
+.profile-cover,
+.profile-cover .profile-heading,
+.profile-cover .profile-identity,
+.profile-cover .profile-name-row,
+.profile-cover .profile-heading h1,
+.profile-cover .profile-heading .profile-username,
+.profile-cover .profile-heading .profile-account-type,
+.profile-cover .profile-heading .profile-unverified,
+.profile-cover .profile-heading .product-meta,
+.profile-cover .profile-heading .seller-stats,
+.profile-cover .profile-cover-bottom {
+  color: #ffffff !important;
+}
+.profile-cover .profile-heading .profile-username,
+.profile-cover .profile-heading .profile-account-type,
+.profile-cover .profile-heading .profile-unverified,
+.profile-cover .profile-cover-bottom { color: rgba(255,255,255,.78) !important; }
+.profile-cover .profile-heading .seller-stats { color: #f2a0a0 !important; }
+.profile-cover .profile-heading .outline-button { color:#ffffff !important; border-color:rgba(255,255,255,.34) !important; background:rgba(255,255,255,.1) !important; }
+.profile-cover .profile-heading .verified-badge,
+.profile-cover .profile-cover-bottom .verified-badge { color:#a8f0d0 !important; background:rgba(93,213,166,.16) !important; border-color:rgba(168,240,208,.28) !important; }
+.promo-summary,
+.promo-summary h2,
+.promo-summary-foot { color:#ffffff !important; }
+.promo-summary-foot { color:rgba(255,255,255,.76) !important; }
+.message-bubble.other { color:#ffffff !important; background:#4b2929 !important; }
+.message-bubble.other small { color:rgba(255,255,255,.78) !important; }
+.listing-preview { background:#4b2929 !important; color:#ffffff !important; }
+.listing-preview .preview-label { color:#ffffff !important; }
+.listing-preview .preview-inner { color:var(--ink) !important; background:var(--card) !important; }
+.auth-welcome-panel,
+.auth-welcome-panel h2,
+.auth-welcome-panel p,
+.auth-welcome-panel .auth-welcome-kicker { color:#ffffff !important; }
+.auth-welcome-panel .auth-welcome-kicker { color:#f1b0b0 !important; }
