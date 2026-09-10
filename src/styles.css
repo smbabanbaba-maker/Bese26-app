@@ -2745,15 +2745,15 @@ input:focus, textarea:focus, select:focus { border-color:#b9b0ee; box-shadow:0 0
 .phone-verification-error { margin:0; padding:9px 10px; border-radius:9px; color:#9a2e27; background:#fff0ee; font-size:11px; line-height:1.4; }
 @media (max-width:520px) { .phone-verification-heading { align-items:flex-start; flex-wrap:wrap; } .phone-verification-status { margin-left:44px; margin-top:-4px; } .phone-verification-actions { display:grid; grid-template-columns:1fr; } }
 
-/* Balanced Bese26 palette: red stays the brand accent; blue carries primary navigation and actions. */
+/* Bese26 blue theme: blue is the primary brand accent with black and white neutrals. */
 :root {
-  --red: #c84b50;
-  --dark-red: #9f303b;
+  --red: #2f6fbb;
+  --dark-red: #173b63;
   --blue: #2f6fbb;
   --navy: #173b63;
   --blue-soft: #edf5ff;
   --blue-line: #c9dcf3;
-  --brand-gradient: linear-gradient(135deg, #c84b50 0%, #9f303b 100%);
+  --brand-gradient: linear-gradient(135deg, #2f6fbb 0%, #173b63 100%);
   --dark-gradient: linear-gradient(135deg, #173b63 0%, #2d6da8 100%);
 }
 body { background: #f4f7fb; }
@@ -2794,7 +2794,7 @@ input:focus, textarea:focus, select:focus { border-color: #9fc2e8; box-shadow: 0
 .business-upgrade-progress button.active b, .business-upgrade-progress button.complete b { background: var(--blue); border-color: var(--blue); }
 
 
-/* Low-red refinement: use red only for the Bese26 mark and critical status; blue leads the interface. */
+/* Blue refinement: blue leads the interface consistently across all marketplace surfaces. */
 .product-price, .modal-price, .wallet-balance { color: var(--blue); }
 .bottom-nav button:nth-child(1).active { color: var(--blue); }
 .results-count, .count-bubble, .unread-pill { border-color: var(--blue-line); }
