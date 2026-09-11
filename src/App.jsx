@@ -80,6 +80,20 @@ function BrandLoader({ message = 'Loading Bese26…', offline = false, compact =
   </div>;
 }
 
+function SplashScreen() {
+  return <div className="splash-screen" role="status" aria-label="Bese26 is loading">
+    <div className="splash-brand-lockup">
+      <img className="splash-bese26-logo" src="/images/bese26-logo-icon.png" alt="Bese26" />
+      <span className="splash-brand-name">Bese26<span>.shop</span></span>
+    </div>
+    <div className="splash-credit" aria-label="From SYLUTION">
+      <span className="splash-credit-label">From</span>
+      <img className="splash-sylution-logo" src="/branding-sylution-logo.png" alt="SYLUTION" />
+      <span className="splash-credit-name">SYLUTION</span>
+    </div>
+  </div>;
+}
+
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -771,7 +785,7 @@ function AppContent() {
 
   const [showStartupLoader, setShowStartupLoader] = useState(true);
   useEffect(() => { const timer = window.setTimeout(() => setShowStartupLoader(false), 2000); return () => window.clearTimeout(timer); }, []);
-  if (showStartupLoader) return <BrandLoader message="Loading Bese26…" />;
+  if (showStartupLoader) return <SplashScreen />;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;

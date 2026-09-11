@@ -3577,3 +3577,88 @@ button:disabled { color:#8a929b !important; opacity:.72; }
   .admin-page .admin-intro .secondary-button { align-self:flex-start; }
   .admin-page .admin-operation-suite, .admin-page .admin-control-panel { gap:11px; }
 }
+
+/* Branded startup splash */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #fff;
+  background: #181818;
+  animation: splashFadeIn 420ms ease-out both;
+}
+.splash-screen::before {
+  content: '';
+  position: absolute;
+  width: min(92vw, 520px);
+  height: min(92vw, 520px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 44, 44, .18) 0%, rgba(255, 44, 44, .05) 42%, transparent 72%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+.splash-brand-lockup, .splash-credit {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.splash-brand-lockup { transform: translateY(-3vh); }
+.splash-bese26-logo {
+  width: clamp(116px, 27vw, 176px);
+  height: clamp(116px, 27vw, 176px);
+  object-fit: contain;
+  border-radius: 30%;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .34));
+  animation: splashLogoIn 700ms cubic-bezier(.23, 1, .32, 1) both;
+}
+.splash-brand-name {
+  margin-top: 16px;
+  font-family: Manrope, sans-serif;
+  font-size: clamp(25px, 6vw, 36px);
+  font-weight: 800;
+  letter-spacing: -.06em;
+}
+.splash-brand-name span { color: #ff4d56; }
+.splash-credit {
+  position: absolute;
+  bottom: max(26px, env(safe-area-inset-bottom));
+  gap: 4px;
+  color: rgba(255, 255, 255, .58);
+  animation: splashCreditIn 800ms 160ms ease-out both;
+}
+.splash-credit-label {
+  font-family: Manrope, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+.splash-sylution-logo {
+  width: 46px;
+  height: 30px;
+  margin-top: 1px;
+  object-fit: contain;
+  border-radius: 6px;
+  opacity: .9;
+}
+.splash-credit-name {
+  font-family: Manrope, sans-serif;
+  color: #f5f5f5;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+@keyframes splashFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes splashLogoIn { from { opacity: 0; transform: scale(.82); } to { opacity: 1; transform: scale(1); } }
+@keyframes splashCreditIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen, .splash-bese26-logo, .splash-credit { animation: none; }
+}
