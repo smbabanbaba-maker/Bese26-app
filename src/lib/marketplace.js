@@ -1,5 +1,6 @@
 import { getAvatarUrl, getListingMediaUrls, supabase } from './supabase';
 import { sanitizePublicBusinessProfile } from './publicBusiness';
+import { normalizeDirectorySearch } from './businessDirectory';
 
 function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
@@ -648,12 +649,24 @@ export async function fetchPublicProfile(username) {
 
 export async function fetchBusinessDirectory(search = '') {
   failIfUnavailable();
-  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,verification_expires_at,is_active,public_contact').eq('is_active', true).order('business_name').limit(60);
-  const value = String(search || '').trim();
-  if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
-  const { data, error } = await query;
-  if (error) throw error;
-  return (data || []).map((business) => ({ ...business, is_verified: verificationIsCurrent(business) }));
+  const value = normalizeDirectorySearch(search);
+  const pageSize = 200;
+  const businesses = [];
+  for (let from = 0; ; from += pageSize) {
+    let query = supabase.from('business_profiles')
+      .select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,verification_expires_at,is_active,public_contact')
+      .eq('is_active', true)
+      .not('business_handle', 'is', null)
+      .neq('business_handle', '')
+      .order('business_name')
+      .range(from, from + pageSize - 1);
+    if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    businesses.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+  }
+  return businesses.map((business) => ({ ...business, is_verified: verificationIsCurrent(business) }));
 }
 
 export async function checkBusinessHandleAvailability(handle, userId = null) {
