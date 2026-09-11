@@ -39,22 +39,33 @@ function findCategoryRow(rows, label, parentId = null) {
 }
 
 const categoryGroups = {
-  Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories'],
-  Electronics: ['Phones', 'Tablets', 'Computers', 'Laptops', 'TVs', 'Cameras', 'Audio', 'Gaming', 'Accessories', 'Networking equipment', 'Smart devices'],
+  Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories', 'Boats & marine', 'Bicycles', 'Vehicle tools'],
+  Electronics: ['Phones', 'Tablets', 'Computers', 'Laptops', 'TVs', 'Cameras', 'Audio', 'Gaming', 'Accessories', 'Networking equipment', 'Smart devices', 'Monitors', 'Printers', 'Computer parts', 'Chargers & power banks'],
+  'Arduino & IoT': ['Arduino boards', 'ESP32', 'ESP8266', 'Raspberry Pi', 'Microcontrollers', 'Sensors', 'Modules', 'Electronic components', 'Development boards', 'Robotics', 'Drones', 'IoT kits', 'Automation', '3D printing', 'Soldering & tools', 'Cables & connectors'],
+  'Computers & Accessories': ['Desktops', 'Laptops', 'Monitors', 'Keyboards', 'Mice', 'Printers', 'Hard drives', 'SSD', 'RAM', 'Graphics cards', 'Computer cases', 'Software'],
+  'Cameras & Photography': ['Digital cameras', 'Lenses', 'Tripods', 'Lighting', 'Drones', 'Camcorders', 'Camera accessories', 'Photography services'],
   Property: ['Houses', 'Apartments', 'Land', 'Shops', 'Offices', 'Warehouses', 'Farms', 'Short-let', 'Commercial property'],
   Fashion: ['Men', 'Women', 'Children', 'Shoes', 'Bags', 'Watches', 'Jewelry', 'Accessories'],
   Agriculture: ['Crops', 'Seeds', 'Fertilizer', 'Agrochemicals', 'Farm equipment', 'Irrigation equipment', 'Livestock', 'Poultry', 'Animal feed', 'Greenhouses', 'Agricultural services'],
   'Home & Garden': ['Furniture', 'Kitchen', 'Appliances', 'Home décor', 'Garden equipment', 'Tools'],
   'Jobs & Services': ['Technology', 'Construction', 'Engineering', 'Design', 'Marketing', 'Education', 'Repair', 'Cleaning', 'Transport', 'Consulting', 'Freelance services', 'Other services'],
   'Business & Industrial': ['Machinery', 'Manufacturing equipment', 'Office equipment', 'Restaurant equipment', 'Wholesale goods', 'Industrial supplies'],
+  'Industrial & Scientific': ['Laboratory equipment', 'Measuring instruments', 'Safety equipment', 'Electrical equipment', 'Factory equipment', 'Water treatment', 'Cleaning equipment', 'Packaging equipment'],
+  'Construction & Building': ['Building materials', 'Plumbing', 'Electrical supplies', 'Power tools', 'Hand tools', 'Paints', 'Doors & windows', 'Roofing', 'Heavy equipment'],
+  'Renewable Energy': ['Solar panels', 'Inverters', 'Batteries', 'Charge controllers', 'Generators', 'Wind energy', 'Solar installation', 'Energy accessories'],
   'Food & Beverages': ['Food', 'Grains', 'Fresh produce', 'Processed food', 'Bakery', 'Catering'],
   'Babies & Kids': ['Baby clothing', 'Toys', 'Strollers', 'School items'],
   'Health & Beauty': ['Skincare', 'Haircare', 'Makeup', 'Health products'],
   'Sports & Fitness': ['Gym equipment', 'Sportswear', 'Outdoor gear'],
   'Books & Education': ['Books', 'Courses', 'School supplies'],
+  'Office & Stationery': ['Office furniture', 'Stationery', 'Printers & scanners', 'Paper products', 'Business supplies', 'Packaging'],
+  'Digital Products': ['Software', 'Templates', 'Digital courses', 'E-books', 'Graphics & design', 'Domains & websites', 'Subscriptions'],
+  'Travel & Luggage': ['Luggage', 'Travel bags', 'Camping equipment', 'Travel accessories', 'Tickets', 'Travel services'],
+  'Events & Entertainment': ['Event equipment', 'Party supplies', 'Tickets', 'Music & DJ', 'Photography & video', 'Entertainment services'],
   'Pets & Animals': ['Pets', 'Pet supplies', 'Animal care'],
   'Hobbies & Collectibles': ['Collectibles', 'Musical instruments', 'Arts & crafts'],
-  Other: ['Other products', 'Other services'],
+  Services: ['Repairs', 'Installation', 'Delivery', 'Cleaning', 'Design', 'Consulting', 'Writing & translation', 'Digital services', 'Personal services', 'Other services'],
+  Other: ['Other products', 'Other services', 'Uncategorized item'],
 };
 
 const dynamicFields = {
@@ -63,6 +74,15 @@ const dynamicFields = {
   ],
   Electronics: [
     ['brand', 'Brand', 'e.g. Apple'], ['model', 'Model', 'e.g. iPhone 15 Pro'], ['storage', 'Storage', 'e.g. 256GB'], ['network', 'Network', 'Select network', ['Unlocked', 'MTN', 'Airtel', 'Glo', '9mobile']],
+  ],
+  'Arduino & IoT': [
+    ['boardType', 'Board / device', 'e.g. Arduino Uno, ESP32'], ['chip', 'Chip / module', 'e.g. ATmega328P, Wi-Fi module'], ['voltage', 'Voltage', 'e.g. 3.3V or 5V'], ['connectivity', 'Connectivity', 'Select connectivity', ['Wi-Fi', 'Bluetooth', 'LoRa', 'GSM', 'USB', 'None']],
+  ],
+  'Computers & Accessories': [
+    ['brand', 'Brand', 'e.g. HP, Dell, Lenovo'], ['model', 'Model', 'e.g. ThinkPad T14'], ['processor', 'Processor', 'e.g. Core i5'], ['ram', 'RAM', 'e.g. 16GB'], ['storage', 'Storage', 'e.g. 512GB SSD'],
+  ],
+  'Cameras & Photography': [
+    ['brand', 'Brand', 'e.g. Canon, Sony, Nikon'], ['model', 'Model', 'e.g. EOS 90D'], ['resolution', 'Resolution', 'e.g. 24MP'], ['lensMount', 'Lens mount', 'e.g. EF, E-mount'],
   ],
   Property: [
     ['propertyType', 'Property type', 'Select type', ['House', 'Apartment', 'Land', 'Shop', 'Office', 'Warehouse', 'Farm']], ['listingType', 'Listing type', 'Select listing type', ['For sale', 'For rent', 'Short-let']], ['bedrooms', 'Bedrooms', 'e.g. 3'], ['bathrooms', 'Bathrooms', 'e.g. 2'], ['size', 'Size', 'e.g. 500 sqm'],
@@ -139,7 +159,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const cameraInput = useRef(null);
 
   const update = (key, value) => { setForm((current) => ({ ...current, [key]: value })); setErrors([]); setDraftSaved(false); };
-  const fallbackCategoryOptions = ['Electronics', 'Vehicles', 'Property', 'Fashion', 'Agriculture', 'Jobs & Services', 'Home & Garden', 'Health & Beauty'];
+  const fallbackCategoryOptions = Object.keys(categoryGroups);
   const activeCategoryOptions = categoryRows === null
     ? fallbackCategoryOptions
     : Object.keys(categoryGroups).filter((label) => findCategoryRow(categoryRows, label));
