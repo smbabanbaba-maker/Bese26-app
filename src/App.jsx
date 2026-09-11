@@ -70,6 +70,9 @@ const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
+import { formatPublicBusinessLocation } from './lib/publicBusiness';
+import { saveListingChatDraft, takeListingChatDraft } from './lib/chatDrafts';
+import { withActiveListingUsage } from './lib/sellerEntitlement';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
@@ -259,7 +262,17 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
   const [expanded, setExpanded] = useState(null);
   const [entitlement, setEntitlement] = useState(null);
   const [busyPlan, setBusyPlan] = useState('');
-  useEffect(() => { let mounted = true; if (!user) { setEntitlement(null); return undefined; } fetchSellerEntitlement().then((data) => mounted && setEntitlement(data)).catch(() => {}); return () => { mounted = false; }; }, [user]);
+  useEffect(() => {
+    let mounted = true;
+    if (!user) { setEntitlement(null); return undefined; }
+    Promise.all([fetchSellerEntitlement(), fetchMyListings({ sellerId: user.id, status: 'active' })])
+      .then(([access, activeListings]) => {
+        if (!mounted) return;
+        setEntitlement(withActiveListingUsage(access, activeListings));
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, [user]);
   const choose = async (plan) => { if (plan.key === 'free') { onDemoAction('The Free plan includes 3 active listings.'); return; } if (plan.price === null) { onDemoAction('Enterprise Lux needs a custom business quote.'); return; } if (!user) { onAuthRequired?.(); return; } trackEvent('begin_checkout', { plan_name: plan.key, value: plan.price, currency: 'NGN' }); setBusyPlan(plan.key); try { const checkout = await startPaystackCheckout(plan.key); if (!checkout.authorization_url) throw new Error('Paystack did not return a checkout link.'); window.location.assign(checkout.authorization_url); } catch (error) { onDemoAction(error.message || 'Could not start Paystack checkout.'); setBusyPlan(''); } };
   return <div className="page-stack subscription-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Payments & services</span></div><section className="subscription-hero"><div><div className="eyebrow light">BESE26 SELLER PLANS</div><h1>Grow when your business is ready.</h1><p>Start free with 3 active listings, then upgrade when you need more capacity, tools, verification eligibility, or visibility credits.</p></div><span className="subscription-hero-mark"><Sparkles size={22} /></span></section>{user && entitlement && <section className="subscription-usage"><div><div className="eyebrow">YOUR CURRENT ACCESS</div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan` : 'Free plan'}</strong><span>{`${entitlement.free_posts_used || 0} of ${entitlement.listing_limit} active listings used · ${Math.max((entitlement.listing_limit || 3) - (entitlement.free_posts_used || 0), 0)} remaining`}</span></div><div className="subscription-usage-track"><span style={{ width: `${entitlement.is_paid ? 100 : Math.max(0, (entitlement.free_posts_remaining / entitlement.free_posts_limit) * 100)}%` }} /></div></section>}<div className="subscription-section-heading"><div><div className="eyebrow">SIMPLE START</div><h2>Choose the right level</h2></div><span>Monthly · no hidden balance</span></div><div className="subscription-plan-grid">{subscriptionPlans.map((plan) => <SubscriptionPlanCard plan={plan} key={plan.key} expanded={expanded === plan.key} onToggle={setExpanded} onChoose={choose} currentPlan={entitlement?.is_paid ? entitlement.plan_key : 'free'} busyPlan={busyPlan} />)}</div><p className="subscription-disclaimer"><ShieldCheck size={15} /> Plan access, verification eligibility, and boost credits remain active while the subscription is active. Verification is subject to review and approval. Boosts increase visibility but do not guarantee sales or buyers. Paystack verifies the payment reference, amount, and currency before access is granted.</p></div>;
 }
@@ -394,6 +407,7 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, initial
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [messageReactions, setMessageReactions] = useState({});
+  const initialDraft = liveListing?.chatDraft || '';
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const emojis = ['😀', '😂', '😍', '🥰', '👍', '❤️', '✅', '👏', '🔥', '😮', '🙏', '🎉'];
@@ -418,6 +432,10 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, initial
     const unsubscribe = subscribeToMessages(selectedConversation.id, (incoming) => setLiveMessages((items) => items.some((item) => item.id === incoming.id) ? items : [...items, incoming]));
     return () => { mounted = false; unsubscribe(); };
   }, [selectedConversation?.id, liveMode, onDemoAction]);
+
+  useEffect(() => {
+    if (selectedConversation && initialDraft) setText((current) => current || initialDraft);
+  }, [initialDraft, selectedConversation?.id]);
 
   const send = async (message = text, file = attachment) => {
     if ((!message.trim() && !file) || !liveMode || mediaBusy) return;
@@ -510,7 +528,8 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const priceType = raw.pricing_type === 'negotiable' ? 'Negotiable' : raw.pricing_type === 'contact' || raw.price == null ? 'Contact for price' : raw.pricing_type === 'on_request' ? 'Price on request' : 'Fixed price';
   const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '').map(([key, value]) => ({ key: key.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), value: Array.isArray(value) ? value.join(', ') : value }));
   const delivery = Array.isArray(listing?.deliveryOptions) ? listing.deliveryOptions.filter(Boolean) : [];
-  useEffect(() => { if (!listing) return undefined; setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setLoadingDetails(true); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing)]).then(([reviewResult, similarResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); }).finally(() => setLoadingDetails(false)); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id]);
+  useEffect(() => { if (!listing) return undefined; setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setQuickMessage(''); setLoadingDetails(true); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing)]).then(([reviewResult, similarResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); }).finally(() => setLoadingDetails(false)); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id]);
+  useEffect(() => { saveListingChatDraft(listing?.id, quickMessage); }, [listing?.id, quickMessage]);
   useEffect(() => { if (!zoomed) return undefined; const onKey = (event) => event.key === 'Escape' && setZoomed(false); document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey); }, [zoomed]);
   if (!listing) return null;
   const nextImage = () => setActiveImage((current) => gallery.length ? (current + 1) % gallery.length : 0);
@@ -536,7 +555,9 @@ function PublicProfileHeader({ profile, business, listings, share }) {
   const isBusiness = Boolean(business);
   const name = business?.business_name || profile?.display_name || 'Bese26 seller';
   const handle = business?.business_handle || profile?.username;
-  const location = [business?.city || profile?.city, business?.state || profile?.state, business?.country || profile?.country].filter(Boolean).join(', ');
+  const location = business
+    ? formatPublicBusinessLocation(business)
+    : [profile?.city, profile?.state, profile?.country].filter(Boolean).join(', ');
   const avatar = business?.logo_path || profile?.avatar_path;
   const description = business?.description || profile?.bio;
   return <section className="public-business-hero storefront-hero-clean"><div className="public-business-logo">{avatar ? <img src={getAvatarUrl(avatar)} alt={`${name} profile`} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="public-business-identity"><div className="eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1>{handle && <strong className="public-business-handle">@{handle}</strong>}{(business?.is_verified || profile?.is_verified) && <span className="verified-badge"><BadgeCheck size={13} /> {business?.is_verified ? 'Verified business' : 'Verified seller'}</span>}<p>{description || 'This seller has not added a description yet.'}</p><span className="public-business-location"><MapPin size={14} /> {location || 'Nigeria'}</span><div className="public-business-actions">{business?.phone && <a className="primary-button" href={`tel:${business.phone}`}><Phone size={15} /> Call</a>}{listings[0] && <a className="secondary-button" href={`/?chat_listing=${listings[0].id}`}><MessageCircle size={15} /> Message</a>}<button type="button" className="secondary-button" onClick={share}>Share</button></div></div></section>;
@@ -546,7 +567,7 @@ function PublicListingSection({ title, listings }) {
 }
 function PublicBusinessAbout({ business }) {
   const hours = getBusinessHoursRows(business?.business_hours);
-  const location = [business?.area, business?.city, business?.state, business?.country].filter(Boolean).join(', ');
+  const location = formatPublicBusinessLocation(business);
   const services = [business?.delivery_available && 'Delivery available', business?.pickup_available && 'Pickup available'].filter(Boolean);
   return <section className="public-business-about" aria-labelledby="about-store-title"><div className="public-about-heading"><div><div className="eyebrow">ABOUT THE STORE</div><h2 id="about-store-title">About this store</h2></div><Store size={20} /></div><p className="public-about-description">{business?.description || 'Not available'}</p><div className="public-about-grid"><div className="public-about-item"><MapPin size={16} /><span><b>Location</b>{location || 'Not available'}</span></div><div className="public-about-item"><Tag size={16} /><span><b>Category</b>{business?.category || business?.business_type || 'Not available'}</span></div><div className="public-about-item"><Package size={16} /><span><b>Services</b>{services.length ? services.join(' · ') : 'Not available'}</span></div>{hours.length > 0 && <div className="public-about-item public-about-hours"><Clock3 size={16} /><span><b>Opening hours</b>{hours.slice(0, 3).map((row) => <em key={row.key}>{row.label}: {row.value}</em>)}</span></div>}</div>{business?.website && <a className="public-about-link" href={business.website.startsWith('http') ? business.website : `https://${business.website}`} target="_blank" rel="noreferrer">Visit store website <ArrowUpRight size={14} /></a>}</section>;
 }
@@ -762,7 +783,8 @@ function AppContent() {
     try {
       const conversation = await getOrCreateConversation({ listingId: listing.id, buyerId: sessionUser.id, sellerId: listing.sellerId });
       setSelectedListing(null);
-      setChatListing(listing);
+      const chatDraft = takeListingChatDraft(listing.id);
+      setChatListing({ ...listing, chatDraft });
       showToast(`Chat opened for ${listing.title}`);
       setChatTargetId(conversation.id);
       navigate('messages');

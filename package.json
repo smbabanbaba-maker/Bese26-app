@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "vite build"
+    "check": "npm test && npm run check:migrations && vite build",
+    "check:migrations": "node scripts/check_migration_versions.mjs",
+    "test": "node --test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

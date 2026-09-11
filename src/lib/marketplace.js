@@ -1,4 +1,5 @@
 import { getAvatarUrl, getListingMediaUrls, supabase } from './supabase';
+import { sanitizePublicBusinessProfile } from './publicBusiness';
 
 function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
@@ -540,11 +541,16 @@ const listingSelectWithOwnership = `${listingSelect},business_profile_id,publish
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
-  const { data: businessProfiles, error: businessError } = businessIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
-    : { data: [], error: null };
+  let businessProfiles = [];
+  let businessError = null;
+  if (businessIds.length) {
+    ({ data: businessProfiles, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_expires_at,is_active,phone,whatsapp,email,contact_preference,public_contact,location_visibility,country,state,city,area,address').in('profile_id', businessIds).eq('is_active', true));
+    if (businessError && /contact_preference|column/i.test(businessError.message || '')) {
+      ({ data: businessProfiles, error: businessError } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_expires_at,is_active,phone,whatsapp,email,public_contact,location_visibility,country,state,city,area,address').in('profile_id', businessIds).eq('is_active', true));
+    }
+  }
   if (businessError) throw businessError;
-  const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
+  const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, sanitizePublicBusinessProfile(business)]));
   const mediaByRow = rows.map((row) => ({
     row: { ...row, business_profile: businessById[row.business_profile_id] || null },
     media: [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order),
@@ -624,7 +630,7 @@ export async function fetchPublicBusiness(handle) {
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
   const listings = await hydrateListingRows(rows || [], { firstMediaOnly: true });
-  return { business: { ...business, is_verified: verificationIsCurrent(business) }, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
+  return { business: { ...sanitizePublicBusinessProfile(business), is_verified: verificationIsCurrent(business) }, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
 }
 
 export async function fetchPublicProfile(username) {

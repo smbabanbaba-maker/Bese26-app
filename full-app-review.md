@@ -1,5 +1,7 @@
 # bese26 Full App Review
 
+> Historical snapshot. This report describes an earlier demo-heavy frontend and is retained for audit history. The repository `README.md` and current code are authoritative for the live product state.
+
 ## Main navigation
 
 - Home

@@ -1,5 +1,7 @@
 # Bese26 real-app cleanup audit
 
+> Historical implementation record. Some planned or deferred items in this document have since been completed. Use the repository `README.md` and current code as the source of truth.
+
 ## Scope
 
 The audit covers the current React/Vite app, Supabase data layer, live Vercel URL, and the primary marketplace surfaces. The requested rule is: a feature must use real Supabase state or be removed/hidden until it does.
