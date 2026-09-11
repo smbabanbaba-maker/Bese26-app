@@ -23,6 +23,21 @@ import nigeriaLocations from '../data/nigeriaLocations.json';
 
 const nigeriaStates = Object.keys(nigeriaLocations).sort((a, b) => a.localeCompare(b));
 
+const categoryLabelAliases = {
+  'Health & Beauty': ['Beauty & Health', 'health-beauty', 'beauty-health'],
+  'Phones & Tablets': ['Electronics', 'Phones & Tablets', 'phones-tablets'],
+};
+
+function categorySlug(value) {
+  return String(value || '').toLowerCase().trim().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function findCategoryRow(rows, label, parentId = null) {
+  const candidates = [label, ...(categoryLabelAliases[label] || [])].map((value) => String(value).toLowerCase().trim());
+  const slugs = candidates.map(categorySlug);
+  return rows.find((row) => (row.parent_id || null) === (parentId || null) && (candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))) || null;
+}
+
 const categoryGroups = {
   Vehicles: ['Cars', 'Motorcycles', 'Tricycles', 'Trucks', 'Buses', 'Heavy equipment', 'Agricultural machinery', 'Spare parts', 'Vehicle accessories'],
   Electronics: ['Phones', 'Tablets', 'Computers', 'Laptops', 'TVs', 'Cameras', 'Audio', 'Gaming', 'Accessories', 'Networking equipment', 'Smart devices'],
@@ -312,9 +327,9 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     setPublishState('publishing');
     try {
       const categoryRows = await fetchCategories();
-      const categoryRow = categoryRows.find((item) => item.parent_id == null && item.name === form.category);
-      const subcategoryRow = categoryRows.find((item) => item.parent_id === categoryRow?.id && item.name === form.subcategory);
-      if (!categoryRow) throw new Error('This category is not available yet. Please choose another category.');
+      const categoryRow = findCategoryRow(categoryRows, form.category);
+      const subcategoryRow = findCategoryRow(categoryRows, form.subcategory, categoryRow?.id);
+      if (!categoryRow) throw new Error('The selected category is not available in the marketplace database yet. Please refresh the page or choose one of the active categories.');
       const attributes = Object.fromEntries((dynamicFields[form.category] || []).map(([key]) => [key, form[key] || null]).filter(([, value]) => value !== null && value !== ''));
       const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: 'NGN', pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: form.city, state: form.state, country: 'Nigeria', delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
       const revisionValues = { category_id: listingValues.category_id, subcategory_id: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricing_type: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, delivery_options: listingValues.delivery_options, contact_preference: listingValues.contact_preference, attributes: listingValues.attributes, status: 'active', moderation_status: 'approved', rejection_reason: null, published_at: new Date().toISOString(), updated_at: new Date().toISOString() };
