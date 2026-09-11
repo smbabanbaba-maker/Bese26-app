@@ -29,9 +29,12 @@ export function getStoragePublicUrl(bucket, path) {
 
 export async function getListingMediaUrls(paths = []) {
   if (!supabase || !paths.length) return [];
-  // Listing media is intentionally public: marketplace visitors and shared
-  // listing links must be able to load images without an authenticated session.
-  return paths.map((path) => getStoragePublicUrl('listing-media', path));
+  // The bucket is public in the intended schema, but existing objects may not
+  // be addressable through /object/public URLs after the storage rollout.
+  // Signed URLs work for anonymous visitors and reliably resolve those objects.
+  const { data, error } = await supabase.storage.from('listing-media').createSignedUrls(paths, 3600);
+  if (error) return [];
+  return (data || []).map((item) => item?.signedUrl || '');
 }
 
 export function getAvatarUrl(path) {
