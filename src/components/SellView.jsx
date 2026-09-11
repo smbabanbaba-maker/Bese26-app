@@ -143,7 +143,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const activeCategoryOptions = categoryRows === null
     ? fallbackCategoryOptions
     : Object.keys(categoryGroups).filter((label) => findCategoryRow(categoryRows, label));
-  const categoryOptions = activeCategoryOptions.includes(form.category) ? activeCategoryOptions : [form.category, ...activeCategoryOptions];
+  const categoryOptions = categoryRows === null || !activeCategoryOptions.length ? fallbackCategoryOptions : activeCategoryOptions;
   const subcategories = categoryGroups[form.category] || categoryGroups.Other;
   const fields = (form.category === 'Electronics' && form.subcategory === 'Phones')
     ? [['brand', 'Phone brand', 'e.g. Apple or Samsung'], ['model', 'Phone model', 'e.g. iPhone 15 Pro'], ['storage', 'Storage', 'e.g. 256GB'], ['ram', 'RAM', 'e.g. 8GB'], ['network', 'Network', 'Select network', ['Unlocked', 'MTN', 'Airtel', 'Glo', '9mobile']]]
@@ -237,6 +237,12 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     fetchCategories().then((rows) => mounted && setCategoryRows(rows || [])).catch(() => mounted && setCategoryRows([]));
     return () => { mounted = false; };
   }, []);
+
+  useEffect(() => {
+    if (categoryRows === null || editMode || !activeCategoryOptions.length || activeCategoryOptions.includes(form.category)) return;
+    const nextCategory = activeCategoryOptions[0];
+    setForm((current) => ({ ...current, category: nextCategory, subcategory: categoryGroups[nextCategory]?.[0] || 'Other products' }));
+  }, [categoryRows, editMode, form.category, activeCategoryOptions.join('|')]);
 
   useEffect(() => {
     let mounted = true;
