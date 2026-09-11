@@ -267,7 +267,9 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   useEffect(() => {
     let mounted = true;
     if (!user || !isSupabaseConfigured || editMode) { setEntitlement(null); return undefined; }
-    fetchSellerEntitlement().then((data) => mounted && setEntitlement(data)).catch(() => {});
+    fetchSellerEntitlement().then((data) => mounted && setEntitlement(data)).catch(() => {
+      if (mounted) onDemoAction?.('Could not load your listing allowance. Please refresh before publishing.');
+    });
     return () => { mounted = false; };
   }, [user, editMode]);
 
@@ -385,7 +387,9 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       await Promise.all(uploadableMedia.map((item) => uploadListingMedia({ userId: user.id, listingId: listing.id, file: item.file, sortOrder: media.indexOf(item) })));
       setPublishState('success');
       setDraftSaved(false);
-      if (!editMode) fetchSellerEntitlement().then(setEntitlement).catch(() => {});
+      if (!editMode) fetchSellerEntitlement().then(setEntitlement).catch(() => {
+        onDemoAction?.('Listing submitted, but the updated allowance could not be refreshed yet.');
+      });
       onDemoAction(editMode ? 'Listing updated and active.' : 'Listing submitted successfully. Bese26 will review it before it goes live.');
     } catch (error) {
       setPublishState('idle');

@@ -36,6 +36,8 @@ RLS is enabled on every application table. Public reads are limited to active ap
 
 Copy `.env.example` to `.env.local` and set the Bese26 project URL and publishable key. Do not add service-role keys, secret keys, database passwords, or `.env.local` to Git. The repository already ignores `.env` and `.env.*` while allowing the placeholder `.env.example`.
 
+Use Node.js 22.12 or newer. Runtime dependencies are pinned exactly in `package.json` and `package-lock.json` so local, CI, and deployment installs stay reproducible.
+
 ```bash
 npm install
 cp .env.example .env.local
@@ -78,12 +80,14 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 6. **Completed seller review loop:** Sellers can see rejection feedback, edit the same listing, and resubmit it to Pending without creating a duplicate or self-approving.
 7. **Completed real notifications and policy layer:** Moderation decisions create recipient-scoped notifications; the notification bell uses Supabase data and Realtime; Terms, Privacy, Safety, and Prohibited Items pages are available in Profile.
 8. **Completed seller monetization:** Paystack-backed Basic, Premium, and Business subscriptions, paid listing limits, verification eligibility, and listing boosts are implemented.
-9. **Current safety baseline:** Public storefront contact/location choices are enforced in the client, quick listing questions carry into chat, automated tests cover public business privacy, and CI checks tests, migration versions, and the production build.
+9. **Current safety baseline:** Public storefront contact/location choices are enforced in the client, quick listing questions carry into chat, Paystack ownership/amount/currency checks have automated coverage, and CI checks behavior, migration versions, secrets, static assets, dependency vulnerabilities, and production bundle size.
 10. **Later slices:** Implement phone OTP, an automated KYC provider if required, buyer ordering/payment, Wallet ledger, and an AI marketplace assistant. None of these future services are presented as active today.
 
 ## Change safety
 
-Run `npm run check` before merging. It executes the behavior tests, rejects duplicate Supabase migration versions, and builds the production bundle. Apply new database migrations in timestamp order and compare the target project's migration history before any production rollout.
+Run `npm run check` before merging. It executes behavior and payment guard tests, rejects duplicate Supabase migration versions, scans tracked text for common secret-key formats, verifies static public assets, builds the production bundle, and enforces gzip size budgets. CI also rejects high-severity production dependency vulnerabilities.
+
+Apply new database migrations in timestamp order and compare the target project's migration history before any production rollout. Configure the recommended repository rules using [the `main` branch protection guide](docs/branch-protection.md).
 
 ## References
 

@@ -270,7 +270,7 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
         if (!mounted) return;
         setEntitlement(withActiveListingUsage(access, activeListings));
       })
-      .catch(() => {});
+      .catch(() => { if (mounted) onDemoAction?.('Could not load your current seller plan. Please try again.'); });
     return () => { mounted = false; };
   }, [user]);
   const choose = async (plan) => { if (plan.key === 'free') { onDemoAction('The Free plan includes 3 active listings.'); return; } if (plan.price === null) { onDemoAction('Enterprise Lux needs a custom business quote.'); return; } if (!user) { onAuthRequired?.(); return; } trackEvent('begin_checkout', { plan_name: plan.key, value: plan.price, currency: 'NGN' }); setBusyPlan(plan.key); try { const checkout = await startPaystackCheckout(plan.key); if (!checkout.authorization_url) throw new Error('Paystack did not return a checkout link.'); window.location.assign(checkout.authorization_url); } catch (error) { onDemoAction(error.message || 'Could not start Paystack checkout.'); setBusyPlan(''); } };
