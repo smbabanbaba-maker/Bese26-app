@@ -70,6 +70,9 @@ const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
+import { formatPublicBusinessLocation } from './lib/publicBusiness';
+import { saveListingChatDraft, takeListingChatDraft } from './lib/chatDrafts';
+import { withActiveListingUsage } from './lib/sellerEntitlement';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
@@ -259,7 +262,17 @@ function SubscriptionView({ user, onBack, onAuthRequired, onDemoAction }) {
   const [expanded, setExpanded] = useState(null);
   const [entitlement, setEntitlement] = useState(null);
   const [busyPlan, setBusyPlan] = useState('');
-  useEffect(() => { let mounted = true; if (!user) { setEntitlement(null); return undefined; } fetchSellerEntitlement().then((data) => mounted && setEntitlement(data)).catch(() => {}); return () => { mounted = false; }; }, [user]);
+  useEffect(() => {
+    let mounted = true;
+    if (!user) { setEntitlement(null); return undefined; }
+    Promise.all([fetchSellerEntitlement(), fetchMyListings({ sellerId: user.id, status: 'active' })])
+      .then(([access, activeListings]) => {
+        if (!mounted) return;
+        setEntitlement(withActiveListingUsage(access, activeListings));
+      })
+      .catch(() => { if (mounted) onDemoAction?.('Could not load your current seller plan. Please try again.'); });
+    return () => { mounted = false; };
+  }, [user]);
   const choose = async (plan) => { if (plan.key === 'free') { onDemoAction('The Free plan includes 3 active listings.'); return; } if (plan.price === null) { onDemoAction('Enterprise Lux needs a custom business quote.'); return; } if (!user) { onAuthRequired?.(); return; } trackEvent('begin_checkout', { plan_name: plan.key, value: plan.price, currency: 'NGN' }); setBusyPlan(plan.key); try { const checkout = await startPaystackCheckout(plan.key); if (!checkout.authorization_url) throw new Error('Paystack did not return a checkout link.'); window.location.assign(checkout.authorization_url); } catch (error) { onDemoAction(error.message || 'Could not start Paystack checkout.'); setBusyPlan(''); } };
   return <div className="page-stack subscription-page"><div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Payments & services</span></div><section className="subscription-hero"><div><div className="eyebrow light">BESE26 SELLER PLANS</div><h1>Grow when your business is ready.</h1><p>Start free with 3 active listings, then upgrade when you need more capacity, tools, verification eligibility, or visibility credits.</p></div><span className="subscription-hero-mark"><Sparkles size={22} /></span></section>{user && entitlement && <section className="subscription-usage"><div><div className="eyebrow">YOUR CURRENT ACCESS</div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan` : 'Free plan'}</strong><span>{`${entitlement.free_posts_used || 0} of ${entitlement.listing_limit} active listings used · ${Math.max((entitlement.listing_limit || 3) - (entitlement.free_posts_used || 0), 0)} remaining`}</span></div><div className="subscription-usage-track"><span style={{ width: `${entitlement.is_paid ? 100 : Math.max(0, (entitlement.free_posts_remaining / entitlement.free_posts_limit) * 100)}%` }} /></div></section>}<div className="subscription-section-heading"><div><div className="eyebrow">SIMPLE START</div><h2>Choose the right level</h2></div><span>Monthly · no hidden balance</span></div><div className="subscription-plan-grid">{subscriptionPlans.map((plan) => <SubscriptionPlanCard plan={plan} key={plan.key} expanded={expanded === plan.key} onToggle={setExpanded} onChoose={choose} currentPlan={entitlement?.is_paid ? entitlement.plan_key : 'free'} busyPlan={busyPlan} />)}</div><p className="subscription-disclaimer"><ShieldCheck size={15} /> Plan access, verification eligibility, and boost credits remain active while the subscription is active. Verification is subject to review and approval. Boosts increase visibility but do not guarantee sales or buyers. Paystack verifies the payment reference, amount, and currency before access is granted.</p></div>;
 }
@@ -394,6 +407,7 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, initial
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [messageReactions, setMessageReactions] = useState({});
+  const initialDraft = liveListing?.chatDraft || '';
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const emojis = ['😀', '😂', '😍', '🥰', '👍', '❤️', '✅', '👏', '🔥', '😮', '🙏', '🎉'];
@@ -418,6 +432,10 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, initial
     const unsubscribe = subscribeToMessages(selectedConversation.id, (incoming) => setLiveMessages((items) => items.some((item) => item.id === incoming.id) ? items : [...items, incoming]));
     return () => { mounted = false; unsubscribe(); };
   }, [selectedConversation?.id, liveMode, onDemoAction]);
+
+  useEffect(() => {
+    if (selectedConversation && initialDraft) setText((current) => current || initialDraft);
+  }, [initialDraft, selectedConversation?.id]);
 
   const send = async (message = text, file = attachment) => {
     if ((!message.trim() && !file) || !liveMode || mediaBusy) return;
@@ -510,7 +528,8 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const priceType = raw.pricing_type === 'negotiable' ? 'Negotiable' : raw.pricing_type === 'contact' || raw.price == null ? 'Contact for price' : raw.pricing_type === 'on_request' ? 'Price on request' : 'Fixed price';
   const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '').map(([key, value]) => ({ key: key.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), value: Array.isArray(value) ? value.join(', ') : value }));
   const delivery = Array.isArray(listing?.deliveryOptions) ? listing.deliveryOptions.filter(Boolean) : [];
-  useEffect(() => { if (!listing) return undefined; setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setLoadingDetails(true); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing)]).then(([reviewResult, similarResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); }).finally(() => setLoadingDetails(false)); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id]);
+  useEffect(() => { if (!listing) return undefined; setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setQuickMessage(''); setLoadingDetails(true); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing)]).then(([reviewResult, similarResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); }).finally(() => setLoadingDetails(false)); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id]);
+  useEffect(() => { saveListingChatDraft(listing?.id, quickMessage); }, [listing?.id, quickMessage]);
   useEffect(() => { if (!zoomed) return undefined; const onKey = (event) => event.key === 'Escape' && setZoomed(false); document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey); }, [zoomed]);
   if (!listing) return null;
   const nextImage = () => setActiveImage((current) => gallery.length ? (current + 1) % gallery.length : 0);
@@ -536,7 +555,9 @@ function PublicProfileHeader({ profile, business, listings, share }) {
   const isBusiness = Boolean(business);
   const name = business?.business_name || profile?.display_name || 'Bese26 seller';
   const handle = business?.business_handle || profile?.username;
-  const location = [business?.city || profile?.city, business?.state || profile?.state, business?.country || profile?.country].filter(Boolean).join(', ');
+  const location = business
+    ? formatPublicBusinessLocation(business)
+    : [profile?.city, profile?.state, profile?.country].filter(Boolean).join(', ');
   const avatar = business?.logo_path || profile?.avatar_path;
   const description = business?.description || profile?.bio;
   return <section className="public-business-hero storefront-hero-clean"><div className="public-business-logo">{avatar ? <img src={getAvatarUrl(avatar)} alt={`${name} profile`} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="public-business-identity"><div className="eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1>{handle && <strong className="public-business-handle">@{handle}</strong>}{(business?.is_verified || profile?.is_verified) && <span className="verified-badge"><BadgeCheck size={13} /> {business?.is_verified ? 'Verified business' : 'Verified seller'}</span>}<p>{description || 'This seller has not added a description yet.'}</p><span className="public-business-location"><MapPin size={14} /> {location || 'Nigeria'}</span><div className="public-business-actions">{business?.phone && <a className="primary-button" href={`tel:${business.phone}`}><Phone size={15} /> Call</a>}{listings[0] && <a className="secondary-button" href={`/?chat_listing=${listings[0].id}`}><MessageCircle size={15} /> Message</a>}<button type="button" className="secondary-button" onClick={share}>Share</button></div></div></section>;
@@ -546,7 +567,7 @@ function PublicListingSection({ title, listings }) {
 }
 function PublicBusinessAbout({ business }) {
   const hours = getBusinessHoursRows(business?.business_hours);
-  const location = [business?.area, business?.city, business?.state, business?.country].filter(Boolean).join(', ');
+  const location = formatPublicBusinessLocation(business);
   const services = [business?.delivery_available && 'Delivery available', business?.pickup_available && 'Pickup available'].filter(Boolean);
   return <section className="public-business-about" aria-labelledby="about-store-title"><div className="public-about-heading"><div><div className="eyebrow">ABOUT THE STORE</div><h2 id="about-store-title">About this store</h2></div><Store size={20} /></div><p className="public-about-description">{business?.description || 'Not available'}</p><div className="public-about-grid"><div className="public-about-item"><MapPin size={16} /><span><b>Location</b>{location || 'Not available'}</span></div><div className="public-about-item"><Tag size={16} /><span><b>Category</b>{business?.category || business?.business_type || 'Not available'}</span></div><div className="public-about-item"><Package size={16} /><span><b>Services</b>{services.length ? services.join(' · ') : 'Not available'}</span></div>{hours.length > 0 && <div className="public-about-item public-about-hours"><Clock3 size={16} /><span><b>Opening hours</b>{hours.slice(0, 3).map((row) => <em key={row.key}>{row.label}: {row.value}</em>)}</span></div>}</div>{business?.website && <a className="public-about-link" href={business.website.startsWith('http') ? business.website : `https://${business.website}`} target="_blank" rel="noreferrer">Visit store website <ArrowUpRight size={14} /></a>}</section>;
 }
@@ -593,12 +614,16 @@ function BusinessDirectoryView({ onBack }) {
   }, []);
   useEffect(() => { loadBusinesses(); }, [loadBusinesses]);
   const submitSearch = (event) => { event.preventDefault(); loadBusinesses(query); };
+  const clearSearch = () => { setQuery(''); loadBusinesses(); };
   return <div className="page-stack business-directory-page">
     <div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div>
     <section className="business-directory-hero"><div><div className="eyebrow light">BESE26 MINIWEBS</div><h1>Find a business</h1><p>Browse public miniwebs created by Bese26 sellers and open the store you need.</p></div><Store size={28} /></section>
-    <form className="business-directory-search" onSubmit={submitSearch}><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search business, category or city" aria-label="Search businesses" /><button className="search-submit" type="submit" aria-label="Search businesses"><Search size={17} /></button></form>
+    <section className="business-directory-controls" aria-label="Business directory controls">
+      <form className="business-directory-search" onSubmit={submitSearch}><Search size={18} aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by business, category or city" aria-label="Search businesses" />{query && <button className="business-directory-clear" type="button" onClick={clearSearch} aria-label="Clear business search"><X size={16} /></button>}<button className="search-submit" type="submit">Search</button></form>
+      {!loading && !error && <div className="business-directory-summary"><div><strong>{businesses.length}</strong><span>{businesses.length === 1 ? 'public business' : 'public businesses'}</span></div><small>Listed alphabetically</small></div>}
+    </section>
     {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}
-    {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="business-directory-grid">{businesses.map((business) => { const name = business.business_name || 'Bese26 business'; const handle = business.business_handle; return <article className="business-directory-card" key={business.profile_id || handle}><div className="business-directory-card-head">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${name} logo`} /> : <div className="business-directory-card-logo">{name.slice(0, 1).toUpperCase()}</div>}<div><h2>{name}{business.is_verified && <BadgeCheck className="business-verified-icon" size={16} />}</h2><span>@{handle || 'public-store'}</span></div></div><p>{business.description || `${business.category || 'Local business'}${business.city ? ` · ${business.city}` : ''}`}</p><div className="business-listing-actions"><a className="primary-button" href={handle ? `/@${handle}` : '#'} onClick={(event) => { if (!handle) event.preventDefault(); }}>Open miniweb <ArrowUpRight size={15} /></a></div></article>; })}</div> : <div className="empty-state"><Store size={28} /><h2>No public miniwebs found</h2><p>Try another business name, category or city.</p></div>}
+    {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="business-directory-grid">{businesses.map((business) => { const name = business.business_name || 'Bese26 business'; const handle = business.business_handle; const location = [business.city, business.state].filter(Boolean).join(', '); return <article className="business-directory-card" key={business.profile_id || handle}><div className="business-directory-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${name} logo`} loading="lazy" decoding="async" /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="business-directory-copy"><div className="business-directory-title"><h2>{name}{business.is_verified && <BadgeCheck className="business-verified-icon" size={15} aria-label="Verified business" />}</h2><span className="business-directory-handle">@{handle}</span></div><div className="business-directory-meta">{business.category && <span><Tag size={12} aria-hidden="true" />{business.category}</span>}{location && <span><MapPin size={12} aria-hidden="true" />{location}</span>}</div></div><a className="business-directory-open" href={`/@${handle}`} aria-label={`Open ${name} miniweb`}>Open miniweb <ArrowUpRight size={14} aria-hidden="true" /></a></article>; })}</div> : <div className="empty-state"><Store size={28} /><h2>No public miniwebs found</h2><p>Try another business name, category or city.</p>{query && <button type="button" className="secondary-button" onClick={clearSearch}>Show all businesses</button>}</div>}
   </div>;
 }
 
@@ -762,7 +787,8 @@ function AppContent() {
     try {
       const conversation = await getOrCreateConversation({ listingId: listing.id, buyerId: sessionUser.id, sellerId: listing.sellerId });
       setSelectedListing(null);
-      setChatListing(listing);
+      const chatDraft = takeListingChatDraft(listing.id);
+      setChatListing({ ...listing, chatDraft });
       showToast(`Chat opened for ${listing.title}`);
       setChatTargetId(conversation.id);
       navigate('messages');

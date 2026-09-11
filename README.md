@@ -6,7 +6,7 @@
 
 The repository now includes the first real Supabase backend foundation in project `slxsbvuskgkacmtkkrmj`: a flexible marketplace schema, Auth-ready profile trigger, Row Level Security (RLS), Storage buckets and policies, seeded categories, and Realtime publication entries for messages and notifications. The Vite frontend includes a publishable-key Supabase client, email/password Auth UI, active-listing and favorites query helpers, authenticated Sell draft persistence, listing creation, and browser media upload helpers.
 
-The app has been converted to a real marketplace experience: all demo fallbacks, hardcoded listings, fake balances, and no-op placeholders have been removed. Every visible surface now uses real Supabase state or displays a truthful empty/loading state. Non-functional demo screens like Wallet and AI have been removed from primary navigation until their corresponding backend services are connected.
+The app has been converted to a real marketplace experience: all demo fallbacks, hardcoded listings, fake balances, and no-op placeholders have been removed. Every visible surface now uses real Supabase state or displays a truthful empty/loading state. Wallet and AI remain unavailable until their corresponding backend services are connected; Notifications and the Business directory occupy those primary-navigation positions.
 
 ## Included experiences
 
@@ -20,7 +20,9 @@ The app has been converted to a real marketplace experience: all demo fallbacks,
 | Messages | Real conversation list and message history for authenticated users. New-message notifications are stored in the recipient-scoped notifications table. |
 | Profile | Real identity, location, and statistics from Supabase. Personal Information form updates real profile and contact records. |
 | Admin moderation | Controlled admin/moderator access shows Pending, Approved, and Rejected queues. Review actions use a protected Supabase RPC; sellers receive a real notification and can edit/resubmit rejected listings. |
-| Wallet and AI | Removed from primary navigation until real backend services are implemented. |
+| Business storefronts | Public seller links respect the seller's contact-method and location-visibility choices. |
+| Seller plans and boosts | Paystack serverless endpoints initialize and verify paid subscriptions and listing boosts. Buyer-to-seller payments, orders, and wallet transfers are not implemented. |
+| Phone and identity verification | Phone numbers can be saved but are not OTP-verified. Identity and business documents use a controlled manual-review workflow; automated KYC/liveness is not configured. |
 
 ## Supabase architecture
 
@@ -34,11 +36,13 @@ RLS is enabled on every application table. Public reads are limited to active ap
 
 Copy `.env.example` to `.env.local` and set the Bese26 project URL and publishable key. Do not add service-role keys, secret keys, database passwords, or `.env.local` to Git. The repository already ignores `.env` and `.env.*` while allowing the placeholder `.env.example`.
 
+Use Node.js 22.12 or newer. Runtime dependencies are pinned exactly in `package.json` and `package-lock.json` so local, CI, and deployment installs stay reproducible.
+
 ```bash
 npm install
 cp .env.example .env.local
 npm run dev
-npm run build
+npm run check
 npm run preview
 ```
 
@@ -75,9 +79,15 @@ Set both variables for the Vercel Production environment. Preview and Developmen
 5. **Completed moderation foundation:** Sellers publish into Pending; controlled admin/moderator access can review pending listings, approve or reject with a reason, and record an audit event.
 6. **Completed seller review loop:** Sellers can see rejection feedback, edit the same listing, and resubmit it to Pending without creating a duplicate or self-approving.
 7. **Completed real notifications and policy layer:** Moderation decisions create recipient-scoped notifications; the notification bell uses Supabase data and Realtime; Terms, Privacy, Safety, and Prohibited Items pages are available in Profile.
-8. **Next product slice:** Complete real chat end-to-end QA, moderation notifications QA, and controlled moderator assignment tooling.
-9. **Later slices:** Implement real Wallet ledger, payment integration, and AI marketplace assistant.
-10. **Deferred by request:** Subscription plans, payments, fees, checkout, and wallet funding or withdrawal mechanics are intentionally not included in this phase.
+8. **Completed seller monetization:** Paystack-backed Basic, Premium, and Business subscriptions, paid listing limits, verification eligibility, and listing boosts are implemented.
+9. **Current safety baseline:** Public storefront contact/location choices are enforced in the client, quick listing questions carry into chat, Paystack ownership/amount/currency checks have automated coverage, and CI checks behavior, migration versions, secrets, static assets, dependency vulnerabilities, and production bundle size.
+10. **Later slices:** Implement phone OTP, an automated KYC provider if required, buyer ordering/payment, Wallet ledger, and an AI marketplace assistant. None of these future services are presented as active today.
+
+## Change safety
+
+Run `npm run check` before merging. It executes behavior and payment guard tests, rejects duplicate Supabase migration versions, scans tracked text for common secret-key formats, verifies static public assets, builds the production bundle, and enforces gzip size budgets. CI also rejects high-severity production dependency vulnerabilities.
+
+Apply new database migrations in timestamp order and compare the target project's migration history before any production rollout. Configure the recommended repository rules using [the `main` branch protection guide](docs/branch-protection.md).
 
 ## References
 
