@@ -569,6 +569,14 @@ export async function fetchListingDetails(listingId) {
   return listing || null;
 }
 
+export async function fetchListingContact(listingId) {
+  failIfUnavailable();
+  if (!listingId) return { phone: '', whatsapp: '' };
+  const { data, error } = await supabase.rpc('get_listing_contact', { p_listing_id: listingId });
+  if (error) throw error;
+  return { phone: data?.phone || '', whatsapp: data?.whatsapp || '' };
+}
+
 export async function recordListingView(listingId) {
   if (!supabase || !listingId) return null;
   const { data, error } = await supabase.rpc('record_listing_view', { p_listing_id: listingId });
