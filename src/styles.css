@@ -3717,3 +3717,38 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .business-directory-card .business-listing-actions { margin-top:0 !important; padding-top:12px; border-top:1px solid #eef0f3; }
 .business-directory-card .business-listing-actions a { width:100%; }
 @media (min-width:701px) { .business-directory-card { padding:20px !important; } }
+
+
+/* Search & Discover vision: dark discovery hero, white controls, and polished result cards. */
+.search-page { gap:16px !important; background:#fff !important; }
+.search-page > .page-title-row { position:relative; overflow:hidden; margin:0 -2px 2px; padding:24px 22px !important; border:1px solid #27315b !important; border-radius:19px !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; box-shadow:0 14px 30px rgba(20,20,40,.12) !important; }
+.search-page > .page-title-row::after { content:''; position:absolute; right:-40px; top:-70px; width:190px; height:190px; border:1px solid rgba(98,227,255,.28); border-radius:50%; box-shadow:0 0 0 22px rgba(255,126,131,.07),0 0 0 46px rgba(98,227,255,.05); }
+.search-page > .page-title-row > div:first-child, .search-page > .page-title-row .eyebrow, .search-page > .page-title-row h1 { position:relative; z-index:1; color:#fff !important; }
+.search-page > .page-title-row .eyebrow { color:#ffb6aa !important; }
+.search-page > .page-title-row h1 { margin-top:6px; font-size:clamp(25px,4vw,36px); }
+.search-page > .page-title-row .results-count { position:relative; z-index:1; color:#d6d9e5 !important; background:rgba(255,255,255,.1) !important; border-color:rgba(255,255,255,.25) !important; }
+.search-page > .back-row { color:#68717d; }
+.search-page .large-search { min-height:56px; padding:0 16px; background:#fff !important; border:1px solid #cfd5dc !important; border-radius:15px !important; box-shadow:0 7px 20px rgba(20,20,40,.06) !important; }
+.search-page .large-search:focus-within { border-color:#7564d8 !important; box-shadow:0 0 0 3px rgba(117,100,216,.13) !important; }
+.search-page .large-search input { background:#fff !important; color:#171717 !important; font-size:13px; }
+.search-page .large-search input::placeholder { color:#7b8490 !important; }
+.search-page .search-clear { color:#68717d !important; }
+.search-page .filter-toolbar { padding:14px; background:#fff !important; border:1px solid #e6e7ea; border-radius:15px; box-shadow:0 5px 16px rgba(20,20,40,.035); }
+.search-page .filter-toolbar-heading, .search-page .filter-toolbar-heading strong { color:#303843 !important; }
+.search-page .clear-filter-button { color:#b71c1c !important; }
+.search-page .filter-chip { color:#5f6873 !important; background:#fff !important; border:1px solid #dfe4eb !important; border-radius:999px !important; }
+.search-page .filter-chip:hover { border-color:#b9b0f2 !important; color:#7564d8 !important; }
+.search-page .filter-chip.active { color:#fff !important; background:#7564d8 !important; border-color:#7564d8 !important; box-shadow:0 6px 14px rgba(117,100,216,.16); }
+.search-page .verified-filter-chip.active { background:#4f73c9 !important; border-color:#4f73c9 !important; }
+.search-page .search-result-head { color:#68717d !important; }
+.search-page .search-result-head select { color:#303843 !important; background:#fff !important; border-color:#dfe4eb !important; }
+.search-page .search-grid { gap:14px !important; }
+.search-page .search-grid .product-card { background:#fff !important; border:1px solid #e6e7ea !important; border-radius:17px !important; box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
+.search-page .search-grid .product-card:hover { border-color:#c9c1f7 !important; box-shadow:0 12px 26px rgba(117,100,216,.12) !important; }
+.search-page .search-grid .product-info h3 { color:#171717 !important; }
+.search-page .search-grid .product-info p, .search-page .search-grid .product-meta, .search-page .search-grid .product-foot { color:#5f6873 !important; }
+.search-page .search-grid .product-price { color:#b71c1c !important; }
+.search-page .search-grid .product-image-wrap { background:#f0f2f7 !important; }
+.search-page .empty-state { background:#fff !important; border:1px solid #e6e7ea !important; color:#171717 !important; }
+.search-page .empty-state p { color:#5f6873 !important; }
+@media (max-width:700px) { .search-page > .page-title-row { margin-inline:0; padding:20px 18px !important; border-radius:17px !important; } .search-page .filter-toolbar { padding:12px; } }
