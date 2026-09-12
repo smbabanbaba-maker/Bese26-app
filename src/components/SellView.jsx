@@ -19,9 +19,10 @@ import {
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getBusinessProfile, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
-import nigeriaLocations from '../data/nigeriaLocations.json';
-
-const nigeriaStates = Object.keys(nigeriaLocations).sort((a, b) => a.localeCompare(b));
+import { Country, State } from 'country-state-city';
+const worldwideCountries = Country.getAllCountries().sort((a, b) => a.name.localeCompare(b.name));
+const countryByName = Object.fromEntries(worldwideCountries.map((country) => [country.name, country]));
+const currencyOptions = ['NGN', 'USD', 'GBP', 'EUR', 'CAD', 'AUD', 'ZAR', 'GHS', 'KES', 'AED', 'INR'];
 
 const categoryLabelAliases = {
   'Health & Beauty': ['Beauty & Health', 'health-beauty', 'beauty-health'],
