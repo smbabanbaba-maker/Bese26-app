@@ -287,7 +287,7 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
-function HomeView({ user, marketListings, adCampaigns = [], isPaid = false, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   const fallbackPromos = [{ eyebrow: 'B26 FEATURED', title: 'Put your business in front of more buyers.', body: 'Create your public store and share one simple link with customers.', action: 'Set up Business', onAction: () => onNavigate('profile') }, { eyebrow: 'SELL WITH CONFIDENCE', title: 'Your next customer is already browsing.', body: 'List a product with clear photos and let buyers chat safely before they meet.', action: 'List an item', onAction: () => onNavigate('sell') }, { eyebrow: 'PROMOTE YOUR STORE', title: 'Be seen in the places buyers search.', body: 'Featured businesses and sponsored listings will appear here as the marketplace grows.', action: 'Explore businesses', onAction: () => onNavigate('business') }];
   const advertisingSlides = adCampaigns.length ? adCampaigns.map((campaign) => ({ type: 'ad', eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } })) : fallbackPromos.map((promo) => ({ ...promo, type: 'ad' }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
@@ -299,7 +299,6 @@ function HomeView({ user, marketListings, adCampaigns = [], isPaid = false, onOp
   return (
     <div className="page-stack home-page">
       {!user && <FirstVisitCard user={user} onNavigate={onNavigate} />}
-      {user && !isPaid && <section className="subscription-prompt-card" aria-label="Upgrade subscription"><div><div className="eyebrow">BESE26 PLUS</div><h2>Get more from your marketplace</h2><p>Upgrade your subscription for more listing capacity, boost credits, and a cleaner experience with fewer promotions.</p></div><button type="button" className="primary-button" onClick={() => onNavigate('subscription')}><Sparkles size={15} /> View subscription plans</button></section>}
       <section className={`home-ad-banner ${promo.type === 'dashboard' ? 'home-ad-dashboard dashboard-welcome-card' : `home-ad-slide-${promoIndex}`}`} aria-label={promo.type === 'dashboard' ? 'Your Bese26 dashboard' : 'Featured promotion'}>
         {promo.type === 'dashboard' ? <><div className="dashboard-welcome-copy"><div className="eyebrow">YOUR BESE26 DASHBOARD</div><h1>Good to see you, <span>{displayName}</span>.</h1><p>Pick up where you left off and keep your marketplace moving.</p><div className="dashboard-actions"><button type="button" className="dashboard-primary-action" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button type="button" className="dashboard-secondary-action" onClick={() => onNavigate('profile')}>View profile <ArrowRight size={15} /></button></div></div><div className="dashboard-orbit-art" aria-hidden="true"><span className="dashboard-orbit dashboard-orbit-one" /><span className="dashboard-orbit dashboard-orbit-two" /><img src="/images/bese26-logo-icon.png" alt="" /></div><div className="dashboard-metrics"><span><strong>{marketListings.length}</strong><small>live listings</small></span><span><strong>{savedIds.length}</strong><small>saved items</small></span><span><strong>100%</strong><small>secure access</small></span></div></> : <><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className="home-ad-art" aria-hidden="true"><img src={promo.image_url || "/images/bese26-official-logo.png"} alt="" /></div></>}
         <div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.key || `${slide.eyebrow}-${index}`} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div>
@@ -640,7 +639,6 @@ function AppContent() {
   const [marketListings, setMarketListings] = useState([]);
   const [marketCategories, setMarketCategories] = useState([]);
   const [adCampaigns, setAdCampaigns] = useState([]);
-  const [sellerEntitlement, setSellerEntitlement] = useState(null);
   const [sessionUser, setSessionUser] = useState(null);
   const [businessOwnerProfile, setBusinessOwnerProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -671,13 +669,6 @@ function AppContent() {
     if (isSupabaseConfigured) getBusinessProfile(sessionUser.id).then((profile) => mounted && setBusinessOwnerProfile(profile)).catch(() => mounted && setBusinessOwnerProfile(null));
     return () => { mounted = false; };
   }, [sessionUser]);
-  useEffect(() => {
-    let mounted = true;
-    if (!sessionUser || !isSupabaseConfigured) { setSellerEntitlement(null); return undefined; }
-    fetchSellerEntitlement().then((data) => mounted && setSellerEntitlement(data || null)).catch(() => mounted && setSellerEntitlement(null));
-    return () => { mounted = false; };
-  }, [sessionUser]);
-
   const toggleSave = (id) => {
     const wasSaved = savedIds.includes(id);
     if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to save listings for later.'); return; }
@@ -839,7 +830,7 @@ function AppContent() {
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
-    if (activeNav === 'home') return <HomeView user={sessionUser} isPaid={Boolean(sellerEntitlement?.is_paid)} adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={() => navigate('home')} onNotice={showToast} onNavigate={navigate} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
