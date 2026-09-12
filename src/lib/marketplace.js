@@ -83,6 +83,9 @@ export async function signUp({ email, password, displayName, username }) {
     options: { data: { display_name: displayName, username } },
   });
   if (error) throw error;
+  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error('This email has already been registered. Please log in or use Forgot password.');
+  }
   return data;
 }
 
