@@ -514,7 +514,9 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
     if (boostError) return listings;
     const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
-    return listings.map((item) => ({ ...item, promoted: promoted.has(item.id) }));
+    return listings
+      .map((item) => ({ ...item, promoted: promoted.has(item.id) }))
+      .sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
   } catch {
     return listings;
   }
