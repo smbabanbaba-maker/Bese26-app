@@ -9,7 +9,7 @@ for insert to authenticated
 with check (
   bucket_id = 'chat-media'
   and (storage.foldername(name))[1] = auth.uid()::text
-  and public.is_conversation_participant(((storage.foldername(name))[2])::uuid)
+  and private.is_conversation_participant(((storage.foldername(name))[2])::uuid)
 );
 
 drop policy if exists chat_media_read on storage.objects;
@@ -17,7 +17,7 @@ create policy chat_media_read on storage.objects
 for select to authenticated
 using (
   bucket_id = 'chat-media'
-  and public.is_conversation_participant(((storage.foldername(name))[2])::uuid)
+  and private.is_conversation_participant(((storage.foldername(name))[2])::uuid)
 );
 
 drop policy if exists chat_media_delete on storage.objects;
