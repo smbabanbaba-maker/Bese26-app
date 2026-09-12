@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, LockKeyhole, LoaderCircle, Mail, UserRound, X } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { requestPasswordReset, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
+import { requestPasswordReset, resendSignupConfirmation, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
 
 function WelcomeSide({ isSignin }) {
   return <div className="auth-welcome-panel">
@@ -37,6 +37,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const [loadingLabel, setLoadingLabel] = useState('Signing you in…');
   const [resetting, setResetting] = useState(false);
   const [registrationSent, setRegistrationSent] = useState(false);
+  const [resendingConfirmation, setResendingConfirmation] = useState(false);
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setRegistrationSent(false); };
@@ -62,6 +63,13 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset instructions sent. Check your email.' }); }
     catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send reset instructions.' }); }
     finally { setResetting(false); }
+  };
+  const resendConfirmation = async () => {
+    setStatus({ type: '', message: '' });
+    setResendingConfirmation(true);
+    try { await resendSignupConfirmation(form.email); setStatus({ type: 'success', message: 'Confirmation email sent again. Check your inbox and spam folder.' }); }
+    catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the confirmation email.' }); }
+    finally { setResendingConfirmation(false); }
   };
   const continueWithGoogle = async () => {
     setStatus({ type: '', message: '' });
@@ -90,7 +98,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
     {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
-    {registrationSent ? <div className="auth-confirmation-card"><div className="auth-confirmation-icon"><Mail size={22} /></div><h3>Check your email</h3><p>We sent a confirmation link to <strong>{form.email}</strong>. Open it and tap the link to return to Bese26 and enter the app automatically.</p><button type="button" className="primary-button auth-submit" onClick={() => { window.location.href = 'mailto:'; }}>Go to check email</button><button type="button" className="auth-forgot" onClick={() => { setRegistrationSent(false); setStatus({ type: '', message: '' }); }}>Change email or try again</button></div> : <form onSubmit={submit} className="auth-form auth-signup-form">
+    {registrationSent ? <div className="auth-confirmation-card"><div className="auth-confirmation-icon"><Mail size={22} /></div><h3>Check your email</h3><p>We sent a confirmation link to <strong>{form.email}</strong>. Open it and tap the link to return to Bese26 and enter the app automatically.</p><button type="button" className="primary-button auth-submit" onClick={() => { window.location.href = 'mailto:'; }}>Go to check email</button><button type="button" className="auth-resend-button" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend email'}</button><button type="button" className="auth-forgot" onClick={() => { setRegistrationSent(false); setStatus({ type: '', message: '' }); }}>Change email or try again</button></div> : <form onSubmit={submit} className="auth-form auth-signup-form">
       <div className="auth-field-row"><label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label><label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label></div>
       <div className="auth-field-row"><label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label><label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="new-password" required /></label></div>
       <button type="submit" className="primary-button auth-submit" disabled={loading}>{loading ? 'Please wait…' : 'Create account'}</button>

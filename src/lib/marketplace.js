@@ -89,6 +89,14 @@ export async function signUp({ email, password, displayName, username }) {
   return data;
 }
 
+export async function resendSignupConfirmation(email) {
+  failIfUnavailable();
+  const value = String(email || '').trim().toLowerCase();
+  if (!value) throw new Error('Enter your email first.');
+  const { error } = await supabase.auth.resend({ type: 'signup', email: value, options: { emailRedirectTo: getAuthRedirectUrl() } });
+  if (error) throw error;
+}
+
 export async function signIn({ email, password }) {
   failIfUnavailable();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
