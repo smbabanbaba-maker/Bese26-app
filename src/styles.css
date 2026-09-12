@@ -3860,3 +3860,27 @@ button:disabled { color:#8a929b !important; opacity:.72; }
   .public-about-grid { grid-template-columns:1fr; }
   .storefront-listings-clean .product-grid { grid-template-columns:1fr; }
 }
+
+
+/* 2026 product improvements: onboarding, trust, and clearer seller outcomes. */
+.first-visit-card, .onboarding-checklist { background: linear-gradient(135deg, #fff8f5, #fff); border: 1px solid #f2d5ce; border-radius: 18px; padding: 20px; box-shadow: 0 10px 28px rgba(43, 25, 20, .06); }
+.first-visit-card { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.first-visit-card h2, .onboarding-checklist h2 { font-size: 20px; margin: 4px 0 6px; }
+.first-visit-card p, .onboarding-checklist p { color: #626975; font-size: 12px; line-height: 1.5; }
+.first-visit-actions { display: flex; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+.first-visit-dismiss { grid-column: 1 / -1; justify-self: start; }
+.onboarding-heading { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.onboarding-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+.onboarding-item { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 8px; align-items: center; text-align: left; padding: 12px; border: 1px solid #ece3df; border-radius: 13px; background: #fff; transition: transform .18s var(--ease), border-color .18s ease; }
+.onboarding-item:hover { transform: translateY(-2px); border-color: #e78978; }
+.onboarding-item > span { grid-row: span 2; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: #fff0eb; color: #bd3c27; }
+.onboarding-item strong { font: 700 11px Manrope, sans-serif; }
+.onboarding-item small { color: #6c7480; font-size: 10px; }
+.onboarding-item.done > span { background: #e7f8ee; color: #248653; }
+.listing-safety-banner { display: flex; align-items: flex-start; gap: 9px; margin: 12px 0; padding: 11px 12px; border: 1px solid #f0d9a7; border-radius: 11px; background: #fff9e9; color: #6f5312; font-size: 11px; line-height: 1.45; }
+.listing-safety-banner svg { flex: none; color: #b17a00; margin-top: 1px; }
+.handle-suggestions { margin-top: -4px; padding: 10px 12px; border-radius: 11px; background: #f7f4ff; color: #625a85; }
+.handle-suggestions small { display: block; margin-bottom: 7px; }
+.handle-suggestions div { display: flex; flex-wrap: wrap; gap: 6px; }
+.handle-suggestions button { border: 1px solid #d9d0fa; border-radius: 999px; padding: 5px 9px; color: #6254b8; background: #fff; font-size: 10px; }
+@media (max-width: 700px) { .first-visit-card { grid-template-columns: 1fr; } .first-visit-actions { justify-content: flex-start; } .onboarding-items { grid-template-columns: 1fr; } }
