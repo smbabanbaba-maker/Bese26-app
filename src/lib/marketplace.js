@@ -4,10 +4,8 @@ function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
 }
 
-function formatMoney(value, currency = 'NGN') {
-  const code = String(currency || 'NGN').toUpperCase();
-  try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(Number(value)); }
-  catch { return `${code} ${Number(value).toLocaleString()}`; }
+function formatNaira(value) {
+  return `₦${Number(value).toLocaleString('en-NG')}`;
 }
 
 function relativeTime(value) {
@@ -41,7 +39,7 @@ export function mapListing(row) {
   return {
     id: row.id,
     title: row.title,
-    price: row.price == null ? 'Contact seller' : formatMoney(row.price, row.currency),
+    price: row.price == null ? 'Contact seller' : formatNaira(row.price),
     numericPrice,
     location,
     condition: row.condition || 'See description',
