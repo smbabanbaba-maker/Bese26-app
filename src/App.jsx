@@ -639,6 +639,7 @@ function AppContent() {
   const [editingDraft, setEditingDraft] = useState(null);
   const [startupReady, setStartupReady] = useState(!isSupabaseConfigured);
   const [startupError, setStartupError] = useState('');
+  const startupReadyRef = useRef(!isSupabaseConfigured);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
 
@@ -719,10 +720,22 @@ function AppContent() {
       }
       if (mounted && initial) {
         setStartupError('');
+        startupReadyRef.current = true;
         setStartupReady(true);
       }
     };
     loadBackend({ initial: true });
+    // Do not trap visitors on the branded splash screen when an upstream
+    // Supabase request is slow or temporarily unavailable. The marketplace
+    // shell can render its truthful empty/offline states while the background
+    // request continues and retries on the normal visibility/focus refreshes.
+    const startupTimeout = window.setTimeout(() => {
+      if (mounted && !startupReadyRef.current) {
+        setStartupError('Live listings are taking longer than usual. You can continue and try again shortly.');
+        startupReadyRef.current = true;
+        setStartupReady(true);
+      }
+    }, 12000);
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
     const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
     const refreshWhenFocused = () => loadBackend();
@@ -738,7 +751,7 @@ function AppContent() {
       }
       if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); setSelectedListing(null); setChatListing(null); setChatTargetId(null); setEditingListing(null); setSearch(''); setActiveNav('home'); loadBackend(); }
     });
-    return () => { mounted = false; window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', refreshWhenVisible); window.removeEventListener('focus', refreshWhenFocused); subscription.unsubscribe(); };
+    return () => { mounted = false; window.clearTimeout(startupTimeout); window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', refreshWhenVisible); window.removeEventListener('focus', refreshWhenFocused); subscription.unsubscribe(); };
   }, []);
   useEffect(() => {
     if (!sessionUser || !isSupabaseConfigured) return undefined;
