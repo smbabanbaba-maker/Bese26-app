@@ -562,7 +562,7 @@ function PublicPersonalPage({ data }) {
 function PublicBusinessPage({ handle }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => { let mounted = true; fetchPublicBusiness(handle).then((data) => data || fetchPublicProfile(handle)).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load this public profile.' })); return () => { mounted = false; }; }, [handle]);
-  if (state.loading) return <div className="public-business-shell"><div className="route-loading">Loading public shop…</div></div>;
+  if (state.loading) return <SplashScreen />;
   if (state.error || !state.data) return <div className="public-business-shell"><section className="public-business-not-found"><div className="brand-mark">B</div><div className="eyebrow">BESE26 SHOP</div><h1>Shop not found</h1><p>This public shop does not exist, is inactive, or has no public profile.</p><a className="primary-button" href="https://www.bese26.shop/">Back to Bese26 <ArrowRight size={16} /></a></section></div>;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
