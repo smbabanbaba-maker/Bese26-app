@@ -8,11 +8,12 @@ function WelcomeSide({ isSignin }) {
     <div className="auth-welcome-shape auth-welcome-shape-one" />
     <div className="auth-welcome-shape auth-welcome-shape-two" />
     <div className="auth-welcome-content">
-      <span className="auth-welcome-kicker">BESE26 MARKETPLACE</span>
+      <span className="auth-welcome-kicker">BESE26 · TRUSTED MARKETPLACE</span>
       <span className="auth-welcome-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></span>
-      <h2>{isSignin ? 'WELCOME\nBACK!' : 'JOIN THE\nMARKETPLACE'}</h2>
-      <p>{isSignin ? 'Save listings, post items, and chat with sellers securely.' : 'Create your profile and start buying or selling with confidence.'}</p>
-      <span className="auth-welcome-note"><span /> Secure access for every device</span>
+      <h2>{isSignin ? 'WELCOME\nBACK!' : 'JOIN THE\nMOVEMENT'}</h2>
+      <p>{isSignin ? 'Find great products, save your favourites, and connect with trusted sellers.' : 'Create your profile and start buying or selling with confidence across Nigeria.'}</p>
+      <div className="auth-welcome-points"><span><b>✓</b> Secure email verification</span><span><b>✓</b> Built for buyers and sellers</span></div>
+      <span className="auth-welcome-note"><span /> Your marketplace. Your confidence.</span>
     </div>
   </div>;
 }
@@ -91,8 +92,8 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const isSignin = mode === 'signin';
   const renderSignin = () => <div className="auth-form-panel auth-form-face-content">
     <div className="auth-panel-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></div>
-    <div className="eyebrow">SAFE MARKETPLACE ACCESS</div><h2 id="auth-title">Login</h2>
-    <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
+    <div className="eyebrow">SAFE MARKETPLACE ACCESS</div><h2 id="auth-title">Welcome back</h2>
+    <p className="auth-panel-copy">{reason || 'Login to continue buying, selling, and connecting on Bese26.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
     {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
     <form onSubmit={submit} className="auth-form">
@@ -100,7 +101,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
       <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="current-password" required /></label>
       <button type="submit" className="primary-button auth-submit" disabled={loading || resetting}>{loading ? 'Signing in…' : 'Login'}</button><button type="button" className="auth-forgot" onClick={resetPassword} disabled={loading || resetting}>{resetting ? 'Sending reset link…' : 'Forgot password?'}</button>
     </form>
-    {isSupabaseConfigured && <div className="auth-otp-box"><div className="auth-divider"><span>or use email code</span></div>{otpSent ? <form className="auth-otp-form" onSubmit={verifyOtp}><label><span><Mail size={14} /> 6-digit code</span><input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" autoComplete="one-time-code" required /></label><button type="submit" className="secondary-button auth-submit" disabled={loading}>{loading ? 'Verifying…' : 'Verify code'}</button><button type="button" className="auth-forgot" onClick={sendOtp} disabled={loading}>Send code again</button></form> : <button type="button" className="secondary-button auth-submit" onClick={sendOtp} disabled={loading || resetting}>{loading ? 'Sending code…' : 'Email me a login code'}</button>}</div>}
+    {isSupabaseConfigured && <div className={`auth-otp-box ${otpSent ? 'is-sent' : ''}`}><div className="auth-divider"><span>FAST & SECURE LOGIN</span></div>{otpSent ? <div className="auth-otp-spotlight"><div className="auth-otp-spotlight-icon"><Mail size={18} /></div><div><strong>Check your inbox</strong><p>We sent a 6-digit code to <b>{form.email}</b>.</p></div><form className="auth-otp-form" onSubmit={verifyOtp}><label><span><LockKeyhole size={14} /> Enter your verification code</span><input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" autoComplete="one-time-code" required /></label><button type="submit" className="secondary-button auth-submit" disabled={loading}>{loading ? 'Verifying…' : 'Verify & continue'}</button><button type="button" className="auth-forgot" onClick={sendOtp} disabled={loading}>Didn’t receive it? Send a new code</button></form></div> : <button type="button" className="secondary-button auth-submit" onClick={sendOtp} disabled={loading || resetting}>{loading ? 'Sending code…' : 'Email me a login code'}</button>}</div>}
     <button type="button" className="auth-switch" onClick={() => switchMode('signup')}>Don’t have an account? <strong>Sign up</strong></button>
   </div>;
   const renderSignup = () => <div className="auth-form-panel auth-form-face-content">
