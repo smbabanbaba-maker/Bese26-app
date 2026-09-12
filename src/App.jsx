@@ -508,8 +508,8 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const owner = Boolean(user?.id && listing?.sellerId === user.id);
   const raw = listing?.raw || {};
   const description = listing?.description || '';
-  const sellerPhone = contact.phone || raw.seller_phone || raw.profiles?.phone || raw.business_profile?.phone || '';
-  const whatsapp = contact.whatsapp || raw.seller_whatsapp || raw.profiles?.whatsapp || raw.business_profile?.whatsapp || '';
+  const sellerPhone = contact.phone || '';
+  const whatsapp = contact.whatsapp || '';
   const priceType = raw.pricing_type === 'negotiable' ? 'Negotiable' : raw.pricing_type === 'contact' || raw.price == null ? 'Contact for price' : raw.pricing_type === 'on_request' ? 'Price on request' : 'Fixed price';
   const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '').map(([key, value]) => ({ key: key.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), value: Array.isArray(value) ? value.join(', ') : value }));
   const delivery = Array.isArray(listing?.deliveryOptions) ? listing.deliveryOptions.filter(Boolean) : [];
