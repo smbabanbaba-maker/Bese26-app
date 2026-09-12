@@ -80,7 +80,7 @@ export async function signUp({ email, password, displayName, username }) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username } },
+    options: { data: { display_name: displayName, username }, emailRedirectTo: getAuthRedirectUrl() },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
