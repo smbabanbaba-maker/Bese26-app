@@ -80,12 +80,13 @@ function BrandLoader({ message = 'Loading Bese26…', offline = false, compact =
   </div>;
 }
 
-function SplashScreen() {
+function SplashScreen({ message = 'Preparing your marketplace…', error = false, onRetry }) {
   return <div className="splash-screen" role="status" aria-label="Bese26 is loading">
     <div className="splash-brand-lockup">
       <img className="splash-bese26-logo" src="/images/bese26-logo-icon.png" alt="Bese26" />
       <span className="splash-brand-name">Bese26<span>.shop</span></span>
     </div>
+    <div className="splash-status" aria-live="polite"><strong>{message}</strong>{error && onRetry && <button type="button" className="splash-retry" onClick={onRetry}>Try again</button>}</div>
     <div className="splash-credit" aria-label="From SYLUTION">
       <span className="splash-credit-label">From</span>
       <img className="splash-sylution-logo" src="/branding-sylution-logo.png" alt="SYLUTION" />
@@ -632,6 +633,8 @@ function AppContent() {
   const [chatListing, setChatListing] = useState(null);
   const [editingListing, setEditingListing] = useState(null);
   const [editingDraft, setEditingDraft] = useState(null);
+  const [startupReady, setStartupReady] = useState(!isSupabaseConfigured);
+  const [startupError, setStartupError] = useState('');
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
 
@@ -665,7 +668,7 @@ function AppContent() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined;
     let mounted = true;
-    const loadBackend = async () => {
+    const loadBackend = async ({ initial = false } = {}) => {
       let session = null;
       try {
         const { data } = await supabase.auth.getSession();
@@ -683,6 +686,8 @@ function AppContent() {
           }
         }
       } catch (error) {
+        if (mounted && initial) setStartupError('Supabase is still connecting. Please try again.');
+        if (initial) return;
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }
       try {
@@ -693,6 +698,8 @@ function AppContent() {
           setAdCampaigns(remoteAds || []);
         }
       } catch (error) {
+        if (mounted && initial) setStartupError('Supabase is loading marketplace data. Please try again.');
+        if (initial) return;
         if (mounted) showToast(error.message || 'Could not load live marketplace data.');
       }
       if (session?.user) {
@@ -706,8 +713,12 @@ function AppContent() {
         setSavedIds([]);
         setIsAdmin(false);
       }
+      if (mounted && initial) {
+        setStartupError('');
+        setStartupReady(true);
+      }
     };
-    loadBackend();
+    loadBackend({ initial: true });
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
     const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
     const refreshWhenFocused = () => loadBackend();
@@ -783,9 +794,12 @@ function AppContent() {
     }).catch((error) => showToast(error.message || 'Could not open the business message.'));
   }, [sessionUser]);
 
-  const [showStartupLoader, setShowStartupLoader] = useState(true);
-  useEffect(() => { const timer = window.setTimeout(() => setShowStartupLoader(false), 2000); return () => window.clearTimeout(timer); }, []);
-  if (showStartupLoader) return <SplashScreen />;
+  const retryStartup = () => {
+    setStartupReady(false);
+    setStartupError('');
+    window.location.reload();
+  };
+  if (!startupReady) return <SplashScreen message={startupError || 'Connecting to Bese26…'} error={Boolean(startupError)} onRetry={retryStartup} />;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
