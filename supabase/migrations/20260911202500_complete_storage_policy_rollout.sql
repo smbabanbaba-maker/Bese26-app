@@ -56,7 +56,7 @@ USING (bucket_id IN ('listing-media', 'avatars'));
 DROP POLICY IF EXISTS listing_media_object_insert ON storage.objects;
 CREATE POLICY listing_media_object_insert
 ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (bucket_id = 'listing-media' AND public.user_owns_listing_storage_path(name));
+WITH CHECK (bucket_id = 'listing-media' AND private.user_owns_listing_storage_path(name));
 
 DROP POLICY IF EXISTS listing_media_object_update ON storage.objects;
 CREATE POLICY listing_media_object_update
