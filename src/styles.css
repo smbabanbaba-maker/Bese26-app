@@ -1463,8 +1463,9 @@ button:disabled { cursor: not-allowed; opacity: .65; }
 .home-ad-copy p { max-width:500px; color:#110101; font-size:11px; line-height:1.45; }
 .home-ad-sponsored { display:inline-flex; margin-left:7px; padding:3px 6px; border:1px solid rgba(255,255,255,.24); border-radius:999px; color:#f0acac; font-size:8px; letter-spacing:.04em; }
 .home-ad-cta { display:inline-flex; align-items:center; gap:6px; margin-top:13px; padding:9px 12px; border:0; border-radius:7px; color:#fff; background:var(--red); font-size:10px; font-weight:800; }
-.home-ad-art { display:grid; place-items:center; width:132px; height:132px; margin-right:12%; border-radius:38px; background:rgba(255,255,255,.06); transform:rotate(9deg); }
-.home-ad-art img { width:94px; height:94px; border-radius:23px; object-fit:cover; transform:rotate(-9deg); box-shadow:0 16px 35px rgba(0,0,0,.25); }
+.home-ad-art { display:grid; place-items:center; width:132px; height:132px; margin-right:12%; border-radius:38px; background:rgba(255,255,255,.06); overflow:hidden; transform:rotate(9deg); }
+.home-ad-art img { width:94px; height:94px; aspect-ratio:1; border-radius:23px; object-fit:cover; object-position:center; transform:rotate(-9deg); box-shadow:0 16px 35px rgba(0,0,0,.25); }
+.home-ad-art-clickable { cursor:pointer; }
 .home-ad-dots { position:absolute; right:18px; bottom:14px; display:flex; gap:5px; }
 .home-ad-dots button { width:7px; height:7px; padding:0; border:0; border-radius:99px; background:#0e0505; }
 .home-ad-dots button.active { width:22px; background:#000000; }
@@ -3890,3 +3891,7 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .sell-profile-setup-warning strong, .sell-profile-setup-warning small { display: block; }
 .sell-profile-setup-warning small { margin-top: 3px; line-height: 1.45; }
 .sell-field input[readonly] { background: #f7f7f8; color: #5d6570; cursor: not-allowed; }
+
+.admin-ad-preview { display:flex; align-items:center; gap:10px; grid-column:1 / -1; padding:10px; border:1px solid var(--line); border-radius:12px; background:#f8f8f8; }
+.admin-ad-preview .eyebrow { margin:0; }
+.admin-ad-preview img { width:92px; height:64px; border-radius:10px; object-fit:cover; object-position:center; background:#151619; }
