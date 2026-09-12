@@ -436,3 +436,27 @@
 .public-share-button:hover { color: #B84F4F !important; }
 .public-business-listings .product-card:hover,
 .public-about-item:hover { border-color: #B84F4F !important; background: #FFFFFF !important; }
+
+
+/* Public miniweb vision: storefronts share Home's dark hero and white marketplace surface. */
+.public-business-shell { background:#fff !important; color:#171717 !important; }
+.public-business-topbar { background:#fff !important; border-color:#e6e7ea !important; }
+.public-business-hero { position:relative !important; overflow:hidden !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; background-size:180% 180% !important; border:1px solid #27315b !important; box-shadow:0 18px 38px rgba(20,20,40,.14) !important; color:#fff !important; }
+.public-business-hero::after { display:block !important; background:radial-gradient(circle,rgba(98,227,255,.2),transparent 68%) !important; opacity:.8 !important; }
+.public-business-hero *, .public-business-identity h1, .public-business-identity .eyebrow, .public-business-handle, .public-business-identity p, .public-business-location { color:#fff !important; }
+.public-business-identity .eyebrow { color:#ffb6aa !important; }
+.public-business-handle { color:#c8ccef !important; }
+.public-business-identity p, .public-business-location { color:#d6d9e5 !important; }
+.public-business-logo { background:rgba(255,255,255,.12) !important; border:1px solid rgba(255,255,255,.25) !important; box-shadow:0 0 0 5px rgba(255,255,255,.07),0 15px 28px rgba(0,0,0,.25) !important; }
+.public-business-actions .primary-button { background:linear-gradient(105deg,#ef4c56,#ff795d) !important; color:#fff !important; border-color:transparent !important; }
+.public-business-actions .secondary-button { background:rgba(255,255,255,.1) !important; color:#fff !important; border-color:rgba(116,218,255,.5) !important; }
+.public-business-main { background:#fff !important; }
+.public-business-nav, .public-business-listings, .public-business-about, .public-trust-section { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; }
+.public-business-listings .section-heading h2, .public-business-about h2, .public-trust-copy h2 { color:#171717 !important; }
+.public-business-listings .product-card { background:#fff !important; border-color:#e6e7ea !important; box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
+.public-business-listings .product-card h3 { color:#171717 !important; }
+.public-business-listings .product-card p, .public-business-about p, .public-trust-copy p { color:#5f6873 !important; }
+.public-business-stats > div { background:#fff !important; border-color:#e6e7ea !important; }
+.public-business-stats strong { color:#171717 !important; }
+.public-business-stats span { color:#68717d !important; }
+@media (max-width:700px) { .public-business-hero { border-radius:17px !important; padding:20px !important; } .public-business-logo { width:84px !important; height:84px !important; } }
