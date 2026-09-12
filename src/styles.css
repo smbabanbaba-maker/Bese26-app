@@ -3662,3 +3662,45 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 @media (prefers-reduced-motion: reduce) {
   .splash-screen, .splash-bese26-logo, .splash-credit { animation: none; }
 }
+/* Settings and Edit Listing: white workspace with dashboard-quality section hierarchy. */
+.profile-subpage, .listing-management-center { background:#fff !important; color:#171717 !important; }
+.profile-subpage-header, .listing-management-toolbar, .listing-management-tabs { background:#fff !important; border-color:#e6e7ea !important; }
+.profile-subpage-header h1, .profile-subpage-header h2, .listing-management-toolbar h1, .listing-management-toolbar h2 { color:#171717 !important; }
+.profile-subpage-header p, .listing-management-toolbar p { color:#5f6873 !important; }
+.settings-card, .profile-form-card, .settings-info-row, .settings-select-row, .profile-photo-editor, .listing-management-card, .managed-listing, .listing-analytics-panel, .listing-price-editor { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; box-shadow:0 6px 18px rgba(20,20,40,.04) !important; }
+.settings-card h2, .settings-card h3, .profile-form-card h2, .profile-form-card h3, .managed-listing h3 { color:#171717 !important; }
+.settings-card p, .settings-card small, .profile-form-card p, .managed-listing span, .listing-analytics-panel span { color:#5f6873 !important; }
+.settings-card input, .settings-card textarea, .settings-card select, .profile-form-card input, .profile-form-card textarea, .profile-form-card select, .listing-price-editor input { background:#fff !important; color:#171717 !important; border-color:#cfd5dc !important; }
+.profile-tabs button, .listing-management-tabs button { color:#5f6873 !important; background:#fff !important; border-color:#e6e7ea !important; }
+.profile-tabs button.active, .listing-management-tabs button.active { color:#b71c1c !important; border-color:#e53935 !important; background:#fff7f7 !important; }
+.listing-management-hero { color:#fff !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; border-color:#27315b !important; }
+.listing-management-hero * { color:#fff; }
+.managed-listing-copy strong, .managed-listing-copy h3 { color:#171717 !important; }
+.managed-listing-copy p, .managed-listing-copy small { color:#5f6873 !important; }
+
+/* Business Directory: one company per row, never cramped, easy to scan. */
+.business-directory-page { max-width:920px; margin:0 auto; padding-bottom:32px; }
+.business-directory-hero { position:relative; display:flex; align-items:center; gap:14px; min-height:174px; margin-bottom:18px; padding:24px 28px; border-radius:22px; overflow:hidden; color:#fff !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; border:1px solid #27315b !important; box-shadow:0 16px 34px rgba(20,20,40,.14) !important; }
+.business-directory-hero h1 { margin:6px 0; color:#fff !important; font-size:clamp(25px,4vw,38px); letter-spacing:-.04em; }
+.business-directory-hero p { margin:0; max-width:520px; color:#d6d9e5 !important; font-size:12px; line-height:1.55; }
+.business-directory-hero .eyebrow { color:#ffb6aa !important; }
+.directory-back { display:grid; place-items:center; width:36px; height:36px; flex:none; color:#fff; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.26); border-radius:11px; }
+.business-directory-hero-icon { margin-left:auto; opacity:.55; color:#9ee9ff; }
+.business-directory-search { display:flex; align-items:center; gap:10px; min-height:50px; margin-bottom:18px; padding:0 16px; color:#68717d; background:#fff; border:1px solid #dfe4eb; border-radius:14px; box-shadow:0 6px 18px rgba(20,20,40,.04); }
+.business-directory-search:focus-within { border-color:#7564d8; box-shadow:0 0 0 3px rgba(117,100,216,.12); }
+.business-directory-search input { width:100%; min-height:46px; border:0 !important; outline:0; background:transparent !important; color:#171717 !important; }
+.business-directory-list { display:grid; gap:12px; }
+.business-directory-card { display:grid; gap:16px; padding:18px; border:1px solid #e6e7ea !important; border-radius:17px !important; background:#fff !important; box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
+.business-directory-card-top { display:flex; align-items:flex-start; gap:14px; min-width:0; }
+.business-directory-logo { display:grid; place-items:center; width:62px; height:62px; flex:none; overflow:hidden; border-radius:16px; color:#7564d8; background:#f0edff; font-size:22px; font-weight:800; }
+.business-directory-logo img { width:100%; height:100%; object-fit:cover; }
+.business-directory-copy { min-width:0; }
+.business-directory-copy h2 { display:flex; align-items:center; gap:5px; margin:0 0 4px; color:#171717 !important; font-size:18px; line-height:1.2; }
+.business-directory-copy strong { display:block; color:#7564d8 !important; font-size:11px; }
+.business-directory-copy p { margin:8px 0; color:#5f6873 !important; font-size:12px; line-height:1.45; }
+.business-directory-location { display:inline-flex; align-items:center; gap:4px; color:#68717d !important; font-size:10px; }
+.business-verified-icon { color:#4f73c9 !important; vertical-align:middle; }
+.business-directory-card-footer { display:flex; align-items:center; gap:8px; padding-top:12px; border-top:1px solid #eef0f3; }
+.business-directory-card-footer > span { padding:5px 8px; color:#7564d8; background:#f4f1ff; border-radius:999px; font-size:10px; font-weight:700; }
+.business-directory-card-footer .primary-button { display:inline-flex; align-items:center; gap:5px; margin-left:auto; padding:9px 13px; border-radius:10px; font-size:11px; }
+@media (max-width:700px) { .business-directory-page { padding-inline:0; } .business-directory-hero { min-height:170px; padding:20px; border-radius:17px; } .business-directory-hero-icon { width:32px; } .business-directory-card { padding:15px; } .business-directory-card-footer { flex-wrap:wrap; } .business-directory-card-footer .primary-button { width:100%; justify-content:center; margin-left:0; } }

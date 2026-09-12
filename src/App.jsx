@@ -72,6 +72,26 @@ import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
+function BusinessDirectoryView({ onBack }) {
+  const [search, setSearch] = useState('');
+  const [businesses, setBusinesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError('');
+    fetchBusinessDirectory(search).then((items) => mounted && setBusinesses(items || [])).catch((err) => mounted && setError(err.message || 'Could not load businesses.')).finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, [search]);
+  return <section className="business-directory-page">
+    <div className="business-directory-hero"><button type="button" className="directory-back" onClick={onBack} aria-label="Back"><ArrowLeft size={18} /></button><div><div className="eyebrow">BESE26 MINIWEBS</div><h1>Business directory</h1><p>Find trusted businesses and open their public miniweb.</p></div><Store size={42} className="business-directory-hero-icon" /></div>
+    <label className="business-directory-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search business, category or city" /></label>
+    {error && <div className="empty-state"><p>{error}</p></div>}
+    {loading ? <div className="empty-state"><p>Loading businesses…</p></div> : businesses.length ? <div className="business-directory-list">{businesses.map((business) => <article className="business-directory-card" key={business.profile_id}><div className="business-directory-card-top"><div className="business-directory-logo">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt="" /> : <span>{(business.business_name || 'B').slice(0, 1).toUpperCase()}</span>}</div><div className="business-directory-copy"><h2>{business.business_name || 'Unnamed business'} {business.is_verified && <BadgeCheck size={16} className="business-verified-icon" aria-label="Verified business" />}</h2><strong>@{business.business_handle || 'business'}</strong><p>{business.description || 'A Bese26 business profile.'}</p><span className="business-directory-location"><MapPin size={13} /> {[business.city, business.state].filter(Boolean).join(', ') || 'Nigeria'}</span></div></div><div className="business-directory-card-footer"><span>{business.category || business.business_type || 'Business'}</span>{(business.delivery_available || business.pickup_available) && <span>{business.delivery_available ? 'Delivery' : 'Pickup'}</span>}<a className="primary-button" href={`/@${business.business_handle}`}>Open miniweb <ArrowRight size={14} /></a></div></article>)}</div> : <div className="empty-state"><Store size={28} /><h3>No businesses found</h3><p>Active public business profiles will appear here.</p></div>}
+  </section>;
+}
+
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
     <div className="brand-loader-orbit" aria-hidden="true"><span className="brand-loader-ring" /><img src="/images/bese26-logo-icon.png" alt="" /></div>
