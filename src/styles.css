@@ -3953,3 +3953,13 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .auth-otp-form input { letter-spacing: .28em; text-align: center; font-weight: 800; }
 .auth-otp-box .auth-divider { margin: 11px 0; }
 .auth-otp-box .auth-submit { width: 100%; }
+
+
+/* Registration confirmation step */
+.auth-confirmation-card { margin-top:28px; padding:24px 20px; border:1px solid #dce8e3; border-radius:17px; background:linear-gradient(145deg,#f8fffc,#eef9f5); text-align:center; }
+.auth-confirmation-icon { width:52px; height:52px; margin:0 auto 13px; display:grid; place-items:center; border-radius:16px; color:#fff; background:linear-gradient(135deg,#087d5b,#12aa79); box-shadow:0 10px 20px rgba(8,125,91,.2); }
+.auth-confirmation-card h3 { color:#13251f; font-size:22px; margin-bottom:8px; }
+.auth-confirmation-card p { color:#657a72; font-size:13px; line-height:1.6; margin:0 auto 18px; max-width:360px; }
+.auth-confirmation-card p strong { color:#087d5b; word-break:break-word; }
+.auth-confirmation-card .auth-submit { width:100%; margin-top:0; }
+.auth-confirmation-card .auth-forgot { margin-top:12px; }
