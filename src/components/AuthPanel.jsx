@@ -50,7 +50,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
       const data = mode === 'signin'
         ? await signIn({ email: form.email, password: form.password })
         : await signUp({ email: form.email, password: form.password, displayName: form.displayName, username: form.username });
-      if (mode === 'signup' && !data.session) { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); }
+      if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); }
       else { onAuthenticated?.(data.user); onClose?.(); }
     } catch (error) { setStatus({ type: 'error', message: error.message || 'Authentication failed. Please try again.' }); }
     finally { setLoading(false); }
