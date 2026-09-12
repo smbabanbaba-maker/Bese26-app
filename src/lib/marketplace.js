@@ -93,6 +93,24 @@ export async function signIn({ email, password }) {
   return data;
 }
 
+export async function sendEmailOtp(email) {
+  failIfUnavailable();
+  const value = String(email || '').trim().toLowerCase();
+  if (!value) throw new Error('Enter your email first.');
+  const { error } = await supabase.auth.signInWithOtp({ email: value, options: { shouldCreateUser: true } });
+  if (error) throw error;
+}
+
+export async function verifyEmailOtp({ email, token }) {
+  failIfUnavailable();
+  const value = String(email || '').trim().toLowerCase();
+  const code = String(token || '').trim();
+  if (!value || !code) throw new Error('Enter the email and 6-digit code.');
+  const { data, error } = await supabase.auth.verifyOtp({ email: value, token: code, type: 'email' });
+  if (error) throw error;
+  return data;
+}
+
 function getAuthRedirectUrl() {
   if (typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)) return window.location.origin;
   return 'https://www.bese26.shop';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, LockKeyhole, LoaderCircle, Mail, UserRound, X } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { requestPasswordReset, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
+import { requestPasswordReset, sendEmailOtp, signIn, signInWithGoogle, signUp, verifyEmailOtp } from '../lib/marketplace';
 
 function WelcomeSide({ isSignin }) {
   return <div className="auth-welcome-panel">
@@ -36,9 +36,11 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const [loading, setLoading] = useState(false);
   const [loadingLabel, setLoadingLabel] = useState('Signing you in…');
   const [resetting, setResetting] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-  const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); };
+  const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setOtpSent(false); setOtp(''); };
   const submit = async (event) => {
     event.preventDefault();
     setStatus({ type: '', message: '' });
@@ -52,6 +54,23 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
       if (mode === 'signup' && !data.session) { setStatus({ type: 'success', message: 'Account created. Check your email to confirm your account, then sign in.' }); switchMode('signin'); }
       else { onAuthenticated?.(data.user); onClose?.(); }
     } catch (error) { setStatus({ type: 'error', message: error.message || 'Authentication failed. Please try again.' }); }
+    finally { setLoading(false); }
+  };
+  const sendOtp = async () => {
+    setStatus({ type: '', message: '' });
+    if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email first.' }); return; }
+    setLoading(true); setLoadingLabel('Sending your login code…');
+    try { await sendEmailOtp(form.email); setOtpSent(true); setStatus({ type: 'success', message: 'We sent a 6-digit code to your email. Check your inbox and spam folder.' }); }
+    catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send the email code.' }); }
+    finally { setLoading(false); }
+  };
+  const verifyOtp = async (event) => {
+    event.preventDefault();
+    setStatus({ type: '', message: '' });
+    if (!/^\d{6}$/.test(otp.trim())) { setStatus({ type: 'error', message: 'Enter the 6-digit code from your email.' }); return; }
+    setLoading(true); setLoadingLabel('Verifying your code…');
+    try { const data = await verifyEmailOtp({ email: form.email, token: otp }); onAuthenticated?.(data.user); onClose?.(); }
+    catch (error) { setStatus({ type: 'error', message: error.message || 'That code is invalid or has expired.' }); }
     finally { setLoading(false); }
   };
   const resetPassword = async () => {
@@ -81,6 +100,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
       <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="current-password" required /></label>
       <button type="submit" className="primary-button auth-submit" disabled={loading || resetting}>{loading ? 'Signing in…' : 'Login'}</button><button type="button" className="auth-forgot" onClick={resetPassword} disabled={loading || resetting}>{resetting ? 'Sending reset link…' : 'Forgot password?'}</button>
     </form>
+    {isSupabaseConfigured && <div className="auth-otp-box"><div className="auth-divider"><span>or use email code</span></div>{otpSent ? <form className="auth-otp-form" onSubmit={verifyOtp}><label><span><Mail size={14} /> 6-digit code</span><input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" autoComplete="one-time-code" required /></label><button type="submit" className="secondary-button auth-submit" disabled={loading}>{loading ? 'Verifying…' : 'Verify code'}</button><button type="button" className="auth-forgot" onClick={sendOtp} disabled={loading}>Send code again</button></form> : <button type="button" className="secondary-button auth-submit" onClick={sendOtp} disabled={loading || resetting}>{loading ? 'Sending code…' : 'Email me a login code'}</button>}</div>}
     <button type="button" className="auth-switch" onClick={() => switchMode('signup')}>Don’t have an account? <strong>Sign up</strong></button>
   </div>;
   const renderSignup = () => <div className="auth-form-panel auth-form-face-content">
