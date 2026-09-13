@@ -18,7 +18,7 @@ function statusLabel(action) {
 }
 
 function AdCampaignManager({ user, onNotice }) {
-  const emptyForm = { title: 'Bese26 campaign banner', body: 'Sponsored campaign', image_url: '', image_only: true, creative_width: 1600, creative_height: 500, cta_label: 'Open', cta_target: '/business', placement: 'home_banner', status: 'draft', priority: 50, max_impressions: '', starts_at: '', ends_at: '' };
+  const emptyForm = { title: 'Bese26 campaign banner', body: 'Sponsored campaign', image_url: '', image_only: true, creative_width: 1600, creative_height: 500, cta_label: 'Open', cta_target: '', placement: 'home_banner', status: 'draft', priority: 50, max_impressions: '', starts_at: '', ends_at: '' };
   const [campaigns, setCampaigns] = useState([]); const [form, setForm] = useState(emptyForm); const [editingId, setEditingId] = useState(''); const [loading, setLoading] = useState(true); const [busy, setBusy] = useState(''); const [uploading, setUploading] = useState(false); const [error, setError] = useState('');
   const load = async () => { setLoading(true); try { setCampaigns(await fetchAdminAdCampaigns()); } catch (reason) { setError(reason.message || 'Could not load campaigns.'); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
