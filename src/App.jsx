@@ -303,7 +303,7 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
 
-function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   const advertisingSlides = adCampaigns.filter((campaign) => campaign.placement === 'home_banner').map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
@@ -325,7 +325,7 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
           <input aria-label="Search listings" placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(event.currentTarget.value)} />
           <button className="search-submit" aria-label="Search" onClick={() => onSearch('')}><Search size={20} /></button>
         </div>
-        <div className="location-row"><MapPin size={14} /><span>Showing</span><strong>approved listings</strong><ChevronDown size={14} /></div>
+        <div className="location-row home-location-row"><MapPin size={14} /><span>Showing</span><strong>{userPlace ? `near ${userPlace}` : 'approved listings'}</strong><button type="button" className="location-detect-button" onClick={onUseLocation} disabled={locationBusy}>{locationBusy ? 'Locating…' : userPlace ? 'Update location' : 'Use my location'}</button></div>
       </section>
       <section className="popular-categories"><SectionHeading eyebrow="START BROWSING" title="Popular near you" action="All categories" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>
 
@@ -660,6 +660,9 @@ function AppContent() {
   const [marketListings, setMarketListings] = useState([]);
   const [marketCategories, setMarketCategories] = useState([]);
   const [adCampaigns, setAdCampaigns] = useState([]);
+  const [userPlace, setUserPlace] = useState('');
+  const [userCoordinates, setUserCoordinates] = useState(null);
+  const [locationBusy, setLocationBusy] = useState(false);
   const [sessionUser, setSessionUser] = useState(null);
   const [businessOwnerProfile, setBusinessOwnerProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -686,6 +689,30 @@ function AppContent() {
   useEffect(() => { try { localStorage.setItem('bese26:theme', isDark ? 'dark' : 'light'); } catch {} }, [isDark]);
 
   const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
+  const useMyLocation = useCallback(() => {
+    if (!navigator.geolocation) { showToast('Location is not available in this browser.'); return; }
+    setLocationBusy(true);
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      setUserCoordinates({ latitude: coords.latitude, longitude: coords.longitude });
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(coords.latitude)}&lon=${encodeURIComponent(coords.longitude)}&zoom=10&addressdetails=1`, { headers: { Accept: 'application/json' } });
+        const result = await response.json();
+        const address = result.address || {};
+        setUserPlace(address.city || address.town || address.municipality || address.county || address.state || 'your area');
+        showToast('Location updated. Showing nearby listings first.');
+      } catch { setUserPlace('your area'); showToast('Location found, but the place name could not be loaded.'); }
+      setLocationBusy(false);
+    }, (error) => { setLocationBusy(false); showToast(error.code === 1 ? 'Location permission was not granted.' : 'Could not detect your location.'); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+  }, [showToast]);
+  const nearbyListings = useMemo(() => {
+    if (!userPlace) return marketListings;
+    const needle = userPlace.toLowerCase();
+    return [...marketListings].sort((a, b) => {
+      const aMatch = `${a.location || ''} ${a.city || ''} ${a.state || ''}`.toLowerCase().includes(needle) ? 1 : 0;
+      const bMatch = `${b.location || ''} ${b.city || ''} ${b.state || ''}`.toLowerCase().includes(needle) ? 1 : 0;
+      return bMatch - aMatch;
+    });
+  }, [marketListings, userPlace]);
   const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setAuthReason(message); setShowAuth(true); }, []);  useEffect(() => {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
@@ -873,7 +900,7 @@ function AppContent() {
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
-    if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
     if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={() => navigate('home')} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
