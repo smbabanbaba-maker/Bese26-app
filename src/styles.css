@@ -4044,3 +4044,16 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .admin-ad-card-copy { flex: 1; }
 @media (max-width:700px) { .admin-ad-card-image { width: 100%; height: 150px; } }
 .home-ad-banner:has(.home-ad-image-only), .home-ad-image-only, .home-ad-image-only img { min-height: 0; }
+
+/* Advertiser-ready banner specification card */
+.campaign-spec-card { grid-column: span 3; display: grid; gap: 11px; padding: 15px; border: 1px solid #e4d5b0; border-radius: 13px; background: linear-gradient(135deg, #fffaf0, #fff); }
+.campaign-spec-card > div:first-child { display: grid; gap: 4px; }
+.campaign-spec-card strong { color: #5e471f; font-size: 13px; }
+.campaign-spec-card small { color: #806c4b; font-size: 10px; }
+.campaign-spec-card label { display: grid; gap: 6px; color: #806c4b; font-size: 10px; font-weight: 800; }
+.campaign-spec-card select { min-height: 38px; padding: 9px; border: 1px solid #e6d7b1; border-radius: 8px; color: #5e471f; background: #fff; }
+.campaign-spec-size { display: flex !important; align-items: center; flex-wrap: wrap; gap: 10px; }
+.campaign-spec-size strong { padding: 8px 10px; border-radius: 8px; color: #fff; background: #8c681e; font-size: 14px; }
+.campaign-spec-size span { color: #806c4b; font-size: 10px; }
+.campaign-spec-size button { margin-left: auto; }
+@media (max-width:700px) { .campaign-spec-card { grid-column: auto; } .campaign-spec-size button { width: 100%; margin-left: 0; } }
