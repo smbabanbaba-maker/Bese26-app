@@ -190,7 +190,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       description: raw.description || initialListing.description || '',
       condition: raw.condition || current.condition,
       price: raw.price == null ? '' : String(raw.price),
-      currency: '₦ NGN',
+      currency: raw.currency || 'NGN',
       negotiable: raw.pricing_type === 'negotiable',
       quantity: raw.quantity == null ? current.quantity : String(raw.quantity),
       unit: raw.unit || current.unit,
@@ -298,6 +298,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     const accepted = [];
     incoming.forEach((file, index) => {
       if (!file.type.startsWith('image/') || nextPhotoCount >= 6) return;
+      if (file.size > 8 * 1024 * 1024) { setErrors((current) => [...current, `${file.name} is larger than 8 MB.`]); return; }
       nextPhotoCount += 1;
       accepted.push({ id: `${file.name}-${file.lastModified}-${index}`, src: URL.createObjectURL(file), file, name: file.name, type: 'image', cover: media.length === 0 && accepted.length === 0 });
     });
