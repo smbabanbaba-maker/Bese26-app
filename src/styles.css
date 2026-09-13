@@ -4024,3 +4024,15 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .home-ad-image-only img { width: 100%; height: 100%; min-height: 154px; display: block; object-fit: contain; }
 @media (max-width: 700px) { .image-first-campaign-grid { grid-template-columns: 1fr; } .campaign-upload-zone { grid-column: auto; } .home-ad-image-only, .home-ad-image-only img { min-height: 190px; } }
 .home-ad-banner:has(.home-ad-image-only) { padding: 0; }
+
+/* Authentic category icon badges */
+.popular-category > span { border: 1px solid rgba(20, 24, 32, .08); box-shadow: 0 5px 12px rgba(24, 29, 40, .08); }
+.popular-category.tone-lavender > span { background: #e8efff !important; color: #315bb4 !important; }
+.popular-category.tone-blue > span { background: #e1f5ff !important; color: #16739d !important; }
+.popular-category.tone-sand > span { background: #fff0c7 !important; color: #9a6511 !important; }
+.popular-category.tone-pink > span { background: #ffe6ed !important; color: #c43d68 !important; }
+.popular-category.tone-green > span { background: #ddf5e3 !important; color: #287c49 !important; }
+.popular-category.tone-peach > span { background: #ffe8da !important; color: #b7522b !important; }
+.popular-category.tone-gold > span { background: #fff1bf !important; color: #a36b08 !important; }
+.popular-category.tone-coral > span { background: #ffe1e1 !important; color: #b52f37 !important; }
+.popular-category > span svg { display: block; }

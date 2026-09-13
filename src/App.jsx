@@ -7,6 +7,8 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Bookmark,
+  BriefcaseBusiness,
+  Building2,
   CarFront,
   Check,
   CheckCircle2,
@@ -37,9 +39,11 @@ import {
   Star,
   Store,
   Tag,
+  UtensilsCrossed,
   UserPlus,
   UserRound,
   WalletCards,
+  Wheat,
   Wrench,
   Share2,
   ZoomIn,
@@ -314,7 +318,7 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
         </div>
         <div className="location-row"><MapPin size={14} /><span>Showing</span><strong>approved listings</strong><ChevronDown size={14} /></div>
       </section>
-      <section className="popular-categories"><SectionHeading eyebrow="START BROWSING" title="Popular near you" action="All categories" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', House, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Sprout, 'tone-green'], ['Services', Wrench, 'tone-peach'], ['Food', ShoppingBasket, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)}><span><Icon size={19} /></span><strong>{label}</strong></button>)}</div></section>
+      <section className="popular-categories"><SectionHeading eyebrow="START BROWSING" title="Popular near you" action="All categories" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>
 
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
