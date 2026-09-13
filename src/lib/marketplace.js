@@ -804,7 +804,16 @@ export async function markNotificationRead(notificationId, userId) {
 
 export function subscribeToNotifications(userId, onInsert) {
   if (!supabase || !userId) return () => {};
-  const channel = supabase.channel(`notifications:${userId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert).subscribe();
+  const channel = supabase.channel(`notifications:${userId}:${Date.now()}`);
+  try {
+    channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert);
+    channel.subscribe((status) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.warn('Notification realtime unavailable:', status);
+    });
+  } catch (error) {
+    console.warn('Notification realtime setup skipped:', error);
+    return () => {};
+  }
   return () => { supabase.removeChannel(channel); };
 }
 
