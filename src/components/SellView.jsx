@@ -201,7 +201,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       description: raw.description || initialListing.description || '',
       condition: raw.condition || current.condition,
       price: raw.price == null ? '' : String(raw.price),
-      currency: raw.currency || 'NGN',
+      currency: raw.currency || current.currency || 'NGN',
       negotiable: raw.pricing_type === 'negotiable',
       quantity: raw.quantity == null ? current.quantity : String(raw.quantity),
       unit: raw.unit || current.unit,
@@ -251,12 +251,15 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   useEffect(() => {
     let mounted = true;
     if (!user) return undefined;
-    Promise.all([getProfile(user.id), getProfilePreferences(user.id)]).then(([profile, preferences]) => {
-      if (!mounted || !profile) return;
+    Promise.allSettled([getProfile(user.id), getProfilePreferences(user.id)]).then(([profileResult, preferencesResult]) => {
+      if (!mounted) return;
+      const profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
+      const preferences = preferencesResult.status === 'fulfilled' ? preferencesResult.value : null;
+      if (!profile) { setProfileLocationStatus('missing'); return; }
       const location = normalizeNigeriaLocation(profile, preferences || {});
-      const hasUsableLocation = Boolean(location.state && location.city && location.currency);
+      const hasUsableLocation = Boolean(location.state && location.city);
       setProfileLocationStatus(hasUsableLocation ? 'ready' : 'missing');
-      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, ...location, sellerLocation: location.country }));
+      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, ...location, currency: preferences?.currency || location.currency || current.currency || 'NGN', sellerLocation: location.country }));
     }).catch(() => mounted && setProfileLocationStatus('missing'));
     return () => { mounted = false; };
   }, [user, editMode]);
@@ -368,7 +371,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     if (isSupabaseConfigured && !profileContact?.phone) { setErrors(['A profile phone number is required before publishing.']); onDemoAction?.('Add your phone number in Profile, then return here to publish.'); return; }
     if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (isSupabaseConfigured && !editMode && !media.some((item) => item.file)) { setErrors(['Choose at least one photo from your device before publishing.']); document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if (!isSupabaseConfigured) { setErrors(['Marketplace connection is not configured. Publishing is unavailable until Supabase is connected.']); return; }
+    if (!isSupabaseConfigured) { setErrors(['Marketplace connection is not configured. Publishing is unavailable right now.']); return; }
     setPublishState('publishing');
     try {
       const categoryRows = await fetchCategories();

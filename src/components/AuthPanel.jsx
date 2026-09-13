@@ -75,7 +75,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     setStatus({ type: '', message: '' });
     setLoading(true); setLoadingLabel('Connecting to Google…');
     try { await signInWithGoogle(); }
-    catch (error) { setStatus({ type: 'error', message: error.message || 'Google sign-in is unavailable. Check that Google is enabled in Supabase Auth.' }); setLoading(false); }
+    catch (error) { setStatus({ type: 'error', message: error.message || 'Google sign-in is unavailable right now. Please try again later.' }); setLoading(false); }
   };
 
   const isSignin = mode === 'signin';
