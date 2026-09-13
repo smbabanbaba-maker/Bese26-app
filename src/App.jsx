@@ -295,7 +295,7 @@ function FirstVisitCard({ user, onNavigate }) {
   return null;
 }
 function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
-  const advertisingSlides = adCampaigns.map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: campaign.creative_width || 1200, creative_height: campaign.creative_height || 1200, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
+  const advertisingSlides = adCampaigns.map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
   const [promoIndex, setPromoIndex] = useState(0);
