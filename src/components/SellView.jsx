@@ -28,6 +28,9 @@ import nigeriaLocations from '../data/nigeriaLocations.json';
 const categoryLabelAliases = {
   'Health & Beauty': ['Beauty & Health', 'health-beauty', 'beauty-health'],
   'Phones & Tablets': ['Electronics', 'Phones & Tablets', 'phones-tablets'],
+  Electronics: ['Electronics', 'Phones & Tablets', 'Electronics & Gadgets', 'Technology', 'electronics', 'phones-tablets'],
+  'Home & Garden': ['Home & Garden', 'Home and Garden', 'home-garden'],
+  'Jobs & Services': ['Jobs & Services', 'Services', 'jobs-services'],
 };
 
 function categorySlug(value) {
@@ -37,7 +40,13 @@ function categorySlug(value) {
 function findCategoryRow(rows, label, parentId = null) {
   const candidates = [label, ...(categoryLabelAliases[label] || [])].map((value) => String(value).toLowerCase().trim());
   const slugs = candidates.map(categorySlug);
-  return rows.find((row) => (row.parent_id || null) === (parentId || null) && (candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))) || null;
+  const scoped = rows.filter((row) => (row.parent_id || null) === (parentId || null));
+  return scoped.find((row) => candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))
+    || scoped.find((row) => {
+      const rowText = `${row.name || ''} ${row.slug || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+      return candidates.some((candidate) => candidate.length > 3 && (rowText.includes(candidate) || candidate.includes(rowText.trim())));
+    })
+    || null;
 }
 
 function normalizeNigeriaLocation(profile = {}, preferences = {}) {

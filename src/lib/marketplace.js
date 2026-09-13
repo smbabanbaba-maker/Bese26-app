@@ -553,7 +553,7 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
 
 export async function fetchCategories() {
   if (!supabase) return [];
-  const { data, error } = await supabase.from('categories').select('id,parent_id,name,slug,icon,sort_order').eq('is_active', true).order('sort_order').limit(100);
+  const { data, error } = await supabase.from('categories').select('id,parent_id,name,slug,icon,sort_order').eq('is_active', true).order('sort_order').limit(1000);
   if (error) throw error;
   return data || [];
 }
