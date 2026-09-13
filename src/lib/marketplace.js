@@ -1361,3 +1361,28 @@ export async function reportListing({ listingId, reporterId, reason = 'other', d
   if (error) throw error;
   return data;
 }
+
+
+export async function adminTeamList() {
+  const { data, error } = await supabase.rpc('admin_team_list');
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminTeamAdd(email, permissions) {
+  const { data, error } = await supabase.rpc('admin_team_add', { p_email: email, p_permissions: permissions });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminTeamUpdate(userId, permissions, active) {
+  const { data, error } = await supabase.rpc('admin_team_update', { p_user_id: userId, p_permissions: permissions, p_active: active });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminTeamRemove(userId) {
+  const { data, error } = await supabase.rpc('admin_team_remove', { p_user_id: userId });
+  if (error) throw error;
+  return data;
+}
