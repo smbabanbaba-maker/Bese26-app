@@ -348,7 +348,7 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
     if (!form.title.trim()) nextErrors.push('Add a short, searchable title.');
     if (!form.category) nextErrors.push('Choose a category.');
-    if (!form.description.trim()) nextErrors.push('Add a description so buyers understand the listing.');
+    if (form.description.trim().length < 5) nextErrors.push('Description must be at least 5 characters.');
     if (!form.price || Number(form.price) <= 0) nextErrors.push('Enter a valid price greater than zero.');
     if (profileLocationStatus !== 'ready') nextErrors.push('Set your country, state/province, city, and currency in Profile before listing.');
     if (!form.state || !form.city) nextErrors.push('Your profile must include a state and city for the listing.');
@@ -426,14 +426,14 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
   const listingStrength = useMemo(() => {
     const checks = [
       ['title', Boolean(form.title.trim())],
-      ['description', form.description.trim().length >= 40],
+      ['description', form.description.trim().length >= 5],
       ['photos', media.length > 0],
       ['price', Number(form.price) > 0],
       ['location', profileLocationStatus === 'ready'],
       ['contact', Boolean(form.contactChat || form.contactPhone || form.contactWhatsApp)],
     ];
     const score = Math.round((checks.filter(([, done]) => done).length / checks.length) * 100);
-    const tips = { title: 'Add a clear title.', description: 'Write at least 40 characters describing the item.', photos: 'Add at least one clear photo.', price: 'Enter a valid price.', location: 'Complete your profile location.', contact: 'Choose at least one contact method.' };
+    const tips = { title: 'Add a clear title.', description: 'Write at least 5 characters describing the item.', photos: 'Add at least one clear photo.', price: 'Enter a valid price.', location: 'Complete your profile location.', contact: 'Choose at least one contact method.' };
     const missing = checks.find(([key, done]) => !done)?.[0];
     return { score, tip: missing ? tips[missing] : 'Great job — your listing is ready to publish.' };
   }, [form, media.length, profileLocationStatus]);
