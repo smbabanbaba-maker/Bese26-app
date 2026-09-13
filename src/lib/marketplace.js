@@ -494,7 +494,7 @@ export async function fetchAdminAdCampaigns() {
 
 export async function createAdminAdCampaign(userId, values) {
   failIfUnavailable();
-  const payload = { created_by: userId, title: values.title.trim(), body: values.body.trim(), image_url: values.image_url?.trim() || null, image_only: values.image_only !== false, creative_width: Math.max(320, Math.min(4000, Number(values.creative_width) || 1200)), creative_height: Math.max(320, Math.min(4000, Number(values.creative_height) || 1200)), cta_label: values.cta_label?.trim() || 'Learn more', cta_target: values.cta_target?.trim() || '/', placement: values.placement || 'home_banner', status: values.status || 'draft', priority: Math.max(0, Math.min(1000, Number(values.priority) || 0)), max_impressions: values.max_impressions ? Math.max(1, Number(values.max_impressions)) : null, starts_at: values.starts_at || new Date().toISOString(), ends_at: values.ends_at || null };
+  const payload = { created_by: userId, title: values.title.trim(), body: values.body.trim(), image_url: values.image_url?.trim() || null, image_only: values.image_only !== false, creative_width: 1600, creative_height: 500, cta_label: values.cta_label?.trim() || 'Learn more', cta_target: values.cta_target?.trim() || '/', placement: values.placement || 'home_banner', status: values.status || 'draft', priority: Math.max(0, Math.min(1000, Number(values.priority) || 0)), max_impressions: values.max_impressions ? Math.max(1, Number(values.max_impressions)) : null, starts_at: values.starts_at || new Date().toISOString(), ends_at: values.ends_at || null };
   const { data, error } = await supabase.from('ad_campaigns').insert(payload).select('*').single();
   if (error) throw error;
   return data;
