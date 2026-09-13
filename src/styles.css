@@ -4036,3 +4036,10 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .popular-category.tone-gold > span { background: #fff1bf !important; color: #a36b08 !important; }
 .popular-category.tone-coral > span { background: #ffe1e1 !important; color: #b52f37 !important; }
 .popular-category > span svg { display: block; }
+
+/* Multiple advertiser creatives in Admin */
+.admin-ad-card { align-items: stretch; }
+.admin-ad-card-image { width: 108px; min-width: 108px; height: 82px; display: block; object-fit: contain; border-radius: 10px; background: #17181d; border: 1px solid #ead6d6; }
+.admin-ad-card-image-empty { display: grid; place-items: center; color: #c24848; background: #fff3f3; }
+.admin-ad-card-copy { flex: 1; }
+@media (max-width:700px) { .admin-ad-card-image { width: 100%; height: 150px; } }
