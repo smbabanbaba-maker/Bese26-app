@@ -21,6 +21,7 @@ import { isSupabaseConfigured } from '../lib/supabase';
 import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getBusinessProfile, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
 import { getProfilePreferences } from '../lib/marketplace';
 import { currencyLabel } from '../lib/currency';
+import nigeriaLocations from '../data/nigeriaLocations.json';
 
 
 
@@ -37,6 +38,16 @@ function findCategoryRow(rows, label, parentId = null) {
   const candidates = [label, ...(categoryLabelAliases[label] || [])].map((value) => String(value).toLowerCase().trim());
   const slugs = candidates.map(categorySlug);
   return rows.find((row) => (row.parent_id || null) === (parentId || null) && (candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))) || null;
+}
+
+function normalizeNigeriaLocation(profile = {}, preferences = {}) {
+  const stateNames = Object.keys(nigeriaLocations);
+  const requestedState = String(profile.state || '').trim();
+  const state = stateNames.includes(requestedState) ? requestedState : 'Kano';
+  const lgas = nigeriaLocations[state] || [];
+  const requestedCity = String(profile.city || '').trim();
+  const city = lgas.includes(requestedCity) ? requestedCity : (state === 'Kano' && lgas.includes('Kano Municipal') ? 'Kano Municipal' : lgas[0] || '');
+  return { country: 'Nigeria', state, city, currency: preferences.currency || 'NGN' };
 }
 
 const categoryGroups = {
@@ -242,9 +253,10 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
     if (!user) return undefined;
     Promise.all([getProfile(user.id), getProfilePreferences(user.id)]).then(([profile, preferences]) => {
       if (!mounted || !profile) return;
-      const ready = Boolean(profile.country && profile.state && profile.city && preferences?.currency);
-      setProfileLocationStatus(ready ? 'ready' : 'missing');
-      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, country: profile.country || current.country, state: profile.state || current.state, city: profile.city || current.city, currency: preferences?.currency || current.currency, sellerLocation: profile.country || current.sellerLocation }));
+      const location = normalizeNigeriaLocation(profile, preferences || {});
+      const hasUsableLocation = Boolean(location.state && location.city && location.currency);
+      setProfileLocationStatus(hasUsableLocation ? 'ready' : 'missing');
+      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, ...location, sellerLocation: location.country }));
     }).catch(() => mounted && setProfileLocationStatus('missing'));
     return () => { mounted = false; };
   }, [user, editMode]);
@@ -364,7 +376,8 @@ export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSub
       const subcategoryRow = findCategoryRow(categoryRows, form.subcategory, categoryRow?.id);
       if (!categoryRow) throw new Error('The selected category is not available in the marketplace database yet. Please refresh the page or choose one of the active categories.');
       const attributes = Object.fromEntries((dynamicFields[form.category] || []).map(([key]) => [key, form[key] || null]).filter(([, value]) => value !== null && value !== ''));
-      const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: form.currency || 'NGN', pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: form.city, state: form.state, country: form.country || 'Nigeria', delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
+      const listingLocation = normalizeNigeriaLocation(form, { currency: form.currency });
+      const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: listingLocation.currency, pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: listingLocation.city, state: listingLocation.state, country: listingLocation.country, delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
       const revisionValues = { category_id: listingValues.category_id, subcategory_id: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricing_type: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, delivery_options: listingValues.delivery_options, contact_preference: listingValues.contact_preference, attributes: listingValues.attributes, status: 'active', moderation_status: 'approved', rejection_reason: null, published_at: new Date().toISOString(), updated_at: new Date().toISOString() };
       const listing = editMode ? (initialListing.raw?.status === 'rejected' ? await reviseRejectedListing({ listingId: initialListing.id, values: { categoryId: listingValues.category_id, subcategoryId: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricingType: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, deliveryOptions: listingValues.delivery_options, contactPreference: listingValues.contact_preference, attributes: listingValues.attributes } }) : await updateListing(initialListing.id, user.id, revisionValues)) : await createListing({ sellerId: user.id, values: listingValues });
       if (editMode) await updateListing(listing.id, user.id, { status: 'active', moderation_status: 'approved', rejection_reason: null, published_at: new Date().toISOString(), updated_at: new Date().toISOString() });
