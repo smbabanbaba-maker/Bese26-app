@@ -27,14 +27,36 @@ export function getStoragePublicUrl(bucket, path) {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
 
+const listingMediaUrlCache = new Map();
+let listingMediaInFlight = null;
+
 export async function getListingMediaUrls(paths = []) {
   if (!supabase || !paths.length) return [];
+  const uniquePaths = [...new Set(paths.filter(Boolean))];
+  const now = Date.now();
+  const missingPaths = uniquePaths.filter((path) => {
+    const cached = listingMediaUrlCache.get(path);
+    return !cached || cached.expiresAt <= now;
+  });
+  if (!missingPaths.length) return paths.map((path) => listingMediaUrlCache.get(path)?.url || '');
+  if (listingMediaInFlight) {
+    await listingMediaInFlight;
+    const stillMissing = missingPaths.filter((path) => !listingMediaUrlCache.get(path)?.url);
+    if (!stillMissing.length) return paths.map((path) => listingMediaUrlCache.get(path)?.url || '');
+  }
+  const refresh = async () => {
   // The bucket is public in the intended schema, but existing objects may not
   // be addressable through /object/public URLs after the storage rollout.
   // Signed URLs work for anonymous visitors and reliably resolve those objects.
-  const { data, error } = await supabase.storage.from('listing-media').createSignedUrls(paths, 3600);
-  if (error) return [];
-  return (data || []).map((item) => item?.signedUrl || '');
+    const { data, error } = await supabase.storage.from('listing-media').createSignedUrls(missingPaths, 3600);
+    if (!error) (data || []).forEach((item, index) => {
+      const url = item?.signedUrl || '';
+      if (url) listingMediaUrlCache.set(missingPaths[index], { url, expiresAt: Date.now() + 50 * 60 * 1000 });
+    });
+  };
+  listingMediaInFlight = refresh().finally(() => { listingMediaInFlight = null; });
+  await listingMediaInFlight;
+  return paths.map((path) => listingMediaUrlCache.get(path)?.url || '');
 }
 
 export function getAvatarUrl(path) {
