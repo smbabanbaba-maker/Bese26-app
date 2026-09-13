@@ -294,8 +294,17 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
+function SponsoredBanner({ campaigns = [], placement, className = '' }) {
+  const campaign = campaigns.find((item) => item.placement === placement && item.image_url);
+  if (!campaign) return null;
+  const linked = Boolean(campaign.cta_target?.trim());
+  const open = () => linked && window.location.assign(campaign.cta_target);
+  const image = <img src={campaign.image_url} alt={campaign.title || 'Sponsored promotion'} />;
+  return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
+}
+
 function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
-  const advertisingSlides = adCampaigns.map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
+  const advertisingSlides = adCampaigns.filter((campaign) => campaign.placement === 'home_banner').map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
   const [promoIndex, setPromoIndex] = useState(0);
@@ -348,7 +357,7 @@ function HomeView({ user, marketListings, adCampaigns = [], onOpenListing, saved
   );
 }
 
-function SearchView({ marketListings, categories, search, setSearch, onOpenListing, savedIds, onToggleSave, onBack }) {
+function SearchView({ marketListings, categories, search, setSearch, onOpenListing, savedIds, onToggleSave, onBack, adCampaigns = [] }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sort, setSort] = useState('Recommended');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
@@ -374,7 +383,7 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
       <div className="filter-toolbar"><div className="filter-toolbar-heading"><strong>Filter by category</strong>{hasFilters && <button type="button" className="clear-filter-button" onClick={clearFilters}>Clear all</button>}</div><div className="filter-scroll"><button type="button" className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All listings</button>{categories.filter((category) => !category.parent_id).map((category) => <button type="button" key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}<button type="button" className={`filter-chip verified-filter-chip ${verifiedOnly ? 'active' : ''}`} aria-pressed={verifiedOnly} onClick={() => setVerifiedOnly((value) => !value)}><ShieldCheck size={14} /> Verified only</button></div></div>
 
       <div className="search-result-head"><span>Recommended for you</span><select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recommended</option><option>Newest</option><option>Price low → high</option><option>Price high → low</option></select></div>
-      {filtered.length ? <div className="product-grid search-grid">{filtered.map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off Verified only or choose another category.' : 'Try a different search word or clear the filters.'}</p><button className="primary-button" onClick={clearFilters}>Clear filters</button></div>}
+      {filtered.length ? <><div className="product-grid search-grid">{filtered.slice(0, 8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><SponsoredBanner campaigns={adCampaigns} placement="search" className="search-sponsored-slot" /><div className="product-grid search-grid">{filtered.slice(8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div></> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off Verified only or choose another category.' : 'Try a different search word or clear the filters.'}</p><button className="primary-button" onClick={clearFilters}>Clear filters</button></div>}
     </div>
   );
 }
@@ -606,7 +615,7 @@ function PublicListingRoute({ listingId }) {
   return <ListingModal listing={listing} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />;
 }
 
-function BusinessDirectoryView({ onBack }) {
+function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
   const [businesses, setBusinesses] = useState([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -623,6 +632,7 @@ function BusinessDirectoryView({ onBack }) {
   return <div className="page-stack business-directory-page">
     <div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div>
     <section className="business-directory-hero"><div><div className="eyebrow light">BESE26 MINIWEBS</div><h1>Find a business</h1><p>Browse public miniwebs created by Bese26 sellers and open the store you need.</p></div><Store size={28} /></section>
+    <SponsoredBanner campaigns={adCampaigns} placement="business_directory" className="business-sponsored-slot" />
     <form className="business-directory-search" onSubmit={submitSearch}><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search business, category or city" aria-label="Search businesses" /><button className="search-submit" type="submit" aria-label="Search businesses"><Search size={17} /></button></form>
     {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}
     {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="business-directory-grid">{businesses.map((business) => { const name = business.business_name || 'Bese26 business'; const handle = business.business_handle; return <article className="business-directory-card" key={business.profile_id || handle}><div className="business-directory-card-head">{business.logo_path ? <img src={getAvatarUrl(business.logo_path)} alt={`${name} logo`} /> : <div className="business-directory-card-logo">{name.slice(0, 1).toUpperCase()}</div>}<div><h2>{name}{business.is_verified && <BadgeCheck className="business-verified-icon" size={16} />}</h2><span>@{handle || 'public-store'}</span></div></div><p>{business.description || `${business.category || 'Local business'}${business.city ? ` · ${business.city}` : ''}`}</p><div className="business-listing-actions"><a className="primary-button" href={handle ? `/@${handle}` : '#'} onClick={(event) => { if (!handle) event.preventDefault(); }}>Open miniweb <ArrowUpRight size={15} /></a></div></article>; })}</div> : <div className="empty-state"><Store size={28} /><h2>No public miniwebs found</h2><p>Try another business name, category or city.</p></div>}
@@ -731,11 +741,11 @@ function AppContent() {
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }
       try {
-        const [remoteListings, remoteCategories, remoteAds] = await Promise.all([fetchActiveListings(), fetchCategories(), fetchActiveAdCampaigns()]);
+        const [remoteListings, remoteCategories, remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds] = await Promise.all([fetchActiveListings(), fetchCategories(), fetchActiveAdCampaigns(), fetchActiveAdCampaigns({ placement: 'homepage' }), fetchActiveAdCampaigns({ placement: 'search' }), fetchActiveAdCampaigns({ placement: 'business_directory' })]);
         if (mounted) {
           setMarketListings(remoteListings || []);
           setMarketCategories(remoteCategories || []);
-          setAdCampaigns(remoteAds || []);
+          setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
         }
       } catch (error) {
         if (mounted && initial) setStartupError('Supabase is loading marketplace data. Please try again.');
@@ -864,12 +874,12 @@ function AppContent() {
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
     if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={marketListings} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
-    if (activeNav === 'search') return <SearchView marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
+    if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={() => navigate('home')} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'business') return <BusinessDirectoryView onBack={() => navigate('home')} />;
+    if (activeNav === 'business') return <BusinessDirectoryView adCampaigns={adCampaigns} onBack={() => navigate('home')} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} initialListing={editingListing} initialDraft={editingDraft} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); }} />;
     if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => { setEditingDraft(null); navigate('sell'); }} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
