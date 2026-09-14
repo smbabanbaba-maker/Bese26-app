@@ -4,6 +4,9 @@ function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
 }
 
+const NIGERIA_COUNTRY = 'Nigeria';
+const NIGERIA_CURRENCY = 'NGN';
+
 function formatMoney(value, currency = 'NGN') {
   const code = String(currency || 'NGN').toUpperCase();
   try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(Number(value)); }
@@ -205,7 +208,7 @@ function maskDocumentNumber(value) {
 }
 export async function saveIdentityVerificationDraft(userId, values) {
   failIfUnavailable();
-  const payload = { user_id: userId, verification_type: 'identity', full_name: [values.legal_first_name, values.legal_middle_name, values.legal_last_name].filter(Boolean).join(' ').trim() || 'Identity verification applicant', status: 'draft', legal_first_name: values.legal_first_name?.trim() || null, legal_middle_name: values.legal_middle_name?.trim() || null, legal_last_name: values.legal_last_name?.trim() || null, date_of_birth: values.date_of_birth || null, gender: values.gender || null, country: values.country?.trim() || null, state: values.state?.trim() || null, city: values.city?.trim() || null, residential_address: values.residential_address?.trim() || null, document_type: values.document_type || null, document_number_reference: maskDocumentNumber(values.document_number_reference), document_country: values.document_country?.trim() || null, document_expiry: values.document_expiry || null, document_front_path: values.document_front_path || null, document_back_path: values.document_back_path || null, selfie_path: values.selfie_path || null, accuracy_confirmed: Boolean(values.accuracy_confirmed) };
+  const payload = { user_id: userId, verification_type: 'identity', full_name: [values.legal_first_name, values.legal_middle_name, values.legal_last_name].filter(Boolean).join(' ').trim() || 'Identity verification applicant', status: 'draft', legal_first_name: values.legal_first_name?.trim() || null, legal_middle_name: values.legal_middle_name?.trim() || null, legal_last_name: values.legal_last_name?.trim() || null, date_of_birth: values.date_of_birth || null, gender: values.gender || null, country: NIGERIA_COUNTRY, state: values.state?.trim() || null, city: values.city?.trim() || null, residential_address: values.residential_address?.trim() || null, document_type: values.document_type || null, document_number_reference: maskDocumentNumber(values.document_number_reference), document_country: NIGERIA_COUNTRY, document_expiry: values.document_expiry || null, document_front_path: values.document_front_path || null, document_back_path: values.document_back_path || null, selfie_path: values.selfie_path || null, accuracy_confirmed: Boolean(values.accuracy_confirmed) };
   if (values.id) {
     const { data, error } = await supabase.from('verification_applications').update(payload).eq('id', values.id).eq('user_id', userId).eq('verification_type', 'identity').select(identityVerificationFields).single();
     if (error) throw error;
@@ -319,7 +322,7 @@ export async function getProfile(userId) {
 
 export async function updateProfile(userId, values) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('profiles').update(values).eq('id', userId).select().single();
+  const { data, error } = await supabase.from('profiles').update({ ...values, country: NIGERIA_COUNTRY }).eq('id', userId).select().single();
   if (error) throw error;
   return data;
 }
@@ -348,7 +351,7 @@ export async function getProfilePreferences(userId) {
 
 export async function updateProfilePreferences(userId, values) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('profile_preferences').upsert({ profile_id: userId, ...values }, { onConflict: 'profile_id' }).select('*').single();
+  const { data, error } = await supabase.from('profile_preferences').upsert({ profile_id: userId, ...values, currency: NIGERIA_CURRENCY, number_format: 'en-NG' }, { onConflict: 'profile_id' }).select('*').single();
   if (error) throw error;
   return data;
 }
@@ -762,12 +765,12 @@ export async function reviseRejectedListing({ listingId, values }) {
     p_price: values.price,
     p_city: values.city,
     p_state: values.state,
-    p_currency: values.currency || 'NGN',
+    p_currency: NIGERIA_CURRENCY,
     p_pricing_type: values.pricingType || 'fixed',
     p_condition: values.condition || null,
     p_quantity: values.quantity || null,
     p_unit: values.unit || null,
-    p_country: values.country || 'Nigeria',
+    p_country: NIGERIA_COUNTRY,
     p_delivery_options: Array.isArray(values.deliveryOptions) ? values.deliveryOptions : [],
     p_contact_preference: values.contactPreference || 'chat',
     p_attributes: values.attributes || {},
@@ -955,7 +958,7 @@ export async function saveBusinessProfile(userId, values) {
     whatsapp: values.whatsapp || null,
     contact_preference: ['whatsapp', 'call', 'both'].includes(values.contact_preference) ? values.contact_preference : 'both',
     email: values.email || null,
-    country: values.country || 'Nigeria',
+    country: NIGERIA_COUNTRY,
     state: values.state || null,
     city: values.city || null,
     area: values.area || null,
@@ -1091,7 +1094,7 @@ export async function toggleFavorite(userId, listingId, shouldSave) {
 
 export async function saveListingDraft({ id, sellerId, title, payload }) {
   failIfUnavailable();
-  const values = { ...(id ? { id } : {}), seller_id: sellerId, title: title || null, payload, last_saved_at: new Date().toISOString() };
+  const values = { ...(id ? { id } : {}), seller_id: sellerId, title: title || null, payload: { ...(payload || {}), country: 'Nigeria', currency: 'NGN' }, last_saved_at: new Date().toISOString() };
   const request = id
     ? supabase.from('listing_drafts').update(values).eq('id', id).eq('seller_id', sellerId).select().single()
     : supabase.from('listing_drafts').insert(values).select().single();
@@ -1158,12 +1161,12 @@ export async function createListing({ sellerId, values }) {
     p_title: values.title,
     p_description: values.description,
     p_price: values.price,
-    p_currency: values.currency || 'NGN',
+    p_currency: NIGERIA_CURRENCY,
     p_pricing_type: values.pricing_type || 'fixed',
     p_condition: values.condition || null,
     p_quantity: values.quantity || null,
     p_unit: values.unit || null,
-    p_country: values.country || 'Nigeria',
+    p_country: NIGERIA_COUNTRY,
     p_state: values.state,
     p_city: values.city,
     p_delivery_options: Array.isArray(values.delivery_options) ? values.delivery_options : [],

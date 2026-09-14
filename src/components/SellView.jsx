@@ -21,16 +21,12 @@ import { isSupabaseConfigured } from '../lib/supabase';
 import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getBusinessProfile, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
 import { getProfilePreferences } from '../lib/marketplace';
 import { currencyLabel } from '../lib/currency';
-import nigeriaLocations from '../data/nigeriaLocations.json';
 
 
 
 const categoryLabelAliases = {
   'Health & Beauty': ['Beauty & Health', 'health-beauty', 'beauty-health'],
   'Phones & Tablets': ['Electronics', 'Phones & Tablets', 'phones-tablets'],
-  Electronics: ['Electronics', 'Phones & Tablets', 'Electronics & Gadgets', 'Technology', 'electronics', 'phones-tablets'],
-  'Home & Garden': ['Home & Garden', 'Home and Garden', 'home-garden'],
-  'Jobs & Services': ['Jobs & Services', 'Services', 'jobs-services'],
 };
 
 function categorySlug(value) {
@@ -40,23 +36,7 @@ function categorySlug(value) {
 function findCategoryRow(rows, label, parentId = null) {
   const candidates = [label, ...(categoryLabelAliases[label] || [])].map((value) => String(value).toLowerCase().trim());
   const slugs = candidates.map(categorySlug);
-  const scoped = rows.filter((row) => (row.parent_id || null) === (parentId || null));
-  return scoped.find((row) => candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))
-    || scoped.find((row) => {
-      const rowText = `${row.name || ''} ${row.slug || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, ' ');
-      return candidates.some((candidate) => candidate.length > 3 && (rowText.includes(candidate) || candidate.includes(rowText.trim())));
-    })
-    || null;
-}
-
-function normalizeNigeriaLocation(profile = {}, preferences = {}) {
-  const stateNames = Object.keys(nigeriaLocations);
-  const requestedState = String(profile.state || '').trim();
-  const state = stateNames.includes(requestedState) ? requestedState : 'Kano';
-  const lgas = nigeriaLocations[state] || [];
-  const requestedCity = String(profile.city || '').trim();
-  const city = lgas.includes(requestedCity) ? requestedCity : (state === 'Kano' && lgas.includes('Kano Municipal') ? 'Kano Municipal' : lgas[0] || '');
-  return { country: 'Nigeria', state, city, currency: preferences.currency || 'NGN' };
+  return rows.find((row) => (row.parent_id || null) === (parentId || null) && (candidates.includes(String(row.name || '').toLowerCase().trim()) || slugs.includes(String(row.slug || '').toLowerCase().trim()))) || null;
 }
 
 const categoryGroups = {
@@ -161,7 +141,7 @@ function Toggle({ checked, onChange, label }) {
   return <button type="button" className={`sell-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button>;
 }
 
-export default function SellView({ user, isAdmin = false, onAuthRequired, onDemoAction, onOpenSubscription, onNavigate, initialListing = null, initialDraft = null }) {
+export default function SellView({ user, onAuthRequired, onDemoAction, onOpenSubscription, onNavigate, initialListing = null, initialDraft = null }) {
   const [form, setForm] = useState(initialForm);
   const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
@@ -210,7 +190,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
       description: raw.description || initialListing.description || '',
       condition: raw.condition || current.condition,
       price: raw.price == null ? '' : String(raw.price),
-      currency: raw.currency || current.currency || 'NGN',
+      currency: 'NGN',
       negotiable: raw.pricing_type === 'negotiable',
       quantity: raw.quantity == null ? current.quantity : String(raw.quantity),
       unit: raw.unit || current.unit,
@@ -260,15 +240,11 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   useEffect(() => {
     let mounted = true;
     if (!user) return undefined;
-    Promise.allSettled([getProfile(user.id), getProfilePreferences(user.id)]).then(([profileResult, preferencesResult]) => {
-      if (!mounted) return;
-      const profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
-      const preferences = preferencesResult.status === 'fulfilled' ? preferencesResult.value : null;
-      if (!profile) { setProfileLocationStatus('missing'); return; }
-      const location = normalizeNigeriaLocation(profile, preferences || {});
-      const hasUsableLocation = Boolean(location.state && location.city);
-      setProfileLocationStatus(hasUsableLocation ? 'ready' : 'missing');
-      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, ...location, currency: preferences?.currency || location.currency || current.currency || 'NGN', sellerLocation: location.country }));
+    Promise.all([getProfile(user.id), getProfilePreferences(user.id)]).then(([profile, preferences]) => {
+      if (!mounted || !profile) return;
+      const ready = Boolean(profile.country && profile.state && profile.city && preferences?.currency);
+      setProfileLocationStatus(ready ? 'ready' : 'missing');
+      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, country: profile.country || current.country, state: profile.state || current.state, city: profile.city || current.city, currency: preferences?.currency || current.currency, sellerLocation: profile.country || current.sellerLocation }));
     }).catch(() => mounted && setProfileLocationStatus('missing'));
     return () => { mounted = false; };
   }, [user, editMode]);
@@ -333,7 +309,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const removeMedia = (id) => setMedia((current) => current.filter((item) => item.id !== id).map((item, index) => ({ ...item, cover: index === 0 ? true : item.cover })));
   const setCover = (id) => setMedia((current) => current.map((item) => ({ ...item, cover: item.id === id })));
   const saveDraft = async () => {
-    if (!isSupabaseConfigured) { onDemoAction('Draft saving is unavailable right now.'); return; }
+    if (!isSupabaseConfigured) { onDemoAction('Draft saving is unavailable until the marketplace connection is configured.'); return; }
     if (!user) { onAuthRequired?.(); return; }
     try {
       const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });
@@ -348,7 +324,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
     if (!form.title.trim()) nextErrors.push('Add a short, searchable title.');
     if (!form.category) nextErrors.push('Choose a category.');
-    if (form.description.trim().length < 5) nextErrors.push('Description must be at least 5 characters.');
+    if (!form.description.trim()) nextErrors.push('Add a description so buyers understand the listing.');
     if (!form.price || Number(form.price) <= 0) nextErrors.push('Enter a valid price greater than zero.');
     if (profileLocationStatus !== 'ready') nextErrors.push('Set your country, state/province, city, and currency in Profile before listing.');
     if (!form.state || !form.city) nextErrors.push('Your profile must include a state and city for the listing.');
@@ -380,7 +356,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     if (isSupabaseConfigured && !profileContact?.phone) { setErrors(['A profile phone number is required before publishing.']); onDemoAction?.('Add your phone number in Profile, then return here to publish.'); return; }
     if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (isSupabaseConfigured && !editMode && !media.some((item) => item.file)) { setErrors(['Choose at least one photo from your device before publishing.']); document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-    if (!isSupabaseConfigured) { setErrors(['Marketplace connection is not configured. Publishing is unavailable right now.']); return; }
+    if (!isSupabaseConfigured) { setErrors(['Marketplace connection is not configured. Publishing is unavailable until Supabase is connected.']); return; }
     setPublishState('publishing');
     try {
       const categoryRows = await fetchCategories();
@@ -388,8 +364,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
       const subcategoryRow = findCategoryRow(categoryRows, form.subcategory, categoryRow?.id);
       if (!categoryRow) throw new Error('The selected category is not available in the marketplace database yet. Please refresh the page or choose one of the active categories.');
       const attributes = Object.fromEntries((dynamicFields[form.category] || []).map(([key]) => [key, form[key] || null]).filter(([, value]) => value !== null && value !== ''));
-      const listingLocation = normalizeNigeriaLocation(form, { currency: form.currency });
-      const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: listingLocation.currency, pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: listingLocation.city, state: listingLocation.state, country: listingLocation.country, delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
+      const listingValues = { category_id: categoryRow.id, subcategory_id: subcategoryRow?.id || null, title: form.title.trim(), description: form.description.trim(), price: Number(form.price), currency: form.currency || 'NGN', pricing_type: form.negotiable ? 'negotiable' : 'fixed', condition: categoryNeedsCondition ? form.condition : null, quantity: form.quantity ? Number(form.quantity) : null, unit: form.unit || null, city: form.city, state: form.state, country: form.country || 'Nigeria', delivery_options: [form.delivery, form.deliveryFee].filter(Boolean), contact_preference: form.contactPhone && form.contactWhatsApp ? 'chat_call' : form.contactPhone ? 'call' : form.contactWhatsApp ? 'whatsapp' : 'chat', attributes, business_profile_id: publishAs === 'business' ? businessProfile?.profile_id : null, published_as_type: publishAs };
       const revisionValues = { category_id: listingValues.category_id, subcategory_id: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricing_type: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, delivery_options: listingValues.delivery_options, contact_preference: listingValues.contact_preference, attributes: listingValues.attributes, status: 'active', moderation_status: 'approved', rejection_reason: null, published_at: new Date().toISOString(), updated_at: new Date().toISOString() };
       const listing = editMode ? (initialListing.raw?.status === 'rejected' ? await reviseRejectedListing({ listingId: initialListing.id, values: { categoryId: listingValues.category_id, subcategoryId: listingValues.subcategory_id, title: listingValues.title, description: listingValues.description, price: listingValues.price, currency: listingValues.currency, pricingType: listingValues.pricing_type, condition: listingValues.condition, quantity: listingValues.quantity, unit: listingValues.unit, city: listingValues.city, state: listingValues.state, country: listingValues.country, deliveryOptions: listingValues.delivery_options, contactPreference: listingValues.contact_preference, attributes: listingValues.attributes } }) : await updateListing(initialListing.id, user.id, revisionValues)) : await createListing({ sellerId: user.id, values: listingValues });
       if (editMode) await updateListing(listing.id, user.id, { status: 'active', moderation_status: 'approved', rejection_reason: null, published_at: new Date().toISOString(), updated_at: new Date().toISOString() });
@@ -426,18 +401,18 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const listingStrength = useMemo(() => {
     const checks = [
       ['title', Boolean(form.title.trim())],
-      ['description', form.description.trim().length >= 5],
+      ['description', form.description.trim().length >= 40],
       ['photos', media.length > 0],
       ['price', Number(form.price) > 0],
       ['location', profileLocationStatus === 'ready'],
       ['contact', Boolean(form.contactChat || form.contactPhone || form.contactWhatsApp)],
     ];
     const score = Math.round((checks.filter(([, done]) => done).length / checks.length) * 100);
-    const tips = { title: 'Add a clear title.', description: 'Write at least 5 characters describing the item.', photos: 'Add at least one clear photo.', price: 'Enter a valid price.', location: 'Complete your profile location.', contact: 'Choose at least one contact method.' };
+    const tips = { title: 'Add a clear title.', description: 'Write at least 40 characters describing the item.', photos: 'Add at least one clear photo.', price: 'Enter a valid price.', location: 'Complete your profile location.', contact: 'Choose at least one contact method.' };
     const missing = checks.find(([key, done]) => !done)?.[0];
     return { score, tip: missing ? tips[missing] : 'Great job — your listing is ready to publish.' };
   }, [form, media.length, profileLocationStatus]);
-  const planUsageNote = !editMode && (isAdmin || entitlement) ? <div className={`sell-plan-usage ${!isAdmin && entitlement?.free_posts_remaining === 0 ? 'exhausted' : ''}`}><div><strong>{isAdmin ? 'Admin account · unlimited active listings' : entitlement.is_paid ? `${entitlement.plan_key} plan · ${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used` : `${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used`}</strong><small>{isAdmin ? 'No listing limit applies to this account.' : entitlement.is_paid ? `${Math.max(entitlement.listing_limit - entitlement.free_posts_used, 0)} active listings remaining` : entitlement.free_posts_remaining ? `${entitlement.free_posts_remaining} active listing slot${entitlement.free_posts_remaining === 1 ? '' : 's'} remaining` : 'Your Free plan has reached its active listing limit.'}</small></div>{!isAdmin && entitlement.free_posts_remaining === 0 && !entitlement.is_paid && <button type="button" className="text-action" onClick={onOpenSubscription}>View plans <ArrowRight size={14} /></button>}</div> : null;
+  const planUsageNote = !editMode && entitlement ? <div className={`sell-plan-usage ${entitlement.free_posts_remaining === 0 ? 'exhausted' : ''}`}><div><strong>{entitlement.is_paid ? `${entitlement.plan_key} plan · ${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used` : `${entitlement.free_posts_used} of ${entitlement.listing_limit} active listings used`}</strong><small>{entitlement.is_paid ? `${Math.max(entitlement.listing_limit - entitlement.free_posts_used, 0)} active listings remaining` : entitlement.free_posts_remaining ? `${entitlement.free_posts_remaining} active listing slot${entitlement.free_posts_remaining === 1 ? '' : 's'} remaining` : 'Your Free plan has reached its active listing limit.'}</small></div>{entitlement.free_posts_remaining === 0 && !entitlement.is_paid && <button type="button" className="text-action" onClick={onOpenSubscription}>View plans <ArrowRight size={14} /></button>}</div> : null;
   const renderPublish = () => publishState === 'success' ? <section className="publish-success-card"><span className="publish-success-icon"><CheckCircle2 size={35} /></span><div className="eyebrow">LISTING ACTIVE</div><h2>{editMode ? 'Your listing was updated' : 'Your listing is live'}</h2><p>Your listing has been added successfully and is now visible in the marketplace.</p>{publishAs === 'business' && businessProfile?.business_handle && <a className="secondary-button" href={`https://www.bese26.shop/${businessProfile.business_handle}`}>View your business store <ArrowRight size={15} /></a>}<div className="publish-success-actions"><button type="button" className="text-action" onClick={reset}>Post another item</button></div></section> : <section id="sell-publish" className="sell-work-card publish-step-card"><div className="sell-work-heading"><span className="sell-step-icon coral"><CheckCircle2 size={19} /></span><div><div className="eyebrow">PUBLISH</div><h2>{editMode ? 'Ready to resubmit?' : 'Ready to post?'}</h2><p>Check your details above, then {editMode ? 'save your changes and make the listing active.' : 'publish your listing.'}</p></div></div>{planUsageNote}<div className="listing-strength-card"><div className="listing-strength-head"><strong>Listing strength</strong><span>{listingStrength.score}%</span></div><div className="listing-strength-track"><span style={{ width: `${listingStrength.score}%` }} /></div><small className="listing-strength-tip">{listingStrength.tip}</small></div><div className="publish-safety"><ShieldCheck size={19} /><div><strong>Safety check</strong><p>Never include passwords, suspicious links, or private exact-address details in a public listing.</p></div></div><button type="button" className="publish-button large-publish" onClick={publish} disabled={publishState === 'publishing' || profileLocationStatus !== 'ready'}><CheckCircle2 size={17} /> {publishState === 'publishing' ? 'Submitting…' : editMode ? 'Save and activate' : 'Publish listing'} <ArrowRight size={17} /></button><p className="publish-disclaimer">By publishing, you confirm that your information is accurate and that you have the right to sell or offer this item/service.</p></section>;
 
   return <div className="page-stack sell-page intelligent-sell-page clean-sell-page"><div className="sell-mobile-header"><button type="button" aria-label="Back to marketplace" onClick={() => window.history.back()}><ArrowLeft size={22} /></button><strong>{editMode ? 'Edit listing' : 'Post new listing'}</strong><button type="button" className="clear-sell-button" onClick={reset}><X size={18} /> Clear</button></div>{editMode && initialListing?.raw?.rejection_reason && <div className="sell-rejection-note"><ShieldCheck size={18} /><div><strong>Review feedback</strong><p>{initialListing.raw.rejection_reason}</p><small>Update the details below, then resubmit this listing for another review.</small></div></div>}{draftSaved && <div className="draft-status"><CheckCircle2 size={14} /> Draft saved to your Bese26 account</div>}{errors.length > 0 && <div className="sell-error"><X size={15} /><div>{errors.map((error) => <span key={error}>{error}</span>)}</div></div>}{publishState === 'success' ? renderPublish() : <div className="clean-sell-sections">{renderPublishAs()}{renderMedia()}{renderDetails()}{renderPricing()}{renderLocation()}{renderPublish()}</div>}</div>;
