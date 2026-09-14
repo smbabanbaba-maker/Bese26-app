@@ -512,3 +512,49 @@
 .public-business-actions .primary-button, .public-business-actions .secondary-button { min-height:34px !important; padding:0 12px !important; font-size:10px !important; }
 .public-business-listings.storefront-listings-clean { margin-top:20px !important; padding:22px !important; }
 @media (max-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:72px minmax(0,1fr) !important; gap:14px !important; min-height:190px !important; padding:21px 17px !important; } .public-business-logo { width:72px !important; height:72px !important; border-radius:17px !important; } .public-business-identity h1 { font-size:27px !important; } .public-business-identity .eyebrow { font-size:8px !important; } .public-business-handle { font-size:12px !important; } .public-business-identity p { font-size:11px !important; } .public-business-actions { display:flex !important; gap:6px !important; } .public-business-actions .primary-button, .public-business-actions .secondary-button { flex:1 !important; min-height:32px !important; padding:0 6px !important; font-size:9px !important; } .public-business-listings.storefront-listings-clean { margin-top:16px !important; padding:16px !important; } }
+
+
+/* Final responsive miniweb hero: short, balanced, and adaptive on every device. */
+.public-business-hero.storefront-hero-clean {
+  display:grid !important;
+  grid-template-columns:78px minmax(0,1fr) !important;
+  gap:16px !important;
+  align-items:center !important;
+  min-height:0 !important;
+  padding:20px 24px !important;
+  border-radius:20px !important;
+}
+.public-business-logo { width:78px !important; height:78px !important; border-radius:18px !important; border-width:4px !important; }
+.public-business-identity { min-width:0 !important; padding:0 !important; }
+.public-business-identity .eyebrow { margin:0 0 4px !important; font-size:8px !important; letter-spacing:.18em !important; }
+.public-business-identity h1 { margin:0 !important; font-size:clamp(24px,3.3vw,38px) !important; line-height:1 !important; letter-spacing:-.045em !important; }
+.public-business-handle { margin:5px 0 0 !important; font-size:12px !important; }
+.public-business-identity .verified-badge { margin:5px 0 0 !important; padding:4px 9px !important; font-size:9px !important; }
+.public-business-identity p { margin:6px 0 3px !important; max-width:560px !important; font-size:11px !important; line-height:1.3 !important; }
+.public-business-location { font-size:10px !important; }
+.public-business-actions { display:flex !important; flex-wrap:wrap !important; gap:6px !important; margin-top:8px !important; }
+.public-business-actions .primary-button, .public-business-actions .secondary-button { min-height:30px !important; padding:0 10px !important; border-radius:9px !important; font-size:9px !important; }
+.public-business-listings.storefront-listings-clean { margin-top:15px !important; padding:20px !important; border-radius:18px !important; }
+@media (min-width:700px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns:92px minmax(0,1fr) !important; gap:19px !important; padding:22px 30px !important; }
+  .public-business-logo { width:92px !important; height:92px !important; }
+}
+@media (max-width:480px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns:56px minmax(0,1fr) !important; gap:11px !important; padding:16px 14px !important; border-radius:16px !important; }
+  .public-business-logo { width:56px !important; height:56px !important; border-radius:14px !important; border-width:3px !important; }
+  .public-business-identity h1 { font-size:23px !important; }
+  .public-business-identity .eyebrow { font-size:7px !important; }
+  .public-business-handle { font-size:10px !important; }
+  .public-business-identity .verified-badge { padding:3px 7px !important; font-size:8px !important; }
+  .public-business-identity p { font-size:10px !important; }
+  .public-business-location { font-size:9px !important; }
+  .public-business-actions { grid-column:1 / -1 !important; margin-top:4px !important; }
+  .public-business-actions .primary-button, .public-business-actions .secondary-button { flex:1 1 0 !important; min-height:29px !important; padding:0 5px !important; font-size:8px !important; }
+  .public-business-listings.storefront-listings-clean { margin-top:12px !important; padding:14px !important; }
+}
+@media (max-width:360px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns:48px minmax(0,1fr) !important; gap:9px !important; padding:14px 11px !important; }
+  .public-business-logo { width:48px !important; height:48px !important; }
+  .public-business-identity h1 { font-size:20px !important; }
+  .public-business-actions .primary-button, .public-business-actions .secondary-button { font-size:7px !important; }
+}
