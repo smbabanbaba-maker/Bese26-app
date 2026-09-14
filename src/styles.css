@@ -4100,3 +4100,7 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .theme-dark .install-prompt { border-color: rgba(255,255,255,.12); background: #221d1f; color: #fff; }
 .theme-dark .install-prompt-copy p { color: #c9bfc0; }
 @media (max-width: 640px) { .install-prompt { right: 14px; bottom: 82px; width: calc(100vw - 28px); } }
+
+.chat-loading-state { min-height: 150px; display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--muted); font-size: 12px; }
+.chat-loading-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,44,44,.2); border-top-color: var(--red); border-radius: 50%; animation: chatLoadingSpin .75s linear infinite; }
+@keyframes chatLoadingSpin { to { transform: rotate(360deg); } }
