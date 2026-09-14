@@ -727,6 +727,7 @@ function AppContent() {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
+    const unsubscribeNotifications = subscribeToNotifications(sessionUser.id, (payload) => { if (mounted && payload?.new && !payload.new.read_at) setUnreadNotifications((count) => count + 1); });
     if (isSupabaseConfigured) getBusinessProfile(sessionUser.id).then((profile) => mounted && setBusinessOwnerProfile(profile)).catch(() => mounted && setBusinessOwnerProfile(null));
     const unsubscribe = subscribeToNotifications(sessionUser.id, (payload) => {
       if (!mounted || !payload?.new) return;
