@@ -497,3 +497,18 @@
 .public-business-listings .section-heading h2 { font-size:clamp(22px,3vw,30px) !important; letter-spacing:-.04em; }
 .public-business-listings .product-grid { gap:16px !important; }
 @media (max-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:86px minmax(0,1fr) !important; gap:16px !important; min-height:245px !important; padding:26px 20px !important; border-radius:18px !important; } .public-miniweb-brand { left:18px; top:16px; } .public-business-logo { width:86px !important; height:86px !important; border-radius:20px !important; } .public-business-identity { padding-top:30px; } .public-business-identity h1 { font-size:27px !important; } .public-business-listings.storefront-listings-clean { padding:17px !important; border-radius:17px !important; } }
+
+
+/* Compact miniweb hero: keep the entire identity panel within one disciplined dashboard block. */
+.public-business-hero.storefront-hero-clean { grid-template-columns:112px minmax(0,1fr) !important; gap:22px !important; min-height:220px !important; padding:25px 30px !important; border-radius:22px !important; }
+.public-business-logo { width:112px !important; height:112px !important; border-radius:24px !important; }
+.public-business-identity { padding-top:0 !important; }
+.public-business-identity .eyebrow { margin-bottom:7px !important; font-size:10px !important; letter-spacing:.18em; }
+.public-business-identity h1 { font-size:clamp(28px,4vw,44px) !important; margin:0 !important; }
+.public-business-handle { margin-top:6px !important; font-size:13px !important; }
+.public-business-identity .verified-badge { margin:6px 0 0 !important; padding:5px 10px !important; font-size:10px !important; }
+.public-business-identity p { margin:9px 0 5px !important; font-size:12px !important; line-height:1.35 !important; }
+.public-business-actions { margin-top:10px !important; }
+.public-business-actions .primary-button, .public-business-actions .secondary-button { min-height:34px !important; padding:0 12px !important; font-size:10px !important; }
+.public-business-listings.storefront-listings-clean { margin-top:20px !important; padding:22px !important; }
+@media (max-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:72px minmax(0,1fr) !important; gap:14px !important; min-height:190px !important; padding:21px 17px !important; } .public-business-logo { width:72px !important; height:72px !important; border-radius:17px !important; } .public-business-identity h1 { font-size:27px !important; } .public-business-identity .eyebrow { font-size:8px !important; } .public-business-handle { font-size:12px !important; } .public-business-identity p { font-size:11px !important; } .public-business-actions { display:flex !important; gap:6px !important; } .public-business-actions .primary-button, .public-business-actions .secondary-button { flex:1 !important; min-height:32px !important; padding:0 6px !important; font-size:9px !important; } .public-business-listings.storefront-listings-clean { margin-top:16px !important; padding:16px !important; } }
