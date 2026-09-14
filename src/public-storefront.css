@@ -628,3 +628,25 @@
 .public-business-hero.storefront-hero-clean { box-shadow:0 12px 26px rgba(9,14,34,.16), inset 0 1px 0 rgba(255,255,255,.08) !important; }
 .public-business-about { box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
 @media (max-width:480px) { .public-business-category { margin-left:4px !important; padding:3px 6px !important; font-size:7px !important; } }
+
+
+/* Balanced hero composition: logo left, identity center, verification and trust right. */
+.public-business-hero.storefront-hero-clean { grid-template-columns:64px minmax(0,1fr) 112px !important; gap:16px !important; align-items:center !important; min-height:118px !important; padding:18px 22px !important; }
+.public-business-hero.storefront-hero-clean > .public-business-logo { grid-column:1 !important; grid-row:1 !important; align-self:center !important; }
+.public-business-hero.storefront-hero-clean > .public-business-identity { grid-column:2 !important; grid-row:1 !important; align-self:center !important; }
+.public-business-subline { display:flex !important; align-items:center !important; flex-wrap:wrap !important; gap:5px !important; min-width:0 !important; }
+.public-business-subline .public-business-handle { margin:0 !important; }
+.public-business-category { margin:0 !important; }
+.public-business-identity p { max-width:380px !important; margin:6px 0 4px !important; }
+.public-business-trust { grid-column:3 !important; grid-row:1 !important; display:grid !important; justify-items:stretch !important; align-self:center !important; gap:8px !important; min-width:0 !important; }
+.public-business-trust .verified-badge, .public-business-trust .unverified-badge { display:flex !important; align-items:center !important; justify-content:center !important; gap:5px !important; width:100% !important; box-sizing:border-box !important; margin:0 !important; padding:7px 6px !important; border-radius:10px !important; text-align:center !important; }
+.public-business-trust .verified-badge span { display:grid !important; gap:1px !important; line-height:1.05 !important; }
+.public-business-trust .verified-badge small { color:#eaf5ff !important; font-size:7px !important; font-weight:700 !important; }
+.public-business-trust .unverified-badge { color:#cad2df !important; border:1px solid rgba(255,255,255,.18) !important; background:rgba(255,255,255,.08) !important; font-size:9px !important; font-weight:800 !important; }
+.public-business-trust .public-business-stats { grid-column:auto !important; display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:5px !important; margin:0 !important; }
+.public-business-trust .public-business-stats span { min-width:0 !important; padding:6px 4px !important; border-radius:8px !important; }
+.public-business-trust .public-business-stats strong { font-size:12px !important; }
+.public-business-trust .public-business-stats small { font-size:6px !important; }
+@media (max-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:58px minmax(0,1fr) 92px !important; gap:11px !important; padding:15px 14px !important; } .public-business-hero.storefront-hero-clean > .public-business-logo { width:58px !important; min-width:58px !important; max-width:58px !important; height:58px !important; min-height:58px !important; max-height:58px !important; } .public-business-identity h1 { font-size:22px !important; } .public-business-trust .verified-badge, .public-business-trust .unverified-badge { font-size:8px !important; padding:6px 4px !important; } }
+@media (max-width:480px) { .public-business-hero.storefront-hero-clean { grid-template-columns:50px minmax(0,1fr) 78px !important; gap:9px !important; padding:13px 11px !important; } .public-business-hero.storefront-hero-clean > .public-business-logo { width:50px !important; min-width:50px !important; max-width:50px !important; height:50px !important; min-height:50px !important; max-height:50px !important; } .public-business-identity h1 { font-size:20px !important; } .public-business-identity p { font-size:9px !important; } .public-business-location { font-size:8px !important; } .public-business-trust { gap:5px !important; } .public-business-trust .verified-badge, .public-business-trust .unverified-badge { font-size:7px !important; } .public-business-trust .verified-badge small { font-size:6px !important; } }
+@media (max-width:360px) { .public-business-hero.storefront-hero-clean { grid-template-columns:44px minmax(0,1fr) 68px !important; gap:7px !important; padding-inline:8px !important; } .public-business-hero.storefront-hero-clean > .public-business-logo { width:44px !important; min-width:44px !important; max-width:44px !important; height:44px !important; min-height:44px !important; max-height:44px !important; } .public-business-identity h1 { font-size:18px !important; } }
