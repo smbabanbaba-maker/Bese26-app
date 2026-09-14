@@ -482,3 +482,18 @@
 .public-business-footer { border-top: 1px solid rgba(50,60,80,.08); }
 @media (max-width: 640px) { .public-business-hero.storefront-hero-clean { padding: 18px 15px; } .public-business-stats { gap: 6px; } .public-business-stats span { padding: 9px 8px; } .public-business-stats strong { font-size: 15px; } .public-business-stats small { font-size: 8px; } }
 @media (prefers-reduced-motion: reduce) { .public-browse-cta svg { transition: none; } }
+/* Premium miniweb dashboard: wide hero, app brand at left, strong trust signal, listings below. */
+.public-business-hero.storefront-hero-clean { display:grid !important; grid-template-columns:132px minmax(0,1fr) !important; align-items:center !important; gap:26px !important; min-height:285px !important; padding:34px 42px !important; border-radius:24px !important; }
+.public-miniweb-brand { position:absolute; top:22px; left:28px; z-index:2; display:flex; align-items:center; gap:8px; color:#fff !important; font:800 14px Manrope,sans-serif; letter-spacing:-.02em; }
+.public-miniweb-brand img { width:28px; height:28px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.2); }
+.public-miniweb-brand > span > span { color:#ff9d93 !important; }
+.public-business-logo { grid-column:1 !important; grid-row:1 !important; width:132px !important; height:132px !important; border-radius:28px !important; }
+.public-business-identity { grid-column:2 !important; grid-row:1 !important; padding-top:24px; }
+.public-business-identity h1 { font-size:clamp(28px,4vw,48px) !important; letter-spacing:-.05em !important; }
+.public-business-identity .verified-badge { display:inline-flex !important; align-items:center !important; gap:6px !important; margin:7px 0 2px !important; padding:7px 12px !important; color:#fff !important; background:#2f7fe7 !important; border:1px solid #9fd0ff !important; border-radius:999px !important; box-shadow:0 5px 15px rgba(27,112,221,.3) !important; font-weight:800 !important; }
+.public-business-identity .verified-badge svg { color:#fff !important; fill:#2f7fe7 !important; }
+.public-business-listings.storefront-listings-clean { margin-top:26px !important; padding:26px !important; border:1px solid #e6e7ea !important; border-radius:21px !important; background:#fff !important; box-shadow:0 9px 26px rgba(20,20,40,.05) !important; }
+.public-business-listings .section-heading { margin-bottom:18px !important; }
+.public-business-listings .section-heading h2 { font-size:clamp(22px,3vw,30px) !important; letter-spacing:-.04em; }
+.public-business-listings .product-grid { gap:16px !important; }
+@media (max-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:86px minmax(0,1fr) !important; gap:16px !important; min-height:245px !important; padding:26px 20px !important; border-radius:18px !important; } .public-miniweb-brand { left:18px; top:16px; } .public-business-logo { width:86px !important; height:86px !important; border-radius:20px !important; } .public-business-identity { padding-top:30px; } .public-business-identity h1 { font-size:27px !important; } .public-business-listings.storefront-listings-clean { padding:17px !important; border-radius:17px !important; } }

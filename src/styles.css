@@ -4104,3 +4104,27 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .chat-loading-state { min-height: 150px; display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--muted); font-size: 12px; }
 .chat-loading-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,44,44,.2); border-top-color: var(--red); border-radius: 50%; animation: chatLoadingSpin .75s linear infinite; }
 @keyframes chatLoadingSpin { to { transform: rotate(360deg); } }
+/* Payments and checkout entry points: premium white billing workspace with a dark branded hero. */
+.subscription-page, .payment-history-page, .boosting-page, .wallet-page { background:#fff !important; color:#171717 !important; }
+.subscription-hero, .payment-history-hero, .boosting-hero, .wallet-hero { color:#fff !important; background:linear-gradient(120deg,#0b1020 0%,#151d3f 42%,#2d1b4b 72%,#461f48 100%) !important; border-color:#27315b !important; box-shadow:0 16px 34px rgba(20,20,40,.14) !important; }
+.subscription-hero *, .payment-history-hero *, .boosting-hero *, .wallet-hero * { color:#fff; }
+.subscription-hero p, .payment-history-hero p, .boosting-hero p, .wallet-hero p { color:#d6d9e5 !important; }
+.subscription-plan-card, .subscription-usage, .profile-payment-row, .boosting-page .settings-card, .wallet-page .settings-card,
+.payment-history-page .settings-card { background:#fff !important; color:#171717 !important; border-color:#e6e7ea !important; box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
+.subscription-plan-card h3, .subscription-plan-price, .profile-payment-row strong { color:#171717 !important; }
+.subscription-plan-summary, .subscription-plan-highlight, .profile-payment-row small, .profile-payment-meta span { color:#5f6873 !important; }
+.subscription-plan-card.popular { border-color:#d9d2ff !important; box-shadow:0 10px 25px rgba(117,100,216,.12) !important; }
+.subscription-plan-card.current { outline-color:#7564d8 !important; }
+.subscription-plan-card.basic { background:#fffaf0 !important; }
+.subscription-plan-card.premium { background:#f8f6ff !important; }
+.subscription-plan-card.business { background:#f2f8ff !important; }
+.subscription-plan-card .primary-button, .subscription-page .primary-button, .boosting-page .primary-button { background:linear-gradient(105deg,#ef4c56,#ff795d) !important; color:#fff !important; border-color:transparent !important; }
+.boosting-page .profile-form-card label, .wallet-page label { color:#303843 !important; }
+.boosting-page select, .boosting-page input, .wallet-page input { background:#fff !important; color:#171717 !important; border-color:#cfd5dc !important; }
+.profile-payment-list { display:grid; gap:10px; }
+.profile-payment-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:15px; border:1px solid #e6e7ea; border-radius:14px; }
+.profile-payment-meta { display:grid; justify-items:end; gap:5px; }
+.profile-payment-meta strong { color:#b71c1c !important; font-size:16px; }
+.status-pill.successful { color:#25764f !important; background:#eaf8f0 !important; }
+.status-pill.initialized, .status-pill.pending { color:#9a6a1c !important; background:#fff5df !important; }
+@media (max-width:700px) { .subscription-hero, .payment-history-hero, .boosting-hero, .wallet-hero { border-radius:17px !important; } .profile-payment-row { align-items:flex-start; flex-direction:column; } .profile-payment-meta { justify-items:start; } }
