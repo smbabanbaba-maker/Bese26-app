@@ -621,3 +621,10 @@
 .public-business-topbar .public-share-button { position:static !important; inset:auto !important; transform:none !important; display:inline-flex !important; align-items:center !important; margin:0 0 0 auto !important; min-height:34px !important; height:34px !important; width:auto !important; padding:0 12px !important; border:1px solid #efc5c5 !important; border-radius:10px !important; background:#fff !important; color:#7e3030 !important; box-shadow:0 4px 12px rgba(30,30,40,.06) !important; font-size:11px !important; }
 .public-business-topbar .public-share-button svg { flex:none !important; }
 @media (max-width:480px) { .public-business-topbar { min-height:54px !important; height:54px !important; padding:0 12px !important; } .public-business-topbar .public-brand-logo { width:32px !important; height:32px !important; } .public-business-topbar .public-brand strong { font-size:16px !important; } .public-business-topbar .public-share-button { min-height:31px !important; height:31px !important; padding:0 9px !important; font-size:10px !important; } }
+
+
+/* Small polish only: category chip stays inline and adds context without extra page height. */
+.public-business-category { display:inline-flex !important; align-items:center !important; width:max-content !important; max-width:100% !important; margin:4px 0 0 6px !important; padding:3px 8px !important; border:1px solid rgba(137,201,255,.35) !important; border-radius:999px !important; color:#cbe9ff !important; background:rgba(76,139,211,.2) !important; font-size:8px !important; font-weight:800 !important; line-height:1.2 !important; text-transform:capitalize !important; vertical-align:middle !important; }
+.public-business-hero.storefront-hero-clean { box-shadow:0 12px 26px rgba(9,14,34,.16), inset 0 1px 0 rgba(255,255,255,.08) !important; }
+.public-business-about { box-shadow:0 7px 20px rgba(20,20,40,.045) !important; }
+@media (max-width:480px) { .public-business-category { margin-left:4px !important; padding:3px 6px !important; font-size:7px !important; } }
