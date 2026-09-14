@@ -1,0 +1,25 @@
+{
+  "name": "Bese26 Marketplace",
+  "short_name": "Bese26",
+  "description": "Buy and sell trusted products and services across Nigeria.",
+  "lang": "en-NG",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e53434",
+  "icons": [
+    {
+      "src": "/images/bese26-logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/bese26-official-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

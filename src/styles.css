@@ -4086,3 +4086,17 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .location-detect-button:hover { background: color-mix(in srgb, var(--blue) 8%, transparent); }
 .location-detect-button:disabled { cursor: wait; opacity: .6; }
 @media (max-width: 520px) { .home-location-row { align-items: center; gap: 6px; } .home-location-row strong { max-width: 52%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .location-detect-button { margin-left: 0; } }
+
+/* Installable Bese26 app prompt */
+.install-prompt { position: fixed; z-index: 80; right: 18px; bottom: 86px; width: min(390px, calc(100vw - 28px)); display: flex; align-items: center; gap: 12px; padding: 14px 42px 14px 14px; border: 1px solid rgba(229,52,52,.18); border-radius: 18px; background: rgba(255,255,255,.98); box-shadow: 0 16px 45px rgba(24,17,17,.18); color: #171214; }
+.install-prompt-icon { width: 40px; height: 40px; flex: 0 0 40px; display: grid; place-items: center; border-radius: 13px; background: #e53434; color: #fff; }
+.install-prompt-copy { min-width: 0; flex: 1; }
+.install-prompt-copy strong { display: block; font-size: 14px; }
+.install-prompt-copy p { display: flex; align-items: center; gap: 4px; margin: 3px 0 0; color: #665d5d; font-size: 12px; line-height: 1.4; }
+.install-prompt-copy p svg { flex: 0 0 auto; color: #e53434; }
+.install-prompt-action { min-height: 36px; padding: 0 13px; font-size: 12px; }
+.install-prompt-close { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #716666; cursor: pointer; }
+.install-prompt-close:hover { background: #fff0f0; color: #b51f1f; }
+.theme-dark .install-prompt { border-color: rgba(255,255,255,.12); background: #221d1f; color: #fff; }
+.theme-dark .install-prompt-copy p { color: #c9bfc0; }
+@media (max-width: 640px) { .install-prompt { right: 14px; bottom: 82px; width: calc(100vw - 28px); } }
