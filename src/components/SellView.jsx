@@ -333,7 +333,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const removeMedia = (id) => setMedia((current) => current.filter((item) => item.id !== id).map((item, index) => ({ ...item, cover: index === 0 ? true : item.cover })));
   const setCover = (id) => setMedia((current) => current.map((item) => ({ ...item, cover: item.id === id })));
   const saveDraft = async () => {
-    if (!isSupabaseConfigured) { onDemoAction('Draft saving is unavailable until the marketplace connection is configured.'); return; }
+    if (!isSupabaseConfigured) { onDemoAction('Draft saving is unavailable right now.'); return; }
     if (!user) { onAuthRequired?.(); return; }
     try {
       const row = await saveListingDraft({ id: draftId, sellerId: user.id, title: form.title, payload: { form, media: media.map(({ id, name, type, cover }) => ({ id, name, type, cover })) } });

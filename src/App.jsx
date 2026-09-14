@@ -763,7 +763,7 @@ function AppContent() {
           }
         }
       } catch (error) {
-        if (mounted && initial) setStartupError('Supabase is still connecting. Please try again.');
+        if (mounted && initial) setStartupError('Bese26 is still connecting. Please try again.');
         if (initial) return;
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }
@@ -775,7 +775,7 @@ function AppContent() {
           setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
         }
       } catch (error) {
-        if (mounted && initial) setStartupError('Supabase is loading marketplace data. Please try again.');
+        if (mounted && initial) setStartupError('Bese26 is loading marketplace data. Please try again.');
         if (initial) return;
         if (mounted) showToast(error.message || 'Could not load live marketplace data.');
       }
@@ -859,7 +859,7 @@ function AppContent() {
   };
   const openChat = async (listing, intent = 'message', draft = '') => {
     if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Sign in to chat with this seller.'); return; }
-    if (!isSupabaseConfigured) { showToast('Chat is unavailable until the marketplace database is connected.'); return; }
+    if (!isSupabaseConfigured) { showToast('Chat is unavailable right now.'); return; }
     if (!listing.sellerId || listing.sellerId === sessionUser.id) { showToast('This listing is not available for a buyer conversation.'); return; }
     try {
       const conversation = await getOrCreateConversation({ listingId: listing.id, buyerId: sessionUser.id, sellerId: listing.sellerId });
