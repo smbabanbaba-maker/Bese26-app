@@ -558,3 +558,23 @@
   .public-business-identity h1 { font-size:20px !important; }
   .public-business-actions .primary-button, .public-business-actions .secondary-button { font-size:7px !important; }
 }
+
+
+/* Ultra-compact identity hero: no distracting contact actions, just the company identity and trust. */
+.public-business-hero.storefront-hero-clean { grid-template-columns:72px minmax(0,1fr) !important; gap:15px !important; padding:17px 22px !important; border-radius:18px !important; min-height:0 !important; background:linear-gradient(112deg,#080d1b 0%,#111a37 58%,#30204e 100%) !important; box-shadow:0 14px 30px rgba(9,14,34,.18) !important; }
+.public-business-hero.storefront-hero-clean::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(#75d7ff,#ff8c91); }
+.public-business-logo { width:72px !important; height:72px !important; border-radius:17px !important; border:3px solid rgba(255,255,255,.85) !important; box-shadow:0 8px 18px rgba(0,0,0,.28) !important; }
+.public-business-identity h1 { font-size:clamp(23px,3.5vw,36px) !important; line-height:1 !important; }
+.public-business-identity .eyebrow { margin-bottom:3px !important; font-size:8px !important; }
+.public-business-handle { margin-top:4px !important; font-size:11px !important; }
+.public-business-identity .verified-badge { margin-top:4px !important; padding:4px 9px !important; font-size:8px !important; }
+.public-business-identity p { margin:6px 0 4px !important; font-size:10px !important; line-height:1.25 !important; }
+.public-business-location { font-size:9px !important; }
+.public-business-actions { display:none !important; }
+.public-business-stats { grid-column:1 / -1 !important; display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:7px !important; max-width:none !important; margin:5px 0 0 !important; }
+.public-business-stats span { padding:7px 9px !important; border:1px solid rgba(255,255,255,.15) !important; border-radius:10px !important; background:rgba(255,255,255,.12) !important; }
+.public-business-stats strong { color:#fff !important; font-size:14px !important; }
+.public-business-stats small { color:#d6d9e5 !important; font-size:7px !important; }
+.public-browse-cta { display:none !important; }
+@media (min-width:700px) { .public-business-hero.storefront-hero-clean { grid-template-columns:82px minmax(0,1fr) !important; padding:19px 28px !important; } .public-business-logo { width:82px !important; height:82px !important; } .public-business-stats { grid-column:2 / 3 !important; margin-top:8px !important; } }
+@media (max-width:480px) { .public-business-hero.storefront-hero-clean { grid-template-columns:54px minmax(0,1fr) !important; gap:11px !important; padding:14px 15px !important; } .public-business-logo { width:54px !important; height:54px !important; border-radius:14px !important; } .public-business-identity h1 { font-size:22px !important; } .public-business-identity p { font-size:9px !important; } .public-business-stats { gap:5px !important; } .public-business-stats span { padding:6px 5px !important; } .public-business-stats strong { font-size:12px !important; } .public-business-stats small { font-size:6px !important; } }
