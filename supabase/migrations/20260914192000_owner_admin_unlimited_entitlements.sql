@@ -2,6 +2,37 @@
 -- The owner is identified by private.is_bese26_owner_admin(), not by a frontend flag.
 -- This keeps unlimited access server-side and prevents ordinary users from receiving it.
 
+update public.profiles
+set is_verified = true,
+    updated_at = timezone('utc', now())
+where id = (
+  select id from auth.users
+  where lower(email) = 'smbabanbaba@gmail.com'
+  limit 1
+);
+
+create or replace function public.enforce_bese26_owner_verified()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if exists (
+    select 1 from auth.users
+    where id = new.id and lower(email) = 'smbabanbaba@gmail.com'
+  ) then
+    new.is_verified := true;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_owner_verified on public.profiles;
+create trigger profiles_owner_verified
+before insert or update on public.profiles
+for each row execute function public.enforce_bese26_owner_verified();
+
 create or replace function public.get_seller_entitlement()
 returns table (
   plan_key text, subscription_status text, is_paid boolean, free_posts_limit integer,
