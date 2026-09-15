@@ -4128,3 +4128,24 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .status-pill.successful { color:#25764f !important; background:#eaf8f0 !important; }
 .status-pill.initialized, .status-pill.pending { color:#9a6a1c !important; background:#fff5df !important; }
 @media (max-width:700px) { .subscription-hero, .payment-history-hero, .boosting-hero, .wallet-hero { border-radius:17px !important; } .profile-payment-row { align-items:flex-start; flex-direction:column; } .profile-payment-meta { justify-items:start; } }
+
+
+/* Unified Bese26 verification mark: consistent wherever a verified seller appears. */
+.unified-verified-icon,
+.listing-seller-verified,
+.chat-verified,
+.profile-name-row .verified-badge svg,
+.seller-profile-heading .verified-badge svg {
+  color: #128cff !important;
+  fill: #128cff;
+  stroke: #062c5c;
+  filter: drop-shadow(0 2px 4px rgba(18, 140, 255, .34));
+  vertical-align: middle;
+  flex: 0 0 auto;
+}
+.listing-seller-name,
+.seller-name-with-badge,
+.chat-person strong,
+.conversation-copy strong { display: inline-flex; align-items: center; gap: 6px; }
+.profile-name-row .verified-badge { display: inline-flex; align-items: center; gap: 5px; color: #fff !important; border-color: #72c4ff !important; background: linear-gradient(135deg, #118dff, #1764d9) !important; box-shadow: 0 5px 14px rgba(18, 140, 255, .24); }
+.profile-username { display: none !important; }
