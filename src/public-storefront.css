@@ -49,6 +49,8 @@
 .public-business-identity .eyebrow { color: #ffcaca; margin-bottom: 12px; }
 .public-business-identity h1 { max-width: 700px; font-size: clamp(34px, 6vw, 66px); line-height: .98; letter-spacing: -2.5px; }
 .public-business-handle { display: inline-block; margin-top: 12px; color: #ffd0d0; font-size: 15px; }
+.public-business-identity > .verified-badge { display: flex; width: fit-content; align-items: center; gap: 8px; margin-top: 14px; padding: 9px 13px; border: 1px solid rgba(147, 211, 255, .88); border-radius: 999px; background: linear-gradient(135deg, #0e8cff, #1764d9); color: #fff; box-shadow: 0 8px 22px rgba(14, 140, 255, .32); font-size: 12px; font-weight: 800; }
+.public-business-identity > .verified-badge svg { color: #fff; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
 .public-business-identity p { max-width: 610px; margin: 20px 0 12px; color: #290404; font-size: 14px; line-height: 1.65; }
 .public-business-location { color: #320303; font-size: 12px; }
 .public-business-actions { gap: 10px; margin-top: 24px; }
@@ -122,6 +124,7 @@
   .public-business-identity h1 { font-size: clamp(29px, 9vw, 42px); letter-spacing: -1.4px; }
   .public-business-identity .eyebrow { margin-bottom: 6px; font-size: 8px; }
   .public-business-handle { margin-top: 7px; font-size: 13px; }
+  .public-business-identity > .verified-badge { margin-top: 10px; padding: 10px 14px; font-size: 12px; }
   .public-business-identity p { grid-column: 1 / -1; margin: 14px 0 6px; font-size: 12px; }
   .public-business-location { grid-column: 1 / -1; font-size: 11px; }
   .public-business-actions { grid-column: 1 / -1; display: flex; gap: 7px; margin-top: 12px; }

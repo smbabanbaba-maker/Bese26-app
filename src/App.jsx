@@ -243,7 +243,7 @@ function UnavailableView({ icon: Icon, eyebrow, title, description, onBack, back
 
 function NotificationsView({ user, onAuthRequired, onBack, onNotice, onNavigate, onOpenListing }) {
   const [items, setItems] = useState([]); const [loading, setLoading] = useState(Boolean(user)); const [entitlement, setEntitlement] = useState(null); const [sellerListings, setSellerListings] = useState([]); const [boosts, setBoosts] = useState([]); const [dismissed, setDismissed] = useState(() => { try { return JSON.parse(localStorage.getItem('bese26:reminders') || '{}'); } catch { return {}; } });
-  useEffect(() => { let mounted = true; if (!user) { setLoading(false); return undefined; } Promise.all([fetchNotifications(user.id), fetchSellerEntitlement(), fetchMyListings({ sellerId: user.id, status: 'active' }), fetchMyBoosts(user.id)]).then(([rows, access, listings, activeBoosts]) => { if (!mounted) return; setItems(rows || []); setEntitlement(access || null); setSellerListings(listings || []); setBoosts((activeBoosts || []).filter((boost) => ['active', 'pending', 'scheduled'].includes(boost.status))); }).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false)); const unsubscribe = subscribeToNotifications(user.id, (payload) => { if (!mounted || !payload?.new) return; setItems((current) => [payload.new, ...current.filter((item) => item.id !== payload.new.id)]); }); return () => { mounted = false; unsubscribe?.(); }; }, [user, onNotice]);
+  useEffect(() => { let mounted = true; if (!user) { setLoading(false); return undefined; } Promise.all([fetchNotifications(user.id), fetchSellerEntitlement(), fetchMyListings({ sellerId: user.id, status: 'active' }), fetchMyBoosts(user.id)]).then(([rows, access, listings, activeBoosts]) => { if (!mounted) return; setItems(rows || []); setEntitlement(access || null); setSellerListings(listings || []); setBoosts((activeBoosts || []).filter((boost) => ['active', 'pending', 'scheduled'].includes(boost.status))); }).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false)); const unsubscribe = subscribeToNotifications(user.id, (payload) => { if (!mounted || !payload?.new) return; setItems((current) => [payload.new, ...current.filter((item) => item.id !== payload.new.id)]); }); const refresh = () => fetchNotifications(user.id).then((rows) => mounted && setItems(rows || [])).catch(() => {}); const refreshTimer = window.setInterval(refresh, 20000); return () => { mounted = false; window.clearInterval(refreshTimer); unsubscribe?.(); }; }, [user, onNotice]);
   const dismissReminder = (key) => { const next = { ...dismissed, [key]: new Date().toISOString().slice(0, 10) }; setDismissed(next); localStorage.setItem('bese26:reminders', JSON.stringify(next)); };
   const today = new Date().toISOString().slice(0, 10);
   const showSubscriptionReminder = Boolean(entitlement && !entitlement.is_paid && dismissed.subscription !== today);
@@ -734,7 +734,8 @@ function AppContent() {
       const title = payload.new.title || 'New Bese26 notification';
       showToast(title);
     });
-    return () => { mounted = false; unsubscribe?.(); };
+    const badgeTimer = window.setInterval(() => { fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {}); }, 20000);
+    return () => { mounted = false; window.clearInterval(badgeTimer); unsubscribe?.(); };
   }, [sessionUser, showToast]);
   const toggleSave = (id) => {
     const wasSaved = savedIds.includes(id);
