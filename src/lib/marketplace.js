@@ -954,10 +954,13 @@ export async function getBusinessProfile(userId) {
 
 export async function saveBusinessProfile(userId, values) {
   failIfUnavailable();
+  const reservedHandles = new Set(['admin', 'api', 'auth', 'business', 'businesses', 'dashboard', 'home', 'listing', 'listings', 'login', 'messages', 'notifications', 'profile', 'search', 'sell', 'saved', 'settings', 'signup', 'support']);
+  const normalizedHandle = String(values.business_handle || '').trim().replace(/^@/, '').toLowerCase() || null;
+  if (normalizedHandle && reservedHandles.has(normalizedHandle)) throw new Error('Choose another business handle; that address is reserved by Bese26.');
   const payload = {
     profile_id: userId,
     business_name: String(values.business_name || '').trim(),
-    business_handle: String(values.business_handle || '').trim().replace(/^@/, '').toLowerCase() || null,
+    business_handle: normalizedHandle,
     business_type: values.business_type || null,
     logo_path: values.logo_path || null,
     category: values.category || null,
