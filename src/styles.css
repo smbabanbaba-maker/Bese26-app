@@ -4162,3 +4162,14 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .location-detect-button { color: #4f49c9 !important; font-weight: 800; }
 .popular-categories .section-heading h2 { letter-spacing: -.035em; }
 @media (max-width: 700px) { .dashboard-welcome-card { min-height: 220px !important; padding: 20px !important; } .product-card:hover { transform: translateY(-3px) !important; } }
+
+/* Stability pass: notification results settle in place instead of shifting during fetch. */
+.notifications-page { animation: none !important; }
+.notifications-page .notification-list { min-height: 220px; align-content: start; }
+.notifications-page .notification-item { min-height: 76px; transform: none !important; transition: background-color .16s ease, border-color .16s ease !important; animation: none !important; }
+.notifications-page .notification-item:hover { transform: none !important; box-shadow: 0 5px 14px rgba(20,20,40,.06) !important; }
+.notifications-page .empty-state { min-height: 220px; display: grid; place-items: center; align-content: center; }
+.page-stack { animation-duration: .2s; }
+.auth-backdrop { backdrop-filter: blur(4px); }
+.product-card, .category-tile, .quick-action, .seller-card, .profile-menu-card, .settings-card, .sell-card, .sell-work-card { box-shadow: 0 5px 16px rgba(20,20,40,.045); }
+@media (prefers-reduced-motion: reduce) { .page-stack, .product-card, .notification-item, .settings-card { animation: none !important; transition: none !important; } }
