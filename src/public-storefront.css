@@ -48,6 +48,9 @@
 .public-business-identity { position: relative; z-index: 1; min-width: 0; }
 .public-business-identity .eyebrow { color: #ffcaca; margin-bottom: 12px; }
 .public-business-identity h1 { max-width: 700px; font-size: clamp(34px, 6vw, 66px); line-height: .98; letter-spacing: -2.5px; }
+.public-business-name { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.public-name-verified { display: inline-flex; width: 34px; height: 34px; align-items: center; justify-content: center; flex: 0 0 34px; color: #138cff; filter: drop-shadow(0 3px 5px rgba(19, 140, 255, .36)); vertical-align: middle; }
+.public-name-verified svg { fill: #138cff; stroke: #072d5c; }
 .public-business-handle { display: inline-block; margin-top: 12px; color: #ffd0d0; font-size: 15px; }
 .public-business-identity > .verified-badge { display: flex; width: fit-content; align-items: center; gap: 8px; margin-top: 14px; padding: 9px 13px; border: 1px solid rgba(147, 211, 255, .88); border-radius: 999px; background: linear-gradient(135deg, #0e8cff, #1764d9); color: #fff; box-shadow: 0 8px 22px rgba(14, 140, 255, .32); font-size: 12px; font-weight: 800; }
 .public-business-identity > .verified-badge svg { color: #fff; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
@@ -122,6 +125,8 @@
   .public-business-hero::after { width: 210px; height: 210px; right: -100px; top: -115px; }
   .public-business-logo { width: 76px; height: 76px; border-width: 4px; border-radius: 18px; }
   .public-business-identity h1 { font-size: clamp(29px, 9vw, 42px); letter-spacing: -1.4px; }
+  .public-business-name { gap: 7px; }
+  .public-name-verified { width: 29px; height: 29px; flex-basis: 29px; }
   .public-business-identity .eyebrow { margin-bottom: 6px; font-size: 8px; }
   .public-business-handle { margin-top: 7px; font-size: 13px; }
   .public-business-identity > .verified-badge { margin-top: 10px; padding: 10px 14px; font-size: 12px; }
@@ -137,6 +142,7 @@
   .public-business-hero { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 17px 14px 15px; }
   .public-business-logo { width: 64px; height: 64px; border-radius: 15px; }
   .public-business-identity h1 { font-size: 28px; }
+  .public-name-verified { width: 26px; height: 26px; flex-basis: 26px; }
   .public-business-actions .primary-button, .public-business-actions .secondary-button { font-size: 9px; }
 }
 @media (prefers-reduced-motion: no-preference) {
