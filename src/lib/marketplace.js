@@ -9,8 +9,13 @@ const NIGERIA_CURRENCY = 'NGN';
 
 function formatMoney(value, currency = 'NGN') {
   const code = String(currency || 'NGN').toUpperCase();
-  try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(Number(value)); }
-  catch { return `${code} ${Number(value).toLocaleString()}`; }
+  try { return new Intl.NumberFormat('en-NG', { style: 'currency', currency: code, currencyDisplay: 'code', maximumFractionDigits: 0 }).format(Number(value)).replace(/^NGN\s?/, 'NGN '); }
+  catch { return `${code} ${Number(value).toLocaleString('en-NG')}`; }
+}
+
+function normalizeLocation(city, state, country = 'Nigeria') {
+  const parts = [city, state, country].map((value) => String(value || '').trim()).filter(Boolean);
+  return [...new Set(parts)].join(', ') || 'Nigeria';
 }
 
 function relativeTime(value) {
@@ -28,14 +33,6 @@ function initials(value = 'bese26 user') {
   return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
 }
 
-function normalizeListingLocation(city, state) {
-  const clean = (value) => String(value || '').trim().replace(/\s+/g, ' ');
-  const town = clean(city);
-  const region = clean(state);
-  if (town && region && town.toLowerCase() === region.toLowerCase()) return region;
-  return [town, region].filter(Boolean).join(', ') || 'Nigeria';
-}
-
 function verificationIsCurrent(record = {}) {
   return Boolean(record.is_verified && (!record.verification_expires_at || new Date(record.verification_expires_at).getTime() > Date.now()));
 }
@@ -47,7 +44,7 @@ export function mapListing(row) {
   const business = row.business_profile || {};
   const category = row.category || row.categories || {};
   const subcategory = row.subcategory || {};
-  const location = normalizeListingLocation(row.city, row.state);
+  const location = normalizeLocation(row.city, row.state, row.country);
   const numericPrice = row.price == null ? 0 : Number(row.price);
   return {
     id: row.id,
@@ -817,7 +814,7 @@ export function subscribeToNotifications(userId, onInsert) {
   if (!supabase || !userId) return () => {};
   const channel = supabase.channel(`notifications:${userId}:${Date.now()}`);
   try {
-    channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert);
+    channel.on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert);
     channel.subscribe((status) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.warn('Notification realtime unavailable:', status);
     });
@@ -954,13 +951,10 @@ export async function getBusinessProfile(userId) {
 
 export async function saveBusinessProfile(userId, values) {
   failIfUnavailable();
-  const reservedHandles = new Set(['admin', 'api', 'auth', 'business', 'businesses', 'dashboard', 'home', 'listing', 'listings', 'login', 'messages', 'notifications', 'profile', 'search', 'sell', 'saved', 'settings', 'signup', 'support']);
-  const normalizedHandle = String(values.business_handle || '').trim().replace(/^@/, '').toLowerCase() || null;
-  if (normalizedHandle && reservedHandles.has(normalizedHandle)) throw new Error('Choose another business handle; that address is reserved by Bese26.');
   const payload = {
     profile_id: userId,
     business_name: String(values.business_name || '').trim(),
-    business_handle: normalizedHandle,
+    business_handle: String(values.business_handle || '').trim().replace(/^@/, '').toLowerCase() || null,
     business_type: values.business_type || null,
     logo_path: values.logo_path || null,
     category: values.category || null,
