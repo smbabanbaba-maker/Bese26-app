@@ -4173,3 +4173,39 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 .auth-backdrop { backdrop-filter: blur(4px); }
 .product-card, .category-tile, .quick-action, .seller-card, .profile-menu-card, .settings-card, .sell-card, .sell-work-card { box-shadow: 0 5px 16px rgba(20,20,40,.045); }
 @media (prefers-reduced-motion: reduce) { .page-stack, .product-card, .notification-item, .settings-card { animation: none !important; transition: none !important; } }
+
+/* Final responsive safety pass: fixed bottom navigation must never cover content. */
+@media (max-width: 700px) {
+  .main-container,
+  .page-stack {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .main-container {
+    padding-bottom: calc(116px + env(safe-area-inset-bottom));
+  }
+  .page-stack > *,
+  .profile-subpage > *,
+  .messages-page > * {
+    min-width: 0;
+  }
+  .product-card,
+  .profile-menu-card,
+  .settings-card,
+  .sell-work-card,
+  .admin-operation-card {
+    min-width: 0;
+  }
+  .product-info h3,
+  .listing-seller-name,
+  .profile-menu-card strong,
+  .admin-listing-body h2 {
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 360px) {
+  .main-container { padding-left: 12px; padding-right: 12px; }
+  .bottom-nav { padding-left: 3px; padding-right: 3px; }
+  .bottom-nav button { font-size: 8px; }
+  .bottom-nav button .nav-icon svg { width: 21px; height: 21px; }
+}

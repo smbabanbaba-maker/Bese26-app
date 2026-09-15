@@ -28,6 +28,14 @@ function initials(value = 'bese26 user') {
   return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
 }
 
+function normalizeListingLocation(city, state) {
+  const clean = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+  const town = clean(city);
+  const region = clean(state);
+  if (town && region && town.toLowerCase() === region.toLowerCase()) return region;
+  return [town, region].filter(Boolean).join(', ') || 'Nigeria';
+}
+
 function verificationIsCurrent(record = {}) {
   return Boolean(record.is_verified && (!record.verification_expires_at || new Date(record.verification_expires_at).getTime() > Date.now()));
 }
@@ -39,7 +47,7 @@ export function mapListing(row) {
   const business = row.business_profile || {};
   const category = row.category || row.categories || {};
   const subcategory = row.subcategory || {};
-  const location = [row.city, row.state].filter(Boolean).join(', ') || row.country || 'Nigeria';
+  const location = normalizeListingLocation(row.city, row.state);
   const numericPrice = row.price == null ? 0 : Number(row.price);
   return {
     id: row.id,

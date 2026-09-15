@@ -575,13 +575,13 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
 }
 
 function PublicListingCard({ listing, featured = false }) {
-  return <a className="product-card public-listing-card" href={`/listing/${encodeURIComponent(listing.id)}`}><div className="product-image-wrap">{featured && <span className="public-featured-label">Featured</span>}{listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" /> : <div className="product-image-placeholder"><Package size={26} /></div>}</div><div className="product-info"><div className="product-price">{listing.price}</div><h3>{listing.title}</h3><div className="product-meta"><MapPin size={13} /> {listing.location}</div><div className="product-foot"><span>{listing.condition}</span><span>{listing.posted}</span></div><span className="public-card-action">View listing <ArrowRight size={14} /></span></div></a>;
+  return <a className="product-card public-listing-card" href={`/listing/${encodeURIComponent(listing.id)}`}><div className="product-image-wrap">{featured && <span className="public-featured-label">Featured</span>}{listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /> : null}<div className="product-image-placeholder" hidden={Boolean(listing.image)}><Package size={26} /></div></div><div className="product-info"><div className="product-price">{listing.price}</div><h3>{listing.title}</h3><div className="product-meta"><MapPin size={13} /> {listing.location}</div><div className="product-foot"><span>{listing.condition}</span><span>{listing.posted}</span></div><span className="public-card-action">View listing <ArrowRight size={14} /></span></div></a>;
 }
 function PublicProfileHeader({ profile, business, listings, share }) {
   const isBusiness = Boolean(business);
   const name = business?.business_name || profile?.display_name || 'Bese26 seller';
   const handle = business?.business_handle || profile?.username;
-  const location = [business?.city || profile?.city, business?.state || profile?.state, business?.country || profile?.country].filter(Boolean).join(', ');
+  const location = [business?.city || profile?.city, business?.state || profile?.state].filter(Boolean).filter((value, index, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === index).join(', ');
   const avatar = business?.logo_path || profile?.avatar_path;
   const description = business?.description || profile?.bio;
   const safeDescription = description && !/^admin$/i.test(String(description).trim()) ? description : '';
