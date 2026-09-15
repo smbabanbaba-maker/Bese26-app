@@ -121,17 +121,18 @@
 .public-business-listings { margin-top: 30px; }
 @media (max-width: 760px) {
   .public-business-main { padding: 16px 14px 46px; }
-  .public-business-hero { grid-template-columns: 76px minmax(0, 1fr); gap: 15px; min-height: 0; padding: 20px 17px 18px; border-radius: 19px; }
+  .public-business-hero { grid-template-columns: 76px minmax(0, 1fr); column-gap: 15px; row-gap: 18px; min-height: 218px; padding: 22px 17px 20px; border-radius: 19px; }
   .public-business-hero::after { width: 210px; height: 210px; right: -100px; top: -115px; }
   .public-business-logo { width: 76px; height: 76px; border-width: 4px; border-radius: 18px; }
-  .public-business-identity h1 { font-size: clamp(29px, 9vw, 42px); letter-spacing: -1.4px; }
+  .public-business-identity h1 { font-size: clamp(29px, 9vw, 42px); line-height: 1.08; letter-spacing: -1.2px; }
   .public-business-name { gap: 7px; }
   .public-name-verified { width: 29px; height: 29px; flex-basis: 29px; }
   .public-business-identity .eyebrow { margin-bottom: 6px; font-size: 8px; }
-  .public-business-handle { margin-top: 7px; font-size: 13px; }
+  .public-business-handle { margin-top: 9px; font-size: 13px; letter-spacing: .01em; }
+  .public-business-subline { gap: 9px; margin-top: 2px; }
   .public-business-identity > .verified-badge { margin-top: 10px; padding: 10px 14px; font-size: 12px; }
-  .public-business-identity p { grid-column: 1 / -1; margin: 14px 0 6px; font-size: 12px; }
-  .public-business-location { grid-column: 1 / -1; font-size: 11px; }
+  .public-business-identity p { grid-column: 1 / -1; margin: 16px 0 8px; font-size: 12px; line-height: 1.55; letter-spacing: .01em; }
+  .public-business-location { grid-column: 1 / -1; gap: 6px; font-size: 11px; line-height: 1.45; letter-spacing: .01em; }
   .public-business-actions { grid-column: 1 / -1; display: flex; gap: 7px; margin-top: 12px; }
   .public-business-actions .primary-button, .public-business-actions .secondary-button { flex: 1; min-height: 36px; padding: 0 8px; font-size: 10px; }
   .public-business-listings { margin-top: 23px; }
@@ -139,7 +140,7 @@
   .public-business-listings .section-heading h2 { font-size: 22px; }
 }
 @media (max-width: 390px) {
-  .public-business-hero { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 17px 14px 15px; }
+  .public-business-hero { grid-template-columns: 64px minmax(0, 1fr); column-gap: 12px; row-gap: 16px; min-height: 210px; padding: 19px 14px 17px; }
   .public-business-logo { width: 64px; height: 64px; border-radius: 15px; }
   .public-business-identity h1 { font-size: 28px; }
   .public-name-verified { width: 26px; height: 26px; flex-basis: 26px; }
