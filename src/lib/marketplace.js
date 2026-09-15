@@ -809,7 +809,7 @@ export function subscribeToNotifications(userId, onInsert) {
   if (!supabase || !userId) return () => {};
   const channel = supabase.channel(`notifications:${userId}:${Date.now()}`);
   try {
-    channel.on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert);
+    channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, onInsert);
     channel.subscribe((status) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.warn('Notification realtime unavailable:', status);
     });
