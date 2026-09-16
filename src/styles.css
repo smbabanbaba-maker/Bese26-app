@@ -5477,3 +5477,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .business-directory-page .business-directory-card-head h2 { font-size: 11px !important; }
   .business-directory-page .business-directory-card > p.business-directory-location { font-size: 8px !important; }
 }
+
+
+/* Verification visibility guarantee: verified businesses always show a clear blue tick before the name. */
+.business-directory-card .business-verified-icon {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  flex: 0 0 auto !important;
+  stroke-width: 3 !important;
+  color: #2476d2 !important;
+}
