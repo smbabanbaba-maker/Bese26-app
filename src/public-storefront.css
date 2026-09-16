@@ -814,3 +814,90 @@
 @media (prefers-reduced-motion: reduce) {
   .public-hero-brand-mark, .public-hero-brand-mark img { animation: none; }
 }
+
+
+/* Responsive visibility fix: full-width hero, safe mobile grid, and no clipped text. */
+.public-business-hero.storefront-hero-clean {
+  width: 100vw !important;
+  max-width: none !important;
+  margin-left: 50% !important;
+  transform: translateX(-50%) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity h1,
+.public-business-hero.storefront-hero-clean .public-business-identity p {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity { min-width: 0 !important; }
+@media (max-width: 700px) {
+  .public-business-hero.storefront-hero-clean {
+    display: grid !important;
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    align-items: center !important;
+    column-gap: 11px !important;
+    row-gap: 8px !important;
+    min-height: 0 !important;
+    padding: 16px 14px 18px !important;
+    border-radius: 0 0 16px 16px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-logo {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 54px !important;
+    min-width: 54px !important;
+    max-width: 54px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-logo-location {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    width: 54px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-identity {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    padding-right: 0 !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-trust {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+  }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 {
+    max-width: 100% !important;
+    font-size: clamp(20px, 7vw, 28px) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -.04em !important;
+  }
+  .public-business-hero.storefront-hero-clean .public-business-identity p {
+    max-width: 100% !important;
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+    margin: 6px 0 0 !important;
+  }
+  .public-business-hero.storefront-hero-clean .public-browse-cta {
+    margin-top: 8px !important;
+  }
+  .public-hero-brand-mark { top: 11px !important; right: 12px !important; width: 34px !important; height: 34px !important; }
+  .public-hero-brand-mark img { width: 21px !important; height: 21px !important; }
+  .public-hero-share { top: 51px !important; right: 10px !important; min-height: 25px !important; }
+}
+@media (max-width: 390px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns: 46px minmax(0, 1fr) !important; column-gap: 9px !important; padding-inline: 10px !important; }
+  .public-business-hero.storefront-hero-clean > .public-business-logo,
+  .public-business-hero.storefront-hero-clean > .public-business-logo-location { width: 46px !important; min-width: 46px !important; max-width: 46px !important; }
+  .public-business-hero.storefront-hero-clean > .public-business-logo { height: 46px !important; min-height: 46px !important; max-height: 46px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size: 20px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { font-size: 9px !important; }
+}
