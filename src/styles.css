@@ -5425,3 +5425,55 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .business-directory-card-head h2 { font-size: 12px !important; }
   .business-directory-card > p.business-directory-location { font-size: 9px !important; }
 }
+
+/* Business Directory compact book-list alignment: centered, left-packed rows. */
+.business-directory-page .business-directory-grid {
+  width: min(100%, 660px) !important;
+  margin-inline: auto !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+}
+.business-directory-page .business-directory-card {
+  width: 100% !important;
+  min-height: 62px !important;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  padding: 7px 10px !important;
+  column-gap: 10px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 9px rgba(24,32,48,.03) !important;
+}
+.business-directory-page .business-directory-card-head > img,
+.business-directory-page .business-directory-card-logo {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 9px !important;
+}
+.business-directory-page .business-directory-card-head > div:last-child {
+  justify-content: flex-start !important;
+  gap: 5px !important;
+}
+.business-directory-page .business-directory-card-head h2 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  text-align: left !important;
+}
+.business-directory-page .business-directory-card .business-verified-icon {
+  order: -1 !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+.business-directory-page .business-directory-card > p.business-directory-location {
+  font-size: 9px !important;
+  text-align: left !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-grid { width: min(100%, 520px) !important; gap: 5px !important; }
+  .business-directory-page .business-directory-card { min-height: 58px !important; grid-template-columns: 38px minmax(0, 1fr) !important; padding: 6px 8px !important; column-gap: 9px !important; }
+  .business-directory-page .business-directory-card-head > img,
+  .business-directory-page .business-directory-card-logo { width: 38px !important; height: 38px !important; }
+  .business-directory-page .business-directory-card-head h2 { font-size: 11px !important; }
+  .business-directory-page .business-directory-card > p.business-directory-location { font-size: 8px !important; }
+}
