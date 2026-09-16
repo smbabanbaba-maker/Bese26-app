@@ -4640,3 +4640,93 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .home-ad-dashboard .dashboard-welcome-copy { padding-block: 3px; }
   .home-ad-dashboard .dashboard-orbit-art { right: -38px; bottom: -20px; transform: scale(.8); }
 }
+
+
+/* Unified hero palette: match the Business storefront hero across the app. */
+:root { --hero-navy: #080d1b; --hero-indigo: #111a37; --hero-purple: #30204e; --hero-cyan: #75d7ff; --hero-pink: #ff8c91; }
+.home-ad-dashboard,
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)),
+.business-directory-hero,
+.subscription-hero,
+.auth-welcome-panel,
+.listing-management-hero,
+.public-info-hero {
+  background: linear-gradient(112deg, var(--hero-navy) 0%, var(--hero-indigo) 58%, var(--hero-purple) 100%) !important;
+  border-color: #27315b !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px rgba(9,14,34,.18) !important;
+  position: relative;
+  overflow: hidden;
+}
+.home-ad-dashboard::before,
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only))::before,
+.business-directory-hero::before,
+.subscription-hero::before,
+.auth-welcome-panel::before,
+.listing-management-hero::before,
+.public-info-hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(var(--hero-cyan), var(--hero-pink));
+  z-index: 2;
+}
+.home-ad-dashboard .dashboard-welcome-copy,
+.home-ad-banner .home-ad-copy,
+.business-directory-hero > div,
+.subscription-hero > div,
+.auth-welcome-content,
+.listing-management-hero > div,
+.public-info-hero > div { position: relative; z-index: 3; }
+.home-ad-dashboard .dashboard-welcome-copy h1,
+.home-ad-dashboard .dashboard-welcome-copy h1 span,
+.home-ad-dashboard .dashboard-welcome-copy p,
+.home-ad-dashboard .dashboard-welcome-copy .eyebrow,
+.home-ad-banner .home-ad-copy h2,
+.home-ad-banner .home-ad-copy p,
+.home-ad-banner .eyebrow,
+.business-directory-hero h1,
+.business-directory-hero p,
+.business-directory-hero .eyebrow,
+.subscription-hero h1,
+.subscription-hero p,
+.subscription-hero .eyebrow,
+.listing-management-hero h1,
+.listing-management-hero p,
+.listing-management-hero .eyebrow,
+.public-info-hero h1,
+.public-info-hero p,
+.public-info-hero .eyebrow { color: #fff !important; }
+.home-ad-dashboard .dashboard-welcome-copy h1 span { color: var(--hero-pink) !important; }
+.home-ad-dashboard .dashboard-welcome-copy p,
+.home-ad-banner .home-ad-copy p,
+.business-directory-hero p,
+.subscription-hero p { color: #d6d9e5 !important; }
+.home-ad-dashboard .dashboard-welcome-copy .eyebrow,
+.home-ad-banner .eyebrow,
+.business-directory-hero .eyebrow,
+.subscription-hero .eyebrow,
+.listing-management-hero .eyebrow,
+.public-info-hero .eyebrow { color: #ffb6c4 !important; }
+.home-ad-dashboard .dashboard-primary-action,
+.home-ad-cta,
+.subscription-hero-mark { background: #fff !important; color: var(--hero-indigo) !important; border-color: #fff !important; }
+.home-ad-dashboard .dashboard-secondary-action { background: rgba(255,255,255,.08) !important; color: #fff !important; border-color: rgba(255,255,255,.7) !important; }
+.home-ad-dashboard .dashboard-secondary-action:hover,
+.home-ad-cta:hover { color: #cfefff !important; border-color: var(--hero-cyan) !important; }
+.home-ad-dashboard .dashboard-orbit-one { border-color: rgba(117,215,255,.35); background: rgba(117,215,255,.08); }
+.home-ad-dashboard .dashboard-orbit-two { border-color: rgba(255,140,145,.35); }
+.home-ad-dashboard .dashboard-orbit-art img { background: linear-gradient(135deg, var(--hero-cyan), var(--hero-pink)); }
+.business-directory-hero > svg { color: var(--hero-cyan) !important; opacity: .95; }
+.subscription-hero-mark { color: var(--hero-purple) !important; }
+.auth-welcome-kicker, .auth-welcome-note { color: #d6f5ff !important; }
+.auth-welcome-content p { color: #d6d9e5 !important; }
+.help-guide-hero, .safety-hero { background: linear-gradient(112deg, #eef7ff 0%, #f3efff 100%) !important; border-color: #111315 !important; color: #111315 !important; }
+.help-guide-hero h1, .help-guide-hero p, .safety-hero h2, .safety-hero p { color: #111315 !important; }
+.help-guide-hero .eyebrow, .safety-hero svg { color: #30204e !important; }
+@media (max-width: 760px) {
+  .home-ad-dashboard { min-height: 350px !important; }
+}
