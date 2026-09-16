@@ -5090,3 +5090,90 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .profile-subpage:has(.notification-list) .notification-row small { font-size: 10px; }
   .profile-subpage:has(.notification-list) .notification-row small:last-child { font-size: 9px; }
 }
+
+
+/* Primary notification center redesign: calm workspace, strong unread signal, and easy scanning. */
+.notifications-page {
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  padding: 10px 4px 40px !important;
+  background: linear-gradient(180deg, #fbfcff 0%, #fff 34%) !important;
+}
+.notifications-page .notifications-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 24px 26px;
+  border: 1px solid #dfe4f0;
+  border-radius: 22px;
+  background: linear-gradient(120deg, #080d1b 0%, #111a37 58%, #30204e 100%);
+  color: #fff;
+  box-shadow: 0 16px 34px rgba(9,14,34,.15);
+}
+.notifications-page .notifications-heading h1 { color: #fff !important; font-size: clamp(28px, 4.5vw, 42px); letter-spacing: -.06em; }
+.notifications-page .notifications-heading p { margin-top: 7px; color: #d6d9e5 !important; font-size: 12px; line-height: 1.45; }
+.notifications-page .notifications-heading .eyebrow { color: #bfeeff !important; }
+.notifications-page .notifications-heading > svg { width: 44px; height: 44px; padding: 10px; border: 1px solid rgba(117,215,255,.45); border-radius: 14px; color: #75d7ff; background: rgba(117,215,255,.12); }
+.notifications-page .reminder-center { display: grid; gap: 10px; margin: 0 0 22px; }
+.notifications-page .reminder-center > .eyebrow { color: #6b57d9; font-size: 10px; letter-spacing: .16em; }
+.notifications-page .reminder-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 28px;
+  align-items: start;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 1px solid #e3dcff;
+  border-left: 4px solid #7258d9;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #fff 0%, #f8f6ff 100%) !important;
+  box-shadow: 0 8px 22px rgba(72,56,150,.07);
+}
+.notifications-page .reminder-card-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #7258d9, #bc5a9a); }
+.notifications-page .reminder-card strong { color: #171a21; font-size: 13px; }
+.notifications-page .reminder-card p { color: #626b78; line-height: 1.45; }
+.notifications-page .reminder-card div button { color: #5b46c5; }
+.notifications-page .reminder-dismiss { position: static; width: 28px; height: 28px; color: #697386; background: #fff; border: 1px solid #e1e3ed; }
+.notifications-page .notification-list { display: grid; gap: 11px; }
+.notifications-page .notification-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 86px;
+  padding: 17px 18px;
+  border: 1px solid #e5e8ef;
+  border-radius: 17px;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(24,32,48,.05);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.notifications-page .notification-item:hover { transform: translateY(-2px); border-color: #b8b0ef; box-shadow: 0 13px 28px rgba(72,56,150,.12); }
+.notifications-page .notification-item.unread { border-color: #efb9c0; background: linear-gradient(135deg, #fff 0%, #fff7f8 100%) !important; box-shadow: 0 10px 26px rgba(207,45,58,.08); }
+.notifications-page .notification-item.unread::before { content: ''; position: absolute; left: -1px; top: 15px; bottom: 15px; width: 4px; border-radius: 0 6px 6px 0; background: linear-gradient(#e3292d, #7c54d9); }
+.notifications-page .notification-dot { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid #d7d1f7; border-radius: 14px; color: #5847c8 !important; background: linear-gradient(135deg, #f1efff, #e7f7ff); }
+.notifications-page .notification-item.unread .notification-dot { border-color: #f2b8bd; color: #d9212a !important; background: linear-gradient(135deg, #fff0f1, #f1efff); }
+.notifications-page .notification-item > span:last-child { display: grid; gap: 6px; min-width: 0; }
+.notifications-page .notification-item strong { color: #171a21 !important; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+.notifications-page .notification-item small { color: #626b78 !important; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.notifications-page .notification-item em { color: #9098a4 !important; font-size: 10px; font-style: normal; }
+.notifications-page .notifications-empty.compact { margin-top: 18px; padding: 48px 24px; border: 1px dashed #cfd5e3; border-radius: 18px; background: #fff; text-align: center; }
+.notifications-page .notifications-empty.compact svg { color: #7258d9; }
+.notifications-page .notifications-empty.compact h2 { margin-top: 10px; color: #171a21; }
+.notifications-page .notifications-empty.compact p { margin-top: 7px; color: #626b78; }
+@media (max-width: 600px) {
+  .notifications-page { padding: 4px 10px 30px !important; }
+  .notifications-page .notifications-heading { margin-bottom: 16px; padding: 19px 17px; border-radius: 17px; }
+  .notifications-page .notifications-heading h1 { font-size: 29px; }
+  .notifications-page .notifications-heading p { font-size: 10px; }
+  .notifications-page .notifications-heading > svg { width: 38px; height: 38px; padding: 8px; }
+  .notifications-page .reminder-card { grid-template-columns: 36px minmax(0, 1fr) 26px; gap: 9px; padding: 12px; }
+  .notifications-page .reminder-card-icon { width: 36px; height: 36px; }
+  .notifications-page .notification-list { gap: 9px; }
+  .notifications-page .notification-item { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; min-height: 76px; padding: 13px 12px; border-radius: 14px; }
+  .notifications-page .notification-dot { width: 38px; height: 38px; border-radius: 11px; }
+  .notifications-page .notification-item strong { font-size: 12px; }
+  .notifications-page .notification-item small { font-size: 10px; }
+  .notifications-page .notification-item em { font-size: 9px; }
+}
