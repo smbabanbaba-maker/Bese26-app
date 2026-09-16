@@ -5488,3 +5488,30 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   stroke-width: 3 !important;
   color: #2476d2 !important;
 }
+
+
+/* Explicit verified mark: reliable text tick before verified business names. */
+.business-directory-card .business-verified-mark {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 15px !important;
+  height: 15px !important;
+  flex: 0 0 15px !important;
+  margin-right: 2px !important;
+  border-radius: 50% !important;
+  color: #fff !important;
+  background: #2476d2 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 15px !important;
+  vertical-align: middle !important;
+}
+@media (max-width: 700px) {
+  .business-directory-card .business-verified-mark {
+    width: 14px !important;
+    height: 14px !important;
+    flex-basis: 14px !important;
+    font-size: 10px !important;
+    line-height: 14px !important;
+  }
+}
