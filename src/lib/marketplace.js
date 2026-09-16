@@ -35,10 +35,7 @@ function initials(value = 'bese26 user') {
 
 function verificationIsCurrent(record = {}) {
   const verified = record.is_verified === true || record.is_verified === 'true' || record.is_verified === 1 || record.is_verified === '1';
-  if (!verified) return false;
-  if (!record.verification_expires_at) return true;
-  const expiry = new Date(record.verification_expires_at).getTime();
-  return Number.isNaN(expiry) || expiry > Date.now();
+  return verified;
 }
 
 export function mapListing(row) {
