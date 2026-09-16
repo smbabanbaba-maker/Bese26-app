@@ -4812,3 +4812,56 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     bottom: -34px;
   }
 }
+
+
+/* Compact dashboard hero: reduce vertical footprint without collapsing the content rhythm. */
+.home-ad-dashboard {
+  min-height: 168px !important;
+  padding: 18px 26px !important;
+}
+.home-ad-dashboard .dashboard-welcome-copy h1 {
+  font-size: clamp(26px, 3.5vw, 38px) !important;
+  margin-bottom: 7px !important;
+  line-height: 1.04 !important;
+}
+.home-ad-dashboard .dashboard-welcome-copy p {
+  font-size: 11px !important;
+  margin-bottom: 11px !important;
+  line-height: 1.35 !important;
+}
+.home-ad-dashboard .dashboard-primary-action,
+.home-ad-dashboard .dashboard-secondary-action {
+  min-height: 34px;
+  padding: 0 13px;
+  font-size: 10px;
+}
+.home-ad-dashboard .dashboard-orbit-art { transform: scale(.72); right: 1%; }
+@media (max-width: 760px) {
+  .home-ad-dashboard {
+    min-height: 205px !important;
+    padding: 17px 18px !important;
+  }
+  .home-ad-dashboard .dashboard-welcome-copy { max-width: 280px; }
+  .home-ad-dashboard .dashboard-welcome-copy h1 {
+    max-width: 275px;
+    font-size: 28px !important;
+    margin-bottom: 7px !important;
+  }
+  .home-ad-dashboard .dashboard-welcome-copy p {
+    max-width: 245px;
+    font-size: 10px !important;
+    margin-bottom: 10px !important;
+  }
+  .home-ad-dashboard .dashboard-actions { gap: 6px; }
+  .home-ad-dashboard .dashboard-primary-action,
+  .home-ad-dashboard .dashboard-secondary-action {
+    min-height: 34px;
+    padding-inline: 11px;
+    font-size: 10px;
+  }
+  .home-ad-dashboard .dashboard-orbit-art {
+    transform: scale(.5);
+    right: -50px;
+    bottom: -48px;
+  }
+}
