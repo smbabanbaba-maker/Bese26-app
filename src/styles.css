@@ -4738,3 +4738,77 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .home-ad-dashboard { min-height: 275px !important; }
   .home-ad-dashboard .dashboard-orbit-art { transform: scale(.72); right: -34px; bottom: -28px; }
 }
+
+
+/* Final dashboard hero polish: clearer type rhythm, more breathing room, shorter frame. */
+.home-ad-dashboard {
+  min-height: 198px !important;
+  padding: 22px 30px !important;
+}
+.home-ad-dashboard .dashboard-welcome-copy {
+  max-width: 540px;
+  padding-block: 0 !important;
+}
+.home-ad-dashboard .dashboard-welcome-copy h1 {
+  max-width: 500px;
+  margin: 0 0 11px !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.045em;
+}
+.home-ad-dashboard .dashboard-welcome-copy p {
+  max-width: 390px;
+  margin: 0 0 17px !important;
+  line-height: 1.55 !important;
+}
+.home-ad-dashboard .dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0 !important;
+  position: relative;
+  z-index: 4;
+}
+.home-ad-dashboard .dashboard-primary-action,
+.home-ad-dashboard .dashboard-secondary-action {
+  min-height: 40px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.home-ad-dashboard .dashboard-orbit-art {
+  transform: scale(.9);
+  right: 3%;
+}
+@media (max-width: 760px) {
+  .home-ad-dashboard {
+    min-height: 248px !important;
+    padding: 21px 21px !important;
+  }
+  .home-ad-dashboard .dashboard-welcome-copy {
+    max-width: 310px;
+  }
+  .home-ad-dashboard .dashboard-welcome-copy h1 {
+    max-width: 300px;
+    margin-bottom: 9px !important;
+    line-height: 1.06 !important;
+  }
+  .home-ad-dashboard .dashboard-welcome-copy p {
+    max-width: 270px;
+    margin-bottom: 14px !important;
+    line-height: 1.45 !important;
+  }
+  .home-ad-dashboard .dashboard-actions {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .home-ad-dashboard .dashboard-primary-action,
+  .home-ad-dashboard .dashboard-secondary-action {
+    min-height: 38px;
+    padding-inline: 13px;
+    font-size: 11px;
+  }
+  .home-ad-dashboard .dashboard-orbit-art {
+    transform: scale(.62);
+    right: -42px;
+    bottom: -34px;
+  }
+}
