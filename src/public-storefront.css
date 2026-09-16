@@ -681,3 +681,38 @@
   .public-business-hero.storefront-hero-clean { min-height:130px !important; }
   .public-name-verified { width:27px !important; height:27px !important; flex-basis:27px !important; }
 }
+
+
+/* Miniweb hero parity: same Business/Dashboard palette and compact proportions. */
+.public-business-hero.storefront-hero-clean {
+  min-height: 168px !important;
+  padding: 18px 26px !important;
+  background: linear-gradient(112deg, #080d1b 0%, #111a37 58%, #30204e 100%) !important;
+  border-color: #27315b !important;
+  box-shadow: 0 14px 30px rgba(9,14,34,.18) !important;
+}
+.public-business-hero.storefront-hero-clean::before {
+  background: linear-gradient(#75d7ff, #ff8c91) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity h1,
+.public-business-hero.storefront-hero-clean .public-business-identity p,
+.public-business-hero.storefront-hero-clean .public-business-identity .eyebrow,
+.public-business-hero.storefront-hero-clean .public-business-handle,
+.public-business-hero.storefront-hero-clean .public-business-location { color: #fff !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity .eyebrow { color: #ffb6c4 !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity p,
+.public-business-hero.storefront-hero-clean .public-business-location { color: #d6d9e5 !important; }
+.public-business-hero.storefront-hero-clean .public-business-category { color: #cbe9ff !important; background: rgba(76,139,211,.2) !important; border-color: rgba(137,201,255,.35) !important; }
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge,
+.public-business-hero.storefront-hero-clean .public-business-trust .unverified-badge { color: #fff !important; }
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge { background: rgba(117,215,255,.14) !important; border-color: rgba(117,215,255,.4) !important; }
+.public-business-hero.storefront-hero-clean .public-business-trust .unverified-badge { background: rgba(255,255,255,.08) !important; border-color: rgba(255,255,255,.18) !important; }
+.public-business-hero.storefront-hero-clean .public-business-stats span { background: rgba(255,255,255,.12) !important; border-color: rgba(255,255,255,.15) !important; }
+.public-business-hero.storefront-hero-clean .public-business-stats strong { color: #fff !important; }
+.public-business-hero.storefront-hero-clean .public-business-stats small { color: #d6d9e5 !important; }
+@media (max-width: 700px) {
+  .public-business-hero.storefront-hero-clean { min-height: 205px !important; padding: 17px 18px !important; }
+}
+@media (max-width: 480px) {
+  .public-business-hero.storefront-hero-clean { min-height: 205px !important; padding: 15px 13px !important; }
+}
