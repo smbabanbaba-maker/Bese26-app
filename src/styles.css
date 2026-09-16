@@ -4555,3 +4555,88 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+/* Hero color pass: distinct identities, strong contrast, and a taller dashboard welcome. */
+.home-ad-dashboard {
+  min-height: 270px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fff8f7 58%, #ffe7e5 100%) !important;
+  border: 1px solid #111315 !important;
+  color: #111315 !important;
+}
+.home-ad-dashboard .dashboard-welcome-copy { padding-block: 10px; }
+.home-ad-dashboard .dashboard-welcome-copy h1 { color: #111315 !important; }
+.home-ad-dashboard .dashboard-welcome-copy h1 span { color: #d9212a !important; }
+.home-ad-dashboard .dashboard-welcome-copy p { color: #34383d !important; }
+.home-ad-dashboard .dashboard-welcome-copy .eyebrow { color: #b51f24 !important; }
+.home-ad-dashboard .dashboard-orbit-art { right: 4%; transform: scale(1.08); }
+.home-ad-dashboard .dashboard-orbit-one { border-color: rgba(217,33,42,.28); background: rgba(217,33,42,.06); }
+.home-ad-dashboard .dashboard-orbit-two { border-color: rgba(17,19,21,.22); }
+.home-ad-dashboard .dashboard-orbit-art img { background: #d9212a; }
+
+/* Sponsored home heroes keep their campaign personality and preserve readable copy. */
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)) {
+  background: linear-gradient(120deg, #111827 0%, #25204a 54%, #7f1d45 100%) !important;
+  color: #fff !important;
+  border: 1px solid #111315 !important;
+}
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)) .home-ad-copy h2,
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)) .home-ad-copy p { color: #fff !important; }
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)) .home-ad-copy p { color: #e8eaf0 !important; }
+.home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-image-only)) .eyebrow { color: #ffb4b4 !important; }
+.home-ad-cta { background: #fff !important; color: #111315 !important; border: 1px solid #fff; }
+.home-ad-cta:hover { color: #c92028 !important; }
+
+/* Directory: deep blue gives business discovery a confident, distinct identity. */
+.business-directory-hero {
+  background: linear-gradient(120deg, #07111f 0%, #12385a 56%, #136f78 100%) !important;
+  border-color: #0b253a !important;
+  box-shadow: 0 18px 38px rgba(7,17,31,.18) !important;
+}
+.business-directory-hero h1, .business-directory-hero p { color: #fff !important; }
+.business-directory-hero p { color: #d9edf2 !important; }
+.business-directory-hero .eyebrow { color: #8be8dc !important; }
+.business-directory-hero > svg { color: #8be8dc !important; opacity: .95; }
+
+/* Seller plans: premium purple gradient with bright text and red action language. */
+.subscription-hero {
+  background: linear-gradient(120deg, #17122c 0%, #32205a 58%, #7b2455 100%) !important;
+  border-color: #261a46 !important;
+  box-shadow: 0 18px 38px rgba(36,22,70,.2) !important;
+}
+.subscription-hero h1, .subscription-hero p { color: #fff !important; }
+.subscription-hero p { color: #e9e2f5 !important; }
+.subscription-hero .eyebrow { color: #ffb3bc !important; }
+.subscription-hero-mark { background: #e3292d !important; color: #fff !important; }
+
+/* Account and safety heroes: warm red signals trust without hurting legibility. */
+.auth-welcome-panel {
+  background: linear-gradient(135deg, #180d16 0%, #521b2d 58%, #b51f35 100%) !important;
+}
+.auth-welcome-kicker, .auth-welcome-note { color: #ffdadd !important; }
+.auth-welcome-content p { color: #f8e8ea !important; }
+.help-guide-hero, .safety-hero {
+  background: linear-gradient(120deg, #fff4f2 0%, #ffe2df 100%) !important;
+  border-color: #111315 !important;
+  color: #111315 !important;
+}
+.help-guide-hero h1, .help-guide-hero p, .safety-hero h2, .safety-hero p { color: #111315 !important; }
+.help-guide-hero .eyebrow, .safety-hero svg { color: #c92028 !important; }
+.listing-management-hero {
+  background: linear-gradient(120deg, #111315 0%, #292d34 58%, #6b202d 100%) !important;
+  border-color: #111315 !important;
+}
+.listing-management-hero h1, .listing-management-hero p { color: #fff !important; }
+.listing-management-hero .eyebrow { color: #ffb0b4 !important; }
+.public-info-hero {
+  background: linear-gradient(120deg, #111315 0%, #3b1119 58%, #c92028 100%) !important;
+  border-color: #111315 !important;
+}
+.public-info-hero h1, .public-info-hero p { color: #fff !important; }
+.public-info-hero .eyebrow { color: #ffd0d2 !important; }
+
+@media (max-width: 760px) {
+  .home-ad-dashboard { min-height: 350px !important; }
+  .home-ad-dashboard .dashboard-welcome-copy { padding-block: 3px; }
+  .home-ad-dashboard .dashboard-orbit-art { right: -38px; bottom: -20px; transform: scale(.8); }
+}
