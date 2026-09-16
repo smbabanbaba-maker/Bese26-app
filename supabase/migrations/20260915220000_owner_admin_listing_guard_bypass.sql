@@ -16,6 +16,12 @@ begin
     return new;
   end if;
 
+  -- The owner admin must be able to approve any pending listing, even when
+  -- the seller has reached a normal plan cap.
+  if private.is_bese26_owner_admin() then
+    return new;
+  end if;
+
   select exists (
     select 1
     from auth.users u
