@@ -4344,3 +4344,44 @@ button:disabled { color:#8a929b !important; opacity:.72; }
     aspect-ratio: 1600 / 600 !important;
   }
 }
+
+/* Universal Bese26 hero treatment: same brand color and 1600×500 (16:5) footprint everywhere. */
+.dashboard-welcome-card,
+.home-ad-banner,
+.miniweb-cover-banner,
+.public-business-hero.storefront-hero-clean {
+  aspect-ratio: 1600 / 500 !important;
+  min-height: 0 !important;
+  background: linear-gradient(135deg, #111827 0%, #1f2a44 56%, #3a2035 100%) !important;
+  background-image: linear-gradient(135deg, #111827 0%, #1f2a44 56%, #3a2035 100%) !important;
+  color: #fff !important;
+}
+.dashboard-welcome-card *,
+.home-ad-banner *,
+.miniweb-cover-banner *,
+.public-business-hero.storefront-hero-clean * {
+  color: #fff;
+}
+.dashboard-welcome-card .eyebrow,
+.home-ad-banner .eyebrow,
+.miniweb-cover-banner .eyebrow,
+.public-business-hero.storefront-hero-clean .eyebrow {
+  color: #ffb6aa !important;
+}
+.dashboard-welcome-card h1 span,
+.home-ad-banner h1 span,
+.home-ad-banner h2 span,
+.miniweb-cover-banner h1 span,
+.miniweb-cover-banner h2 span,
+.public-business-hero.storefront-hero-clean h1 span {
+  color: #ff766f !important;
+}
+@media (max-width: 700px) {
+  .dashboard-welcome-card,
+  .home-ad-banner,
+  .miniweb-cover-banner,
+  .public-business-hero.storefront-hero-clean {
+    aspect-ratio: 1600 / 500 !important;
+    min-height: 0 !important;
+  }
+}
