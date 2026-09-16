@@ -312,6 +312,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
   const [promoIndex, setPromoIndex] = useState(0);
+  const [homeSearch, setHomeSearch] = useState('');
   useEffect(() => { setPromoIndex(0); }, [user?.id, adCampaigns.length]);
   useEffect(() => { if (promoSlides.length < 2) return undefined; const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
   const promo = promoSlides[promoIndex];
@@ -325,8 +326,8 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
       <section className="search-section">
         <div className="search-box home-search">
           <Search size={18} />
-          <input aria-label="Search listings" placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(event.currentTarget.value)} />
-          <button className="search-submit" aria-label="Search" onClick={() => onSearch('')}><Search size={20} /></button>
+          <input aria-label="Search listings" value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(homeSearch)} />
+          <button className="search-submit" aria-label="Search" onClick={() => onSearch(homeSearch)}><Search size={20} /></button>
         </div>
         <div className="location-row home-location-row"><MapPin size={14} /><span>Showing</span><strong>{userPlace ? `near ${userPlace}` : 'popular listings'}</strong><button type="button" className="location-detect-button" onClick={onUseLocation} disabled={locationBusy}>{locationBusy ? 'Locating…' : userPlace ? 'Update location' : 'Use my location'}</button></div>
       </section>

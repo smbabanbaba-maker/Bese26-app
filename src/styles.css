@@ -4385,3 +4385,173 @@ button:disabled { color:#8a929b !important; opacity:.72; }
     min-height: 0 !important;
   }
 }
+
+
+/* ================================================================
+   Bese26 Premium Marketplace Refresh
+   White primary surfaces · red action accent · black outlines/type
+   Bottom navigation intentionally preserved.
+   ================================================================ */
+:root {
+  --red: #e3292d;
+  --dark-red: #b51f24;
+  --ink: #111315;
+  --muted: #6f747b;
+  --soft: #f7f7f5;
+  --line: #111315;
+  --card: #ffffff;
+  --cream: #ffffff;
+  --shadow: 0 14px 34px rgba(17, 19, 21, .075);
+  --shadow-lg: 0 26px 70px rgba(17, 19, 21, .18);
+  --ease: cubic-bezier(.23, 1, .32, 1);
+}
+body { background: #fff; color: var(--ink); }
+.app-shell { background: #fff; color: var(--ink); }
+.topbar { background: rgba(255,255,255,.94); border-bottom: 1px solid #e7e7e4; }
+.brand-mark { background: var(--red); box-shadow: 0 8px 18px rgba(227,41,45,.2); }
+.brand-tagline, .eyebrow { color: #6d7177; }
+.desktop-location { border-color: #111315; }
+.topbar-search { background: #f7f7f5; border-color: #111315; }
+.topbar-search:hover { background: #fff; border-color: var(--red); }
+kbd { border-color: #111315; color: #111315; }
+.icon-button:hover { background: #f2f2ef; }
+
+/* Home hero: one confident message, white base, red detail. */
+.home-ad-banner { border-radius: 24px; box-shadow: var(--shadow); }
+.home-ad-dashboard { background: #fff !important; color: var(--ink); border: 1px solid #111315; min-height: 230px; }
+.home-ad-dashboard::before { content: ''; position: absolute; inset: auto 0 0 0; height: 5px; background: var(--red); }
+.dashboard-welcome-copy { max-width: 590px; }
+.dashboard-welcome-copy .eyebrow { color: var(--red); letter-spacing: .16em; }
+.dashboard-welcome-copy h1 { color: #111315; font-size: clamp(32px, 4.5vw, 54px); max-width: 580px; }
+.dashboard-welcome-copy h1 span { color: var(--red); }
+.dashboard-welcome-copy p { color: #62676d; font-size: 13px; max-width: 430px; }
+.dashboard-primary-action, .dashboard-secondary-action { border-radius: 999px; min-height: 44px; padding: 0 17px; font-weight: 800; }
+.dashboard-primary-action { background: var(--red); color: #fff; box-shadow: 0 10px 22px rgba(227,41,45,.2); }
+.dashboard-primary-action:hover { background: var(--dark-red); transform: translateY(-2px); }
+.dashboard-secondary-action { background: #fff; color: #111315; border: 1px solid #111315; }
+.dashboard-secondary-action:hover { color: var(--red); border-color: var(--red); transform: translateY(-2px); }
+.dashboard-orbit-art { opacity: .95; }
+.dashboard-orbit-one { border-color: rgba(227,41,45,.25); background: rgba(227,41,45,.04); }
+.dashboard-orbit-two { border-color: rgba(17,19,21,.16); }
+.dashboard-orbit-art img { background: var(--red); box-shadow: 0 12px 30px rgba(227,41,45,.22); }
+.search-section { margin-top: -17px; }
+.home-search { height: 62px; border: 1.5px solid #111315; box-shadow: 0 8px 24px rgba(17,19,21,.08); }
+.home-search:focus-within { border-color: var(--red); box-shadow: 0 0 0 4px rgba(227,41,45,.1); }
+.home-search input { font-size: 14px; }
+.home-search .search-submit { background: var(--red); }
+.home-search .search-submit:hover { background: var(--dark-red); transform: scale(1.04); }
+.location-row { color: #73787e; }
+.location-row strong { color: #111315; }
+.location-detect-button { color: var(--red); font-weight: 800; }
+
+/* Category rail: clean, tactile, no rainbow noise. */
+.popular-category { background: #fff !important; border: 1px solid #e1e1de !important; border-radius: 16px; min-height: 82px; transition: transform .18s var(--ease), border-color .18s ease, box-shadow .18s ease; }
+.popular-category:hover, .popular-category:focus-visible { border-color: #111315 !important; box-shadow: 0 10px 22px rgba(17,19,21,.08); transform: translateY(-3px); }
+.popular-category > span { background: #f7f7f5 !important; color: var(--red) !important; border: 1px solid #111315; }
+.popular-category strong { color: #111315; }
+.section-heading h2, .browse-heading h2 { color: #111315; }
+.text-button, .inline-link { color: var(--red); }
+
+/* Cards: image first, readable price, restrained badges. */
+.product-card { border: 1px solid #111315; border-radius: 18px; box-shadow: 0 4px 12px rgba(17,19,21,.035); }
+.product-card:hover { border-color: var(--red); box-shadow: 0 16px 30px rgba(17,19,21,.1); transform: translateY(-4px); }
+.product-image-wrap { background: #f0f0ed; }
+.save-button { border: 1px solid rgba(17,19,21,.18); color: #111315; }
+.save-button:hover, .save-button.saved { color: var(--red); border-color: var(--red); }
+.product-price, .modal-price { color: #111315; }
+.product-info h3 { color: #222428; font-size: 14px; }
+.product-meta, .product-foot { color: #747980; }
+.product-foot { border-color: #e5e5e1; }
+.verified-badge { color: #111315; background: #fff; border: 1px solid #111315; }
+.listing-card-badges > span { box-shadow: 0 4px 12px rgba(17,19,21,.12); }
+.listing-card-badges .promoted-pill { background: #111315; color: #fff; }
+.fresh-pill { color: #fff; background: var(--red); }
+.trust-pill { color: #111315; background: #fff; border: 1px solid #111315; }
+
+/* Trust strip and lower content. */
+.trust-strip, .trust-card, .seller-card, .quick-action, .saved-list, .filter-drawer { border-color: #111315; background: #fff; }
+.trust-strip-icon, .trust-strip-blue, .trust-strip-gold { background: #f7f7f5; color: var(--red); }
+.trust-strip-item { border-color: #e5e5e1; }
+.trust-card { box-shadow: var(--shadow); }
+.trust-card-icon { background: var(--red); }
+.trust-card p, .recommendation-banner p { color: #666b71; }
+.recommendation-banner { background: #f7f7f5; border-color: #111315; }
+.dark-button { background: #111315; color: #fff; border: 1px solid #111315; }
+
+/* Buttons: white surfaces, red action, black outline. */
+.primary-button, .publish-button, .search-submit { background: var(--red); color: #fff; border: 1px solid var(--red); }
+.primary-button:hover, .publish-button:hover, .search-submit:hover { background: var(--dark-red); box-shadow: 0 10px 22px rgba(227,41,45,.2); }
+.secondary-button, .outline-button { border: 1px solid #111315; background: #fff; color: #111315; }
+.secondary-button:hover, .outline-button:hover { border-color: var(--red); color: var(--red); background: #fff; }
+.text-action, .auth-link-button { color: var(--red); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgba(227,41,45,.2); outline-offset: 3px; }
+
+/* Search: hierarchy and clearer filtering. */
+.page-title-row h1 { color: #111315; }
+.large-search { border: 1.5px solid #111315; background: #fff; }
+.large-search:focus-within { border-color: var(--red); box-shadow: 0 0 0 4px rgba(227,41,45,.1); }
+.filter-chip, .filter-button { border-color: #111315; background: #fff; color: #111315; }
+.filter-chip.active { color: #fff; background: var(--red); border-color: var(--red); }
+.filter-button:hover, .filter-chip:hover { border-color: var(--red); }
+.empty-state { border-color: #111315; background: #fff; }
+.empty-state svg { color: var(--red); }
+
+/* Listing detail: trust-first and mobile action bar. */
+.listing-modal { border: 1px solid #111315; box-shadow: var(--shadow-lg); }
+.modal-content { background: #fff; }
+.modal-content h1 { color: #111315; }
+.detail-pills span, .modal-spec-chip-list span { border-color: #111315; background: #fff; color: #111315; }
+.modal-delivery-note { background: #f7f7f5; border: 1px solid #111315; }
+.modal-actions { position: sticky; bottom: 0; z-index: 5; padding: 12px 0 4px; background: linear-gradient(transparent, #fff 22%); }
+.modal-actions .primary-button { min-height: 46px; }
+.modal-close { border: 1px solid #111315; background: #fff; color: #111315; }
+.modal-close:hover { border-color: var(--red); color: var(--red); }
+
+/* Sell flow: guided, calm, and confidence-building. */
+.sell-page, .sell-shell { color: #111315; }
+.sell-step, .sell-section, .sell-preview, .sell-card, .sell-form-card { border-color: #111315 !important; background: #fff !important; border-radius: 18px; }
+.sell-page input, .sell-page textarea, .sell-page select { border-color: #111315; background: #fff; }
+.sell-page input:focus, .sell-page textarea:focus, .sell-page select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(227,41,45,.1); }
+.sell-progress, .progress-track { background: #f0f0ed; }
+.sell-progress span, .progress-track span { background: var(--red); }
+.listing-strength-card { border-color: #111315; background: #fff; }
+.listing-strength-head span { color: var(--red); }
+.listing-strength-track span { background: var(--red); }
+
+/* Profile/business/admin: premium panels with clear grouping. */
+.profile-menu-card, .profile-stat-card, .business-directory-card, .business-profile-card, .admin-intro, .admin-listing-card { border-color: #111315 !important; background: #fff !important; }
+.profile-menu-card:hover, .business-directory-card:hover { border-color: var(--red) !important; box-shadow: var(--shadow); }
+.profile-subpage-header h1, .business-directory-hero h1 { color: #111315; }
+.business-directory-hero, .subscription-hero { background: #fff !important; color: #111315 !important; border: 1px solid #111315; }
+.business-directory-hero .eyebrow, .subscription-hero .eyebrow { color: var(--red); }
+.business-directory-search { border: 1.5px solid #111315; background: #fff; }
+.admin-status-tabs { border-color: #111315; background: #fff; }
+.admin-status-tabs button.active { background: #111315; color: #fff; }
+
+/* Loading and feedback. */
+.skeleton { background: #f0f0ed !important; }
+.toast { border: 1px solid #111315; background: #111315; color: #fff; box-shadow: var(--shadow-lg); }
+
+@media (max-width: 760px) {
+  .main-container { padding: 24px 15px 18px; }
+  .home-ad-dashboard { min-height: 300px; padding: 24px 22px; }
+  .dashboard-welcome-copy h1 { font-size: 34px; max-width: 300px; }
+  .dashboard-welcome-copy p { font-size: 12px; max-width: 280px; }
+  .dashboard-actions { flex-wrap: wrap; gap: 8px; }
+  .dashboard-primary-action, .dashboard-secondary-action { min-height: 42px; }
+  .dashboard-orbit-art { transform: scale(.75); right: -45px; bottom: -25px; }
+  .home-search { height: 56px; }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+  .product-image-wrap { height: 150px; }
+  .product-info { padding: 11px; }
+  .product-price { font-size: 15px; }
+  .product-info h3 { font-size: 12px; }
+  .trust-strip { grid-template-columns: 1fr; gap: 4px; }
+  .trust-strip-item { border-right: 0; border-bottom: 1px solid #e5e5e1; padding: 9px 4px; }
+  .trust-strip-item:last-child { border-bottom: 0; }
+  .section-heading h2 { font-size: 20px; }
+  .modal-actions { position: sticky; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
