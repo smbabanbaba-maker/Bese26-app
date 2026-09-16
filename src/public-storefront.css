@@ -716,3 +716,35 @@
 @media (max-width: 480px) {
   .public-business-hero.storefront-hero-clean { min-height: 205px !important; padding: 15px 13px !important; }
 }
+
+
+/* Hero CTA: one focused path from business identity to available listings. */
+.public-business-hero.storefront-hero-clean .public-browse-cta {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  margin-top: 10px;
+  padding: 0 12px;
+  border: 1px solid #fff;
+  border-radius: 9px;
+  background: #fff;
+  color: #111a37;
+  font-size: 10px;
+  font-weight: 800;
+  transition: transform .18s ease, color .18s ease, border-color .18s ease;
+}
+.public-business-hero.storefront-hero-clean .public-browse-cta:hover {
+  color: #30204e;
+  border-color: #75d7ff;
+  transform: translateY(-2px);
+}
+@media (max-width: 480px) {
+  .public-business-hero.storefront-hero-clean .public-browse-cta {
+    min-height: 29px;
+    margin-top: 7px;
+    padding-inline: 10px;
+    font-size: 9px;
+  }
+}
