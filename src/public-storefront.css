@@ -748,3 +748,69 @@
     font-size: 9px;
   }
 }
+
+
+/* Final Miniweb hero composition: flush under the app bar, branded, and share-ready. */
+.public-business-main { padding-top: 0 !important; }
+.public-business-topbar {
+  width: 100% !important;
+  max-width: none !important;
+  height: 58px !important;
+  padding: 0 12px !important;
+  border-bottom-color: #e6e7ea !important;
+}
+.public-business-topbar .public-brand { margin-left: 0 !important; }
+.public-business-topbar .public-brand-logo { width: 32px !important; height: 32px !important; }
+.public-business-hero.storefront-hero-clean { border-radius: 0 0 18px 18px !important; }
+.public-hero-brand-mark {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,.32);
+  border-radius: 14px;
+  background: rgba(255,255,255,.1);
+  box-shadow: 0 8px 22px rgba(0,0,0,.2);
+  animation: miniwebBrandFloat 5s ease-in-out infinite;
+}
+.public-hero-brand-mark img {
+  width: 29px;
+  height: 29px;
+  border-radius: 9px;
+  animation: miniwebBrandPulse 3s ease-in-out infinite;
+}
+.public-hero-share {
+  position: absolute;
+  top: 70px;
+  right: 18px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 29px;
+  padding: 0 9px;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 8px;
+  background: rgba(255,255,255,.1);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+.public-hero-share:hover { transform: translateY(-2px); background: rgba(255,255,255,.2); border-color: #75d7ff; }
+@keyframes miniwebBrandFloat { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes miniwebBrandPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@media (max-width: 700px) {
+  .public-hero-brand-mark { top: 13px; right: 14px; width: 39px; height: 39px; border-radius: 11px; }
+  .public-hero-brand-mark img { width: 24px; height: 24px; }
+  .public-hero-share { top: 59px; right: 12px; min-height: 26px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-hero-brand-mark, .public-hero-brand-mark img { animation: none; }
+}
