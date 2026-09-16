@@ -4730,3 +4730,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (max-width: 760px) {
   .home-ad-dashboard { min-height: 350px !important; }
 }
+
+
+/* Dashboard hero height refinement: compact but still comfortable for copy and actions. */
+.home-ad-dashboard { min-height: 220px !important; }
+@media (max-width: 760px) {
+  .home-ad-dashboard { min-height: 275px !important; }
+  .home-ad-dashboard .dashboard-orbit-art { transform: scale(.72); right: -34px; bottom: -28px; }
+}
