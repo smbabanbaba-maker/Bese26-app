@@ -972,3 +972,20 @@
   }
   .public-business-hero.storefront-hero-clean > .public-business-identity { padding-right: 45px !important; }
 }
+
+
+/* Zero-gap junction: the hero must touch the Bese26 app bar directly. */
+.public-business-shell > .public-business-topbar {
+  margin-bottom: 0 !important;
+  border-bottom: 0 !important;
+}
+.public-business-shell > .public-business-main {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.public-business-shell > .public-business-main > .public-business-hero.storefront-hero-clean:first-child {
+  margin-top: 0 !important;
+  top: 0 !important;
+  transform: translateX(-50%) !important;
+  border-top: 0 !important;
+}
