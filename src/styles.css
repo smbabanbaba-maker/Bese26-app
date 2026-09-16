@@ -5177,3 +5177,77 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .notifications-page .notification-item small { font-size: 10px; }
   .notifications-page .notification-item em { font-size: 9px; }
 }
+
+
+/* Listing Detail continuation feed: browse many related items without leaving the detail view. */
+.listing-details-premium .listing-similar-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px !important;
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 3px 4px 4px 1px;
+  scrollbar-width: thin;
+  scrollbar-color: #b7afea transparent;
+}
+.listing-details-premium .listing-similar-grid button {
+  position: relative;
+  display: grid !important;
+  align-content: center;
+  gap: 7px;
+  min-height: 88px;
+  padding: 15px !important;
+  border: 1px solid #e3e6ed !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, #fff, #fafbff) !important;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(24,32,48,.04);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.listing-details-premium .listing-similar-grid button:hover {
+  transform: translateY(-2px);
+  border-color: #b8b0ef !important;
+  box-shadow: 0 10px 20px rgba(72,56,150,.1);
+}
+.listing-details-premium .listing-similar-grid button strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #171a21 !important;
+  font-size: 12px;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.listing-details-premium .listing-similar-grid button span {
+  color: #d9212a !important;
+  font-size: 11px;
+  font-weight: 800;
+}
+.listing-details-premium .listing-similar-grid button:nth-child(-n+3)::before {
+  content: 'Recommended first';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #5c49bd;
+  background: #f0edff;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+@media (max-width: 700px) {
+  .listing-details-premium .listing-similar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px !important;
+    max-height: 460px;
+  }
+  .listing-details-premium .listing-similar-grid button {
+    min-height: 82px;
+    padding: 12px 10px !important;
+  }
+  .listing-details-premium .listing-similar-grid button strong { font-size: 10px; }
+  .listing-details-premium .listing-similar-grid button span { font-size: 9px; }
+  .listing-details-premium .listing-similar-grid button:nth-child(-n+3)::before { top: 6px; right: 6px; font-size: 6px; }
+}

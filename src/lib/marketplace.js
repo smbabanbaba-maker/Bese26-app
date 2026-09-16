@@ -634,10 +634,20 @@ export async function fetchListingReviews(listingId) {
 
 export async function fetchSimilarListings(listing) {
   if (!supabase || !listing?.id) return [];
-  let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', listing.raw?.category_id || null).order('created_at', { ascending: false }).limit(4);
+  let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', listing.raw?.category_id || null).order('created_at', { ascending: false }).limit(50);
   const { data, error } = await query;
   if (error) return [];
-  return hydrateListingRows(data || [], { firstMediaOnly: true });
+  const listings = await hydrateListingRows(data || [], { firstMediaOnly: true });
+  try {
+    const ids = listings.map((item) => item.id).filter(Boolean);
+    if (!ids.length) return listings;
+    const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
+    if (boostError) return listings;
+    const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
+    return listings.map((item) => ({ ...item, promoted: promoted.has(item.id) })).sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
+  } catch {
+    return listings;
+  }
 }
 
 export async function updateListing(listingId, ownerId, values) {
