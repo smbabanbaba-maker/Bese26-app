@@ -705,12 +705,12 @@ export async function fetchPublicProfile(username) {
 
 export async function fetchBusinessDirectory(search = '') {
   failIfUnavailable();
-  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,verification_expires_at,is_active,public_contact').eq('is_active', true).not('business_handle', 'is', null).neq('business_handle', '').order('business_name').limit(60);
+  let query = supabase.from('business_profiles').select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,delivery_available,pickup_available,is_verified,verification_status,verified_at,verification_expires_at,is_active,public_contact').eq('is_active', true).not('business_handle', 'is', null).neq('business_handle', '').order('business_name').limit(60);
   const value = String(search || '').trim();
   if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
   const { data, error } = await query;
   if (error) throw error;
-  return (data || []).map((business) => ({ ...business, is_verified: verificationIsCurrent(business) }));
+  return (data || []).map((business) => ({ ...business, is_verified: verificationIsCurrent({ ...business, is_verified: verificationIsCurrent(business) || String(business.verification_status || '').toLowerCase() === 'verified' }) }));
 }
 
 export async function checkBusinessHandleAvailability(handle, userId = null) {
