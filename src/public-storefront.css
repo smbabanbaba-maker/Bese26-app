@@ -901,3 +901,74 @@
   .public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size: 20px !important; }
   .public-business-hero.storefront-hero-clean .public-business-identity p { font-size: 9px !important; }
 }
+
+
+/* Hero composition cleanup: touch the Bese26 bar cleanly and reserve space for every control. */
+.public-business-hero.storefront-hero-clean {
+  margin-top: 0 !important;
+  min-height: 210px !important;
+  padding: 24px 28px 22px !important;
+  grid-template-columns: 82px minmax(0, 1fr) 124px !important;
+  column-gap: 18px !important;
+  row-gap: 10px !important;
+  align-items: center !important;
+}
+.public-business-hero.storefront-hero-clean > .public-business-logo {
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  height: 82px !important;
+  min-height: 82px !important;
+  max-height: 82px !important;
+}
+.public-business-hero.storefront-hero-clean > .public-business-identity {
+  padding-right: 6px !important;
+}
+.public-business-hero.storefront-hero-clean > .public-business-trust {
+  padding-top: 38px !important;
+  align-self: center !important;
+}
+.public-hero-brand-mark { top: 14px !important; right: 20px !important; }
+.public-hero-share { top: 67px !important; right: 17px !important; }
+@media (max-width: 700px) {
+  .public-business-hero.storefront-hero-clean {
+    min-height: 225px !important;
+    padding: 17px 14px 19px !important;
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+    column-gap: 11px !important;
+    row-gap: 9px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-logo {
+    width: 54px !important;
+    min-width: 54px !important;
+    max-width: 54px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-identity {
+    padding-right: 49px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-trust {
+    padding-top: 0 !important;
+  }
+  .public-hero-brand-mark { top: 11px !important; right: 12px !important; }
+  .public-hero-share { top: 51px !important; right: 10px !important; }
+}
+@media (max-width: 390px) {
+  .public-business-hero.storefront-hero-clean {
+    min-height: 235px !important;
+    padding-inline: 10px !important;
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    column-gap: 9px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-logo {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+  }
+  .public-business-hero.storefront-hero-clean > .public-business-identity { padding-right: 45px !important; }
+}
