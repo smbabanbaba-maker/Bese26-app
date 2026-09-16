@@ -989,3 +989,61 @@
   transform: translateX(-50%) !important;
   border-top: 0 !important;
 }
+
+
+/* Hero contrast guarantee: every visible label must remain readable on the dark palette. */
+.public-business-hero.storefront-hero-clean,
+.public-business-hero.storefront-hero-clean * {
+  color: #fff !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity .eyebrow,
+.public-business-hero.storefront-hero-clean .public-business-subline,
+.public-business-hero.storefront-hero-clean .public-business-category {
+  color: #bfeeff !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity p,
+.public-business-hero.storefront-hero-clean .public-business-location,
+.public-business-hero.storefront-hero-clean .public-business-handle,
+.public-business-hero.storefront-hero-clean .public-business-trust small {
+  color: #e4e8f1 !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-location svg,
+.public-business-hero.storefront-hero-clean .public-business-trust svg {
+  color: #75d7ff !important;
+  stroke: #75d7ff !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-name,
+.public-business-hero.storefront-hero-clean .public-business-name * {
+  color: #fff !important;
+  text-shadow: 0 1px 10px rgba(0,0,0,.2);
+}
+.public-business-hero.storefront-hero-clean .public-business-category {
+  background: rgba(117,215,255,.16) !important;
+  border-color: rgba(117,215,255,.55) !important;
+  text-shadow: none !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge,
+.public-business-hero.storefront-hero-clean .public-business-trust .unverified-badge {
+  color: #fff !important;
+  background: rgba(255,255,255,.14) !important;
+  border-color: rgba(255,255,255,.42) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge small {
+  color: #dff7ff !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-stats span {
+  background: rgba(255,255,255,.14) !important;
+  border-color: rgba(255,255,255,.3) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-stats strong { color: #fff !important; }
+.public-business-hero.storefront-hero-clean .public-browse-cta {
+  color: #111a37 !important;
+  background: #fff !important;
+  border-color: #fff !important;
+  text-shadow: none !important;
+}
+.public-business-hero.storefront-hero-clean .public-hero-share {
+  color: #fff !important;
+  background: rgba(255,255,255,.16) !important;
+  border-color: rgba(255,255,255,.62) !important;
+}
