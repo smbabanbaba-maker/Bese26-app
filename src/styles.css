@@ -4250,3 +4250,68 @@ button:disabled { color:#8a929b !important; opacity:.72; }
     height: auto;
   }
 }
+
+/* Dashboard hero final standard: 1600×500 footprint with animated mark on every viewport. */
+.dashboard-welcome-card {
+  aspect-ratio: 1600 / 500 !important;
+  min-height: 0 !important;
+  overflow: hidden;
+}
+.dashboard-orbit-art {
+  display: grid !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  animation: dashboardArtFloat 5s ease-in-out infinite !important;
+}
+.dashboard-orbit-art img {
+  animation: dashboardLogoPulse 3s ease-in-out infinite !important;
+}
+.dashboard-orbit {
+  animation: dashboardOrbitSpin 9s linear infinite !important;
+}
+.dashboard-orbit-two {
+  animation-duration: 13s !important;
+  animation-direction: reverse !important;
+}
+@media (max-width: 700px) {
+  .dashboard-welcome-card {
+    aspect-ratio: 1600 / 500 !important;
+    min-height: 170px !important;
+    padding: 16px 14px 18px !important;
+  }
+  .dashboard-welcome-copy {
+    max-width: calc(100% - 76px) !important;
+  }
+  .dashboard-welcome-copy h1 {
+    font-size: clamp(18px, 6vw, 24px) !important;
+  }
+  .dashboard-welcome-copy p {
+    font-size: 9px !important;
+    max-width: 225px;
+  }
+  .dashboard-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .dashboard-primary-action,
+  .dashboard-secondary-action {
+    min-height: 32px !important;
+    padding: 7px 9px !important;
+    font-size: 9px !important;
+  }
+  .dashboard-orbit-art {
+    display: grid !important;
+    right: -24px !important;
+    top: 18px !important;
+    width: 92px !important;
+    height: 92px !important;
+    opacity: 1 !important;
+  }
+  .dashboard-orbit-art img {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 14px !important;
+  }
+}
