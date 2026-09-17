@@ -5628,9 +5628,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   direction: ltr !important;
 }
 .business-directory-page .business-directory-card-head h2 .business-verified-mark {
-  order: 0 !important;
+  order: 1 !important;
 }
 .business-directory-page .business-directory-card-head h2 .business-directory-name {
-  order: 1 !important;
+  order: 0 !important;
   display: inline-block !important;
 }
