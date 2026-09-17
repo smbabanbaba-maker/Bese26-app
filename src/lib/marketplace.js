@@ -707,7 +707,19 @@ export async function fetchBusinessDirectory(search = '') {
   if (value) query = query.or(`business_name.ilike.%${value}%,business_handle.ilike.%${value}%,category.ilike.%${value}%,city.ilike.%${value}%`);
   const { data, error } = await query;
   if (error) throw error;
-  return (data || []).map((business) => ({ ...business, is_verified: verificationIsCurrent({ ...business, is_verified: verificationIsCurrent(business) || String(business.verification_status || '').toLowerCase() === 'verified' }) }));
+  const businesses = data || [];
+  const profileIds = businesses.map((business) => business.profile_id).filter(Boolean);
+  let verifiedProfiles = new Set();
+  if (profileIds.length) {
+    const { data: profiles } = await supabase.from('profiles').select('id,is_verified,verification_expires_at').in('id', profileIds);
+    verifiedProfiles = new Set((profiles || []).filter((profile) => verificationIsCurrent(profile)).map((profile) => profile.id));
+  }
+  return businesses.map((business) => ({
+    ...business,
+    is_verified: verificationIsCurrent(business)
+      || String(business.verification_status || '').toLowerCase() === 'verified'
+      || verifiedProfiles.has(business.profile_id),
+  }));
 }
 
 export async function checkBusinessHandleAvailability(handle, userId = null) {
