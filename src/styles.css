@@ -6043,3 +6043,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .listing-details-premium .listing-detail-body > .listing-primary-actions { position: static !important; margin-top: 12px !important; }
   .listing-details-premium .listing-detail-body > .listing-primary-actions button { min-height: 46px !important; }
 }
+
+
+/* Official Bese26 palette: keep the Farmx layout, use Bese26 red branding everywhere. */
+.listing-details-premium .listing-detail-price,
+.listing-details-premium .listing-mobile-price strong { color: #ff2c2c !important; }
+.listing-details-premium .listing-primary-actions .primary-contact-button,
+.listing-details-premium .listing-primary-actions .listing-start-chat,
+.listing-details-premium .listing-mobile-chat { background: linear-gradient(105deg,#ef4c56,#ff795d) !important; border-color: transparent !important; color: #fff !important; }
+.listing-details-premium .listing-primary-actions .secondary-contact-button,
+.listing-details-premium .listing-mobile-call,
+.listing-details-premium .listing-mobile-whatsapp { border-color: #ff2c2c !important; color: #ff2c2c !important; background: #fff !important; }
+.listing-details-premium .listing-mobile-save { color: #ff2c2c !important; }
+.listing-details-premium .modal-gallery-thumbs button.active { border-color: #ff2c2c !important; box-shadow: 0 0 0 2px rgba(255,44,44,.12) !important; }
+.listing-details-premium .listing-detail-body > .listing-location-line svg,
+.listing-details-premium .listing-pricing-type { color: #ff2c2c !important; }
