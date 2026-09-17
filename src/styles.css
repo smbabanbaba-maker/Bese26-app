@@ -6018,3 +6018,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .listing-details-premium .listing-mobile-chat { padding:0 10px !important; }
   .listing-details-premium .listing-mobile-sticky-actions { gap:4px !important; padding-left:7px !important; padding-right:7px !important; }
 }
+
+
+/* Keep price and contact actions attached to the listing flow, not floating over unrelated content. */
+@media (max-width:700px) {
+  .listing-details-premium .listing-mobile-sticky-actions { display:none !important; }
+  .listing-details-premium .listing-detail-body { padding-bottom: 28px !important; }
+  .listing-details-premium .listing-location-line { margin-top: 0 !important; padding-top: 17px !important; }
+  .listing-details-premium .listing-price-row { margin-top: 10px !important; padding: 0 !important; }
+  .listing-details-premium .listing-primary-actions { position: static !important; margin-top: 14px !important; }
+}
