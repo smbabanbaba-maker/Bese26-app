@@ -77,6 +77,7 @@ const AdminView = lazyWithRetry(() => import('./components/AdminView'), 'admin')
 const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import InstallPrompt from './components/InstallPrompt';
+import { City, Country, State } from 'country-state-city';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, blockUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
@@ -308,6 +309,14 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
 }
 
 function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+  const countries = useMemo(() => Country.getAllCountries().filter((country) => ['NG', 'GH', 'KE', 'ZA', 'GB', 'US'].includes(country.isoCode)), []);
+  const [selectedCountry, setSelectedCountry] = useState('NG');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedLga, setSelectedLga] = useState('');
+  const selectedCountryData = countries.find((country) => country.isoCode === selectedCountry);
+  const states = useMemo(() => State.getStatesOfCountry(selectedCountry) || [], [selectedCountry]);
+  const localGovernments = useMemo(() => selectedState ? (City.getCitiesOfState(selectedCountry, selectedState) || []) : [], [selectedCountry, selectedState]);
+  const findByLocation = () => onSearch([selectedLga, states.find((state) => state.isoCode === selectedState)?.name, selectedCountryData?.name].filter(Boolean).join(' '));
   const advertisingSlides = adCampaigns.filter((campaign) => campaign.placement === 'home_banner').map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
@@ -328,6 +337,12 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
           <Search size={18} />
           <input aria-label="Search listings" value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(homeSearch)} />
           <button className="search-submit" aria-label="Search" onClick={() => onSearch(homeSearch)}><Search size={20} /></button>
+        </div>
+        <div className="home-location-picker" aria-label="Choose listing location">
+          <label><span>Country</span><select value={selectedCountry} onChange={(event) => { setSelectedCountry(event.target.value); setSelectedState(''); setSelectedLga(''); }}><option value="">Select country</option>{countries.map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}</select></label>
+          <label><span>State</span><select value={selectedState} onChange={(event) => { setSelectedState(event.target.value); setSelectedLga(''); }} disabled={!selectedCountry}><option value="">Select state</option>{states.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}</select></label>
+          <label><span>Local government</span><select value={selectedLga} onChange={(event) => setSelectedLga(event.target.value)} disabled={!selectedState}><option value="">Select local government</option>{localGovernments.map((lga) => <option key={`${lga.name}-${lga.stateCode}`} value={lga.name}>{lga.name}</option>)}</select></label>
+          <button type="button" className="home-location-search" onClick={findByLocation} disabled={!selectedCountry || !selectedState || !selectedLga}><Search size={16} /> Find listings</button>
         </div>
         <div className="location-row home-location-row"><MapPin size={14} /><span>Browse listings</span><strong>{userPlace ? `near ${userPlace}` : 'Choose what you are looking for'}</strong><button type="button" className="location-detect-button" onClick={onUseLocation} disabled={locationBusy}>{locationBusy ? 'Locating…' : userPlace ? 'Update location' : 'Use my location'}</button></div>
       </section>
