@@ -257,7 +257,7 @@ export async function fetchVerificationQueue() {
 }
 export async function fetchIdentityVerificationQueue() {
   failIfUnavailable();
-  const { data, error } = await supabase.from('verification_applications').select(`${identityVerificationFields},profile:profiles!verification_applications_user_id_fkey(display_name,username)`).eq('verification_type', 'identity').in('status', ['pending_review', 'under_review', 'requires_more_information', 'rejected', 'verified']).order('created_at', { ascending: true });
+  const { data, error } = await supabase.from('verification_applications').select(`${identityVerificationFields},profile:profiles!verification_applications_user_id_fkey(display_name,username)`).eq('verification_type', 'identity').in('status', ['pending_review', 'under_review', 'requires_more_information']).order('created_at', { ascending: true });
   if (error) throw error;
   return data || [];
 }
@@ -305,6 +305,14 @@ export async function uploadVerificationDocument({ userId, file }) {
   const { error } = await supabase.storage.from('verification-documents').upload(path, file, { upsert: false, contentType: file.type });
   if (error) throw error;
   return path;
+}
+
+export async function getVerificationDocumentUrl(path, expiresIn = 300) {
+  failIfUnavailable();
+  if (!path) return null;
+  const { data, error } = await supabase.storage.from('verification-documents').createSignedUrl(path, expiresIn);
+  if (error) throw error;
+  return data?.signedUrl || null;
 }
 
 export async function getProfile(userId) {
