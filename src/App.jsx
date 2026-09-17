@@ -567,6 +567,7 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
 
 function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAction, onAuthRequired, onStartChat, onEditListing, onOpenListing }) {
   const [activeImage, setActiveImage] = useState(0);
+  const [failedImages, setFailedImages] = useState(() => new Set());
   const [zoomed, setZoomed] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [similar, setSimilar] = useState([]);
@@ -583,7 +584,25 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const [followingSeller, setFollowingSeller] = useState(false);
   const [similarVisibleCount, setSimilarVisibleCount] = useState(12);
   const similarSentinelRef = useRef(null);
-  const gallery = [...new Set((Array.isArray(listing?.gallery) ? listing.gallery : [listing?.image]).filter((value) => typeof value === 'string' && /^https?:\/\//i.test(value) && !/placeholder|no[-_ ]?image|localhost/i.test(value.trim())).map((value) => value.trim()).filter(Boolean))];
+  const validImages = useMemo(() => {
+    const candidates = Array.isArray(listing?.gallery) ? listing.gallery : [listing?.image];
+    const seen = new Set();
+    return candidates.filter((value) => {
+      if (typeof value !== 'string') return false;
+      const url = value.trim();
+      if (!url || failedImages.has(url) || /placeholder|no[-_ ]?image|no listing photo|no photos available|photo unavailable|localhost/i.test(url)) return false;
+      try {
+        const parsed = new URL(url, window.location.origin);
+        if (!['http:', 'https:', 'blob:', 'data:'].includes(parsed.protocol)) return false;
+      } catch {
+        return false;
+      }
+      if (seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    });
+  }, [listing?.gallery, listing?.image, failedImages]);
+  const gallery = validImages;
   const owner = Boolean(user?.id && listing?.sellerId === user.id);
   const raw = listing?.raw || {};
   const description = listing?.description || '';
@@ -592,7 +611,8 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const priceType = raw.pricing_type === 'negotiable' ? 'Negotiable' : raw.pricing_type === 'contact' || raw.price == null ? 'Contact for price' : raw.pricing_type === 'on_request' ? 'Price on request' : 'Fixed price';
   const specs = Object.entries(listing?.attributes || {}).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '').map(([key, value]) => ({ key: key.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), value: Array.isArray(value) ? value.join(', ') : value }));
   const delivery = Array.isArray(listing?.deliveryOptions) ? listing.deliveryOptions.filter(Boolean) : [];
-  useEffect(() => { if (!listing) return undefined; setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setContact({ phone: '', whatsapp: '' }); setContactLoading(true); setLoadingDetails(true); setFollowingSeller(false); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing), fetchListingContact(listing.id), user?.id && listing.sellerId ? getFollowState(user.id, listing.sellerId) : Promise.resolve({ following: false })]).then(([reviewResult, similarResult, contactResult, followResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); if (contactResult.status === 'fulfilled') setContact(contactResult.value || { phone: '', whatsapp: '' }); if (followResult.status === 'fulfilled') setFollowingSeller(Boolean(followResult.value?.following)); }).finally(() => { setLoadingDetails(false); setContactLoading(false); }); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id, user?.id]);
+  useEffect(() => { if (!listing) return undefined; setFailedImages(new Set()); setActiveImage(0); setZoomed(false); setExpandedDescription(false); setReportOpen(false); setContact({ phone: '', whatsapp: '' }); setContactLoading(true); setLoadingDetails(true); setFollowingSeller(false); Promise.allSettled([fetchListingReviews(listing.id), fetchSimilarListings(listing), fetchListingContact(listing.id), user?.id && listing.sellerId ? getFollowState(user.id, listing.sellerId) : Promise.resolve({ following: false })]).then(([reviewResult, similarResult, contactResult, followResult]) => { if (reviewResult.status === 'fulfilled') setReviews(reviewResult.value || []); if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []); if (contactResult.status === 'fulfilled') setContact(contactResult.value || { phone: '', whatsapp: '' }); if (followResult.status === 'fulfilled') setFollowingSeller(Boolean(followResult.value?.following)); }).finally(() => { setLoadingDetails(false); setContactLoading(false); }); recordListingView(listing.id).catch(() => {}); return undefined; }, [listing?.id, user?.id]);
+  useEffect(() => { setActiveImage((current) => Math.min(current, Math.max(validImages.length - 1, 0))); }, [validImages.length]);
   useEffect(() => { setSimilarVisibleCount(12); }, [listing?.id]);
   useEffect(() => { if (!similarSentinelRef.current || similarVisibleCount >= similar.length) return undefined; const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) setSimilarVisibleCount((count) => Math.min(count + 12, similar.length)); }, { rootMargin: '320px' }); observer.observe(similarSentinelRef.current); return () => observer.disconnect(); }, [similar.length, similarVisibleCount]);
   useEffect(() => { if (!zoomed) return undefined; const onKey = (event) => event.key === 'Escape' && setZoomed(false); document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey); }, [zoomed]);
@@ -613,7 +633,7 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const trustLabel = listing.verified ? 'Verified seller' : 'Seller profile available';
   const trustNote = listing.verified ? 'Identity or business status has been reviewed by Bese26.' : 'Review the seller profile and keep the conversation inside Bese26.';
   const buyerQuestions = ['Is this still available?', 'What is your final price?', 'Can I pick it up today?', 'Do you offer delivery?'];
-  const safeImage = gallery[activeImage] || listing.image || '';
+  const safeImage = gallery[activeImage] || '';
   const sellerName = listing.sellerDisplayName || listing.seller || 'Bese26 seller';
   const sellerInitial = listing.sellerInitials || sellerName.slice(0, 1).toUpperCase();
   const detailSpecs = [["Category", listing.category], ["Condition", listing.condition], ["Location", listing.location], ["Type", raw.listing_type || raw.type || listing.subcategory]].filter(([, value]) => value);
@@ -626,7 +646,7 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
       <header className="listing-details-topbar"><button type="button" className="icon-button" onClick={onClose} aria-label="Back to marketplace"><ArrowLeft size={19} /></button><span>Listing details</span><div className="listing-details-top-actions"><button type="button" className={`icon-button ${isSaved ? 'saved' : ''}`} onClick={() => onToggleSave?.(listing.id)} aria-label={isSaved ? 'Remove from saved' : 'Save listing'}><Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} /></button><button type="button" className="icon-button" onClick={share} aria-label="Share listing"><Share2 size={18} /></button></div></header>
       <main className="listing-details-scroll">
         <section className="listing-detail-gallery" onTouchStart={(event) => setTouchStart(event.touches[0].clientX)} onTouchEnd={(event) => { if (touchStart === null || gallery.length < 2) return; const delta = event.changedTouches[0].clientX - touchStart; if (Math.abs(delta) > 42) delta < 0 ? nextImage() : previousImage(); setTouchStart(null); }}>
-          {safeImage ? <img src={safeImage} alt={listing.title} onClick={() => setZoomed(true)} onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /> : null}<div className="listing-detail-image-fallback" hidden={Boolean(safeImage)}><ImageIcon size={42} /><span>No listing photo</span></div>{gallery.length > 1 && <><button type="button" className="listing-gallery-arrow listing-gallery-prev" onClick={previousImage} aria-label="Previous photo"><ArrowLeft size={17} /></button><button type="button" className="listing-gallery-arrow listing-gallery-next" onClick={nextImage} aria-label="Next photo"><ArrowRight size={17} /></button></>}<span className="listing-gallery-counter">{gallery.length ? activeImage + 1 : 0} / {gallery.length || 0}</span></section>
+          {gallery.length > 0 ? <img src={safeImage} alt={listing.title} onClick={() => setZoomed(true)} onError={() => setFailedImages((current) => new Set([...current, safeImage]))} /> : <div className="listing-detail-image-fallback"><ImageIcon size={42} /><span>No listing photo</span></div>}{gallery.length > 1 && <><button type="button" className="listing-gallery-arrow listing-gallery-prev" onClick={previousImage} aria-label="Previous photo"><ArrowLeft size={17} /></button><button type="button" className="listing-gallery-arrow listing-gallery-next" onClick={nextImage} aria-label="Next photo"><ArrowRight size={17} /></button></>}<span className="listing-gallery-counter">{gallery.length ? `${activeImage + 1} / ${gallery.length}` : '0 / 0'}</span></section>
         <section className="listing-main-info-card"><div className="listing-detail-location"><MapPin size={14} /> <span>{listing.location || 'Nigeria'}</span><span>·</span><span>{listing.posted || 'Recently posted'}</span></div><h1>{listing.title}</h1><div className="listing-detail-price-row"><strong>{listing.price}</strong>{listing.condition && <span>{listing.condition}</span>}</div><div className="listing-primary-actions"><button type="button" className="primary-button" onClick={() => onStartChat?.(listing, 'message')}><MessageCircle size={16} /> Message seller</button>{sellerPhone ? <button type="button" className="secondary-button" onClick={callSeller}><Phone size={16} /> Call</button> : whatsapp ? <button type="button" className="secondary-button" onClick={openWhatsApp}><MessageCircle size={16} /> WhatsApp</button> : <button type="button" className="secondary-button" onClick={requestCallback} disabled={actionBusy}><Phone size={16} /> Request call</button>}</div></section>
         <section className="listing-detail-card listing-chat-card"><div className="listing-card-heading"><div><div className="eyebrow">CONTACT</div><h2>Chat with the seller</h2></div><MessageCircle size={19} /></div><div className="listing-quick-chips">{['Make an offer', 'Is this available?', 'Last price'].map((message) => <button type="button" key={message} onClick={() => setQuickMessage(message)}>{message}</button>)}</div><textarea value={quickMessage} onChange={(event) => setQuickMessage(event.target.value)} placeholder="Write your message here…" aria-label="Message seller" maxLength={1000} /><button type="button" className="primary-button listing-start-chat" disabled={!quickMessage.trim()} onClick={() => onStartChat?.(listing, 'message', quickMessage.trim())}><Send size={15} /> Start chat</button></section>
         {detailSpecs.length > 0 && <section className="listing-detail-card"><div className="listing-card-heading"><div><div className="eyebrow">AT A GLANCE</div><h2>Product details</h2></div><Tag size={18} /></div><div className="listing-spec-grid listing-spec-grid-clean">{detailSpecs.map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div></section>}
