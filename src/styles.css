@@ -5634,3 +5634,31 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   order: 0 !important;
   display: inline-block !important;
 }
+
+
+/* Shared app verification icon: same BadgeCheck treatment in Directory and Listing Detail. */
+.business-directory-page .business-directory-card .business-verified-mark {
+  display: inline-block !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  margin: 0 0 0 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #128cff !important;
+  fill: #128cff !important;
+  stroke: #062c5c !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 2px 4px rgba(18,140,255,.34)) !important;
+  font-size: initial !important;
+  line-height: initial !important;
+  text-shadow: none !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-card .business-verified-mark {
+    width: 17px !important;
+    height: 17px !important;
+    flex-basis: 17px !important;
+  }
+}
