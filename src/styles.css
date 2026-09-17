@@ -5713,3 +5713,68 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .business-directory-page .business-directory-card > p.business-directory-location { font-size: 9px !important; }
   .business-directory-page .business-directory-hero p { font-size: 11px !important; }
 }
+
+
+/* Final company visibility pass: make every directory business unmistakable at a glance. */
+.business-directory-page .business-directory-card {
+  min-height: 96px !important;
+  padding: 14px 18px !important;
+  border-radius: 14px !important;
+}
+.business-directory-page .business-directory-card-head {
+  min-height: 64px !important;
+  gap: 14px !important;
+}
+.business-directory-page .business-directory-card-head > img,
+.business-directory-page .business-directory-card-logo {
+  width: 64px !important;
+  height: 64px !important;
+  flex: 0 0 64px !important;
+  border-radius: 14px !important;
+}
+.business-directory-page .business-directory-card-head h2 {
+  font-size: clamp(20px, 2.2vw, 26px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -.025em !important;
+  line-height: 1.12 !important;
+  min-height: 29px !important;
+}
+.business-directory-page .business-directory-card-head .business-directory-name {
+  color: #111315 !important;
+  font-weight: 900 !important;
+}
+.business-directory-page .business-directory-card > p.business-directory-location {
+  margin: 5px 0 0 78px !important;
+  color: #697386 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+.business-directory-page .business-directory-card-head .business-directory-handle {
+  margin-top: 3px !important;
+  font-size: 11px !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-card {
+    min-height: 86px !important;
+    padding: 11px 12px !important;
+  }
+  .business-directory-page .business-directory-card-head {
+    min-height: 56px !important;
+    gap: 11px !important;
+  }
+  .business-directory-page .business-directory-card-head > img,
+  .business-directory-page .business-directory-card-logo {
+    width: 56px !important;
+    height: 56px !important;
+    flex-basis: 56px !important;
+    border-radius: 12px !important;
+  }
+  .business-directory-page .business-directory-card-head h2 {
+    font-size: 18px !important;
+    min-height: 22px !important;
+  }
+  .business-directory-page .business-directory-card > p.business-directory-location {
+    margin-left: 67px !important;
+    font-size: 10px !important;
+  }
+}
