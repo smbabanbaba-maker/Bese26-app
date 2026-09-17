@@ -6142,3 +6142,30 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .listing-mobile-sticky-actions { display: none; }
 @media (min-width: 760px) { .listing-details-backdrop { padding: 20px; align-items: center; } .listing-details-page { height: min(94vh, 960px); border-radius: 18px; } .listing-details-scroll { padding: 0 18px 42px; } .listing-main-info-card, .listing-detail-card, .listing-owner-controls { margin-left: 0; margin-right: 0; } .listing-detail-gallery { border-radius: 0 0 14px 14px; } }
 @media (max-width: 560px) { .listing-detail-gallery { min-height: 66vw; } .listing-detail-gallery > img { min-height: 66vw; } .listing-main-info-card, .listing-detail-card, .listing-owner-controls { margin-left: 10px; margin-right: 10px; padding: 14px; } .listing-safety-card { align-items: flex-start; flex-direction: column; } .listing-report-button { width: 100%; justify-content: center; } .listing-similar-grid-clean { grid-template-columns: repeat(2, minmax(0,1fr)); } .listing-mobile-sticky-actions { position: sticky; bottom: 0; z-index: 7; display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-top: 1px solid #e4e7ec; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); } .listing-mobile-sticky-actions > strong { margin-right: auto; color: #101828; font-size: 14px; } .listing-mobile-chat { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 8px 12px; border: 0; border-radius: 8px; background: #e43b45; color: #fff; font-size: 11px; font-weight: 800; } }
+
+/* Final Listing Details correction pass. */
+.listing-detail-gallery { margin-bottom: 0 !important; }
+.listing-main-info-card { margin-top: 0 !important; border-top: 0; border-radius: 0 0 14px 14px; }
+.listing-primary-actions button { border-radius: 9px !important; padding: 8px 11px !important; }
+.listing-verification-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.listing-verification-badges span { display: inline-flex; align-items: center; gap: 4px; padding: 5px 7px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+.verification-id-badge { color: #175cd3; background: #eff8ff; border: 1px solid #b2ddff; }
+.verification-cac-badge { color: #087443; background: #ecfdf3; border: 1px solid #abefc6; }
+.verification-basic-badge { color: #087443; background: #ecfdf3; border: 1px solid #abefc6; }
+.listing-empty-feedback-compact { min-height: 100px; padding: 10px 12px; border-radius: 8px; background: #f5f8fb; }
+.listing-empty-feedback-compact svg { color: #98a2b3; }
+.listing-similar-feed { margin: 18px 14px 0; }
+.listing-similar-feed > .listing-card-heading { margin-bottom: 10px; }
+.listing-similar-feed > .listing-card-heading h2 { font-size: 18px; }
+.listing-feed-note { display: block; margin-top: 4px; color: #667085; font-size: 11px; }
+.listing-similar-products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.listing-similar-products .product-card { min-width: 0; border: 1px solid #e4e7ec; border-radius: 10px; background: #fff; box-shadow: 0 4px 14px rgba(16,24,40,.04); }
+.listing-similar-products .product-image-wrap { aspect-ratio: 1 / 1; }
+.listing-similar-products .product-info { padding: 10px; }
+.listing-similar-products .product-price { font-size: 13px; }
+.listing-similar-products .product-info h3 { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.listing-similar-products .product-meta, .listing-similar-products .listing-seller-line, .listing-similar-products .product-foot, .listing-similar-products .verified-badge { font-size: 9px; }
+.listing-similar-sentinel { height: 2px; }
+.listing-feed-loading { padding: 15px; color: #667085; text-align: center; font-size: 11px; }
+@media (min-width: 760px) { .listing-similar-feed { margin-left: 0; margin-right: 0; } }
+@media (max-width: 600px) { .listing-similar-products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .listing-similar-products .product-info { padding: 8px; } .listing-similar-products .product-foot { display: none; } }
