@@ -108,7 +108,7 @@ function Avatar({ name, path, size = 'md', tone = 'navy' }) {
 }
 
 function VerifiedBadge({ verified }) {
-  return verified ? <span className="verified-badge"><BadgeCheck size={13} strokeWidth={2.6} /> Verified</span> : <span className="profile-unverified"><Info size={13} /> Not verified</span>;
+  return verified ? <span className="verification-id-badge" title="Identity Verified — Bese26 has verified this seller's identity."><BadgeCheck size={13} strokeWidth={2.6} /> ID Verified</span> : null;
 }
 
 function SubpageHeader({ title, eyebrow, onBack }) {

@@ -35,7 +35,7 @@ function initials(value = 'bese26 user') {
 
 function verificationIsCurrent(record = {}) {
   const verified = record.is_verified === true || record.is_verified === 'true' || record.is_verified === 1 || record.is_verified === '1';
-  return verified;
+  return verified || String(record.verification_status || '').toLowerCase() === 'verified';
 }
 
 export function mapListing(row) {
@@ -68,6 +68,8 @@ export function mapListing(row) {
     sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
     sellerInitials: initials(business.business_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
+    idVerified: verificationIsCurrent(seller),
+    cacVerified: verificationIsCurrent(business) && String(business.verification_status || 'verified').toLowerCase() === 'verified',
     verified: verificationIsCurrent(seller) || verificationIsCurrent(business),
     promoted: false,
     description: row.description || '',
@@ -583,7 +585,7 @@ const listingSelectWithOwnership = `${listingSelect},business_profile_id,publish
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
   const { data: businessProfiles, error: businessError } = businessIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
+    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
     : { data: [], error: null };
   if (businessError) throw businessError;
   const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
@@ -672,7 +674,7 @@ export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,verification_expires_at,is_active,created_at';
+  const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,verification_status,verification_expires_at,is_active,created_at';
   const legacyBusinessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
   let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle();
   if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle());

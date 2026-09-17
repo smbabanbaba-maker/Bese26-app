@@ -6152,6 +6152,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .verification-id-badge { color: #175cd3; background: #eff8ff; border: 1px solid #b2ddff; }
 .verification-cac-badge { color: #087443; background: #ecfdf3; border: 1px solid #abefc6; }
 .verification-basic-badge { color: #087443; background: #ecfdf3; border: 1px solid #abefc6; }
+.verification-badge-group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.verification-badge-group > span { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border-radius: 999px; font-size: 10px; line-height: 1; font-weight: 800; white-space: nowrap; }
+.verification-badge-group-compact { margin-top: 0; gap: 4px; }
+.verification-badge-group-compact > span { padding: 4px 6px; font-size: 9px; }
+.profile-name-row .verification-badge-group { margin-top: 0; margin-left: 6px; }
+.public-business-identity > .verification-badge-group { margin-top: 8px; }
 .listing-empty-feedback-compact { min-height: 100px; padding: 10px 12px; border-radius: 8px; background: #f5f8fb; }
 .listing-empty-feedback-compact svg { color: #98a2b3; }
 .listing-similar-feed { margin: 18px 14px 0; }
