@@ -5617,3 +5617,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (max-width: 700px) {
   .business-directory-page .business-directory-card .business-verified-mark { font-size: 15px !important; }
 }
+
+
+/* DOM and visual order lock: verification tick first, business name second. */
+.business-directory-page .business-directory-card-head h2 {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  direction: ltr !important;
+}
+.business-directory-page .business-directory-card-head h2 .business-verified-mark {
+  order: 0 !important;
+}
+.business-directory-page .business-directory-card-head h2 .business-directory-name {
+  order: 1 !important;
+  display: inline-block !important;
+}
