@@ -640,7 +640,7 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
   const submitSearch = (event) => { event.preventDefault(); loadBusinesses(query); };
   return <div className="page-stack business-directory-page">
     <div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div>
-    <section className="business-directory-hero"><div><div className="eyebrow light">BESE26 MINIWEBS</div><h1>Find a business</h1><p>Browse public miniwebs created by Bese26 sellers and open the store you need.</p></div><Store size={28} /></section>
+    <section className="business-directory-hero"><div><div className="eyebrow light">BESE26 MINIWEBS</div><h1>Business directory</h1><p>Find the company or store you need.</p></div><Store size={28} /></section>
     <SponsoredBanner campaigns={adCampaigns} placement="business_directory" className="business-sponsored-slot" />
     <form className="business-directory-search" onSubmit={submitSearch}><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search business, category or city" aria-label="Search businesses" /><button className="search-submit" type="submit" aria-label="Search businesses"><Search size={17} /></button></form>
     {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}

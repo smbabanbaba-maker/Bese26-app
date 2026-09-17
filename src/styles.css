@@ -5674,3 +5674,42 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (max-width: 700px) {
   .search-page > .page-title-row > div:first-child > p { font-size: 10px; }
 }
+
+
+/* Company-first directory typography: names are the primary scanning target. */
+.business-directory-page .business-directory-card {
+  min-height: 78px !important;
+  padding: 10px 14px !important;
+}
+.business-directory-page .business-directory-card-head > img,
+.business-directory-page .business-directory-card-logo {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 12px !important;
+}
+.business-directory-page .business-directory-card-head h2 {
+  font-size: 17px !important;
+  font-weight: 850 !important;
+  letter-spacing: -.02em;
+  line-height: 1.15 !important;
+}
+.business-directory-page .business-directory-card > p.business-directory-location {
+  margin-top: 2px !important;
+  font-size: 10px !important;
+}
+.business-directory-page .business-directory-hero h1 {
+  font-size: clamp(28px, 5vw, 42px) !important;
+  letter-spacing: -.035em;
+}
+.business-directory-page .business-directory-hero p {
+  max-width: 420px;
+  font-size: 13px !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-card { min-height: 70px !important; padding: 8px 10px !important; }
+  .business-directory-page .business-directory-card-head > img,
+  .business-directory-page .business-directory-card-logo { width: 48px !important; height: 48px !important; }
+  .business-directory-page .business-directory-card-head h2 { font-size: 15px !important; }
+  .business-directory-page .business-directory-card > p.business-directory-location { font-size: 9px !important; }
+  .business-directory-page .business-directory-hero p { font-size: 11px !important; }
+}
