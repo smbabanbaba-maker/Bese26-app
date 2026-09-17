@@ -5515,3 +5515,65 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     line-height: 14px !important;
   }
 }
+
+
+/* Professional directory finish: full-width left-aligned rows and a clear blue verification badge. */
+.business-directory-page .business-directory-grid {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+  gap: 7px !important;
+}
+.business-directory-page .business-directory-card {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  justify-self: stretch !important;
+  transform: none !important;
+  min-height: 66px !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+}
+.business-directory-page .business-directory-card:hover,
+.business-directory-page .business-directory-card:focus-visible {
+  transform: translateX(2px) !important;
+}
+.business-directory-page .business-directory-card-head h2 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  overflow: visible !important;
+  text-align: left !important;
+}
+.business-directory-page .business-directory-card .business-verified-mark {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 19px !important;
+  height: 19px !important;
+  flex: 0 0 19px !important;
+  margin: 0 !important;
+  border: 2px solid #0b83ff !important;
+  border-radius: 50% !important;
+  color: #fff !important;
+  background: #1593ff !important;
+  box-shadow: 0 2px 7px rgba(21,147,255,.35) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 15px !important;
+}
+.business-directory-page .business-directory-card > p.business-directory-location {
+  text-align: left !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-card { min-height: 60px !important; padding: 7px 9px !important; }
+  .business-directory-page .business-directory-card .business-verified-mark {
+    width: 17px !important;
+    height: 17px !important;
+    flex-basis: 17px !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+    line-height: 13px !important;
+  }
+}
