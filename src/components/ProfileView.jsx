@@ -515,9 +515,11 @@ function VerificationPage({ user, profile, onBack, onNotice, onOpenSubscription 
   const [form, setForm] = useState({ business_name: '', business_address: '', registration_number: '', business_registration_type: 'registered', phone: '', notes: '' });
   useEffect(() => { let mounted = true; fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)); return () => { mounted = false; }; }, [user.id]);
   useEffect(() => { let mounted = true; Promise.allSettled([fetchVerificationApplications(user.id), getBusinessProfile(user.id)]).then(([applicationsResult, businessResult]) => { if (!mounted) return; if (applicationsResult.status === 'fulfilled') setItems(applicationsResult.value); if (businessResult.status === 'fulfilled') { setBusiness(businessResult.value); if (businessResult.value) setForm((current) => ({ ...current, business_name: businessResult.value.business_name || '', business_address: businessResult.value.address || '', registration_number: businessResult.value.registration_number || '', phone: businessResult.value.phone || '' })); } const failed = [applicationsResult, businessResult].find((result) => result.status === 'rejected'); if (failed && applicationsResult.status === 'rejected') setError(failed.reason?.message || 'Could not load verification status.'); }).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
-  const canVerify = entitlement?.verification_eligible === true || (['premium', 'business'].includes(entitlement?.plan_key) && entitlement?.is_paid);
-  const openIdentity = () => canVerify ? setShowIdentityForm(true) : onOpenSubscription?.();
-  const openBusiness = () => canVerify ? setShowBusinessForm(true) : onOpenSubscription?.();
+  // Identity KYC is available to every seller; it must not be paywalled.
+  // Business verification is available when the user has a business profile.
+  const canVerify = true;
+  const openIdentity = () => setShowIdentityForm(true);
+  const openBusiness = () => business ? setShowBusinessForm(true) : onNotice('Create your Business profile first, then submit it for verification.');
   const latest = (type) => items.find((item) => item.verification_type === type);
   const businessApplication = latest('business');
   const identityApplication = latest('identity');
