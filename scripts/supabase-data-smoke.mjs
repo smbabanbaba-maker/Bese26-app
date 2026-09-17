@@ -1,0 +1,11 @@
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_PUBLISHABLE_KEY, { auth: { persistSession: false } });
+const out = { checks: [] };
+const add = (name, result, expected = 'success') => out.checks.push({ name, ok: expected === 'error' ? Boolean(result.error) : !result.error, error: result.error ? { code: result.error.code, message: result.error.message } : null, rows: Array.isArray(result.data) ? result.data.length : null });
+add('public categories read', await supabase.from('categories').select('id,name').limit(3));
+add('public active listings read', await supabase.from('listings').select('id,title,status').eq('status','active').limit(3));
+add('public profiles read', await supabase.from('profiles').select('id,display_name').limit(3));
+add('anonymous protected profile_preferences read', await supabase.from('profile_preferences').select('profile_id').limit(3), 'error');
+const session = await supabase.auth.getSession();
+out.checks.push({ name: 'anonymous session empty', ok: !session.error && !session.data.session, error: session.error ? { code: session.error.code, message: session.error.message } : null });
+console.log(JSON.stringify(out, null, 2));

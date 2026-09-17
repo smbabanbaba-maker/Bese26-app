@@ -1,0 +1,26 @@
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'node:crypto';
+const url = process.env.VITE_SUPABASE_URL;
+const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+if (!url || !key) throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY');
+const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+const email = `qa+bese26-${crypto.randomUUID().slice(0, 8)}@example.com`;
+const password = `Bese26-QA-${crypto.randomBytes(12).toString('hex')}!`;
+const out = { email, steps: [] };
+const record = (name, result) => {
+  out.steps.push({ name, ok: !result?.error, error: result?.error ? { code: result.error.code, status: result.error.status, message: result.error.message } : null, hasUser: Boolean(result?.data?.user), hasSession: Boolean(result?.data?.session), userId: result?.data?.user?.id || null });
+  return result;
+};
+let result = await supabase.auth.signUp({ email, password, options: { data: { display_name: 'QA Tester', username: `qa_${crypto.randomUUID().slice(0, 8)}` } } });
+record('signUp', result);
+result = await supabase.auth.signUp({ email, password, options: { data: { display_name: 'QA Tester' } } });
+record('duplicateSignUp', result);
+result = await supabase.auth.signInWithPassword({ email, password });
+record('signInWithPassword', result);
+const session = await supabase.auth.getSession();
+out.steps.push({ name: 'getSession', ok: !session.error, error: session.error ? { code: session.error.code, status: session.error.status, message: session.error.message } : null, hasSession: Boolean(session.data?.session), userId: session.data?.session?.user?.id || null });
+const signedOut = await supabase.auth.signOut();
+out.steps.push({ name: 'signOut', ok: !signedOut.error, error: signedOut.error ? { code: signedOut.error.code, status: signedOut.error.status, message: signedOut.error.message } : null });
+const after = await supabase.auth.getSession();
+out.steps.push({ name: 'getSessionAfterSignOut', ok: !after.error && !after.data?.session, error: after.error ? { code: after.error.code, status: after.error.status, message: after.error.message } : null, hasSession: Boolean(after.data?.session) });
+console.log(JSON.stringify(out, null, 2));
