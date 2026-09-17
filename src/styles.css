@@ -5831,3 +5831,33 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .home-location-picker label:last-of-type { grid-column: 1 / -1; }
   .home-location-search { grid-column: 1 / -1; width: 100%; }
 }
+
+
+/* Compact dashboard location control: reveal selectors only after the user taps. */
+.location-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 5px 9px;
+  border: 1px solid #e3e6ed;
+  border-radius: 999px;
+  color: #4d5868;
+  background: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+}
+.location-picker-trigger .is-open { transform: rotate(180deg); }
+.location-picker-trigger span { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-location-picker {
+  padding: 10px;
+  border: 1px solid #e6e9ef;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+@media (max-width: 700px) {
+  .location-picker-trigger { margin-top: 6px; font-size: 9px; }
+  .location-picker-trigger span { max-width: 160px; }
+}

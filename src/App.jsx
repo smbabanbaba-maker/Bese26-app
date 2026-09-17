@@ -313,6 +313,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
   const [selectedCountry, setSelectedCountry] = useState('NG');
   const [selectedState, setSelectedState] = useState('');
   const [selectedLga, setSelectedLga] = useState('');
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const selectedCountryData = countries.find((country) => country.isoCode === selectedCountry);
   const states = useMemo(() => State.getStatesOfCountry(selectedCountry) || [], [selectedCountry]);
   const localGovernments = useMemo(() => selectedState ? (City.getCitiesOfState(selectedCountry, selectedState) || []) : [], [selectedCountry, selectedState]);
@@ -338,12 +339,13 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
           <input aria-label="Search listings" value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(homeSearch)} />
           <button className="search-submit" aria-label="Search" onClick={() => onSearch(homeSearch)}><Search size={20} /></button>
         </div>
-        <div className="home-location-picker" aria-label="Choose listing location">
+        <button type="button" className="location-picker-trigger" onClick={() => setLocationPickerOpen((open) => !open)} aria-expanded={locationPickerOpen} aria-controls="home-location-picker"><MapPin size={14} /><span>{selectedLga || (userPlace ? `Near ${userPlace}` : 'Choose location')}</span><ChevronDown size={14} className={locationPickerOpen ? 'is-open' : ''} /></button>
+        {locationPickerOpen && <div id="home-location-picker" className="home-location-picker" aria-label="Choose listing location">
           <label><span>Country</span><select value={selectedCountry} onChange={(event) => { setSelectedCountry(event.target.value); setSelectedState(''); setSelectedLga(''); }}><option value="">Select country</option>{countries.map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}</select></label>
           <label><span>State</span><select value={selectedState} onChange={(event) => { setSelectedState(event.target.value); setSelectedLga(''); }} disabled={!selectedCountry}><option value="">Select state</option>{states.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}</select></label>
           <label><span>Local government</span><select value={selectedLga} onChange={(event) => setSelectedLga(event.target.value)} disabled={!selectedState}><option value="">Select local government</option>{localGovernments.map((lga) => <option key={`${lga.name}-${lga.stateCode}`} value={lga.name}>{lga.name}</option>)}</select></label>
           <button type="button" className="home-location-search" onClick={findByLocation} disabled={!selectedCountry || !selectedState || !selectedLga}><Search size={16} /> Find listings</button>
-        </div>
+        </div>}
         <div className="location-row home-location-row"><MapPin size={14} /><span>Browse listings</span><strong>{userPlace ? `near ${userPlace}` : 'Choose what you are looking for'}</strong><button type="button" className="location-detect-button" onClick={onUseLocation} disabled={locationBusy}>{locationBusy ? 'Locating…' : userPlace ? 'Update location' : 'Use my location'}</button></div>
       </section>
       <section className="popular-categories"><SectionHeading eyebrow="CHOOSE A CATEGORY" title="What are you looking for?" action="View all" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>
