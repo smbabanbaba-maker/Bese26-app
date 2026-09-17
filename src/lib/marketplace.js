@@ -202,7 +202,7 @@ export async function submitBusinessVerification(values) {
   if (error) throw error;
   return data;
 }
-const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,provider,provider_reference,provider_status,rejection_reason,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
+const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,provider,provider_reference,provider_status,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
 export async function fetchIdentityVerification(userId) {
   failIfUnavailable();
   const { data, error } = await supabase.from('verification_applications').select(identityVerificationFields).eq('user_id', userId).eq('verification_type', 'identity').order('created_at', { ascending: false }).limit(1).maybeSingle();
