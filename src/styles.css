@@ -5662,3 +5662,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     flex-basis: 17px !important;
   }
 }
+
+
+/* Compact marketplace search header after removing redundant discovery copy. */
+.search-page > .page-title-row > div:first-child > p {
+  margin: 5px 0 0;
+  color: #697386;
+  font-size: 12px;
+}
+.search-page > .page-title-row h1 { margin-top: 0 !important; }
+@media (max-width: 700px) {
+  .search-page > .page-title-row > div:first-child > p { font-size: 10px; }
+}
