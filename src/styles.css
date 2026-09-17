@@ -5577,3 +5577,43 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     line-height: 13px !important;
   }
 }
+
+
+/* Match Listing Detail seller verification styling: clean blue mark, not a filled circle. */
+.business-directory-page .business-directory-card .business-verified-mark {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  margin: 0 1px 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #128cff !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-shadow: 0 2px 4px rgba(18,140,255,.34);
+}
+.business-directory-page .business-directory-card-head h2 {
+  gap: 6px !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+.business-directory-page .business-directory-grid {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  align-items: stretch !important;
+}
+.business-directory-page .business-directory-card {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+@media (max-width: 700px) {
+  .business-directory-page .business-directory-card .business-verified-mark { font-size: 15px !important; }
+}
