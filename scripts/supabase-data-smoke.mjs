@@ -5,7 +5,8 @@ const add = (name, result, expected = 'success') => out.checks.push({ name, ok: 
 add('public categories read', await supabase.from('categories').select('id,name').limit(3));
 add('public active listings read', await supabase.from('listings').select('id,title,status').eq('status','active').limit(3));
 add('public profiles read', await supabase.from('profiles').select('id,display_name').limit(3));
-add('anonymous protected profile_preferences read', await supabase.from('profile_preferences').select('profile_id').limit(3), 'error');
+const protectedRead = await supabase.from('profile_preferences').select('profile_id').limit(3);
+out.checks.push({ name: 'anonymous protected profile_preferences read', ok: !protectedRead.error && (protectedRead.data || []).length === 0, error: protectedRead.error ? { code: protectedRead.error.code, message: protectedRead.error.message } : null, rows: (protectedRead.data || []).length });
 const session = await supabase.auth.getSession();
 out.checks.push({ name: 'anonymous session empty', ok: !session.error && !session.data.session, error: session.error ? { code: session.error.code, message: session.error.message } : null });
 console.log(JSON.stringify(out, null, 2));
