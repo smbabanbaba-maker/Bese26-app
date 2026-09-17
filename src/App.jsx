@@ -224,11 +224,22 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
   );
 });
 
+const categoryImageFor = (category = {}) => {
+  const value = String(category.name || category.slug || category.icon || '').toLowerCase();
+  if (value.includes('phone') || value.includes('elect') || value.includes('tech')) return '/images/category-electronics.webp';
+  if (value.includes('car') || value.includes('vehicle') || value.includes('auto')) return '/images/category-vehicles.webp';
+  if (value.includes('property') || value.includes('real estate') || value.includes('house')) return '/images/category-property.webp';
+  if (value.includes('fashion') || value.includes('cloth') || value.includes('beaut')) return '/images/category-fashion.webp';
+  if (value.includes('agri') || value.includes('farm') || value.includes('food')) return '/images/category-agriculture.webp';
+  if (value.includes('service')) return '/images/category-services.webp';
+  return '/images/category-other.webp';
+};
 function CategoryTile({ category, onClick }) {
   const Icon = iconMap[category.icon] || Package;
+  const image = categoryImageFor(category);
   return (
     <button className={`category-tile tone-${category.tone}`} onClick={onClick}>
-      <span className="category-icon"><Icon size={20} strokeWidth={1.9} /></span>
+      <span className="category-icon category-photo-wrap"><img src={image} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /><span className="category-icon-fallback" hidden><Icon size={20} strokeWidth={1.9} /></span></span>
       <span>{category.name}</span>
       <ChevronRight size={14} className="category-chevron" />
     </button>
