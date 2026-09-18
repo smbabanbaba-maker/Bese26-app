@@ -1,36 +1,38 @@
-# bese26 Mobile Responsiveness Report
+# Bese26 Mobile Responsiveness Report
 
-## Test scope
+## Test configuration
 
-The application was tested at **390 × 844** and **360 × 800** mobile viewports across Home, Search, Wallet, Saved, Messages, AI, Sell, and Profile. The test covered the top and bottom of the long Sell and Profile pages, primary navigation, cards, forms, fixed bottom navigation, and key interaction surfaces.
+The application was tested with a local Vite preview using Chromium at a viewport of **390 × 844 pixels**, representing a common mobile-phone width. Each route was allowed to wait through application startup and Supabase loading before capture. The existing audit also covered the 360 × 800 layout rules for the primary marketplace views.
 
-## Results
+## Route results
 
-| View | 390px result | 360px result | Notes |
-|---|---:|---:|---|
-| Home | Pass | Pass | Discovery, featured listings, trust strip, recently viewed, and navigation fit without horizontal overflow. |
-| Search | Pass | Pass | Search input, category chips, one sort control, result cards, and navigation fit cleanly. |
-| Wallet | Pass | Pass | Balance card, Add money, Withdraw, Transactions, and navigation fit cleanly. |
-| Saved | Pass | Pass | Saved listings, saved search, saved sellers, and navigation fit; content continues vertically. |
-| Messages | Pass | Pass | Conversation list, message bubbles, composer, send button, and navigation fit cleanly. |
-| AI | Pass | Pass | Hero, prompt cards, composer area, and assistant content stack vertically without clipping. |
-| Sell | Pass | Pass | Mobile header, upload controls, media, dynamic form fields, delivery/contact controls, safety copy, and Publish action fit cleanly. |
-| Profile | Pass | Pass | Cover, stats, two-column menu cards, settings lists, legal content, logout, and navigation remain reachable. |
+| Area | Test route or interaction | Result | Notes |
+|---|---|---:|---|
+| Home marketplace | `/` | Pass | Search, location selector, categories, featured listings, and bottom navigation fit within the viewport. |
+| Listing Details | `/listing/3490fd83-0fd1-4749-b348-70937e9cfa60` | Pass | Header, gallery, `1/1` counter, title, price, contact actions, seller/chat flow, and safety hierarchy fit without horizontal overflow. |
+| Business directory | `/?business_dashboard=1` | Pass | Hero, business search, business cards, and bottom navigation remain usable at mobile width. |
+| Search | Home search control | Pass | The mobile shell and search entry point fit correctly. A query-string-only route is not the supported way to enter the Search view; the app uses the home search control and navigation state. |
+| Messages / unauthenticated chat | `/?chat_listing=3490fd83-0fd1-4749-b348-70937e9cfa60` | Pass | The authentication panel fits the viewport, including Google sign-in, email, password, and login controls. |
+| Public profile | `/@bese26` | Pass | Profile community and follow content fit within the mobile viewport. |
+| Privacy policy | `/#privacy` | Pass after fix | Policy hero, content cards, install prompt, and bottom navigation render correctly on an initial deep-link load. |
+| Wallet, Saved, AI, Sell, and Profile | In-app navigation and existing 360/390px audit | Pass | Long pages remain vertically scrollable; forms, cards, fixed navigation, publish controls, and logout remain reachable. |
 
-## Automated overflow measurements
+## Findings and fixes
 
-At both tested widths, every captured view reported `clientWidth` equal to `scrollWidth` and `bodyScrollWidth`, indicating no horizontal overflow. The measured values were 390/390/390 at the 390px viewport and 360/360/360 at the 360px viewport.
+The main issue found during this test was policy deep linking. The application already supported navigating to Terms, Privacy, Refunds, and Safety from the footer after a click, but an initial visit to `/#privacy` or another supported hash opened Home instead. The startup navigation effect now reads the policy hash and opens the corresponding public information page immediately. Hash changes are also handled without a full page reload.
 
-## Visual findings
+The Listing Details layout did not exhibit mobile overflow or duplicate gallery slides. The tested listing’s image URL returned a browser connection error in the local test environment, but the gallery remained in a single `1/1` state and did not append a second “No listing photo” slide. The valid-image filtering and fallback behavior remain intact.
 
-The mobile layout is single-column where the content is form-heavy, while compact marketplace cards use two columns where appropriate. The fixed bottom navigation remains visible and does not cover the Sell Publish action or the final Profile Logout action. The Sell form remains a long vertical page with no step-navigation interruption, matching the requested mobile behavior. Profile descriptions are intentionally compact and may truncate secondary helper text, while the main labels and actions remain readable.
+The Home view has a large reserved visual area above the search control on the tested mobile width. It does not cause horizontal overflow and appears to be part of the existing hero composition, but it is a candidate for a future visual-density refinement if a more compact above-the-fold layout is desired.
+
+## Existing mobile checks
+
+The broader mobile audit covered Home, Search, Wallet, Saved, Messages, AI, Sell, and Profile at 390 × 844 and 360 × 800. At both widths, the measured `clientWidth`, `scrollWidth`, and `bodyScrollWidth` were equal, indicating no horizontal overflow. The fixed bottom navigation remained visible and did not cover the Sell publish action or the final Profile logout action. Form-heavy screens stacked vertically, while compact marketplace cards used two columns where appropriate.
+
+## Validation
+
+`npm run build` completed successfully after the deep-link fix. `git diff --check` completed without whitespace errors. The fix was committed and pushed to GitHub in commit `8b6a768` (`Fix mobile policy page deep links`). The working tree is clean and `origin/main` is synchronized.
 
 ## Conclusion
 
-No responsive layout blocker was found at the tested mobile widths. No application source change was required during this audit; the existing responsive rules handled the tested screens correctly. The repository remains a static Vite frontend with local/demo data, so this responsiveness result does not imply backend, authentication, cloud upload, or live publish behavior.
-
-Author: Manus AI
-
-## References
-
-No external references were required; this report records repository and browser viewport verification results.
+No mobile responsiveness blocker was found across the tested application surfaces. One navigation defect was found and fixed: supported policy hash links now open the correct public information page on initial load. The remaining image connection error observed for the test listing is an environment/storage asset response issue, not a responsive layout failure.
