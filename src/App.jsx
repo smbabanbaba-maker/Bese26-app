@@ -577,7 +577,17 @@ function ListingModal({ listing, user, onClose, isSaved, onToggleSave, onDemoAct
   const [touchStart, setTouchStart] = useState(null);
   const [quickMessage, setQuickMessage] = useState('');
   const [followingSeller, setFollowingSeller] = useState(false);
-  const gallery = listing?.gallery?.length ? listing.gallery : listing?.image ? [listing.image] : [];
+  const gallery = [...new Set((Array.isArray(listing?.gallery) && listing.gallery.length ? listing.gallery : listing?.image ? [listing.image] : []).filter((value) => {
+    if (typeof value !== 'string') return false;
+    const candidate = value.trim();
+    if (!candidate || /no listing photo|no photos available|photo unavailable|placeholder/i.test(candidate)) return false;
+    try {
+      const protocol = new URL(candidate, 'https://bese26.shop').protocol;
+      return ['http:', 'https:', 'blob:', 'data:'].includes(protocol);
+    } catch {
+      return false;
+    }
+  }))];
   const owner = Boolean(user?.id && listing?.sellerId === user.id);
   const raw = listing?.raw || {};
   const description = listing?.description || '';
