@@ -1047,3 +1047,34 @@
   background: rgba(255,255,255,.16) !important;
   border-color: rgba(255,255,255,.62) !important;
 }
+.public-follow-showcase { display: grid; gap: 17px; margin: 18px 0 28px; padding: 24px; border: 1px solid #e5e8ee; border-radius: 22px; background: linear-gradient(135deg, #fff 0%, #fbfcff 58%, #fff3f2 100%); box-shadow: 0 14px 34px rgba(20,24,32,.07); }
+.public-follow-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.public-follow-heading h2 { margin: 3px 0 6px; color: #17191e; font-size: clamp(20px, 3vw, 28px); }
+.public-follow-heading p { max-width: 540px; color: #68717f; font-size: 11px; line-height: 1.55; }
+.public-follow-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 118px; padding: 11px 15px; border: 1px solid #111315; border-radius: 10px; color: #fff; background: #111315; font-size: 11px; font-weight: 800; transition: transform .18s ease, background .18s ease, color .18s ease; }
+.public-follow-button:hover { transform: translateY(-2px); background: #e52f35; border-color: #e52f35; }
+.public-follow-button.following { color: #111315; background: #fff; border-color: #cfd5df; }
+.public-follow-button:disabled { cursor: default; opacity: .7; }
+.public-follow-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.public-follow-stats > div { display: grid; gap: 3px; padding: 12px 14px; border: 1px solid #e8ebef; border-radius: 13px; background: rgba(255,255,255,.8); }
+.public-follow-stats strong { color: #17191e; font: 800 21px Manrope, sans-serif; }
+.public-follow-stats span, .public-follow-list-heading span { color: #707987; font-size: 10px; font-weight: 750; }
+.public-follow-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.public-follow-list { display: grid; gap: 7px; padding: 13px; border: 1px solid #e8ebef; border-radius: 15px; background: #fff; }
+.public-follow-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+.public-follow-list-heading strong { color: #282d36; font-size: 11px; }
+.public-follow-person { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 6px; border-radius: 10px; color: inherit; text-decoration: none; transition: background .16s ease, transform .16s ease; }
+.public-follow-person:hover { background: #fff4f3; transform: translateX(2px); }
+.public-follow-avatar { width: 29px; height: 29px; display: grid; place-items: center; flex: none; overflow: hidden; border-radius: 50%; color: #fff; background: #111315; font-size: 10px; font-weight: 800; }
+.public-follow-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.public-follow-person > span:nth-child(2) { display: grid; gap: 2px; min-width: 0; }
+.public-follow-person strong { overflow: hidden; color: #242932; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.public-follow-person small { color: #9097a2; font-size: 9px; }
+.public-follow-person .unified-verified-icon { margin-left: auto; flex: none; }
+.public-follow-empty { margin: 7px 0 3px; color: #8a929d; font-size: 10px; line-height: 1.45; }
+@media (max-width: 620px) {
+  .public-follow-showcase { padding: 17px 14px; border-radius: 17px; }
+  .public-follow-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .public-follow-button { width: 100%; }
+  .public-follow-columns { grid-template-columns: 1fr; }
+}

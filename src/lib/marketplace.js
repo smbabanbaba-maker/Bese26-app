@@ -295,6 +295,15 @@ export async function reviewBusinessVerification({ id, status, reviewerNote = nu
   if (error) throw error;
   return data;
 }
+export async function adminGrantVerificationByEmail({ email, note }) {
+  failIfUnavailable();
+  const normalizedEmail = email?.trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Enter the user email address.');
+  if (!note?.trim()) throw new Error('Add a reason for granting the verification tick.');
+  const { data, error } = await supabase.rpc('admin_grant_verification_by_email', { p_email: normalizedEmail, p_note: note.trim() });
+  if (error) throw error;
+  return data;
+}
 export async function uploadVerificationDocument({ userId, file }) {
   failIfUnavailable();
   if (!userId || !file) throw new Error('Choose a verification document first.');
