@@ -797,11 +797,19 @@ function AppContent() {
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
 
-  // Always start the marketplace shell on Home; only explicit deep links may open another view.
+  // Start on the requested deep link while keeping the normal marketplace shell on Home.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('business_dashboard')) setActiveNav('business');
-    else if (!params.has('chat_listing') && !params.has('reference') && !params.has('payment')) setActiveNav('home');
+    const policyPages = new Set(['terms', 'privacy', 'refund-policy', 'safety']);
+    const applyDeepLink = () => {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+      if (policyPages.has(hash)) setActiveNav(`public-${hash}`);
+      else if (params.has('business_dashboard')) setActiveNav('business');
+      else if (!params.has('chat_listing') && !params.has('reference') && !params.has('payment')) setActiveNav('home');
+    };
+    applyDeepLink();
+    window.addEventListener('hashchange', applyDeepLink);
+    return () => window.removeEventListener('hashchange', applyDeepLink);
   }, []);
   useEffect(() => { try { localStorage.setItem('bese26:theme', isDark ? 'dark' : 'light'); } catch {} }, [isDark]);
 
