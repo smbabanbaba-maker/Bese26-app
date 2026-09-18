@@ -6148,3 +6148,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .profile-name-row .verification-badge-group { margin-top: 4px; }
 .profile-cover-bottom .verification-badge-group { margin-top: 0; }
 @media (max-width: 430px) { .verification-badge-popover { position: fixed; top: auto; bottom: 72px; left: 16px; right: 16px; width: auto; } }
+
+/* Listing cards: keep seller name and explicit verification labels compact under the image content. */
+.listing-seller-line { align-items: flex-start; min-width: 0; }
+.listing-seller-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: 1px; }
+.listing-seller-copy .listing-seller-name { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.listing-seller-copy .verification-badge-group { flex-wrap: nowrap; max-width: 100%; margin-top: 1px; gap: 3px; }
+.listing-seller-copy .verification-badge-group .verification-badge { min-height: 18px; padding: 2px 5px; font-size: 8px; }
+.listing-seller-copy .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
+.product-card-compact .listing-seller-copy .verification-badge { font-size: 7px; }

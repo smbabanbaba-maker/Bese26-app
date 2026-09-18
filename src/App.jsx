@@ -214,12 +214,11 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
         <div className="product-price">{listing.price}</div>
         <h3>{listing.title}</h3>
         <div className="product-meta"><MapPin size={13} /> {listing.location}</div>
-        <div className="listing-seller-line"><span className="listing-seller-avatar">{listing.sellerInitials || 'BE'}</span><span className="listing-seller-name">{listing.sellerDisplayName || listing.seller}{listing.verified && <BadgeCheck className="unified-verified-icon" size={18} strokeWidth={3} aria-label="Verified account" />}</span></div>
+        <div className="listing-seller-line"><span className="listing-seller-avatar">{listing.sellerInitials || 'BE'}</span><div className="listing-seller-copy"><span className="listing-seller-name">{listing.sellerDisplayName || listing.seller}</span><VerificationBadges idVerified={listing.idVerified} cacVerified={listing.cacVerified} compact /></div></div>
         <div className="product-foot">
           <span>{listing.condition}</span>
           <span>{listing.posted}</span>
         </div>
-        {listing.verified && <VerifiedBadge text="Verified account" />}
       </div>
     </article>
   );
