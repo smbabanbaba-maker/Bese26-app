@@ -6127,3 +6127,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .subscription-plan-card .subscription-plan-price { letter-spacing: -.02em; }
 .subscription-plan-card .subscription-plan-price small { margin-left: 3px; }
 @media (max-width: 600px) { .subscription-payment-note { align-items: flex-start; } .subscription-payment-note b { margin-top: 1px; } }
+
+/* Separate verification badges: compact, legible, and explicit about what was verified. */
+.verification-badge-group { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-width: 0; margin-top: 6px; }
+.verification-badge-group.compact { gap: 4px; margin-top: 4px; }
+.verification-badge-wrap { position: relative; display: inline-flex; max-width: 100%; }
+.verification-badge { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-height: 24px; padding: 3px 7px; border: 1px solid; border-radius: 999px; overflow: hidden; font: inherit; font-size: 10px; font-weight: 800; line-height: 1.1; letter-spacing: .01em; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease; }
+.verification-badge-group.compact .verification-badge { min-height: 22px; padding: 3px 6px; font-size: 9px; }
+.verification-badge:active { transform: scale(.97); }
+.verification-badge:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.verification-badge-id { color: #175cd3; background: #eff8ff; border-color: #b2ddff; }
+.verification-badge-cac { color: #087443; background: #ecfdf3; border-color: #abefc6; }
+.verification-badge-id:hover, .verification-badge-id.is-open { box-shadow: 0 0 0 2px rgba(23,92,211,.12); }
+.verification-badge-cac:hover, .verification-badge-cac.is-open { box-shadow: 0 0 0 2px rgba(8,116,67,.12); }
+.verification-badge-popover { position: absolute; z-index: 20; top: calc(100% + 7px); left: 0; width: min(220px, calc(100vw - 32px)); display: grid; gap: 3px; padding: 9px 10px; border: 1px solid #d0d5dd; border-radius: 9px; color: #344054; background: #fff; box-shadow: 0 10px 24px rgba(16,24,40,.15); white-space: normal; }
+.verification-badge-popover strong { font-size: 11px; }
+.verification-badge-popover small { color: #667085; font-size: 10px; line-height: 1.4; }
+.listing-new-seller-head .verification-badge-group { align-self: flex-start; }
+.public-business-identity .verification-badge-group { margin: 8px 0 0; }
+.profile-name-row .verification-badge-group { margin-top: 4px; }
+.profile-cover-bottom .verification-badge-group { margin-top: 0; }
+@media (max-width: 430px) { .verification-badge-popover { position: fixed; top: auto; bottom: 72px; left: 16px; right: 16px; width: auto; } }
