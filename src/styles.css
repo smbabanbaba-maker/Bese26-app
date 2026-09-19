@@ -6277,3 +6277,46 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .messages-selected-page .chat-messages { padding-block: 10px; }
   .sell-page .sell-mobile-header { min-height: 42px; }
 }
+
+/* Boosting page redesign: clearer setup flow and calmer payment-service hierarchy. */
+.boosting-page { max-width: 880px; margin-inline: auto; }
+.boosting-page .profile-subpage-intro { display: none; }
+.boosting-hero { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px; align-items: center; padding: 22px; border: 1px solid #d9e1eb; border-radius: 16px; color: #fff; background: linear-gradient(120deg, #172554 0%, #263b78 55%, #384a91 100%); box-shadow: 0 12px 28px rgba(23,37,84,.14); }
+.boosting-hero-main { display: flex; align-items: flex-start; gap: 13px; min-width: 0; }
+.boosting-hero-icon { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,.28); border-radius: 13px; color: #fff; background: rgba(255,255,255,.14); }
+.boosting-hero .eyebrow { color: #cdd8ff; }
+.boosting-hero h2 { margin: 4px 0 6px; color: #fff; font-size: clamp(21px, 3vw, 29px); letter-spacing: -.04em; }
+.boosting-hero p { max-width: 610px; margin: 0; color: #dce5ff; font-size: 12px; line-height: 1.55; }
+.boosting-hero-note { display: flex; align-items: center; gap: 7px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; color: #e9eeff; background: rgba(255,255,255,.1); font-size: 10px; white-space: nowrap; }
+.boosting-setup-card { display: grid; gap: 18px; padding: 22px; border: 1px solid #e1e6ed; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgba(16,24,40,.055); }
+.boosting-card-heading, .boosting-history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.boosting-card-heading h2, .boosting-history-heading h2 { margin: 3px 0 4px; color: #172230; font-size: 20px; letter-spacing: -.035em; }
+.boosting-card-heading p { margin: 0; color: #667085; font-size: 11px; line-height: 1.5; }
+.boosting-step-badge { display: inline-flex; align-items: baseline; gap: 3px; flex: 0 0 auto; padding: 7px 10px; border: 1px solid #f0c7c7; border-radius: 999px; color: #a93636; background: #fff7f7; font-size: 13px; font-weight: 800; }
+.boosting-step-badge small { color: #98a2b3; font-size: 9px; font-weight: 600; }
+.boosting-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 13px; }
+.boosting-field { display: grid; gap: 6px; min-width: 0; }
+.boosting-field > span { color: #344054; font-size: 12px; font-weight: 800; }
+.boosting-field > small { min-height: 27px; color: #98a2b3; font-size: 10px; line-height: 1.35; }
+.boosting-field select { width: 100%; min-height: 46px; box-sizing: border-box; padding: 0 12px; border: 1px solid #d0d5dd; border-radius: 10px; color: #172230; background: #fff; font: inherit; font-size: 12px; outline: none; }
+.boosting-field select:focus { border-color: #c94b4b; box-shadow: 0 0 0 3px rgba(201,75,75,.1); }
+.boosting-actions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 2px; }
+.boosting-actions .primary-button, .boosting-actions .secondary-button { min-height: 42px; }
+.boosting-empty-hint { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed #d0d5dd; border-radius: 10px; color: #667085; background: #f8fafc; font-size: 10px; }
+.boosting-history { display: grid; gap: 12px; }
+.boosting-history-heading { align-items: center; padding-inline: 2px; }
+.boosting-history-heading > span { padding: 5px 9px; border-radius: 999px; color: #667085; background: #f2f4f7; font-size: 10px; font-weight: 700; }
+.boosting-history .notification-list { display: grid; gap: 8px; }
+.boosting-history .notification-row { border-color: #e4e7ec; border-radius: 11px; box-shadow: 0 4px 12px rgba(16,24,40,.035); }
+@media (max-width: 700px) {
+  .boosting-page { gap: 13px; }
+  .boosting-hero { grid-template-columns: 1fr; gap: 13px; padding: 17px 15px; border-radius: 13px; }
+  .boosting-hero h2 { font-size: 22px; }
+  .boosting-hero-note { justify-self: start; white-space: normal; }
+  .boosting-setup-card { gap: 15px; padding: 15px; border-radius: 13px; }
+  .boosting-card-heading h2, .boosting-history-heading h2 { font-size: 18px; }
+  .boosting-field-grid { grid-template-columns: 1fr; gap: 11px; }
+  .boosting-field > small { min-height: 0; }
+  .boosting-actions { display: grid; grid-template-columns: 1fr; }
+  .boosting-actions .primary-button, .boosting-actions .secondary-button { width: 100%; }
+}
