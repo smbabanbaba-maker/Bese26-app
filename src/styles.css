@@ -6212,3 +6212,68 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .search-page .mobile-stable-search { top: 0; }
   .search-page .filter-toolbar { padding-top: 7px; }
 }
+
+/* App-wide mobile keyboard and spacing pass for form-heavy views. */
+html, body, #root { max-width: 100%; overflow-x: hidden; }
+@media (max-width: 760px) {
+  .messages-page, .messages-inbox-page, .profile-page, .profile-subpage, .sell-page, .notifications-page { min-width: 0; max-width: 100%; }
+  .messages-page { gap: 12px; }
+  .messages-page .page-title-row { gap: 8px; }
+  .messages-page .page-title-row h1 { font-size: 27px; }
+  .messages-inbox-page { gap: 10px; }
+  .messages-inbox-header { padding-inline: 2px; }
+  .messages-search { position: sticky; top: 0; z-index: 5; margin-inline: -2px; padding: 7px 2px; background: #fff; }
+  .message-filter-tabs { gap: 6px; padding-bottom: 3px; overflow-x: auto; scrollbar-width: none; }
+  .message-filter-tabs::-webkit-scrollbar { display: none; }
+  .message-filter-tabs button { flex: 0 0 auto; min-height: 34px; padding-inline: 11px; border-radius: 8px; }
+  .message-inbox-list { gap: 7px; }
+  .message-inbox-row { min-width: 0; grid-template-columns: 38px minmax(0,1fr) auto; gap: 9px; padding: 11px 10px; }
+  .message-inbox-copy { min-width: 0; }
+  .message-inbox-copy strong, .message-inbox-copy b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .messages-selected-page { min-height: calc(100dvh - 104px); }
+  .messages-selected-page .message-layout { min-height: 0; }
+  .messages-selected-page .chat-panel { min-height: calc(100dvh - 190px); max-height: calc(100dvh - 150px); display: flex; flex-direction: column; overflow: hidden; }
+  .messages-selected-page .chat-header { flex: 0 0 auto; }
+  .messages-selected-page .chat-context, .messages-selected-page .chat-safety-note, .messages-selected-page .chat-quick-actions, .messages-selected-page .deal-form, .messages-selected-page .deal-status-card { flex: 0 0 auto; }
+  .messages-selected-page .chat-messages { flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
+  .messages-selected-page .chat-bottom-tools { flex: 0 0 auto; }
+  .messages-selected-page .chat-composer { position: sticky; bottom: 0; z-index: 6; flex: 0 0 auto; padding-bottom: max(10px, env(safe-area-inset-bottom)); background: #fff; }
+  .messages-selected-page .chat-composer input { min-width: 0; }
+  .messages-selected-page .chat-quick-actions { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .messages-selected-page .chat-quick-actions::-webkit-scrollbar { display: none; }
+  .messages-selected-page .chat-quick-actions button { flex: 0 0 auto; border-radius: 8px; }
+  .messages-selected-page .deal-form { max-height: 42dvh; overflow-y: auto; }
+  .profile-page, .profile-subpage, .sell-page, .notifications-page { overflow-wrap: anywhere; }
+  .profile-subpage { gap: 12px; }
+  .profile-subpage-header { gap: 10px; }
+  .profile-subpage-header h1 { font-size: 25px; line-height: 1.15; }
+  .profile-subpage form, .profile-subpage .profile-form-card, .profile-subpage .settings-card, .profile-subpage .profile-state-card { min-width: 0; }
+  .profile-subpage form label, .profile-subpage .profile-form-card label, .profile-subpage .settings-card label { min-width: 0; }
+  .profile-subpage input, .profile-subpage textarea, .profile-subpage select { width: 100%; max-width: 100%; min-height: 42px; box-sizing: border-box; }
+  .profile-subpage textarea { min-height: 92px; resize: vertical; }
+  .profile-inline-actions { flex-wrap: wrap; gap: 8px; }
+  .profile-inline-actions > * { flex: 1 1 135px; }
+  .profile-page .profile-menu-grid, .profile-page .profile-quick-grid { gap: 8px; }
+  .profile-page .profile-menu-card, .profile-page .profile-quick-grid > button { min-width: 0; }
+  .profile-page .profile-menu-card strong, .profile-page .profile-menu-card small, .profile-page .profile-quick-grid strong, .profile-page .profile-quick-grid small { overflow-wrap: anywhere; }
+  .sell-page { gap: 10px; }
+  .sell-page .sell-mobile-header { position: sticky; top: 0; z-index: 7; min-height: 48px; margin-inline: -2px; padding: 6px 2px; background: #fff; }
+  .sell-page .clean-sell-sections { gap: 10px; }
+  .sell-page .sell-work-card { padding: 14px 13px; border-radius: 11px; }
+  .sell-page .sell-fields-grid { grid-template-columns: 1fr; gap: 10px; }
+  .sell-page .sell-field.wide { grid-column: auto; }
+  .sell-page .sell-field input, .sell-page .sell-field textarea, .sell-page .sell-field select { width: 100%; max-width: 100%; min-height: 42px; box-sizing: border-box; }
+  .sell-page .sell-field textarea { min-height: 105px; }
+  .sell-page .choice-pill-grid, .sell-page .contact-preferences { grid-template-columns: 1fr; gap: 7px; }
+  .sell-page .choice-pill-grid button, .sell-page .contact-preferences label { min-height: 38px; }
+  .sell-page .publish-button.large-publish { width: 100%; min-height: 44px; }
+  .notifications-page .notification-list { gap: 8px; }
+  .notifications-page .notification-row { grid-template-columns: 38px minmax(0,1fr) auto; gap: 9px; padding: 12px 10px; }
+  .notifications-page .notification-row span, .notifications-page .notification-row strong, .notifications-page .notification-row small { min-width: 0; overflow-wrap: anywhere; }
+}
+@media (max-height: 560px) and (max-width: 760px) {
+  .messages-selected-page .chat-panel { min-height: calc(100dvh - 132px); max-height: calc(100dvh - 108px); }
+  .messages-selected-page .chat-context, .messages-selected-page .chat-safety-note { margin-top: 6px; }
+  .messages-selected-page .chat-messages { padding-block: 10px; }
+  .sell-page .sell-mobile-header { min-height: 42px; }
+}
