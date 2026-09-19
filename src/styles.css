@@ -4387,8 +4387,7 @@ button:disabled { color:#8a929b !important; opacity:.72; }
 }
 
 
-/* ================================================================
-   Bese26 Premium Marketplace Refresh
+/* =========================================================   Bese26 Premium Marketplace Refresh
    White primary surfaces · red action accent · black outlines/type
    Bottom navigation intentionally preserved.
    ================================================================ */
@@ -6157,3 +6156,59 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .listing-seller-copy .verification-badge-group .verification-badge { min-height: 18px; padding: 2px 5px; font-size: 8px; }
 .listing-seller-copy .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
 .product-card-compact .listing-seller-copy .verification-badge { font-size: 7px; }
+/* Calm marketplace pass: restrained color, stable mobile search, and tighter result rhythm. */
+:root { --red: #c94b4b; --dark-red: #8f3030; --shadow: 0 5px 18px rgba(16,24,40,.045); --shadow-lg: 0 16px 40px rgba(16,24,40,.10); }
+.home-page, .search-page { gap: 22px; }
+.home-page .popular-categories, .search-page .filter-toolbar, .home-page > section:not(.home-ad-banner) { color: #182230; }
+.home-page .popular-category-rail { gap: 10px; padding: 3px 1px 6px; }
+.home-page .popular-category { min-width: 76px; padding: 9px 8px; border: 1px solid #e4e7ec; border-radius: 10px; background: #fff; box-shadow: none; }
+.home-page .popular-category:hover { border-color: #c94b4b; box-shadow: 0 5px 14px rgba(16,24,40,.06); transform: translateY(-1px); }
+.home-page .popular-category > span { width: 30px; height: 30px; border-radius: 8px; }
+.home-page .popular-category strong { color: #344054; font-size: 11px; }
+.home-page .product-card, .search-page .product-card { border: 1px solid #e4e7ec; border-radius: 12px; box-shadow: 0 4px 14px rgba(16,24,40,.04); }
+.home-page .product-card:hover, .search-page .product-card:hover { transform: translateY(-2px); border-color: #d0d5dd; box-shadow: 0 8px 20px rgba(16,24,40,.08); }
+.home-page .product-image-wrap, .search-page .product-image-wrap { background: #f2f4f7; }
+.home-page .product-info, .search-page .product-info { padding: 10px 11px 12px; }
+.home-page .product-price, .search-page .product-price { color: #b93838; }
+.home-page .product-meta, .search-page .product-meta, .home-page .product-foot, .search-page .product-foot { color: #667085; }
+.search-page { min-height: calc(100dvh - 104px); align-content: start; }
+.search-page .filter-toolbar { padding: 11px 0 3px; border-top: 1px solid #eaecf0; border-bottom: 1px solid #eaecf0; }
+.search-page .filter-toolbar-heading { margin-bottom: 8px; }
+.search-page .filter-scroll { gap: 7px; padding: 0 1px 5px; scrollbar-width: thin; }
+.search-page .filter-chip { min-height: 32px; padding: 0 11px; border: 1px solid #d0d5dd; border-radius: 8px; color: #475467; background: #fff; font-size: 12px; }
+.search-page .filter-chip.active { border-color: #c94b4b; color: #8f3030; background: #fff5f5; }
+.search-page .search-results-area { min-width: 0; }
+.search-page .search-result-head { margin-bottom: 10px; }
+.search-page .search-grid { gap: 12px; margin-top: 0; }
+.search-page .search-grid + .search-grid { margin-top: 12px; }
+.search-page .search-sponsored-slot { margin-block: 14px; }
+@media (max-width: 760px) {
+  .home-page, .search-page { gap: 14px; }
+  .search-page { padding-bottom: 18px; }
+  .search-page .back-row, .search-page .page-title-row { margin-bottom: 0; }
+  .search-page .mobile-stable-search { position: sticky; top: 0; z-index: 6; margin: 0 -3px; padding: 8px 3px; border-radius: 0; background: #f6f7f8; box-shadow: 0 4px 10px rgba(16,24,40,.04); }
+  .search-page .mobile-stable-search input { min-height: 42px; }
+  .search-page .filter-toolbar { margin-top: -3px; }
+  .search-page .search-results-area { overflow: visible; }
+  .home-page .home-search { position: relative; z-index: 2; }
+  .home-page .popular-category-rail { margin-right: -15px; padding-right: 15px; overflow-x: auto; overscroll-behavior-x: contain; }
+  .home-page .product-grid, .search-page .product-grid { gap: 9px; }
+  .home-page .product-image-wrap, .search-page .product-image-wrap { height: 142px; }
+}
+@media (max-width: 390px) {
+  .search-page .page-title-row h1 { font-size: 25px; }
+  .search-page .large-search { min-height: 48px; }
+  .search-page .filter-chip { padding-inline: 9px; }
+  .home-page .product-image-wrap, .search-page .product-image-wrap { height: 132px; }
+  .home-page .product-info, .search-page .product-info { padding: 9px; }
+}
+@media (max-width: 360px) {
+  .home-page .product-grid, .search-page .product-grid { gap: 8px; }
+  .home-page .product-image-wrap, .search-page .product-image-wrap { height: 122px; }
+  .home-page .product-info h3, .search-page .product-info h3 { font-size: 11px; }
+}
+@media (max-height: 560px) and (max-width: 760px) {
+  .search-page .page-title-row { display: none; }
+  .search-page .mobile-stable-search { top: 0; }
+  .search-page .filter-toolbar { padding-top: 7px; }
+}
