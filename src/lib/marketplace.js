@@ -35,7 +35,9 @@ function initials(value = 'bese26 user') {
 
 function verificationIsCurrent(record = {}) {
   const verified = record.is_verified === true || record.is_verified === 'true' || record.is_verified === 1 || record.is_verified === '1';
-  return verified || String(record.verification_status || '').toLowerCase() === 'verified';
+  const statusVerified = String(record.verification_status || '').toLowerCase() === 'verified';
+  const expiresAt = record.verification_expires_at ? new Date(record.verification_expires_at).getTime() : null;
+  return (verified || statusVerified) && (!expiresAt || expiresAt > Date.now());
 }
 
 export function mapListing(row) {
