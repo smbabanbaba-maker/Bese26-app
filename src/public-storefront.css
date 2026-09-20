@@ -1358,3 +1358,23 @@
   .miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 16px; padding: 2px 4px; font-size: 6.5px; }
   .miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 8px; height: 8px; }
 }
+
+/* One-line verification lockup: blue tick + ID + CAC, without the tall card. */
+.miniweb-hero-v2-verification { display: inline-flex; align-items: center; width: fit-content; max-width: 100%; gap: 4px; margin-top: 6px; padding: 3px 5px; border-radius: 7px; }
+.miniweb-hero-v2-verification > svg { flex: 0 0 auto; width: 13px; height: 13px; color: #1683ff !important; }
+.miniweb-hero-v2-verification > span { display: inline-flex; align-items: center; min-width: 0; gap: 4px; }
+.miniweb-hero-v2-verification > span > strong { display: inline; flex: 0 0 auto; color: #fff; font-size: 7px; line-height: 1; white-space: nowrap; }
+.miniweb-hero-v2-verification > span > small { display: none; }
+.miniweb-hero-v2-verification .verification-badge-group { flex-wrap: nowrap; gap: 3px; margin: 0; min-width: 0; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 16px; padding: 2px 4px; border-width: 1px; font-size: 6.5px; line-height: 1; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 8px; height: 8px; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge-id { color: #fff; background: #0878f9; border-color: #57a4ff; box-shadow: 0 0 0 1px rgba(8,120,249,.3); }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge-cac { color: #fff; background: #079447; border-color: #73e6a7; box-shadow: 0 0 0 1px rgba(7,148,71,.25); }
+@media (max-width: 600px) {
+  .miniweb-hero-v2-verification { gap: 3px; margin-top: 5px; padding: 2px 4px; }
+  .miniweb-hero-v2-verification > svg { width: 12px; height: 12px; }
+  .miniweb-hero-v2-verification > span { gap: 3px; }
+  .miniweb-hero-v2-verification > span > strong { font-size: 6.5px; }
+  .miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 15px; padding: 2px 3px; font-size: 6px; }
+  .miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 7px; height: 7px; }
+}
