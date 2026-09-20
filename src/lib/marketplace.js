@@ -412,6 +412,20 @@ export async function fetchActiveAdCampaigns({ placement = 'home_banner' } = {})
   return data || [];
 }
 
+export async function fetchPlatformMaintenance() {
+  if (!supabase) return { enabled: false };
+  const { data, error } = await supabase.rpc('platform_maintenance');
+  if (error) return { enabled: false };
+  return data || { enabled: false };
+}
+
+export async function adminUpdateMaintenance(enabled, message, eta) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_update_maintenance', { p_enabled: Boolean(enabled), p_message: message || null, p_eta: eta || null });
+  if (error) throw error;
+  return data || { enabled: Boolean(enabled) };
+}
+
 export async function fetchAdminControlOverview() {
   failIfUnavailable();
   const { data, error } = await supabase.rpc('admin_control_overview');
