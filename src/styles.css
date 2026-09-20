@@ -6435,3 +6435,29 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .maintenance-owner-login { margin-top: 24px; padding: 9px 13px; border: 1px solid #e2b5b5; border-radius: 9px; color: #9d2029; background: #fff7f6; cursor: pointer; font-size: 11px; font-weight: 800; }
 .maintenance-owner-login:hover { border-color: #b4232c; background: #fff0ef; }
 @media (max-width: 650px) { .admin-directory-searchbar { grid-template-columns: 1fr; } .admin-directory-searchbar .primary-button { width: 100%; } .admin-directory-group .admin-operation-row { align-items: flex-start; } .admin-directory-group .admin-row-actions { flex-wrap: wrap; justify-content: flex-end; } }
+
+/* Premium maintenance state: public-facing, calm, and clearly in progress. */
+.maintenance-card { position: relative; overflow: hidden; }
+.maintenance-icon-wrap { display: grid; width: 58px; height: 58px; place-items: center; margin: 0 auto 16px; border: 1px solid rgba(255, 44, 44, .18); border-radius: 19px; color: #ff2c2c; background: linear-gradient(145deg, #fff6f3, #fff); box-shadow: 0 13px 30px rgba(255, 44, 44, .12); }
+.maintenance-animation { position: relative; height: 116px; margin: 27px -6px 2px; overflow: hidden; border-radius: 17px; background: linear-gradient(180deg, #f8fbff 0%, #fff8f1 70%, #fff 100%); }
+.maintenance-animation::before, .maintenance-animation::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255, 255, 255, .9); filter: blur(1px); }
+.maintenance-animation::before { top: 23px; left: 18%; width: 75px; height: 15px; box-shadow: 22px -6px 0 4px rgba(255,255,255,.85), 48px 2px 0 1px rgba(255,255,255,.8); }
+.maintenance-animation::after { top: 43px; right: 7%; width: 62px; height: 12px; box-shadow: -24px -5px 0 3px rgba(255,255,255,.85), -47px 3px 0 0 rgba(255,255,255,.8); }
+.maintenance-cloud { position: absolute; top: 28px; width: 46px; height: 9px; border-radius: 999px; background: rgba(255, 255, 255, .82); animation: cloud-drift 8s linear infinite; }
+.cloud-one { left: -52px; animation-delay: -2s; }
+.cloud-two { left: -110px; top: 54px; transform: scale(.72); animation-delay: -5s; }
+.maintenance-animal { position: absolute; z-index: 2; left: -58px; bottom: 37px; display: block; font-size: 35px; line-height: 1; filter: drop-shadow(0 7px 4px rgba(91, 52, 19, .18)); animation: animal-run 5.8s cubic-bezier(.45, .04, .55, .96) infinite; }
+.maintenance-track { position: absolute; right: 0; bottom: 25px; left: 0; height: 2px; background: #f2d8c7; }
+.maintenance-track::after { content: ''; position: absolute; right: -30px; bottom: -10px; left: -30px; height: 5px; opacity: .48; background: repeating-linear-gradient(90deg, transparent 0 20px, #e5b99e 20px 34px, transparent 34px 55px); animation: road-move 1.2s linear infinite; }
+.maintenance-progress { position: absolute; right: 15%; bottom: 26px; left: 15%; height: 3px; overflow: hidden; border-radius: 999px; background: rgba(255, 44, 44, .09); }
+.maintenance-progress::after { content: ''; display: block; width: 38%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff5c45, #ff2c2c); animation: progress-shimmer 2.4s ease-in-out infinite; }
+.maintenance-status { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; color: #9a7470; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.maintenance-pulse { width: 7px; height: 7px; border-radius: 50%; background: #ff5b45; box-shadow: 0 0 0 0 rgba(255, 91, 69, .42); animation: status-pulse 1.8s infinite; }
+.maintenance-auth-screen { align-items: center; }
+@keyframes animal-run { 0% { transform: translateX(0) translateY(0) scaleX(1); } 12% { transform: translateX(18vw) translateY(-3px) scaleX(1); } 45% { transform: translateX(54vw) translateY(0) scaleX(1); } 82% { transform: translateX(108vw) translateY(-2px) scaleX(1); } 83%, 100% { transform: translateX(108vw) translateY(0) scaleX(1); } }
+@keyframes road-move { to { transform: translateX(-55px); } }
+@keyframes progress-shimmer { 0%, 100% { transform: translateX(-110%); } 55% { transform: translateX(280%); } }
+@keyframes cloud-drift { from { transform: translateX(0); } to { transform: translateX(570px); } }
+@keyframes status-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,91,69,.42); } 70% { box-shadow: 0 0 0 7px rgba(255,91,69,0); } 100% { box-shadow: 0 0 0 0 rgba(255,91,69,0); } }
+@media (prefers-reduced-motion: reduce) { .maintenance-animal, .maintenance-track::after, .maintenance-progress::after, .maintenance-cloud, .maintenance-pulse { animation: none; } }
+@media (max-width: 520px) { .maintenance-card { width: min(92vw, 390px); padding: 30px 22px 24px; } .maintenance-animation { height: 104px; } .maintenance-animal { font-size: 31px; } }

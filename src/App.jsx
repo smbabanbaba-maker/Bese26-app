@@ -828,6 +828,7 @@ function AppContent() {
   const startupReadyRef = useRef(!isSupabaseConfigured);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
+  const privateAdminEntry = new URLSearchParams(window.location.search).get('admin') === 'login';
   useEffect(() => { if (!isSupabaseConfigured) return undefined; let mounted = true; fetchPlatformSettings().then((value) => mounted && setPlatformSettings(value || { maintenance_mode: false })).catch(() => {}); return () => { mounted = false; }; }, []);
 
   // Start on the requested deep link while keeping the normal marketplace shell on Home.
@@ -1057,7 +1058,8 @@ function AppContent() {
     window.location.reload();
   };
   if (!startupReady) return <SplashScreen message={startupError || 'Connecting to Bese26…'} error={Boolean(startupError)} onRetry={retryStartup} />;
-  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small><button type="button" className="maintenance-owner-login" onClick={() => setShowAuth(true)}>Owner / Admin login</button></div>{showAuth && <AuthPanel reason="Owner or delegated admin access" onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setAuthReason(''); setShowAuth(false); showToast('Signed in to Bese26.'); }} />}</div>;
+  if (platformSettings.maintenance_mode && !canAccessAdmin && privateAdminEntry) return <div className="maintenance-screen maintenance-auth-screen"><AuthPanel reason="Owner or delegated admin access" onClose={() => { window.history.replaceState({}, '', window.location.pathname); window.location.reload(); }} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setAuthReason(''); setActiveNav('admin'); window.history.replaceState({}, '', `${window.location.pathname}?admin=login`); showToast('Signed in to Bese26.'); }} /></div>;
+  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><div className="maintenance-icon-wrap"><ShieldCheck size={30} /></div><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small><div className="maintenance-animation" aria-label="A cheetah running while maintenance is in progress"><span className="maintenance-cloud cloud-one" /><span className="maintenance-cloud cloud-two" /><span className="maintenance-animal" role="img" aria-label="Running cheetah">🐆</span><span className="maintenance-track" /><span className="maintenance-progress" /></div><div className="maintenance-status"><span className="maintenance-pulse" /> Maintenance in progress</div></div></div>;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
