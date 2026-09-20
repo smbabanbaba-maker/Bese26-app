@@ -1223,3 +1223,16 @@
   .public-business-hero.storefront-hero-clean .public-browse-cta { display: inline-flex !important; order: 5 !important; align-self: flex-start !important; width: auto !important; min-height: 31px !important; margin: 0 !important; padding: 7px 11px !important; font-size: 9px !important; }
   .public-business-listings.storefront-listings-clean { margin-top: 12px !important; padding: 13px !important; }
 }
+
+/* Emergency correction: keep the first Miniweb hero in the viewport. */
+.public-business-shell > .public-business-main > .public-business-hero.storefront-hero-clean:first-child {
+  transform: none !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: linear-gradient(120deg, #0b1020 0%, #151d3f 42%, #2d1b4b 72%, #461f48 100%) !important;
+  color: #fff !important;
+}
