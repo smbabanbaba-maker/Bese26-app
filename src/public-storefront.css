@@ -1236,3 +1236,13 @@
   background: linear-gradient(120deg, #0b1020 0%, #151d3f 42%, #2d1b4b 72%, #461f48 100%) !important;
   color: #fff !important;
 }
+
+/* Final collision-proof hero positioning and mobile breathing room. */
+.public-business-hero.storefront-hero-clean { transform: none !important; left: auto !important; right: auto !important; }
+@media (max-width: 600px) {
+  .public-business-hero.storefront-hero-clean { transform: none !important; width: 100% !important; min-height: 310px !important; height: auto !important; padding: 16px 14px 18px !important; gap: 11px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { width: 76px !important; height: 76px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity .public-business-name { min-height: 34px !important; font-size: 30px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { display: block !important; max-width: 100% !important; margin: 5px 0 0 !important; color: #dfe7fb !important; font-size: 10px !important; line-height: 1.35 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-trust { margin-top: 2px !important; }
+}
