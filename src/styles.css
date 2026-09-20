@@ -6336,3 +6336,23 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .search-section { padding-top: 6px; }
   .home-search { height: 48px !important; }
 }
+.maintenance-screen { min-height: 100dvh; display: grid; place-items: center; padding: 24px; color: #172230; background: radial-gradient(circle at 20% 10%, #fff2f2 0, transparent 38%), #f7f8fa; }
+.maintenance-card { width: min(460px, 100%); display: grid; justify-items: center; gap: 10px; padding: 34px 26px; border: 1px solid #e4e7ec; border-radius: 20px; text-align: center; background: #fff; box-shadow: 0 18px 48px rgba(16,24,40,.09); }
+.maintenance-card > svg { color: #c94b4b; }
+.maintenance-card h1 { margin: 0; font-size: clamp(25px, 6vw, 38px); letter-spacing: -.04em; }
+.maintenance-card p, .maintenance-card small { max-width: 340px; margin: 0; color: #667085; line-height: 1.6; }
+.admin-platform-control-grid { display: grid; gap: 12px; }
+.admin-platform-state { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px; border: 1px solid #d6f5df; border-radius: 12px; background: #f6fff8; }
+.admin-platform-state.is-paused { border-color: #f4cccc; background: #fff8f8; }
+.admin-platform-state > div { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.admin-platform-state > div > svg { flex: 0 0 auto; color: #087443; }
+.admin-platform-state.is-paused > div > svg { color: #c94b4b; }
+.admin-platform-state strong, .admin-platform-state small { display: block; }
+.admin-platform-state small { margin-top: 3px; color: #667085; font-size: 10px; }
+.admin-maintenance-message { display: grid; gap: 5px; color: #344054; font-size: 11px; font-weight: 700; }
+.admin-maintenance-message textarea { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid #d0d5dd; border-radius: 9px; font: inherit; font-size: 11px; resize: vertical; }
+.admin-platform-subsections { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; margin-top: 16px; }
+.admin-platform-subsections > div { min-width: 0; }
+.admin-platform-subsections .admin-section-title { margin-bottom: 8px; }
+.admin-platform-subsections time { color: #98a2b3; font-size: 10px; white-space: nowrap; }
+@media (max-width: 700px) { .admin-platform-state { align-items: flex-start; flex-direction: column; } .admin-platform-state button { width: 100%; } .admin-platform-subsections { grid-template-columns: 1fr; } }

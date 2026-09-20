@@ -83,6 +83,8 @@ import nigeriaLgas from './data/nigeria-lgas.json';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, blockUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { fetchPlatformSettings } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, blockUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -823,9 +825,11 @@ function AppContent() {
   const [editingDraft, setEditingDraft] = useState(null);
   const [startupReady, setStartupReady] = useState(!isSupabaseConfigured);
   const [startupError, setStartupError] = useState('');
+  const [platformSettings, setPlatformSettings] = useState({ maintenance_mode: false });
   const startupReadyRef = useRef(!isSupabaseConfigured);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
+  useEffect(() => { if (!isSupabaseConfigured) return undefined; let mounted = true; fetchPlatformSettings().then((value) => mounted && setPlatformSettings(value || { maintenance_mode: false })).catch(() => {}); return () => { mounted = false; }; }, []);
 
   // Start on the requested deep link while keeping the normal marketplace shell on Home.
   useEffect(() => {
@@ -842,6 +846,7 @@ function AppContent() {
     return () => window.removeEventListener('hashchange', applyDeepLink);
   }, []);
   useEffect(() => { try { localStorage.setItem('bese26:theme', isDark ? 'dark' : 'light'); } catch {} }, [isDark]);
+  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>We’ll be back shortly</h1><p>{platformSettings.maintenance_message || 'Bese26 is temporarily unavailable while we make improvements.'}</p><small>Thank you for your patience.</small></div></div>;
 
   const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
   const useMyLocation = useCallback(() => {

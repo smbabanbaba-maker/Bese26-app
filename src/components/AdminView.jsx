@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Check, CheckCircle2, Clock3, Headphones, MapPin, Megaphone, Package, Pause, Play, Plus, RefreshCw, Search, ShieldCheck, Trash2, UserRound, Users, X } from 'lucide-react';
-import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign } from '../lib/marketplace';
+import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign, adminSetMaintenance, adminSoftDeleteBusiness, fetchAdminAuditLogs, fetchAdminPlatformSettings } from '../lib/marketplace';
+import AdminPlatformControls from './AdminPlatformControls';
 
 function formatDate(value) {
   if (!value) return 'Recently submitted';
@@ -83,6 +84,7 @@ function AdminOperationsPanel({ onNotice }) {
 function ManualVerificationGrant({ onNotice }) {
   const [email, setEmail] = useState('');
   const [note, setNote] = useState('');
+  const [durationMonths, setDurationMonths] = useState('12');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -90,14 +92,14 @@ function ManualVerificationGrant({ onNotice }) {
     event.preventDefault();
     setBusy(true); setError(''); setResult(null);
     try {
-      const row = await adminGrantVerificationByEmail({ email, note });
-      setResult(row); setEmail(''); setNote(''); onNotice?.(`Verification tick granted to ${row.email}.`);
+      const row = await adminGrantVerificationByEmail({ email, note, durationMonths });
+      setResult(row); setEmail(''); setNote(''); onNotice?.(`Verification tick granted to ${row.email} for ${row.duration_months || durationMonths} month(s).`);
     } catch (reason) {
       const code = reason?.message || '';
       setError(code.includes('USER_EMAIL_NOT_FOUND') ? 'No registered Bese26 account was found with this email.' : code.includes('MODERATOR_REQUIRED') ? 'Only an authorized admin can grant verification.' : code || 'Could not grant verification tick.');
     } finally { setBusy(false); }
   };
-  return <section className="admin-operation-card manual-verification-grant"><div className="admin-section-title"><div><strong><ShieldCheck size={16} /> Grant verification by email</strong><p>Use this only when you have completed an offline review. The user must already have a Bese26 account.</p></div><span className="status-pill approved">Admin only</span></div>{error && <div className="auth-status error">{error}</div>}<form className="manual-verification-form" onSubmit={submit}><label>User email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="user@example.com" required /></label><label>Reason / audit note<textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Why is this account being manually verified?" rows="2" required /></label><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Granting…' : 'Give verification tick'}</button></form>{result && <div className="manual-verification-result"><CheckCircle2 size={16} /><span><strong>{result.email}</strong> is now verified. The profile and linked business badge were updated.</span></div>}</section>;
+  return <section className="admin-operation-card manual-verification-grant"><div className="admin-section-title"><div><strong><ShieldCheck size={16} /> Grant verification by email</strong><p>Use this only when you have completed an offline review. The user must already have a Bese26 account.</p></div><span className="status-pill approved">Admin only</span></div>{error && <div className="auth-status error">{error}</div>}<form className="manual-verification-form" onSubmit={submit}><label>User email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="user@example.com" required /></label><label>Verification duration<select value={durationMonths} onChange={(event) => setDurationMonths(event.target.value)}><option value="1">1 month</option><option value="3">3 months</option><option value="6">6 months</option><option value="12">1 year</option><option value="24">2 years</option><option value="120">No short expiry (10 years)</option></select></label><label>Reason / audit note<textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Why is this account being manually verified?" rows="2" required /></label><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Granting…' : 'Give verification tick'}</button></form>{result && <div className="manual-verification-result"><CheckCircle2 size={16} /><span><strong>{result.email}</strong> is verified until {result.expires_at ? new Date(result.expires_at).toLocaleDateString('en-NG') : 'the selected expiry'}. The profile and linked business badge were updated.</span></div>}</section>;
 }
 
 function VerificationCenter({ verificationItems, identityItems, onReviewBusiness, onReviewIdentity }) {
@@ -202,6 +204,7 @@ export default function AdminView({ user, onBack, onNotice, onCreateListing }) {
     <ManualVerificationGrant onNotice={onNotice} />
     <VerificationCenter verificationItems={verificationItems} identityItems={identityItems} onReviewBusiness={reviewVerification} onReviewIdentity={reviewIdentity} />
     <AdminTeamPanel onNotice={onNotice} />
+    <AdminPlatformControls onNotice={onNotice} />
     <AdminControlPanel onNotice={onNotice} />
     <AdminOperationsPanel onNotice={onNotice} />
     <AdCampaignManager user={user} onNotice={onNotice} />

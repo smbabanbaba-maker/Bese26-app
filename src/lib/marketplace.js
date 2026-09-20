@@ -295,12 +295,12 @@ export async function reviewBusinessVerification({ id, status, reviewerNote = nu
   if (error) throw error;
   return data;
 }
-export async function adminGrantVerificationByEmail({ email, note }) {
+export async function adminGrantVerificationByEmail({ email, note, durationMonths = 12 }) {
   failIfUnavailable();
   const normalizedEmail = email?.trim().toLowerCase();
   if (!normalizedEmail) throw new Error('Enter the user email address.');
   if (!note?.trim()) throw new Error('Add a reason for granting the verification tick.');
-  const { data, error } = await supabase.rpc('admin_grant_verification_by_email', { p_email: normalizedEmail, p_note: note.trim() });
+  const { data, error } = await supabase.rpc('admin_grant_verification_by_email', { p_email: normalizedEmail, p_note: note.trim(), p_duration_months: Math.min(120, Math.max(1, Number(durationMonths) || 12)) });
   if (error) throw error;
   return data;
 }
@@ -1455,4 +1455,39 @@ export async function adminTeamRemove(userId) {
   const { data, error } = await supabase.rpc('admin_team_remove', { p_user_id: userId });
   if (error) throw error;
   return data;
+}
+
+export async function fetchPlatformSettings() {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('app_settings').select('value').eq('key', 'platform').maybeSingle();
+  if (error) throw error;
+  return data?.value || { maintenance_mode: false };
+}
+
+export async function fetchAdminPlatformSettings() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_platform_settings');
+  if (error) throw error;
+  return data || {};
+}
+
+export async function adminSetMaintenance(enabled, message = '') {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_set_maintenance', { p_enabled: Boolean(enabled), p_message: message || null });
+  if (error) throw error;
+  return data;
+}
+
+export async function adminSoftDeleteBusiness(businessProfileId, reason) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_soft_delete_business', { p_business_profile_id: businessProfileId, p_reason: reason });
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchAdminAuditLogs(limit = 100) {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_audit_list', { p_limit: limit });
+  if (error) throw error;
+  return data || [];
 }
