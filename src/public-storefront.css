@@ -818,10 +818,10 @@
 
 /* Responsive visibility fix: full-width hero, safe mobile grid, and no clipped text. */
 .public-business-hero.storefront-hero-clean {
-  width: 100vw !important;
-  max-width: none !important;
-  margin-left: 50% !important;
-  transform: translateX(-50%) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  transform: none !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
@@ -986,7 +986,6 @@
 .public-business-shell > .public-business-main > .public-business-hero.storefront-hero-clean:first-child {
   margin-top: 0 !important;
   top: 0 !important;
-  transform: translateX(-50%) !important;
   border-top: 0 !important;
 }
 
