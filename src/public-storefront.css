@@ -1322,3 +1322,13 @@
   .miniweb-hero-v2-stats .miniweb-hero-v2-follow { min-height: 43px; padding: 5px 3px; font-size: 7px; }
   .miniweb-hero-v2-stats .miniweb-hero-v2-follow svg { width: 11px; height: 11px; }
 }
+
+/* Full-width metrics row on phone: each cell gets equal readable space. */
+.miniweb-hero-v2-bottom { width: 100%; }
+.miniweb-hero-v2-stats { width: 100%; }
+.miniweb-hero-v2-actions { width: 100%; }
+.miniweb-hero-v2-actions .miniweb-hero-v2-listings { width: 100%; }
+@media (max-width: 600px) {
+  .miniweb-hero-v2-stats .miniweb-hero-v2-follow span { display: inline; overflow: visible; }
+  .miniweb-hero-v2-stats .miniweb-hero-v2-follow { font-size: 8px; }
+}
