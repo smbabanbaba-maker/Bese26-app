@@ -712,7 +712,7 @@ function PublicStorefrontLayout({ title, share, children }) {
 function PublicPersonalPage({ data }) {
   const { profile, listings } = data;
   const share = async () => { const url = `https://www.bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: profile.display_name, text: profile.bio || profile.display_name, url }); else await navigator.clipboard?.writeText(url); };
-  return <PublicStorefrontLayout title={profile.display_name} share={share}><PublicProfileHeader profile={profile} listings={listings} share={share} /><PublicFollowShowcase targetId={profile.id} name={profile.display_name} /><PublicListingSection title={`Listings by ${profile.display_name}`} listings={listings} /></PublicStorefrontLayout>;
+  return <PublicStorefrontLayout title={profile.display_name} share={share}><PublicProfileHeader profile={profile} listings={listings} share={share} /><PublicListingSection title={`Listings by ${profile.display_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 function PublicBusinessPage({ handle }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
@@ -722,7 +722,7 @@ function PublicBusinessPage({ handle }) {
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
   const share = async () => { const url = `https://www.bese26.shop/@${business.business_handle}`; if (navigator.share) await navigator.share({ title: business.business_name, text: business.description || business.business_name, url }); else await navigator.clipboard?.writeText(url); };
-  return <PublicStorefrontLayout title={business.business_name} share={share}><PublicProfileHeader business={business} profile={ownerProfile} listings={listings} share={share} /><PublicFollowShowcase targetId={ownerProfile?.id} name={business.business_name} /><PublicBusinessAbout business={business} /><PublicListingSection title={`Listings from ${business.business_name}`} listings={listings} /></PublicStorefrontLayout>;
+  return <PublicStorefrontLayout title={business.business_name} share={share}><PublicProfileHeader business={business} profile={ownerProfile} listings={listings} share={share} /><PublicBusinessAbout business={business} /><PublicListingSection title={`Listings from ${business.business_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 function PublicListingRoute({ listingId }) {
   const [listing, setListing] = useState(null);

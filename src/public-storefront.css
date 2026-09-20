@@ -1142,3 +1142,47 @@
   .public-follow-stats strong { font-size: 19px !important; }
   .public-follow-stats span { font-size: 8px !important; }
 }
+
+/* Final Miniweb mobile correction: compact identity hero, clear text, listings first. */
+.public-business-hero.storefront-hero-clean { min-height: 0 !important; }
+@media (max-width: 600px) {
+  .public-business-main { padding: 10px 10px 36px !important; }
+  .public-business-hero.storefront-hero-clean { display: grid !important; grid-template-columns: 68px minmax(0, 1fr) !important; grid-template-rows: auto auto auto auto !important; grid-template-areas: "logo identity" "location location" "trust trust" "actions actions" !important; column-gap: 12px !important; row-gap: 9px !important; padding: 15px 13px !important; min-height: 0 !important; border-radius: 16px !important; }
+  .public-business-hero.storefront-hero-clean .public-hero-brand-mark { display: none !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { grid-area: logo !important; width: 68px !important; height: 68px !important; align-self: start !important; border-width: 3px !important; border-radius: 15px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity { grid-area: identity !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; min-width: 0 !important; padding: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity .eyebrow { margin: 0 0 4px !important; font-size: 8px !important; line-height: 1.1 !important; color: #ffcaca !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 { display: block !important; width: 100% !important; margin: 0 !important; color: #fff !important; font-size: clamp(24px, 8vw, 32px) !important; line-height: 1.05 !important; letter-spacing: -.8px !important; overflow-wrap: anywhere !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity .public-verification-panel { margin-top: 7px !important; max-width: 100% !important; padding: 6px 8px !important; border-radius: 8px !important; }
+  .public-business-hero.storefront-hero-clean .public-verification-panel strong { font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-verification-panel small { font-size: 7px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-badges { margin-top: 4px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-badges .verification-badge { min-height: 21px !important; padding: 3px 6px !important; font-size: 7px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-subline { margin-top: 5px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-subline span { font-size: 8px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { display: none !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo-location { grid-area: location !important; align-self: start !important; min-width: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-location { display: inline-flex !important; align-items: center !important; gap: 5px !important; color: #dfe7fb !important; font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-trust { grid-area: trust !important; align-self: stretch !important; min-width: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 7px !important; margin: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats > span { min-height: 48px !important; padding: 8px 10px !important; border: 1px solid rgba(255,255,255,.2) !important; border-radius: 9px !important; background: rgba(255,255,255,.1) !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats strong { color: #fff !important; font-size: 17px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats small { color: #dfe7fb !important; font-size: 7px !important; }
+  .public-business-hero.storefront-hero-clean .public-hero-share { grid-area: actions !important; position: static !important; justify-self: stretch !important; width: 100% !important; min-height: 30px !important; padding: 6px 10px !important; border-radius: 8px !important; font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-browse-cta { grid-area: actions !important; width: calc(100% - 82px) !important; min-height: 30px !important; margin-top: 0 !important; padding: 6px 8px !important; font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-hero-share { width: 75px !important; justify-self: end !important; margin-top: -39px !important; margin-right: 0 !important; }
+  .public-business-listings.storefront-listings-clean { margin-top: 14px !important; padding: 14px !important; border-radius: 15px !important; }
+  .public-business-listings .section-heading { padding-bottom: 9px !important; }
+  .public-business-listings .section-heading h2 { font-size: 20px !important; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns: 82px minmax(0, 1fr) !important; min-height: 0 !important; padding: 20px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { width: 82px !important; height: 82px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size: 34px !important; }
+}
+
+@media (max-width: 600px) {
+  .public-business-hero.storefront-hero-clean .public-hero-share { position: absolute !important; top: 12px !important; right: 12px !important; z-index: 5 !important; width: auto !important; min-height: 29px !important; margin: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity { padding-right: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-browse-cta { width: auto !important; min-height: 29px !important; margin-top: 7px !important; padding: 6px 10px !important; }
+}
