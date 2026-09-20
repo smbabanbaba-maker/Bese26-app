@@ -82,6 +82,7 @@ import { City, Country, State } from 'country-state-city';
 import nigeriaLgas from './data/nigeria-lgas.json';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
+import { I18nProvider, useI18n } from './lib/i18n';
 import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, blockUser, recordListingView, recordRecentlyViewed, requestListingCallback, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
@@ -786,6 +787,7 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
 }
 
 function AppContent() {
+  const { t } = useI18n();
   if (typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app')) {
     const canonicalUrl = `https://www.bese26.shop${window.location.pathname}${window.location.search}${window.location.hash}`;
     window.location.replace(canonicalUrl);
@@ -1055,7 +1057,7 @@ function AppContent() {
     window.location.reload();
   };
   if (!startupReady) return <SplashScreen message={startupError || 'Connecting to Bese26…'} error={Boolean(startupError)} onRetry={retryStartup} />;
-  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>We’ll be back shortly</h1><p>{platformSettings.maintenance_message || 'Bese26 is temporarily unavailable while we make improvements.'}</p><small>Thank you for your patience.</small></div></div>;
+  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small></div></div>;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
@@ -1075,7 +1077,7 @@ function AppContent() {
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
     <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<BrandLoader message="Loading page…" compact />}>{renderView()}</Suspense></AppErrorBoundary></main>
     <footer className="site-footer"><div><strong>Bese26<span>.shop</span></strong><p>Nigerian online marketplace for personal and business transactions.</p></div><nav aria-label="Public information"><a href="/#terms" onClick={(event) => { event.preventDefault(); goPublicSection('terms'); }} title="Read Terms of Service">Terms</a><a href="/#privacy" onClick={(event) => { event.preventDefault(); goPublicSection('privacy'); }} title="Read Privacy Policy">Privacy</a><a href="/#refund-policy" onClick={(event) => { event.preventDefault(); goPublicSection('refund-policy'); }} title="Read Refund Policy">Refunds</a><a href="/#safety" onClick={(event) => { event.preventDefault(); goPublicSection('safety'); }} title="Read Marketplace Safety">Safety</a><a href="mailto:info@bese26.shop?subject=Bese26%20Support" title="Email Bese26 support">info@bese26.shop</a></nav></footer>
-    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{label}</span></button>)}</nav>
+    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{t(label)}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     <ListingDetailsView listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
@@ -1086,5 +1088,5 @@ function AppContent() {
 
 
 export default function App() {
-  return <AppErrorBoundary><AppContent /></AppErrorBoundary>;
+  return <I18nProvider><AppErrorBoundary><AppContent /></AppErrorBoundary></I18nProvider>;
 }

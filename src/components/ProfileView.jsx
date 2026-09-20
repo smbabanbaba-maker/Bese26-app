@@ -43,6 +43,7 @@ import {
 import { getAvatarUrl } from '../lib/supabase';
 import nigeriaLocations from '../data/nigeriaLocations.json';
 import VerificationBadges from './VerificationBadges';
+import { useI18n } from '../lib/i18n';
 import {
   blockUser,
   deleteMyAccount,
@@ -113,20 +114,24 @@ function VerifiedBadge({ verified }) {
 }
 
 function SubpageHeader({ title, eyebrow, onBack }) {
-  return <div className="profile-subpage-header"><button className="icon-button" type="button" onClick={onBack} aria-label={`Back from ${title}`}><ArrowLeft size={18} /></button><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1></div></div>;
+  const { t } = useI18n();
+  return <div className="profile-subpage-header"><button className="icon-button" type="button" onClick={onBack} aria-label={`${t('Back')} from ${t(title)}`}><ArrowLeft size={18} /></button><div><div className="eyebrow">{t(eyebrow)}</div><h1>{t(title)}</h1></div></div>;
 }
 
 function SectionLabel({ eyebrow, title }) {
-  return <div className="profile-section-label"><div><div className="eyebrow">{eyebrow}</div><h2>{title}</h2></div></div>;
+  const { t } = useI18n();
+  return <div className="profile-section-label"><div><div className="eyebrow">{t(eyebrow)}</div><h2>{t(title)}</h2></div></div>;
 }
 
 function ProfileMenuCard({ item, onOpen }) {
+  const { t } = useI18n();
   const Icon = item.icon;
-  return <button type="button" className="profile-menu-card" onClick={() => onOpen(item.page)}><span className={`profile-menu-card-icon ${item.tone || ''}`}><Icon size={17} /></span><span className="profile-menu-card-copy"><strong>{item.label}</strong><small>{item.description}</small></span><ChevronRight size={16} /></button>;
+  return <button type="button" className="profile-menu-card" onClick={() => onOpen(item.page)}><span className={`profile-menu-card-icon ${item.tone || ''}`}><Icon size={17} /></span><span className="profile-menu-card-copy"><strong>{t(item.label)}</strong><small>{t(item.description)}</small></span><ChevronRight size={16} /></button>;
 }
 
 function ToggleRow({ icon: Icon, label, description, checked, onChange, disabled = false }) {
-  return <div className={`profile-toggle-row ${disabled ? 'is-disabled' : ''}`}><span className="profile-toggle-icon"><Icon size={16} /></span><span className="profile-toggle-copy"><strong>{label}</strong><small>{description}</small></span><button type="button" className={`profile-toggle ${checked ? 'on' : ''}`} disabled={disabled} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`} aria-pressed={checked}><span /></button></div>;
+  const { t } = useI18n();
+  return <div className={`profile-toggle-row ${disabled ? 'is-disabled' : ''}`}><span className="profile-toggle-icon"><Icon size={16} /></span><span className="profile-toggle-copy"><strong>{t(label)}</strong><small>{t(description)}</small></span><button type="button" className={`profile-toggle ${checked ? 'on' : ''}`} disabled={disabled} onClick={() => onChange(!checked)} aria-label={`Toggle ${t(label)}`} aria-pressed={checked}><span /></button></div>;
 }
 
 async function prepareAvatarFile(file, rotation = 0) {
@@ -263,17 +268,18 @@ function PersonalPage({ user, profile, onBack, onSaved, onAuthRequired }) {
 }
 
 function SettingsPage({ page, user, onBack, isDark, onToggleTheme, onNotice }) {
+  const { locale, setLocale, locales, t } = useI18n();
   const [preferences, setPreferences] = useState(null);
   const [contacts, setContacts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  useEffect(() => { let mounted = true; const request = page.key === 'communication' ? getProfileContacts(user.id) : getProfilePreferences(user.id); request.then((data) => mounted && (page.key === 'communication' ? setContacts(data || {}) : setPreferences(data || {}))).catch((requestError) => mounted && setError(requestError.message || 'Could not load your preferences.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [page.key, user.id]);
+  useEffect(() => { let mounted = true; const request = page.key === 'communication' ? getProfileContacts(user.id) : getProfilePreferences(user.id); request.then((data) => { if (!mounted) return; if (page.key === 'language' && data?.language) { const saved = String(data.language).toLowerCase(); const match = locales.find((item) => item.code === saved || item.label.toLowerCase() === saved || item.native.toLowerCase() === saved); if (match) setLocale(match.code); } page.key === 'communication' ? setContacts(data || {}) : setPreferences(data || {}); }).catch((requestError) => mounted && setError(requestError.message || 'Could not load your preferences.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [page.key, user.id]);
   const current = page.key === 'communication' ? contacts || {} : preferences || {};
   const update = async (values) => { setSaving(true); setError(''); try { const next = page.key === 'communication' ? await updateProfileContacts(user.id, values) : await updateProfilePreferences(user.id, values); page.key === 'communication' ? setContacts(next) : setPreferences(next); if (values.theme) onToggleTheme(values.theme === 'dark'); onNotice('Preference saved.'); } catch (requestError) { setError(requestError.message || 'Your preference could not be saved.'); } finally { setSaving(false); } };
   if (loading) return <div className="profile-subpage"><SubpageHeader title={page.title} eyebrow={page.eyebrow} onBack={onBack} /><EmptyState title="Loading settings" description="Getting your saved preferences." /></div>;
   if (error) return <div className="profile-subpage"><SubpageHeader title={page.title} eyebrow={page.eyebrow} onBack={onBack} /><div className="auth-status error">{error}</div><button type="button" className="secondary-button" onClick={onBack}>Back</button></div>;
-  if (page.key === 'language') return <div className="profile-subpage"><SubpageHeader title="Language & Region" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><label className="settings-select-row"><span><Languages size={16} /> Interface language</span><select value={current.language || 'English'} disabled={saving} onChange={(event) => update({ language: event.target.value })}>{['English', 'Hausa', 'Yoruba', 'Igbo', 'Kanuri'].map((item) => <option key={item}>{item}</option>)}</select></label><label className="settings-select-row"><span><WalletCards size={16} /> Currency</span><select value={current.currency || 'NGN'} disabled><option>NGN / ₦</option></select></label><label className="settings-select-row"><span><Globe2 size={16} /> Date format</span><select value={current.date_format || 'DD/MM/YYYY'} onChange={(event) => update({ date_format: event.target.value })}><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option></select></label></div><p className="profile-help-note">Language selection is stored in your Bese26 account. Full translation coverage will expand as each interface string is translated.</p></div>;
+  if (page.key === 'language') return <div className="profile-subpage"><SubpageHeader title={t('Language & Region')} eyebrow={t('Preferences')} onBack={onBack} /><div className="settings-card"><label className="settings-select-row"><span><Languages size={16} /> {t('Interface language')}</span><select value={locale} disabled={saving} onChange={(event) => { setLocale(event.target.value); update({ language: event.target.value }); }}>{locales.map((item) => <option key={item.code} value={item.code}>{item.native}</option>)}</select></label><label className="settings-select-row"><span><WalletCards size={16} /> {t('Currency')}</span><select value={current.currency || 'NGN'} disabled><option>NGN / ₦</option></select></label><label className="settings-select-row"><span><Globe2 size={16} /> {t('Date format')}</span><select value={current.date_format || 'DD/MM/YYYY'} onChange={(event) => update({ date_format: event.target.value })}><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option></select></label></div><p className="profile-help-note">{t('Language selection is stored in your Bese26 account.')}</p></div>;
   if (page.key === 'appearance') return <div className="profile-subpage"><SubpageHeader title="Appearance" eyebrow="PREFERENCES" onBack={onBack} /><div className="appearance-options">{[['light', 'Light', 'Use the clean white marketplace theme', Moon], ['dark', 'Dark', 'Use the dark marketplace theme', Moon], ['system', 'System', 'Follow this device preference', Info]].map(([value, label, description, Icon]) => <button type="button" key={value} className={(current.theme || (isDark ? 'dark' : 'light')) === value ? 'selected' : ''} onClick={() => update({ theme: value })}><span><Icon size={17} /> <span><strong>{label}</strong><small>{description}</small></span></span>{(current.theme || (isDark ? 'dark' : 'light')) === value && <Check size={17} />}</button>)}</div></div>;
   if (page.key === 'privacy') return <div className="profile-subpage"><SubpageHeader title="Privacy" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><ToggleRow icon={Eye} label="Profile visibility" description="Allow people to discover your seller profile" checked={current.profile_visibility !== false} onChange={(value) => update({ profile_visibility: value })} /><ToggleRow icon={MapPin} label="Show approximate location" description="Display your city, not your exact address" checked={current.show_approximate_location !== false} onChange={(value) => update({ show_approximate_location: value })} /><ToggleRow icon={Users} label="Show online status" description="Let buyers know when you are active" checked={current.show_online_status !== false} onChange={(value) => update({ show_online_status: value })} /><ToggleRow icon={Phone} label="Show phone number" description="Allow your phone to appear where supported" checked={current.show_phone_number === true} onChange={(value) => update({ show_phone_number: value })} /><ToggleRow icon={MessageCircle} label="Show email" description="Allow your email to appear where supported" checked={current.show_email === true} onChange={(value) => update({ show_email: value })} /><ToggleRow icon={Sparkles} label="Personalized recommendations" description="Use your activity to improve marketplace suggestions" checked={current.personalized_recommendations !== false} onChange={(value) => update({ personalized_recommendations: value })} /></div></div>;
   if (page.key === 'communication') return <div className="profile-subpage"><SubpageHeader title="Communication" eyebrow="PREFERENCES" onBack={onBack} /><div className="settings-card"><ToggleRow icon={Phone} label="Allow calls" description="Let buyers call when you choose phone contact" checked={current.allow_calls !== false} onChange={(value) => update({ allow_calls: value })} /><ToggleRow icon={MessageCircle} label="Allow WhatsApp" description="Allow WhatsApp contact where supported" checked={current.allow_whatsapp !== false} onChange={(value) => update({ allow_whatsapp: value })} /><ToggleRow icon={MessageCircle} label="Buyer messages" description="Receive conversations started from listings" checked={current.buyer_messages !== false} onChange={(value) => update({ buyer_messages: value })} /></div></div>;
