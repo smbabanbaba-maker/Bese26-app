@@ -1078,3 +1078,67 @@
   .public-follow-button { width: 100%; }
   .public-follow-columns { grid-template-columns: 1fr; }
 }
+
+/* Miniweb identity and community hero: trust-first, legible, and responsive on phone/tablet. */
+.public-business-hero.storefront-hero-clean { grid-template-columns: 96px minmax(0, 1fr) auto !important; grid-template-rows: auto auto; column-gap: 20px !important; row-gap: 8px !important; min-height: 0 !important; padding: 24px 28px !important; }
+.public-business-hero.storefront-hero-clean .public-business-logo { grid-column: 1; grid-row: 1 / span 2; align-self: start; width: 96px !important; height: 96px !important; }
+.public-business-hero.storefront-hero-clean .public-business-logo-location { grid-column: 1; grid-row: 3; align-self: start; }
+.public-business-hero.storefront-hero-clean .public-business-identity { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+.public-business-hero.storefront-hero-clean .public-business-trust { grid-column: 3; grid-row: 2; align-self: end; }
+.public-business-hero.storefront-hero-clean .public-hero-share { grid-column: 3; grid-row: 1; justify-self: end; position: static !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size: clamp(28px, 4vw, 46px) !important; line-height: 1.04 !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity p { max-width: 620px !important; color: #dfe7fb !important; font-size: 12px !important; line-height: 1.5 !important; }
+.public-verification-panel { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin-top: 9px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.22); border-radius: 10px; color: #dbe6ff; background: rgba(255,255,255,.09); }
+.public-verification-panel svg { flex: 0 0 auto; color: #aebdff; }
+.public-verification-panel.is-verified { border-color: rgba(138,224,199,.48); color: #e3fff6; background: rgba(66,175,143,.16); }
+.public-verification-panel.is-verified svg { color: #8ee7c6; }
+.public-verification-panel span { display: grid; gap: 2px; min-width: 0; }
+.public-verification-panel strong { font-size: 11px; line-height: 1.1; }
+.public-verification-panel small { color: inherit; font-size: 9px; line-height: 1.3; opacity: .86; }
+.public-business-badges { margin-top: 6px; }
+.public-business-badges .verification-badge-group { gap: 5px; }
+.public-business-badges .verification-badge { min-height: 25px; padding: 4px 8px; border-radius: 7px; font-size: 9px; }
+.public-follow-showcase { gap: 15px !important; margin: 16px 0 24px !important; padding: 20px !important; border-color: #dce3ec !important; border-radius: 18px !important; background: linear-gradient(135deg, #ffffff 0%, #f8fbff 68%, #fff7f5 100%) !important; box-shadow: 0 10px 24px rgba(16,24,40,.06) !important; }
+.public-follow-heading h2 { font-size: clamp(20px, 3vw, 27px) !important; line-height: 1.1 !important; }
+.public-follow-heading p { color: #667085 !important; font-size: 11px !important; line-height: 1.5 !important; }
+.public-follow-button { min-height: 39px !important; border-radius: 9px !important; background: #c92028 !important; border-color: #c92028 !important; }
+.public-follow-button:hover { background: #a81720 !important; border-color: #a81720 !important; }
+.public-follow-button.following { color: #20252d !important; background: #fff !important; border-color: #bfc7d2 !important; }
+.public-follow-stats > div { padding: 12px 13px !important; border-color: #dfe5ed !important; background: #fff !important; }
+.public-follow-stats strong { font-size: 22px !important; }
+.public-follow-columns { gap: 10px !important; }
+.public-follow-list { padding: 12px !important; border-color: #dfe5ed !important; border-radius: 12px !important; }
+.public-follow-list-heading strong { color: #20252d !important; font-size: 11px !important; }
+.public-follow-person { min-height: 39px; padding: 6px 7px !important; }
+.public-follow-person strong { color: #20252d !important; font-size: 10px !important; }
+.public-follow-empty { color: #667085 !important; line-height: 1.55 !important; }
+@media (max-width: 900px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns: 76px minmax(0, 1fr) !important; padding: 20px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { width: 76px !important; height: 76px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-trust { grid-column: 2; grid-row: 4; justify-self: start; }
+  .public-business-hero.storefront-hero-clean .public-business-identity { grid-row: 1 / span 3; }
+  .public-business-stats { gap: 7px !important; }
+}
+@media (max-width: 600px) {
+  .public-business-hero.storefront-hero-clean { grid-template-columns: 58px minmax(0, 1fr) !important; column-gap: 12px !important; row-gap: 8px !important; padding: 16px 14px !important; border-radius: 15px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { width: 58px !important; height: 58px !important; border-radius: 14px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo-location { grid-column: 1 / -1; grid-row: 4; }
+  .public-business-hero.storefront-hero-clean .public-business-identity { grid-column: 2; grid-row: 1 / span 3; }
+  .public-business-hero.storefront-hero-clean .public-business-trust { grid-column: 1 / -1; grid-row: 5; }
+  .public-business-hero.storefront-hero-clean .public-hero-share { grid-column: 2; grid-row: 1; padding: 7px 9px !important; font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity h1 { font-size: clamp(22px, 8vw, 31px) !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { font-size: 11px !important; }
+  .public-verification-panel { margin-top: 7px; padding: 7px 8px; }
+  .public-verification-panel strong { font-size: 10px; }
+  .public-verification-panel small { font-size: 8px; }
+  .public-business-badges .verification-badge { font-size: 8px; padding-inline: 6px; }
+  .public-follow-showcase { margin-top: 13px !important; padding: 15px 13px !important; border-radius: 15px !important; }
+  .public-follow-heading { gap: 10px !important; }
+  .public-follow-heading h2 { font-size: 21px !important; }
+  .public-follow-heading p { font-size: 10px !important; }
+  .public-follow-button { width: 100% !important; }
+  .public-follow-stats { gap: 6px !important; }
+  .public-follow-stats > div { padding: 10px 8px !important; }
+  .public-follow-stats strong { font-size: 19px !important; }
+  .public-follow-stats span { font-size: 8px !important; }
+}
