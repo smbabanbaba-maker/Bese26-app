@@ -334,7 +334,13 @@ export async function getVerificationDocumentUrl(path, expiresIn = 300) {
   if (error) throw error;
   return data?.signedUrl || null;
 }
-
+export async function downloadVerificationDocumentPreview(path) {
+  failIfUnavailable();
+  if (!path) return null;
+  const { data, error } = await supabase.storage.from('verification-documents').download(path);
+  if (error) throw error;
+  return data ? URL.createObjectURL(data) : null;
+}
 export async function getProfile(userId) {
   failIfUnavailable();
   const fullQuery = supabase

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Check, CheckCircle2, Clock3, Headphones, MapPin, Megaphone, Package, Pause, Play, Plus, RefreshCw, Search, ShieldCheck, Trash2, UserRound, Users, X } from 'lucide-react';
-import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, fetchAdminVerificationQueue, searchAdminDirectory, fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, getVerificationDocumentUrl, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign, adminSetMaintenance, adminSoftDeleteBusiness, fetchAdminAuditLogs, fetchAdminPlatformSettings } from '../lib/marketplace';
+import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, fetchAdminVerificationQueue, searchAdminDirectory, fetchModerationHistory, fetchPendingListings, moderateListing, getVerificationDocumentUrl, downloadVerificationDocumentPreview, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign, adminSetMaintenance, adminSoftDeleteBusiness, fetchAdminAuditLogs, fetchAdminPlatformSettings } from '../lib/marketplace';
 import AdminPlatformControls from './AdminPlatformControls';
 
 function formatDate(value) {
@@ -131,7 +131,10 @@ function VerificationCenter({ verificationItems, identityItems, onReviewBusiness
     setExpandedId(key); setDocumentsLoading(true); setError('');
     try {
       const entries = documentEntries(item);
-      const resolved = await Promise.all(entries.map(async ([, path]) => [path, await getVerificationDocumentUrl(path, 600)]));
+      const resolved = await Promise.all(entries.map(async ([, path]) => {
+        try { return [path, await downloadVerificationDocumentPreview(path)]; }
+        catch { return [path, await getVerificationDocumentUrl(path, 600)]; }
+      }));
       setDocumentUrls((current) => ({ ...current, ...Object.fromEntries(resolved) }));
     } catch (reason) { setError(reason.message || 'Could not load private KYC documents.'); }
     finally { setDocumentsLoading(false); }
