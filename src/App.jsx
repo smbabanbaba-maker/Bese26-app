@@ -1057,7 +1057,7 @@ function AppContent() {
     window.location.reload();
   };
   if (!startupReady) return <SplashScreen message={startupError || 'Connecting to Bese26…'} error={Boolean(startupError)} onRetry={retryStartup} />;
-  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small></div></div>;
+  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small><button type="button" className="maintenance-owner-login" onClick={() => setShowAuth(true)}>Owner / Admin login</button></div>{showAuth && <AuthPanel reason="Owner or delegated admin access" onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setAuthReason(''); setShowAuth(false); showToast('Signed in to Bese26.'); }} />}</div>;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;

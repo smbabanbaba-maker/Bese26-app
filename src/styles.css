@@ -6417,3 +6417,21 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .maintenance-control-actions small { color: #87919a; font-size: 10px; }
 @media (max-width: 650px) { .notification-summary-row { grid-template-columns: repeat(3, 1fr); } .notification-summary-row > div { padding: 11px 9px; } .notification-summary-row strong { font-size: 18px; } .notification-center-header { padding-top: 0; } .maintenance-control-grid { grid-template-columns: 1fr; } .maintenance-control-actions { align-items: stretch; flex-direction: column; } .maintenance-control-actions button { width: 100%; } }
 @media (max-width: 440px) { .notification-center-header p { font-size: 12px; } .notification-header-icon { width: 42px; height: 42px; } .notification-item { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 9px; padding: 13px 11px; } .notification-dot { width: 30px; height: 30px; } }
+
+/* Admin global directory search and maintenance recovery. */
+.admin-directory-search { margin: 16px 0; }
+.admin-directory-searchbar { display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; gap: 9px; align-items: center; margin-top: 14px; }
+.admin-directory-searchbar label { min-width: 0; display: flex; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid #dfe3e8; border-radius: 10px; color: #7b858e; background: #fff; }
+.admin-directory-searchbar input { width: 100%; min-width: 0; padding: 10px 0; border: 0; outline: 0; color: #293039; background: transparent; font: inherit; font-size: 12px; }
+.admin-directory-searchbar select { min-width: 0; padding: 10px; border: 1px solid #dfe3e8; border-radius: 10px; color: #4d5862; background: #fff; font: inherit; font-size: 12px; }
+.admin-directory-searchbar .primary-button { min-height: 38px; white-space: nowrap; }
+.admin-search-hint { display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 14px; border: 1px dashed #d8dde3; border-radius: 11px; color: #77828c; background: #fafbfc; font-size: 12px; }
+.admin-directory-results { display: grid; gap: 13px; margin-top: 15px; }
+.admin-directory-group { overflow: hidden; border: 1px solid #e3e6ea; border-radius: 12px; background: #fff; }
+.admin-directory-group-title { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; border-bottom: 1px solid #edf0f2; color: #535e68; background: #fafbfc; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .07em; }
+.admin-directory-group-title b { display: grid; min-width: 22px; height: 22px; place-items: center; border-radius: 999px; color: #a51f28; background: #fff0ef; font-size: 10px; }
+.admin-directory-group .admin-operation-row { margin: 0; border: 0; border-bottom: 1px solid #f0f2f4; border-radius: 0; }
+.admin-directory-group .admin-operation-row:last-child { border-bottom: 0; }
+.maintenance-owner-login { margin-top: 24px; padding: 9px 13px; border: 1px solid #e2b5b5; border-radius: 9px; color: #9d2029; background: #fff7f6; cursor: pointer; font-size: 11px; font-weight: 800; }
+.maintenance-owner-login:hover { border-color: #b4232c; background: #fff0ef; }
+@media (max-width: 650px) { .admin-directory-searchbar { grid-template-columns: 1fr; } .admin-directory-searchbar .primary-button { width: 100%; } .admin-directory-group .admin-operation-row { align-items: flex-start; } .admin-directory-group .admin-row-actions { flex-wrap: wrap; justify-content: flex-end; } }
