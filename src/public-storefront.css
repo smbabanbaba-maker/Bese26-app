@@ -1347,3 +1347,14 @@
 .miniweb-hero-v2-verification .verification-badge-wrap { display: inline-flex; }
 .miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 20px; padding: 3px 6px; font-size: 8px; }
 .miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
+
+/* Final compact verification treatment: small badges, unmistakable blue identity tick. */
+.miniweb-hero-v2-verification .verification-badge-group { gap: 3px; margin-top: 4px; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 17px; padding: 2px 5px; border-radius: 999px; font-size: 7px; line-height: 1; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 9px; height: 9px; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge-id { color: #0756d6; background: #dbeafe; border-color: #4d8ff7; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge-cac { color: #087443; background: #dcfce7; border-color: #5bd18a; }
+@media (max-width: 600px) {
+  .miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 16px; padding: 2px 4px; font-size: 6.5px; }
+  .miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 8px; height: 8px; }
+}
