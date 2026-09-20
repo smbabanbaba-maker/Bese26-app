@@ -1332,3 +1332,12 @@
   .miniweb-hero-v2-stats .miniweb-hero-v2-follow span { display: inline; overflow: visible; }
   .miniweb-hero-v2-stats .miniweb-hero-v2-follow { font-size: 8px; }
 }
+
+@media (max-width: 600px) {
+  .miniweb-hero-v2-bottom { grid-template-columns: minmax(0, 1fr); align-items: stretch; justify-items: stretch; }
+  .miniweb-hero-v2-bottom > .miniweb-hero-v2-stats,
+  .miniweb-hero-v2-bottom > .miniweb-hero-v2-actions { grid-column: 1 / -1; min-width: 0; width: 100%; }
+  .miniweb-hero-v2-stats { display: flex; }
+  .miniweb-hero-v2-stats > span,
+  .miniweb-hero-v2-stats > .miniweb-hero-v2-follow { width: auto; }
+}
