@@ -6320,3 +6320,10 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .boosting-actions { display: grid; grid-template-columns: 1fr; }
   .boosting-actions .primary-button, .boosting-actions .secondary-button { width: 100%; }
 }
+
+.business-directory-card-head > div { min-width: 0; }
+.business-directory-card-head .verification-badge-group { flex-wrap: nowrap; gap: 3px; margin: 3px 0 2px; }
+.business-directory-card-head .verification-badge-group .verification-badge { min-height: 18px; padding: 2px 5px; font-size: 8px; }
+.business-directory-card-head .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
+.business-directory-card-head .business-directory-handle { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 430px) { .business-directory-card-head .verification-badge-group .verification-badge { font-size: 7px; padding-inline: 4px; } }

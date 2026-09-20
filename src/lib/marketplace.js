@@ -733,12 +733,16 @@ export async function fetchBusinessDirectory(search = '') {
     const { data: profiles } = await supabase.from('profiles').select('id,is_verified,verification_expires_at').in('id', profileIds);
     verifiedProfiles = new Set((profiles || []).filter((profile) => verificationIsCurrent(profile)).map((profile) => profile.id));
   }
-  return businesses.map((business) => ({
-    ...business,
-    is_verified: verificationIsCurrent(business)
-      || String(business.verification_status || '').toLowerCase() === 'verified'
-      || verifiedProfiles.has(business.profile_id),
-  }));
+  return businesses.map((business) => {
+    const cacVerified = verificationIsCurrent(business) || String(business.verification_status || '').toLowerCase() === 'verified';
+    const idVerified = verifiedProfiles.has(business.profile_id);
+    return {
+      ...business,
+      id_verified: idVerified,
+      cac_verified: cacVerified,
+      is_verified: cacVerified || idVerified,
+    };
+  });
 }
 
 export async function checkBusinessHandleAvailability(handle, userId = null) {
