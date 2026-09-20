@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ArrowLeft, Check, CheckCircle2, Clock3, Headphones, MapPin, Megaphone, Package, Pause, Play, Plus, RefreshCw, Search, ShieldCheck, Trash2, UserRound, Users, X } from 'lucide-react';
-import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, searchAdminDirectory, fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, getVerificationDocumentUrl, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign, adminSetMaintenance, adminSoftDeleteBusiness, fetchAdminAuditLogs, fetchAdminPlatformSettings } from '../lib/marketplace';
+import { adminGrantVerificationByEmail, adminSetCategoryActive, adminSetBusinessVisibility, adminSetListingLifecycle, adminSetUserAccess, adminDeleteUser, adminTeamAdd, adminTeamList, adminTeamRemove, adminTeamUpdate, adminUpdateBoost, adminUpdateCallback, adminUpdateListingReport, adminUpdateReport, adminUpdateReview, adminUpdateSupportTicket, adminUpsertBoostPackage, createAdminAdCampaign, deleteAdminAdCampaign, fetchAdminAdCampaigns, fetchAdminControlOverview, fetchAdminDirectoryControls, fetchAdminMarketplaceOperations, fetchAdminVerificationQueue, searchAdminDirectory, fetchModerationHistory, fetchPendingListings, moderateListing, fetchVerificationQueue, fetchIdentityVerificationQueue, getVerificationDocumentUrl, reviewBusinessVerification, reviewIdentityVerification, reviewVerificationApplication, updateAdminAdCampaign, adminSetMaintenance, adminSoftDeleteBusiness, fetchAdminAuditLogs, fetchAdminPlatformSettings } from '../lib/marketplace';
 import AdminPlatformControls from './AdminPlatformControls';
 
 function formatDate(value) {
@@ -141,11 +141,11 @@ export default function AdminView({ user, onBack, onNotice, onCreateListing }) {
     setLoading(true);
     setError('');
     try {
-      const [pendingRows, historyRows, verificationRows, identityRows] = await Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue(), fetchIdentityVerificationQueue().catch(() => [])]);
+      const [pendingRows, historyRows, kycRows] = await Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchAdminVerificationQueue()]);
       setItems(pendingRows);
       setHistory(historyRows);
-      setVerificationItems(verificationRows);
-      setIdentityItems(identityRows);
+      setVerificationItems((kycRows || []).filter((row) => row.verification_type !== 'identity'));
+      setIdentityItems((kycRows || []).filter((row) => row.verification_type === 'identity'));
     } catch (requestError) {
       setError(requestError.message || 'Could not load moderation data.');
     } finally {
@@ -155,13 +155,13 @@ export default function AdminView({ user, onBack, onNotice, onCreateListing }) {
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchVerificationQueue(), fetchIdentityVerificationQueue().catch(() => [])])
-      .then(([pendingRows, historyRows, verificationRows, identityRows]) => {
+    Promise.all([fetchPendingListings(), fetchModerationHistory(), fetchAdminVerificationQueue()])
+      .then(([pendingRows, historyRows, kycRows]) => {
         if (!mounted) return;
         setItems(pendingRows);
         setHistory(historyRows);
-        setVerificationItems(verificationRows);
-        setIdentityItems(identityRows);
+        setVerificationItems((kycRows || []).filter((row) => row.verification_type !== 'identity'));
+        setIdentityItems((kycRows || []).filter((row) => row.verification_type === 'identity'));
       })
       .catch((requestError) => mounted && setError(requestError.message || 'Could not load moderation data.'))
       .finally(() => mounted && setLoading(false));

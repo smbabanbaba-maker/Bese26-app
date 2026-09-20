@@ -264,6 +264,14 @@ export async function fetchIdentityVerificationQueue() {
   if (error) throw error;
   return data || [];
 }
+
+export async function fetchAdminVerificationQueue() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_verification_queue');
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
+
 export async function reviewIdentityVerification({ id, status, reviewerNote = null }) {
   failIfUnavailable();
   if (!['under_review', 'verified', 'rejected', 'requires_more_information'].includes(status)) throw new Error('Invalid identity review status.');
