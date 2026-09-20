@@ -1195,3 +1195,31 @@
   .public-business-hero.storefront-hero-clean .public-business-identity .public-business-badges { position: relative !important; z-index: 13 !important; }
   .public-business-hero.storefront-hero-clean .public-business-hero::after { z-index: 0 !important; }
 }
+
+/* Definitive phone layout: use a simple vertical flow so no Miniweb hero content can overlap. */
+@media (max-width: 600px) {
+  .public-business-hero.storefront-hero-clean { display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 10px !important; min-height: 0 !important; height: auto !important; padding: 14px !important; overflow: hidden !important; }
+  .public-business-hero.storefront-hero-clean .public-hero-brand-mark { display: none !important; }
+  .public-business-hero.storefront-hero-clean .public-hero-share { position: absolute !important; top: 12px !important; right: 12px !important; z-index: 20 !important; width: auto !important; min-height: 30px !important; margin: 0 !important; padding: 6px 9px !important; font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo { order: 1 !important; align-self: flex-start !important; width: 70px !important; height: 70px !important; margin: 0 !important; border-width: 3px !important; border-radius: 15px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity { order: 2 !important; display: flex !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; min-width: 0 !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; position: relative !important; z-index: 8 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity .eyebrow { display: block !important; margin: 0 0 5px !important; color: #ffcaca !important; font-size: 8px !important; line-height: 1.2 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity .public-business-name { display: block !important; width: 100% !important; min-height: 31px !important; margin: 0 !important; color: #ffffff !important; visibility: visible !important; opacity: 1 !important; font-size: 29px !important; font-weight: 850 !important; line-height: 1.08 !important; letter-spacing: -.8px !important; overflow-wrap: anywhere !important; }
+  .public-business-hero.storefront-hero-clean .public-verification-panel { display: inline-flex !important; order: 2 !important; max-width: calc(100% - 84px) !important; margin: 8px 0 0 !important; padding: 7px 9px !important; border-radius: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-verification-panel strong { font-size: 10px !important; }
+  .public-business-hero.storefront-hero-clean .public-verification-panel small { font-size: 8px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-badges { order: 3 !important; display: block !important; margin: 5px 0 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-badges .verification-badge { min-height: 22px !important; padding: 3px 7px !important; font-size: 8px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-subline { order: 4 !important; display: block !important; margin: 6px 0 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-subline span { font-size: 9px !important; }
+  .public-business-hero.storefront-hero-clean .public-business-identity p { display: none !important; }
+  .public-business-hero.storefront-hero-clean .public-business-logo-location { order: 3 !important; display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-location { display: inline-flex !important; align-items: center !important; gap: 5px !important; color: #e8edff !important; font-size: 10px !important; line-height: 1.35 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-trust { order: 4 !important; display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 7px !important; width: 100% !important; margin: 0 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats > span { display: grid !important; gap: 2px !important; min-height: 48px !important; padding: 8px 10px !important; border: 1px solid rgba(255,255,255,.22) !important; border-radius: 9px !important; background: rgba(255,255,255,.11) !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats strong { color: #ffffff !important; font-size: 18px !important; line-height: 1 !important; }
+  .public-business-hero.storefront-hero-clean .public-business-stats small { color: #e8edff !important; font-size: 8px !important; }
+  .public-business-hero.storefront-hero-clean .public-browse-cta { display: inline-flex !important; order: 5 !important; align-self: flex-start !important; width: auto !important; min-height: 31px !important; margin: 0 !important; padding: 7px 11px !important; font-size: 9px !important; }
+  .public-business-listings.storefront-listings-clean { margin-top: 12px !important; padding: 13px !important; }
+}
