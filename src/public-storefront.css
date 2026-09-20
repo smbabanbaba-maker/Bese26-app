@@ -1292,3 +1292,24 @@
   .miniweb-hero-v2-stats { flex: 1; }
   .miniweb-hero-v2-listings { align-self: end; }
 }
+
+/* Slim Miniweb trust strip: compact metrics plus a clear Follow action. */
+.miniweb-hero-v2-bottom { align-items: center; gap: 14px; }
+.miniweb-hero-v2-stats { display: flex; flex: 1 1 auto; min-width: 0; gap: 0; overflow: hidden; border: 1px solid rgba(255,255,255,.22); border-radius: 10px; background: rgba(255,255,255,.08); }
+.miniweb-hero-v2-stats span { display: grid; flex: 1 1 0; min-width: 0; gap: 3px; padding: 8px 10px; border: 0; border-right: 1px solid rgba(255,255,255,.24); border-radius: 0; background: transparent; text-align: center; }
+.miniweb-hero-v2-stats span:last-child { border-right: 0; }
+.miniweb-hero-v2-stats strong { font-size: 17px; }
+.miniweb-hero-v2-stats small { white-space: nowrap; }
+.miniweb-hero-v2-actions { display: inline-flex; flex: none; align-items: center; gap: 7px; }
+.miniweb-hero-v2-follow { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 32px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.55); border-radius: 8px; color: #fff; background: rgba(255,255,255,.12); font-size: 9px; font-weight: 800; white-space: nowrap; }
+.miniweb-hero-v2-follow.following { color: #112033; background: #8ee7c6; border-color: #8ee7c6; }
+.miniweb-hero-v2-follow:disabled { cursor: not-allowed; opacity: .68; }
+@media (max-width: 600px) {
+  .miniweb-hero-v2-bottom { display: grid; gap: 9px; }
+  .miniweb-hero-v2-stats { width: 100%; }
+  .miniweb-hero-v2-stats span { padding: 7px 4px; }
+  .miniweb-hero-v2-stats strong { font-size: 15px; }
+  .miniweb-hero-v2-stats small { font-size: 7px; }
+  .miniweb-hero-v2-actions { width: 100%; }
+  .miniweb-hero-v2-follow, .miniweb-hero-v2-listings { flex: 1; min-height: 30px; }
+}

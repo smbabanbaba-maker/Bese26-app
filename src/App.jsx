@@ -696,7 +696,34 @@ function PublicProfileHeader({ profile, business, listings, share }) {
   const scrollToListings = () => document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const idVerified = Boolean(profile?.is_verified && !isBusiness);
   const cacVerified = Boolean(business?.is_verified || (isBusiness && profile?.is_verified));
-  return <section className="miniweb-hero-v2"><div className="miniweb-hero-v2-top"><div className="miniweb-hero-v2-logo">{avatar ? <img src={getAvatarUrl(avatar)} alt={`${name} profile`} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="miniweb-hero-v2-heading"><div className="miniweb-hero-v2-eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1><div className={`miniweb-hero-v2-verification ${idVerified || cacVerified ? 'is-verified' : ''}`}><BadgeCheck size={16} /><span><strong>{idVerified || cacVerified ? 'Verified profile' : 'Public profile'}</strong><small>{idVerified && cacVerified ? 'Identity and business verified' : idVerified ? 'Identity verified by Bese26' : cacVerified ? 'Business verified by Bese26' : 'Public profile on Bese26'}</small></span></div></div><button type="button" className="miniweb-hero-v2-share" onClick={share} aria-label="Share shop"><Share2 size={14} /> Share</button></div><div className="miniweb-hero-v2-meta"><span><MapPin size={13} /> {location || 'Nigeria'}</span>{(business?.category || business?.business_type) && <span className="miniweb-hero-v2-category">{business.category || business.business_type}</span>}</div>{safeDescription && <p className="miniweb-hero-v2-description">{safeDescription}</p>}<div className="miniweb-hero-v2-bottom"><div className="miniweb-hero-v2-stats"><span><strong>{listings.length}</strong><small>Listings</small></span><span><strong>{profile?.seller_rating ? Number(profile.seller_rating).toFixed(1) : 'New'}</strong><small>Rating</small></span></div><button type="button" className="miniweb-hero-v2-listings" onClick={scrollToListings}>View listings <ArrowRight size={14} /></button></div></section>;
+  const targetId = profile?.id;
+  const [heroFollow, setHeroFollow] = useState({ followers: 0, following: 0, isFollowing: false, busy: false });
+  useEffect(() => {
+    let mounted = true;
+    if (!targetId || !isSupabaseConfigured || !supabase) return undefined;
+    (async () => {
+      try {
+        const [{ data: sessionData }, followSummary] = await Promise.all([supabase.auth.getSession(), fetchFollowSummary(targetId)]);
+        const currentUser = sessionData?.session?.user || null;
+        const relation = currentUser && currentUser.id !== targetId ? await getFollowState(currentUser.id, targetId) : { following: false };
+        if (mounted) setHeroFollow({ followers: Number(followSummary?.followers || 0), following: Number(followSummary?.following || 0), isFollowing: Boolean(relation?.following), busy: false });
+      } catch { if (mounted) setHeroFollow((current) => ({ ...current, busy: false })); }
+    })();
+    return () => { mounted = false; };
+  }, [targetId]);
+  const handleHeroFollow = async () => {
+    if (!supabase || !targetId) return;
+    const { data } = await supabase.auth.getSession();
+    const currentUser = data?.session?.user || null;
+    if (!currentUser) { window.alert('Sign in to follow this profile.'); return; }
+    if (currentUser.id === targetId || heroFollow.busy) return;
+    const next = !heroFollow.isFollowing;
+    setHeroFollow((current) => ({ ...current, isFollowing: next, followers: Math.max(0, current.followers + (next ? 1 : -1)), busy: true }));
+    try { await toggleFollow(currentUser.id, targetId, next); } catch { setHeroFollow((current) => ({ ...current, isFollowing: !next, followers: Math.max(0, current.followers + (next ? -1 : 1)), busy: false })); window.alert('Could not update follow status. Try again.'); return; }
+    setHeroFollow((current) => ({ ...current, busy: false }));
+  };
+  const heroViews = listings.reduce((total, item) => total + Number(item.views_count || 0), 0);
+  return <section className="miniweb-hero-v2"><div className="miniweb-hero-v2-top"><div className="miniweb-hero-v2-logo">{avatar ? <img src={getAvatarUrl(avatar)} alt={`${name} profile`} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="miniweb-hero-v2-heading"><div className="miniweb-hero-v2-eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1><div className={`miniweb-hero-v2-verification ${idVerified || cacVerified ? 'is-verified' : ''}`}><BadgeCheck size={16} /><span><strong>{idVerified || cacVerified ? 'Verified profile' : 'Public profile'}</strong><small>{idVerified && cacVerified ? 'Identity and business verified' : idVerified ? 'Identity verified by Bese26' : cacVerified ? 'Business verified by Bese26' : 'Public profile on Bese26'}</small></span></div></div><button type="button" className="miniweb-hero-v2-share" onClick={share} aria-label="Share shop"><Share2 size={14} /> Share</button></div><div className="miniweb-hero-v2-meta"><span><MapPin size={13} /> {location || 'Nigeria'}</span>{(business?.category || business?.business_type) && <span className="miniweb-hero-v2-category">{business.category || business.business_type}</span>}</div>{safeDescription && <p className="miniweb-hero-v2-description">{safeDescription}</p>}<div className="miniweb-hero-v2-bottom"><div className="miniweb-hero-v2-stats"><span><strong>{listings.length}</strong><small>Listings</small></span><span><strong>{heroFollow.followers}</strong><small>Followers</small></span><span><strong>{heroFollow.following}</strong><small>Following</small></span><span><strong>{heroViews}</strong><small>Views</small></span></div><div className="miniweb-hero-v2-actions"><button type="button" className={`miniweb-hero-v2-follow ${heroFollow.isFollowing ? 'following' : ''}`} onClick={handleHeroFollow} disabled={heroFollow.busy || !targetId}><UserPlus size={13} /> {heroFollow.isFollowing ? 'Following' : 'Follow'}</button><button type="button" className="miniweb-hero-v2-listings" onClick={scrollToListings}>View listings <ArrowRight size={14} /></button></div></div></section>;
 }
 function PublicListingSection({ title, listings }) {
   return <section id="listings" className="public-business-listings storefront-listings-clean"><div className="section-heading"><div><div className="eyebrow">AVAILABLE NOW</div><h2>{title}</h2></div><span>{listings.length} listing{listings.length === 1 ? '' : 's'}</span></div>{listings.length ? <div className="product-grid">{listings.map((listing, index) => <PublicListingCard key={listing.id} listing={listing} featured={index === 0} />)}</div> : <div className="empty-state"><Package size={26} /><h3>No active listings yet</h3><p>Listings from this profile will appear here automatically.</p></div>}</section>;
