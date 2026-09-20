@@ -706,6 +706,13 @@ export async function fetchPublicBusiness(handle) {
   return { business: { ...business, is_verified: verificationIsCurrent(business) }, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
 }
 
+export async function fetchPublicSellerViews(userId) {
+  if (!supabase || !userId) return 0;
+  const { data, error } = await supabase.from('listings').select('views_count').eq('seller_id', userId).limit(1000);
+  if (error) throw error;
+  return (data || []).reduce((total, row) => total + Number(row.views_count || 0), 0);
+}
+
 export async function fetchPublicProfile(username) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();

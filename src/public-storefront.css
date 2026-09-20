@@ -1341,3 +1341,9 @@
   .miniweb-hero-v2-stats > span,
   .miniweb-hero-v2-stats > .miniweb-hero-v2-follow { width: auto; }
 }
+
+/* Explicit identity and business verification inside the dark Miniweb hero. */
+.miniweb-hero-v2-verification .verification-badge-group { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 5px; }
+.miniweb-hero-v2-verification .verification-badge-wrap { display: inline-flex; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 20px; padding: 3px 6px; font-size: 8px; }
+.miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
