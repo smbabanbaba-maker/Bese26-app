@@ -200,6 +200,7 @@ export async function submitBusinessVerification(values) {
     p_phone: values.phone?.trim() || null,
     p_notes: values.notes?.trim() || null,
     p_document_path: values.document_path || null,
+    p_cac_registered_name: values.cac_registered_name?.trim() || '',
   });
   if (error) throw error;
   return data;
