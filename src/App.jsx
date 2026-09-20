@@ -843,7 +843,6 @@ function AppContent() {
     return () => window.removeEventListener('hashchange', applyDeepLink);
   }, []);
   useEffect(() => { try { localStorage.setItem('bese26:theme', isDark ? 'dark' : 'light'); } catch {} }, [isDark]);
-  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>We’ll be back shortly</h1><p>{platformSettings.maintenance_message || 'Bese26 is temporarily unavailable while we make improvements.'}</p><small>Thank you for your patience.</small></div></div>;
 
   const showToast = useCallback((message) => { setToast(message); window.setTimeout(() => setToast(''), 3000); }, []);
   const useMyLocation = useCallback(() => {
@@ -1056,6 +1055,7 @@ function AppContent() {
     window.location.reload();
   };
   if (!startupReady) return <SplashScreen message={startupError || 'Connecting to Bese26…'} error={Boolean(startupError)} onRetry={retryStartup} />;
+  if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><ShieldCheck size={30} /><div className="eyebrow">BESE26 MARKETPLACE</div><h1>We’ll be back shortly</h1><p>{platformSettings.maintenance_message || 'Bese26 is temporarily unavailable while we make improvements.'}</p><small>Thank you for your patience.</small></div></div>;
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
