@@ -1360,14 +1360,17 @@ export async function fetchConversations(userId) {
   const conversations = rows || [];
   const listingIds = [...new Set(conversations.map((row) => row.listing_id).filter(Boolean))];
   const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
-  const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }] = await Promise.all([
+  const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }] = await Promise.all([
     listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
+    profileIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200) : Promise.resolve({ data: [], error: null }),
   ]);
   if (listingError) throw listingError;
   if (profileError) throw profileError;
+  if (businessError) throw businessError;
   const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
-  const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, row]));
+  const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getAvatarUrl(row.logo_path) }]));
+  const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, { ...row, avatar_url: getAvatarUrl(row.avatar_path), business: businessMap[row.id] || null }]));
   return conversations.map((row) => ({ ...row, listing: listingMap[row.listing_id] || null, buyer: profileMap[row.buyer_id] || null, seller: profileMap[row.seller_id] || null }));
 }
 
