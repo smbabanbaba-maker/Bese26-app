@@ -6568,6 +6568,9 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .notification-feed-media img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .notification-feed-content { min-width: 0; padding-top: 1px; }
 .notification-feed-heading { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.notification-feed-heading .verification-badge-group { flex: none; flex-wrap: nowrap; gap: 3px; margin: 0; }
+.notification-feed-heading .verification-badge-group .verification-badge { min-height: 18px; padding: 2px 5px; font-size: 8px; }
+.notification-feed-heading .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
 .notification-feed-heading strong { overflow: hidden; color: #252b30; font-size: 13px; font-weight: 850; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .notification-feed-row.is-read .notification-feed-heading strong { font-weight: 700; }
 .notification-verified { display: inline-flex; flex: none; color: #1877f2; }
