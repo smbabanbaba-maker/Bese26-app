@@ -907,9 +907,27 @@ export async function fetchModerationHistory() {
 export async function fetchNotifications(userId) {
   failIfUnavailable();
   if (!userId) return [];
-  const { data, error } = await supabase.from('notifications').select('id,notification_type,title,body,data,read_at,created_at').eq('recipient_id', userId).order('created_at', { ascending: false }).limit(50);
+  const { data, error } = await supabase.from('notifications').select('id,actor_id,notification_type,title,body,data,read_at,created_at').eq('recipient_id', userId).order('created_at', { ascending: false }).limit(50);
   if (error) throw error;
-  return data || [];
+  const rows = data || [];
+  if (!rows.length) return rows;
+  const actorIds = [...new Set(rows.map((row) => row.actor_id).filter(Boolean))];
+  const listingIds = [...new Set(rows.map((row) => row.data?.listing_id).filter(Boolean))];
+  const businessIds = [...new Set(rows.map((row) => row.data?.business_profile_id).filter(Boolean))];
+  const [{ data: profiles, error: profilesError }, { data: businesses, error: businessesError }, { data: listings, error: listingsError }] = await Promise.all([
+    actorIds.length ? supabase.from('profiles').select('id,display_name,username,avatar_path,is_verified,verification_expires_at').in('id', actorIds) : Promise.resolve({ data: [], error: null }),
+    businessIds.length ? supabase.from('business_profiles').select('profile_id,business_name,logo_path,is_verified,verification_status,verification_expires_at,is_active').in('profile_id', businessIds).eq('is_active', true) : Promise.resolve({ data: [], error: null }),
+    listingIds.length ? supabase.from('listings').select('id,title,listing_media(storage_path,media_type,sort_order)').in('id', listingIds) : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (profilesError) throw profilesError;
+  if (businessesError) throw businessesError;
+  if (listingsError) throw listingsError;
+  const mediaEntries = (listings || []).flatMap((listing) => [...(listing.listing_media || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).slice(0, 1).map((media) => ({ listingId: listing.id, path: media.storage_path })));
+  const mediaUrls = await getListingMediaUrls(mediaEntries.map((entry) => entry.path));
+  const profileMap = Object.fromEntries((profiles || []).map((profile) => [profile.id, { ...profile, avatar_url: getAvatarUrl(profile.avatar_path) }]));
+  const businessMap = Object.fromEntries((businesses || []).map((business) => [business.profile_id, { ...business, logo_url: getAvatarUrl(business.logo_path) }]));
+  const listingMap = Object.fromEntries((listings || []).map((listing) => [listing.id, { ...listing, image_url: mediaUrls[mediaEntries.findIndex((entry) => entry.listingId === listing.id)] || '' }]));
+  return rows.map((row) => ({ ...row, actor: profileMap[row.actor_id] || null, business: businessMap[row.data?.business_profile_id] || null, listing: listingMap[row.data?.listing_id] || null }));
 }
 
 export async function markNotificationRead(notificationId, userId) {
