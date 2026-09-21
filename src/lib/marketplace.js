@@ -341,6 +341,19 @@ export async function downloadVerificationDocumentPreview(path) {
   if (error) throw error;
   return data ? URL.createObjectURL(data) : null;
 }
+export async function downloadAdminVerificationDocument(path) {
+  failIfUnavailable();
+  if (!path) return null;
+  const { data, error } = await supabase.auth.getSession();
+  if (error || !data?.session?.access_token) throw new Error('Your admin session expired. Please sign in again.');
+  const response = await fetch(`/api/admin/verification-document?path=${encodeURIComponent(path)}`, { headers: { Authorization: `Bearer ${data.session.access_token}` } });
+  if (!response.ok) {
+    let message = 'Could not load the private KYC document.';
+    try { message = (await response.json()).error || message; } catch {}
+    throw new Error(message);
+  }
+  return URL.createObjectURL(await response.blob());
+}
 export async function getProfile(userId) {
   failIfUnavailable();
   const fullQuery = supabase
