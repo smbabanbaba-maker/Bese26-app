@@ -6595,21 +6595,3 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .notification-more { padding: 0; color: #a51f28; font-size: 10px; font-weight: 850; }
 .notification-unread-dot { position: absolute; top: 34px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: #d53e42; }
 @media (max-width: 380px) { .notification-center-header p { max-width: 220px; font-size: 11px; } .notification-feed-row { grid-template-columns: 48px minmax(0, 1fr); gap: 10px; padding-inline: 4px; } .notification-feed-media { width: 48px; height: 48px; } .notification-feed-heading strong { font-size: 12px; } .notification-feed-content p { font-size: 11px; } .notification-unread-dot { top: 32px; right: 1px; } }
-/* Miniweb creation celebration: visual confirmation and a short success chime. */
-.business-congrats-backdrop { position: fixed; inset: 0; left: 0; right: 0; z-index: 100; display: grid; place-items: center; overflow: hidden; width: auto; min-width: 0; height: 100dvh; max-width: 100%; max-height: 100dvh; min-height: 0; padding: 0; box-sizing: border-box; background: linear-gradient(145deg, rgba(10,17,31,.82), rgba(21,33,58,.72)); backdrop-filter: blur(8px); }
-.business-congrats-card { position: relative; z-index: 2; width: 100%; min-width: 0; height: 100dvh; max-width: 100%; max-height: 100dvh; min-height: 0; display: grid; align-content: center; justify-items: center; gap: 12px; padding: 0 clamp(16px, 6vw, 32px); box-sizing: border-box; overflow: hidden; border-radius: 0; background: radial-gradient(circle at 50% 20%, rgba(255,244,220,.95), transparent 32%), linear-gradient(150deg, #fff, #fff7f3); box-shadow: none; text-align: center; animation: businessCongratsIn .42s cubic-bezier(.2,.8,.2,1) both; }
-.business-congrats-close { position: absolute; top: 10px; right: 13px; width: 32px; height: 32px; border-radius: 50%; color: #68717d; background: #f0f3f6; font-size: 23px; line-height: 1; }
-.business-congrats-icon { width: 66px; height: 66px; display: grid; place-items: center; border-radius: 22px; color: #fff; background: linear-gradient(145deg, #ef4c56, #ff8a67); box-shadow: 0 12px 25px rgba(239,76,86,.28); }
-.business-congrats-card .eyebrow { margin-top: 3px; color: #b3313a; }
-.business-congrats-welcome { padding: 7px 13px; border: 1px solid #ffd8ca; border-radius: 999px; color: #b3313a; background: #fff1eb; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
-.business-congrats-card h2 { margin: 0; color: #182230; font-size: clamp(25px, 7vw, 34px); }
-.business-congrats-card p { margin: 0; color: #303a46; font-size: 15px; line-height: 1.45; }
-.business-congrats-card p strong { color: #b3313a; }
-.business-congrats-card > small { max-width: 330px; color: #68717d; font-size: 12px; line-height: 1.5; }
-.business-congrats-actions { width: min(100%, 360px); display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
-.business-congrats-actions > * { max-width: 100%; box-sizing: border-box; }
-.business-confetti { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.business-confetti i { position: absolute; top: -20px; left: calc((var(--i) * 7.1%) + 1%); width: 8px; height: 18px; border-radius: 3px; background: hsl(calc(var(--i) * 31deg), 82%, 58%); transform: rotate(calc(var(--i) * 23deg)); animation: businessConfettiFall 2.8s ease-in infinite; animation-delay: calc(var(--i) * -0.12s); }
-@keyframes businessCongratsIn { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes businessConfettiFall { 0% { opacity: 0; transform: translateY(-10vh) rotate(0); } 12% { opacity: 1; } 100% { opacity: .1; transform: translateY(110vh) rotate(520deg); } }
-@media (prefers-reduced-motion: reduce) { .business-congrats-card, .business-confetti i { animation: none; } }
