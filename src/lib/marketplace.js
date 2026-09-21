@@ -459,7 +459,12 @@ export async function fetchAdminControlOverview() {
   if (error) throw error;
   return data || { counts: {}, recent_users: [], reports: [], listing_reports: [], support: [] };
 }
-
+export async function fetchAdminUsersDirectory() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('admin_users_directory');
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
 export async function searchAdminDirectory(query = '', entity = 'all') {
   failIfUnavailable();
   const { data, error } = await supabase.rpc('admin_global_directory_search', { p_query: query || '', p_entity: entity || 'all' });
