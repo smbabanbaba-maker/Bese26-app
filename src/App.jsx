@@ -199,18 +199,29 @@ function SectionHeading({ eyebrow, title, action, onAction }) {
   );
 }
 
+function ListingCardMedia({ listing, children }) {
+  const images = useMemo(() => Array.from(new Set([...(listing.gallery || []), listing.image].filter(Boolean))), [listing.gallery, listing.image]);
+  const [activeImage, setActiveImage] = useState(0);
+  useEffect(() => { setActiveImage(0); }, [listing.id]);
+  useEffect(() => { if (images.length < 2) return undefined; const timer = window.setInterval(() => setActiveImage((current) => (current + 1) % images.length), 7000); return () => window.clearInterval(timer); }, [images.length]);
+  return <div className={`product-image-wrap ${images.length > 1 ? 'has-gallery' : ''}`}>
+    {images.length ? images.map((image, index) => <img key={`${image}-${index}`} src={image} alt={listing.title} className={`product-image product-image-slide ${index === activeImage ? 'is-active' : ''}`} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" onError={(event) => event.currentTarget.classList.add('is-broken')} />) : <div className="product-image-placeholder"><Package size={26} /></div>}
+    {images.length > 1 && <span className="product-gallery-dots" aria-label={`${images.length} listing photos`}>{images.map((image, index) => <i className={index === activeImage ? 'active' : ''} key={`${image}-dot-${index}`} />)}</span>}
+    {children}
+  </div>;
+}
+
 const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onToggleSave, compact = false }) {
   const isNew = Boolean(listing.raw?.created_at && Date.now() - new Date(listing.raw.created_at).getTime() < 24 * 60 * 60 * 1000);
   const isTopRated = Number(listing.sellerRating || 0) >= 4.5;
   return (
     <article className={`product-card ${compact ? 'product-card-compact' : ''}`} role="button" tabIndex={0} aria-label={`Open listing: ${listing.title}`} onClick={() => onOpen(listing)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); onOpen(listing); } }}>
-      <div className="product-image-wrap">
-        {listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /> : null}<div className="product-image-placeholder" hidden={Boolean(listing.image)}><Package size={26} /></div>
+      <ListingCardMedia listing={listing}>
         <div className="listing-card-badges">{listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> BOOSTED</span>}{isNew && <span className="fresh-pill">NEW</span>}{isTopRated && <span className="trust-pill"><BadgeCheck size={11} /> TOP RATED</span>}</div>
         <button className={`save-button ${isSaved ? 'saved' : ''}`} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} onClick={(event) => { event.stopPropagation(); onToggleSave(listing.id); }}>
           <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
-      </div>
+      </ListingCardMedia>
       <div className="product-info">
         <div className="product-price">{listing.price}</div>
         <h3>{listing.title}</h3>
@@ -647,7 +658,7 @@ function ListingDetailsView({ listing, user, onClose, isSaved, onToggleSave, onD
 }
 
 function PublicListingCard({ listing, featured = false }) {
-  return <a className="product-card public-listing-card" href={`/listing/${encodeURIComponent(listing.id)}`}><div className="product-image-wrap">{featured && <span className="public-featured-label">Featured</span>}{listing.image ? <img src={listing.image} alt={listing.title} className="product-image" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.nextElementSibling?.removeAttribute('hidden'); }} /> : null}<div className="product-image-placeholder" hidden={Boolean(listing.image)}><Package size={26} /></div></div><div className="product-info"><div className="product-price">{listing.price}</div><h3>{listing.title}</h3><div className="product-meta"><MapPin size={13} /> {listing.location}</div><div className="product-foot"><span>{listing.condition}</span><span>{listing.posted}</span></div><span className="public-card-action">View listing <ArrowRight size={14} /></span></div></a>;
+  return <a className="product-card public-listing-card" href={`/listing/${encodeURIComponent(listing.id)}`}><ListingCardMedia listing={listing}>{featured && <span className="public-featured-label">Featured</span>}</ListingCardMedia><div className="product-info"><div className="product-price">{listing.price}</div><h3>{listing.title}</h3><div className="product-meta"><MapPin size={13} /> {listing.location}</div><div className="product-foot"><span>{listing.condition}</span><span>{listing.posted}</span></div><span className="public-card-action">View listing <ArrowRight size={14} /></span></div></a>;
 }
 function PublicFollowShowcase({ targetId, name }) {
   const [sessionUser, setSessionUser] = useState(null);

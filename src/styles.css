@@ -6547,6 +6547,15 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .notification-item > i { width: 7px; height: 7px; margin-top: 5px; }
 @media (max-width: 380px) { .notification-center-header p { font-size: 11px; } .notification-filters button { padding-inline: 8px; } .notification-refresh { font-size: 9px; } .notification-item { grid-template-columns: 32px minmax(0, 1fr) 7px; gap: 9px; padding-inline: 8px; } .notification-dot { width: 32px; height: 32px; } }
 @media (min-width: 700px) { .notification-center { padding-top: 8px; } .notification-item { padding-inline: 15px; } }
+/* Listing card galleries: automatically cycle through seller-uploaded photos. */
+.product-image-wrap.has-gallery { isolation: isolate; }
+.product-image-slide { position: absolute; inset: 0; z-index: 0; opacity: 0; transform: scale(1.015); transition: opacity .7s ease, transform 7s ease; }
+.product-image-slide.is-active { z-index: 1; opacity: 1; transform: scale(1); }
+.product-image-slide.is-broken { display: none; }
+.product-gallery-dots { position: absolute; z-index: 4; left: 50%; bottom: 9px; display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 999px; background: rgba(17,19,21,.42); transform: translateX(-50%); pointer-events: none; }
+.product-gallery-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.58); transition: width .25s ease, background .25s ease; }
+.product-gallery-dots i.active { width: 14px; border-radius: 999px; background: #fff; }
+@media (prefers-reduced-motion: reduce) { .product-image-slide { transition: opacity .2s ease; transform: none; } .product-gallery-dots i { transition: none; } }
 /* Notification activity feed v2 — layout only, scoped to NotificationsView. */
 .notification-center { max-width: 680px; padding: 0 0 28px; }
 .notification-center-header { align-items: flex-start; padding-bottom: 15px; border-bottom: 1px solid #eee7e7; }
