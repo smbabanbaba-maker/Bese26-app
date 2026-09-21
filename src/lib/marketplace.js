@@ -914,9 +914,10 @@ export async function fetchNotifications(userId) {
   const actorIds = [...new Set(rows.map((row) => row.actor_id).filter(Boolean))];
   const listingIds = [...new Set(rows.map((row) => row.data?.listing_id).filter(Boolean))];
   const businessIds = [...new Set(rows.map((row) => row.data?.business_profile_id).filter(Boolean))];
+  const businessOwnerIds = [...new Set([...actorIds, ...businessIds])];
   const [{ data: profiles, error: profilesError }, { data: businesses, error: businessesError }, { data: listings, error: listingsError }] = await Promise.all([
-    actorIds.length ? supabase.from('profiles').select('id,display_name,username,avatar_path,is_verified,verification_expires_at').in('id', actorIds) : Promise.resolve({ data: [], error: null }),
-    businessIds.length ? supabase.from('business_profiles').select('profile_id,business_name,logo_path,is_verified,verification_status,verification_expires_at,is_active').in('profile_id', businessIds).eq('is_active', true) : Promise.resolve({ data: [], error: null }),
+    actorIds.length ? supabase.from('profiles').select('id,display_name,username,avatar_path,is_verified,verification_expires_at,app_role').in('id', actorIds) : Promise.resolve({ data: [], error: null }),
+    businessOwnerIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active').in('profile_id', businessOwnerIds).eq('is_active', true) : Promise.resolve({ data: [], error: null }),
     listingIds.length ? supabase.from('listings').select('id,title,listing_media(storage_path,media_type,sort_order)').in('id', listingIds) : Promise.resolve({ data: [], error: null }),
   ]);
   if (profilesError) throw profilesError;
@@ -927,7 +928,7 @@ export async function fetchNotifications(userId) {
   const profileMap = Object.fromEntries((profiles || []).map((profile) => [profile.id, { ...profile, avatar_url: getAvatarUrl(profile.avatar_path) }]));
   const businessMap = Object.fromEntries((businesses || []).map((business) => [business.profile_id, { ...business, logo_url: getAvatarUrl(business.logo_path) }]));
   const listingMap = Object.fromEntries((listings || []).map((listing) => [listing.id, { ...listing, image_url: mediaUrls[mediaEntries.findIndex((entry) => entry.listingId === listing.id)] || '' }]));
-  return rows.map((row) => ({ ...row, actor: profileMap[row.actor_id] || null, business: businessMap[row.data?.business_profile_id] || null, listing: listingMap[row.data?.listing_id] || null }));
+  return rows.map((row) => ({ ...row, actor: profileMap[row.actor_id] || null, business: businessMap[row.data?.business_profile_id] || null, actorBusiness: businessMap[row.actor_id] || null, listing: listingMap[row.data?.listing_id] || null }));
 }
 
 export async function markNotificationRead(notificationId, userId) {
