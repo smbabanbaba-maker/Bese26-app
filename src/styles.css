@@ -6500,3 +6500,13 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .admin-directory-group-search input { width: 100%; min-height: 33px; border: 0; outline: 0; color: #22262c; background: transparent; font: inherit; font-size: 11px; }
 .admin-search-empty { padding: 13px; border-radius: 8px; color: #808996; background: #f7f8f9; font-size: 10px; text-align: center; }
 @media (max-width: 600px) { .admin-directory-group-title { align-items: flex-start; } .admin-directory-group-title > div { flex-wrap: wrap; } .admin-directory-more { white-space: nowrap; } }
+
+/* Compact User access card: keep the member list closed until requested. */
+.admin-user-access-summary { display: inline-flex; align-items: center; gap: 9px; }
+.admin-user-access-card .admin-directory-more { white-space: nowrap; }
+.admin-user-collapsed { display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 16px; border: 1px dashed #dfe3e8; border-radius: 10px; color: #737c88; background: #fafbfc; }
+.admin-user-collapsed svg { flex: none; color: #bd3c32; }
+.admin-user-collapsed span { color: #4e5662; font-size: 11px; font-weight: 750; }
+.admin-user-collapsed small { margin-left: auto; color: #8a929d; font-size: 10px; text-align: right; }
+.admin-user-access-card.is-expanded { border-color: #ffb4aa; }
+@media (max-width: 560px) { .admin-user-access-summary { align-items: flex-end; flex-direction: column; gap: 5px; } .admin-user-collapsed { align-items: flex-start; flex-wrap: wrap; } .admin-user-collapsed small { width: 100%; margin-left: 29px; text-align: left; } }
