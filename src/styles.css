@@ -6583,8 +6583,8 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .notification-feed-heading strong { overflow: hidden; color: #252b30; font-size: 13px; font-weight: 850; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .notification-feed-row.is-read .notification-feed-heading strong { font-weight: 700; }
 .notification-verified { display: inline-flex; flex: none; color: #1877f2; }
-.notification-admin-verified { width: 18px; height: 18px; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: #1683f3; }
-.notification-admin-verified svg { stroke-width: 3; }
+.notification-admin-mark { width: 20px; height: 20px; display: inline-grid; flex: none; place-items: center; border: 2px solid #0b63ce; border-radius: 7px; color: #fff; background: linear-gradient(145deg, #2494ff, #0754bc); box-shadow: 0 2px 5px rgba(7,84,188,.25); }
+.notification-admin-mark svg { width: 13px; height: 13px; stroke-width: 3; }
 .notification-feed-content p { display: -webkit-box; overflow: hidden; margin: 3px 0 0; color: #5f6972; font-size: 12px; line-height: 1.42; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 .notification-feed-meta { display: flex; align-items: center; gap: 8px; min-height: 16px; margin-top: 4px; }
 .notification-feed-meta time { color: #929ba3; font-size: 10px; line-height: 1.2; }
