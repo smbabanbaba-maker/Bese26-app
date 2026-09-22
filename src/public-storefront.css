@@ -1378,3 +1378,4 @@
   .miniweb-hero-v2-verification .verification-badge-group .verification-badge { min-height: 15px; padding: 2px 3px; font-size: 6px; }
   .miniweb-hero-v2-verification .verification-badge-group .verification-badge svg { width: 7px; height: 7px; }
 }
+.public-boosted-label { position: absolute; z-index: 4; top: 10px; right: 10px; display: inline-flex; align-items: center; padding: 5px 8px; border-radius: 999px; color: #fff; background: #c92020; font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 5px 12px rgba(201,32,32,.22); }

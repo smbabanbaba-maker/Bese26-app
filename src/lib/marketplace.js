@@ -839,7 +839,17 @@ export async function fetchMyListings({ sellerId, status = 'all' } = {}) {
   if (status === 'archived') query = query.in('status', ['archived', 'rejected']);
   const { data, error } = await query;
   if (error) throw error;
-  return hydrateListingRows(data || []);
+  const listings = await hydrateListingRows(data || []);
+  try {
+    const ids = listings.map((item) => item.id).filter(Boolean);
+    if (!ids.length) return listings;
+    const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
+    if (boostError) return listings;
+    const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
+    return listings.map((item) => ({ ...item, promoted: promoted.has(item.id) }));
+  } catch {
+    return listings;
+  }
 }
 
 export async function isAdminUser(userId) {
