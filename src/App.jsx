@@ -766,9 +766,81 @@ function PublicPersonalPage({ data }) {
   const share = async () => { const url = `https://www.bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: profile.display_name, text: profile.bio || profile.display_name, url }); else await navigator.clipboard?.writeText(url); };
   return <PublicStorefrontLayout title={profile.display_name} share={share}><PublicProfileHeader profile={profile} listings={listings} share={share} /><PublicListingSection title={`Listings by ${profile.display_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
+const SEO_SITE_URL = 'https://www.bese26.shop';
+const SEO_DEFAULT_IMAGE = `${SEO_SITE_URL}/images/bese26-official-logo.png`;
+function seoText(value, fallback = '') {
+  return String(value || fallback).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function seoSetMeta(attribute, name, content) {
+  if (!content) return;
+  let tag = document.head.querySelector(`meta[${attribute}="${name}"]`);
+  if (!tag) { tag = document.createElement('meta'); tag.setAttribute(attribute, name); document.head.appendChild(tag); }
+  tag.setAttribute('content', content);
+}
+function seoSetCanonical(url) {
+  let tag = document.head.querySelector('link[rel="canonical"]');
+  if (!tag) { tag = document.createElement('link'); tag.rel = 'canonical'; document.head.appendChild(tag); }
+  tag.href = url;
+}
+function seoSetSchema(id, value) {
+  let tag = document.head.querySelector(`script[data-bese26-schema="${id}"]`);
+  if (!tag) { tag = document.createElement('script'); tag.type = 'application/ld+json'; tag.dataset.bese26Schema = id; document.head.appendChild(tag); }
+  tag.textContent = JSON.stringify(value);
+}
+function seoListingSchema(listing) {
+  const rawPrice = Number(listing?.raw?.price);
+  const price = Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : null;
+  const image = listing?.image || SEO_DEFAULT_IMAGE;
+  const sellerName = listing?.sellerDisplayName || listing?.seller || 'Bese26 seller';
+  const sellerUrl = listing?.sellerBusinessHandle ? `${SEO_SITE_URL}/@${listing.sellerBusinessHandle}` : undefined;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: seoText(listing?.title, 'Marketplace listing'),
+    description: seoText(listing?.description, `${listing?.title || 'Product'} available on Bese26 marketplace.`),
+    image: [image],
+    url: `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}`,
+    brand: { '@type': 'Brand', name: 'Bese26' },
+    offers: { '@type': 'Offer', url: `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}`, priceCurrency: 'NGN', availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/UsedCondition' },
+  };
+  if (price) schema.offers.price = price;
+  schema.offers.seller = sellerUrl ? { '@type': 'Organization', name: sellerName, url: sellerUrl } : { '@type': 'Person', name: sellerName };
+  return schema;
+}
+function usePublicSeo({ title, description, canonical, image = SEO_DEFAULT_IMAGE, schema }) {
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = title;
+    seoSetMeta('name', 'description', description);
+    seoSetMeta('name', 'robots', 'index,follow,max-image-preview:large,max-snippet:-1');
+    seoSetMeta('property', 'og:title', title);
+    seoSetMeta('property', 'og:description', description);
+    seoSetMeta('property', 'og:type', 'website');
+    seoSetMeta('property', 'og:url', canonical);
+    seoSetMeta('property', 'og:image', image || SEO_DEFAULT_IMAGE);
+    seoSetMeta('property', 'og:site_name', 'Bese26');
+    seoSetMeta('name', 'twitter:card', 'summary_large_image');
+    seoSetMeta('name', 'twitter:title', title);
+    seoSetMeta('name', 'twitter:description', description);
+    seoSetMeta('name', 'twitter:image', image || SEO_DEFAULT_IMAGE);
+    seoSetCanonical(canonical);
+    if (schema) seoSetSchema('public-page', schema);
+    return () => { document.title = previousTitle; };
+  }, [title, description, canonical, image, schema]);
+}
+
 function PublicBusinessPage({ handle }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => { let mounted = true; fetchPublicBusiness(handle).then((data) => data || fetchPublicProfile(handle)).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load this public profile.' })); return () => { mounted = false; }; }, [handle]);
+const seoData = state.data;
+  const seoBusiness = seoData?.business;
+  const seoProfile = seoData?.profile || seoData?.ownerProfile;
+  const seoListings = seoData?.listings || [];
+  const seoName = seoBusiness?.business_name || seoProfile?.display_name || handle;
+  const seoDescription = seoText(seoBusiness?.description || seoProfile?.bio, `${seoName} on Bese26 — discover listings, products and services in Nigeria.`);
+  const seoCanonical = `${SEO_SITE_URL}/@${String(seoBusiness?.business_handle || seoProfile?.username || handle).toLowerCase()}`;
+  const seoBusinessImage = getAvatarUrl(seoBusiness?.logo_path) || SEO_DEFAULT_IMAGE;
+  usePublicSeo({ title: `${seoName} | Bese26 Miniweb`, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage, schema: seoData ? { '@context': 'https://schema.org', '@type': seoBusiness ? 'Store' : 'Person', name: seoName, url: seoCanonical, description: seoDescription, image: seoBusinessImage, address: { '@type': 'PostalAddress', addressLocality: seoBusiness?.city || seoProfile?.city || '', addressRegion: seoBusiness?.state || seoProfile?.state || '', addressCountry: 'NG' }, hasOfferCatalog: { '@type': 'OfferCatalog', name: `Listings from ${seoName}`, itemListElement: seoListings.slice(0, 60).map((item, index) => ({ '@type': 'Offer', position: index + 1, url: `${SEO_SITE_URL}/listing/${encodeURIComponent(item.id)}`, itemOffered: { '@type': 'Product', name: seoText(item.title), image: item.image || SEO_DEFAULT_IMAGE, offers: { '@type': 'Offer', priceCurrency: 'NGN', availability: 'https://schema.org/InStock' } } })) } } : null });
   if (state.loading) return <SplashScreen />;
   if (state.error || !state.data) return <div className="public-business-shell"><section className="public-business-not-found"><div className="brand-mark">B</div><div className="eyebrow">BESE26 SHOP</div><h1>Shop not found</h1><p>This public shop does not exist, is inactive, or has no public profile.</p><a className="primary-button" href="https://www.bese26.shop/">Back to Bese26 <ArrowRight size={16} /></a></section></div>;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
@@ -780,7 +852,8 @@ function PublicListingRoute({ listingId }) {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => { let mounted = true; fetchListingDetails(listingId).then((data) => mounted && setListing(data)).catch(() => mounted && setListing(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [listingId]);
-  useEffect(() => { if (!listing) return undefined; const previous = { title: document.title, description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '' }; document.title = `${listing.title} | Bese26`; let description = document.querySelector('meta[name="description"]'); if (!description) { description = document.createElement('meta'); description.name = 'description'; document.head.appendChild(description); } description.content = `${listing.title} — ${listing.price} in ${listing.location}. View details on Bese26.`; let canonical = document.querySelector('link[rel="canonical"]'); if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); } canonical.href = `https://www.bese26.shop/listing/${encodeURIComponent(listing.id)}`; const tags = [['og:title', `${listing.title} | Bese26`], ['og:description', description.content], ['og:image', listing.image || `https://www.bese26.shop/images/bese26-official-logo.png`], ['og:url', canonical.href], ['twitter:card', 'summary_large_image'], ['twitter:title', `${listing.title} | Bese26`], ['twitter:description', description.content]]; tags.forEach(([name, content]) => { const selector = name.startsWith('og:') ? `meta[property="${name}"]` : `meta[name="${name}"]`; let tag = document.querySelector(selector); if (!tag) { tag = document.createElement('meta'); tag.setAttribute(name.startsWith('og:') ? 'property' : 'name', name); document.head.appendChild(tag); } tag.content = content; }); return () => { document.title = previous.title; if (description) description.content = previous.description; }; }, [listing]);
+const listingDescription = listing ? seoText(listing.description, `${listing.title} — ${listing.price} in ${listing.location}. Find it on Bese26, Nigeria's marketplace.`) : '';
+  usePublicSeo({ title: listing ? `${listing.title} | Bese26 Marketplace` : 'Bese26 Marketplace', description: listingDescription, canonical: listing ? `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}` : `${SEO_SITE_URL}/`, image: listing?.image || SEO_DEFAULT_IMAGE, schema: listing ? seoListingSchema(listing) : null });
   if (loading) return <BrandLoader message="Loading listing…" compact />;
   if (!listing) return <div className="empty-state listing-not-found"><Package size={30} /><h1>Listing not found</h1><p>This listing is no longer available or is not public.</p><a className="primary-button" href="/">Back to Bese26</a></div>;
   return <ListingDetailsView listing={listing} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />;
