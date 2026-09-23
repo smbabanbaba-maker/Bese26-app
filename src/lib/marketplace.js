@@ -1473,7 +1473,7 @@ export function subscribeToMessages(conversationId, onMessage) {
 
 export async function fetchBoostPackages() {
   failIfUnavailable();
-  const { data, error } = await supabase.from('boost_packages').select('id,name,duration_days,price_kobo,placement').eq('is_active', true).order('price_kobo').limit(20);
+  const { data, error } = await supabase.from('boost_packages').select('id,name,duration_days,price_kobo,placement').eq('is_active', true).eq('is_public', true).order('price_kobo').limit(20);
   if (error) throw error;
   return data || [];
 }

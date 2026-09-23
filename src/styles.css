@@ -6598,3 +6598,18 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .listing-boost-status { display:inline-flex; align-items:center; gap:4px; }
 .listing-boost-action { display:inline-flex; align-items:center; gap:4px; padding:3px 6px; border:1px solid #e8b8b8; border-radius:999px; color:#b71c1c; background:#fff7f7; font-size:10px; font-weight:800; white-space:nowrap; }
 .listing-boost-action:hover, .listing-boost-action:focus-visible { background:#fff0f0; }
+.boosting-package-field { display:grid; gap:10px; }
+.boosting-field-label { display:grid; gap:4px; }
+.boosting-field-label span { color:#344054; font-size:12px; font-weight:800; }
+.boosting-field-label small { color:#98a2b3; font-size:10px; line-height:1.35; }
+.boosting-package-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.boosting-package-card { position:relative; display:grid; gap:5px; min-width:0; padding:14px 12px; border:1px solid #e1e6ed; border-radius:14px; color:#172230; background:#fff; text-align:left; cursor:pointer; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+.boosting-package-card:hover { transform:translateY(-2px); border-color:#e2a0a0; box-shadow:0 8px 18px rgba(16,24,40,.08); }
+.boosting-package-card.selected { border-color:#c94b4b; background:linear-gradient(145deg,#fff8f8,#fff); box-shadow:0 0 0 3px rgba(201,75,75,.11); }
+.boosting-package-top { display:flex; align-items:center; justify-content:space-between; gap:5px; min-height:18px; }
+.boosting-package-top strong { font-size:11px; }
+.boosting-package-top em { padding:3px 5px; border-radius:999px; color:#9b5b15; background:#fff1d6; font-size:7px; font-style:normal; font-weight:800; white-space:nowrap; }
+.boosting-package-card b { color:#b71c1c; font-size:20px; letter-spacing:-.04em; }
+.boosting-package-duration { color:#344054; font-size:10px; font-weight:800; }
+.boosting-package-placement { min-height:25px; color:#98a2b3; font-size:9px; line-height:1.35; }
+@media (max-width:700px) { .boosting-package-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .boosting-package-card { padding:12px 10px; } .boosting-package-card b { font-size:18px; } .boosting-package-top em { font-size:6px; } }
