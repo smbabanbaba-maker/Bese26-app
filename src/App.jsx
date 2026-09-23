@@ -822,6 +822,7 @@ function AppContent() {
   if (publicListingId) return <PublicListingRoute listingId={publicListingId} />;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
   const [activeNav, setActiveNav] = useState('home');
+  const navigationReadyRef = useRef(false);
   const [savedIds, setSavedIds] = useState([]);
   const [selectedListing, setSelectedListing] = useState(null);
   const [search, setSearch] = useState('');
@@ -1031,11 +1032,40 @@ function AppContent() {
   }, [sessionUser]);
   useEffect(() => { initAnalytics(); }, []);
   useEffect(() => { trackPageView(`${window.location.pathname}#${activeNav}`); }, [activeNav]);
-  const navigate = (page) => { if (page !== 'sell') setEditingListing(null); if (page === 'sell') trackEvent('open_sell'); if (page === 'subscription') trackEvent('view_pricing'); if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1); setActiveNav(page); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  useEffect(() => {
+    const currentState = window.history.state || {};
+    window.history.replaceState({ ...currentState, bese26Route: 'home' }, '', window.location.href);
+    navigationReadyRef.current = true;
+    const handlePopState = (event) => {
+      setSelectedListing(null);
+      setEditingListing(null);
+      setEditingDraft(null);
+      setActiveNav(event.state?.bese26Route || 'home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  const navigate = (page) => {
+    if (page !== 'sell') setEditingListing(null);
+    if (page === 'sell') trackEvent('open_sell');
+    if (page === 'subscription') trackEvent('view_pricing');
+    if (page === 'profile' && activeNav === 'profile') setProfileReset((value) => value + 1);
+    if (selectedListing) window.history.replaceState({ ...(window.history.state || {}), bese26Route: activeNav, bese26Listing: false }, '', window.location.href);
+    if (navigationReadyRef.current && page !== activeNav) window.history.pushState({ ...(window.history.state || {}), bese26Route: page }, '', window.location.href);
+    setSelectedListing(null);
+    setActiveNav(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const goBack = () => {
+    if (window.history.state?.bese26Route && activeNav !== 'home') window.history.back();
+    else if (activeNav !== 'home') navigate('home');
+  };
   const goPublicSection = (section) => { trackEvent('view_public_policy', { policy: section }); setActiveNav(`public-${section}`); setEditingListing(null); window.scrollTo({ top: 0, behavior: 'smooth' }); window.history.replaceState({}, '', `/#${section}`); };
   const goSearch = (value) => { setSearch(value); trackEvent('search', { search_term: value }); navigate('search'); };
   const openListing = (listing) => {
     trackEvent('view_listing', { listing_id: listing?.id, listing_category: listing?.category });
+    window.history.pushState({ ...(window.history.state || {}), bese26Route: activeNav, bese26Listing: true }, '', window.location.href);
     setSelectedListing(listing);
     if (sessionUser?.id) recordRecentlyViewed(sessionUser.id, listing.id).catch(() => {});
     fetchListingDetails(listing.id).then((details) => {
@@ -1086,17 +1116,17 @@ function AppContent() {
   if (platformSettings.maintenance_mode && !canAccessAdmin) return <div className="maintenance-screen"><div className="maintenance-card"><div className="maintenance-icon-wrap"><ShieldCheck size={30} /></div><div className="eyebrow">BESE26 MARKETPLACE</div><h1>{t('We’ll be back shortly')}</h1><p>{platformSettings.maintenance_message || t('Bese26 is temporarily unavailable while we make improvements.')}</p><small>{t('Thank you for your patience.', 'Thank you for your patience.')}</small><div className="maintenance-animation" aria-label="A cheetah running while maintenance is in progress"><span className="maintenance-cloud cloud-one" /><span className="maintenance-cloud cloud-two" /><span className="maintenance-animal" role="img" aria-label="Running cheetah">🐆</span><span className="maintenance-track" /><span className="maintenance-progress" /></div><div className="maintenance-status"><span className="maintenance-pulse" /> Maintenance in progress</div></div></div>;
 
   const renderView = () => {
-    if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={() => navigate('home')} />;
+    if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={goBack} />;
     if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
-    if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={() => navigate('home')} />;
-    if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={() => navigate('home')} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} />;
+    if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={goBack} />;
+    if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={goBack} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
-    if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={() => navigate('home')} />;
-    if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={() => navigate('profile')} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'business') return <BusinessDirectoryView adCampaigns={adCampaigns} onBack={() => navigate('home')} />;
+    if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={goBack} />;
+    if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={goBack} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
+    if (activeNav === 'business') return <BusinessDirectoryView adCampaigns={adCampaigns} onBack={goBack} />;
     if (activeNav === 'sell') return <SellView user={sessionUser} isAdmin={canAccessAdmin} initialListing={editingListing} initialDraft={editingDraft} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onOpenListing={openListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); }} />;
-    if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} onBack={() => navigate('profile')} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => { setEditingDraft(null); navigate('sell'); }} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
+    if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} onBack={goBack} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => { setEditingDraft(null); navigate('sell'); }} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
     return <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={() => { setEditingDraft(null); navigate('sell'); }} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
   };
 
@@ -1106,7 +1136,7 @@ function AppContent() {
     <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{t(label)}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
-    <ListingDetailsView listing={selectedListing} user={sessionUser} onClose={() => setSelectedListing(null)} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
+    <ListingDetailsView listing={selectedListing} user={sessionUser} onClose={() => window.history.back()} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
     <InstallPrompt />
   </div>;
