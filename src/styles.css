@@ -6613,3 +6613,10 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .boosting-package-duration { color:#344054; font-size:10px; font-weight:800; }
 .boosting-package-placement { min-height:25px; color:#98a2b3; font-size:9px; line-height:1.35; }
 @media (max-width:700px) { .boosting-package-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .boosting-package-card { padding:12px 10px; } .boosting-package-card b { font-size:18px; } .boosting-package-top em { font-size:6px; } }
+.verification-plan-gate { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding:14px; border:1px solid #ead7b0; border-radius:15px; background:linear-gradient(135deg,#fffaf0,#fff); box-shadow:0 7px 20px rgba(77,54,13,.05); }
+.verification-plan-gate-icon { display:grid; flex:0 0 40px; width:40px; height:40px; place-items:center; border-radius:12px; color:#9b671d; background:#fff0ce; }
+.verification-plan-gate > div { min-width:0; flex:1; }
+.verification-plan-gate strong { color:#4a3517; font-size:12px; }
+.verification-plan-gate p { margin:3px 0 0; color:#806f51; font-size:10px; line-height:1.45; }
+.verification-plan-gate .primary-button { flex:none; white-space:nowrap; }
+@media (max-width:700px) { .verification-plan-gate { align-items:flex-start; flex-wrap:wrap; } .verification-plan-gate .primary-button { width:100%; justify-content:center; margin-left:52px; } }
