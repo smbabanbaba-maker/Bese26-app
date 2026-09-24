@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bese26-shell-v1';
+const CACHE_NAME = 'bese26-shell-v2';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/images/bese26-logo-icon.png', '/images/bese26-official-logo.png'];
 
 self.addEventListener('install', (event) => {
