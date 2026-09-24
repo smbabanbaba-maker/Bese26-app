@@ -1,17 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "bese26-app.vercel.app"
-        }
-      ],
-      "destination": "https://www.bese26.shop/$1",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
