@@ -708,6 +708,14 @@ export async function fetchListingReviews(listingId) {
   return data || [];
 }
 
+export async function fetchSellerReviews(sellerId) {
+  failIfUnavailable();
+  if (!sellerId) return [];
+  const { data, error } = await supabase.from('reviews').select('id,listing_id,rating,body,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path),listing:listings!reviews_listing_id_fkey(title)').eq('reviewee_id', sellerId).eq('status', 'published').order('created_at', { ascending: false }).limit(50);
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchSimilarListings(listing) {
   if (!supabase || !listing?.id) return [];
   let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', listing.raw?.category_id || null).order('created_at', { ascending: false }).limit(50);

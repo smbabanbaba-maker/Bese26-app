@@ -6107,6 +6107,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .listing-new-review-top { display: flex; align-items: center; gap: 7px; } .listing-new-review-top strong { color: #31404a; font-size: 12px; } .listing-new-review-top time { margin-left: auto; color: #8a959d; font-size: 10px; }
 .listing-new-review-avatar { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #c9343d; background: #ffe5e7; font-size: 11px; font-weight: 800; }
 .listing-new-stars { margin: 6px 0 3px 34px; color: #e4a626; font-size: 12px; letter-spacing: 1px; } .listing-new-review p { margin: 0 0 0 34px; color: #53616b; font-size: 12px; line-height: 1.45; }
+.listing-review-summary, .listing-review-listing { display: block; margin-top: 4px; color: #7c8992; font-size: 11px; }
 .listing-new-no-reviews { display: flex; align-items: center; gap: 8px; color: #87929a; } .listing-new-no-reviews span { font-size: 25px; } .listing-new-no-reviews p { margin: 0; font-size: 12px; }
 .listing-new-safety { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; color: #66552e; background: #fffaf0; }
 .listing-new-safety > div { display: flex; gap: 9px; } .listing-new-safety svg { flex: 0 0 auto; color: #bd8d2a; } .listing-new-safety strong { display: block; margin-bottom: 3px; color: #5e4b22; font-size: 13px; } .listing-new-safety p { margin: 0; font-size: 11px; line-height: 1.45; }
@@ -6117,6 +6118,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .listing-new-card > strong, .listing-new-card > b, .listing-new-card > small { display: block; margin-right: 8px; margin-left: 8px; } .listing-new-card > strong { overflow: hidden; margin-top: 9px; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; } .listing-new-card > b { margin-top: 5px; color: #d43840; font-size: 13px; } .listing-new-card > small { display: flex; align-items: center; gap: 3px; margin-top: 5px; overflow: hidden; color: #7a8790; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 761px) { .listing-details-view { box-shadow: 0 0 0 1px #e4eaee, 0 18px 50px rgba(20,35,45,.1); } }
 @media (max-width: 390px) { .listing-new-section { padding-right: 13px; padding-left: 13px; } .listing-new-seller-head { grid-template-columns: 42px minmax(0,1fr); } .listing-new-seller-avatar { width: 42px; height: 42px; } .listing-new-link { grid-column: 2; justify-self: start; margin-top: -3px; } .listing-new-seller-actions { margin-left: 52px; } }
+
+.listing-action-overlay { position: fixed; inset: 0; z-index: 120; display: flex; align-items: flex-end; justify-content: center; padding: 16px; background: rgba(17,24,31,.48); }
+.listing-action-sheet { width: min(100%, 540px); max-height: min(88vh, 720px); overflow-y: auto; padding: 20px; border-radius: 18px 18px 0 0; color: #26323b; background: #fff; box-shadow: 0 -12px 50px rgba(17,24,31,.22); }
+.listing-action-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.listing-action-sheet h2 { margin: 3px 0 0; font-size: 22px; }
+.listing-action-sheet > p { color: #65727b; font-size: 13px; }
+.listing-action-sheet > p strong { color: #d43840; }
+.listing-action-sheet label { display: grid; gap: 7px; margin-top: 16px; color: #34414c; font-size: 12px; font-weight: 750; }
+.listing-action-sheet input { width: 100%; min-height: 48px; padding: 0 12px; border: 1px solid #dbe3e8; border-radius: 9px; color: #26323b; background: #fff; font-size: 16px; outline: none; }
+.listing-action-sheet input:focus { border-color: #df3d45; box-shadow: 0 0 0 3px rgba(223,61,69,.1); }
+.listing-action-sheet > small { display: block; margin: 10px 0 16px; color: #7c8992; font-size: 11px; line-height: 1.45; }
+.listing-action-sheet .primary-button { width: 100%; min-height: 46px; }
+.listing-reviews-list { display: grid; gap: 8px; }
+@media (max-width: 430px) { .listing-action-overlay { padding: 0; } .listing-action-sheet { padding: 18px 15px calc(18px + env(safe-area-inset-bottom)); } }
 
 /* Subscription checkout clarity: show the Paystack handoff before plan selection. */
 .subscription-payment-note { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid #dfe9f2; border-radius: 12px; color: #35556e; background: #f5faff; }
