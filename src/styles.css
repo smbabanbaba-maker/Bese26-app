@@ -6073,6 +6073,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .listing-new-outline-action { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #d9e0e5; color: #34414c; background: #fff; }
 .listing-new-solid-action, .listing-new-start-chat { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; color: #fff; background: #df3d45; }
 .listing-new-whatsapp { display: inline-flex; align-items: center; gap: 6px; margin-top: 9px; padding: 5px 0; border: 0; color: #197a51; background: transparent; font: inherit; font-size: 12px; font-weight: 750; cursor: pointer; }
+.listing-new-message-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 42px; margin-top: 8px; border: 1px solid #d9e0e5; border-radius: 9px; color: #24313d; background: #fff; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer; }
+.listing-contact-note { grid-column: 1 / -1; margin: 0; color: #68737d; font-size: 12px; }
 .listing-new-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .listing-new-section-heading h2 { margin: 0; color: #1b2730; font-size: 17px; letter-spacing: -.015em; }
 .listing-new-section-heading span { color: #77848e; font-size: 11px; }

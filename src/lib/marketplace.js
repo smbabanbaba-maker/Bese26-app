@@ -652,7 +652,7 @@ export async function fetchSavedIds(userId) {
 // Keep reads compatible with the existing Supabase schema until the ownership
 // migration is applied. New ownership fields are hydrated automatically once
 // the migration is live.
-const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,username,display_name,avatar_path,is_verified,verification_expires_at,seller_rating),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,username,display_name,avatar_path,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 const listingSelectWithOwnership = `${listingSelect},business_profile_id,published_as_type`;
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
@@ -731,6 +731,19 @@ export async function updateListing(listingId, ownerId, values) {
   const { data, error } = await supabase.from('listings').update(values).eq('id', listingId).select().single();
   if (error) throw error;
   return data;
+}
+
+export async function fetchSellerListings(listing) {
+  if (!supabase || !listing?.sellerId) return [];
+  const { data, error } = await supabase.from('listings').select(listingSelect)
+    .eq('seller_id', listing.sellerId)
+    .eq('status', 'active')
+    .eq('moderation_status', 'approved')
+    .neq('id', listing.id)
+    .order('created_at', { ascending: false })
+    .limit(12);
+  if (error) return [];
+  return hydrateListingRows(data || [], { firstMediaOnly: true });
 }
 
 export async function deleteListing(listingId, ownerId) {
