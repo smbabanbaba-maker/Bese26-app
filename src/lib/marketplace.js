@@ -989,6 +989,49 @@ export async function fetchSellerStats(userId) {
   };
 }
 
+
+export async function fetchSellerAnalytics({ userId, startDate, endDate } = {}) {
+  failIfUnavailable();
+  if (!userId) return { listings: [], views: [], inquiries: [], summary: { views: 0, inquiries: 0, uploaded: 0, sold: 0, active: 0 } };
+  const start = startDate ? new Date(startDate).toISOString() : null;
+  const end = endDate ? new Date(endDate).toISOString() : null;
+  const [{ data: listingRows, error: listingError }, { data: conversationRows, error: conversationError }] = await Promise.all([
+    supabase.from('listings').select('id,title,description,price,currency,status,views_count,created_at,updated_at,category:categories!listings_category_id_fkey(name)').eq('seller_id', userId).order('created_at', { ascending: false }).limit(1000),
+    supabase.from('conversations').select('id,listing_id,created_at,updated_at,last_message_at').eq('seller_id', userId).order('created_at', { ascending: false }).limit(5000),
+  ]);
+  if (listingError) throw listingError;
+  if (conversationError) throw conversationError;
+  const allListings = listingRows || [];
+  const listingIds = allListings.map((row) => row.id);
+  let viewRows = [];
+  if (listingIds.length) {
+    let query = supabase.from('listing_views').select('id,listing_id,viewed_at').in('listing_id', listingIds).order('viewed_at', { ascending: false }).limit(20000);
+    if (start) query = query.gte('viewed_at', start);
+    if (end) query = query.lt('viewed_at', end);
+    const result = await query;
+    if (result.error) throw result.error;
+    viewRows = result.data || [];
+  }
+  const inRange = (value) => { const time = new Date(value || 0).getTime(); return (!start || time >= new Date(start).getTime()) && (!end || time < new Date(end).getTime()); };
+  const rangeListings = allListings.filter((row) => inRange(row.created_at));
+  const rangeInquiries = (conversationRows || []).filter((row) => inRange(row.created_at));
+  const viewsByListing = new Map();
+  viewRows.forEach((row) => viewsByListing.set(row.listing_id, (viewsByListing.get(row.listing_id) || 0) + 1));
+  const listings = rangeListings.map((row) => ({ ...row, category_name: row.category?.name || 'Uncategorised', range_views: viewsByListing.get(row.id) || 0, range_inquiries: rangeInquiries.filter((item) => item.listing_id === row.id).length }));
+  return {
+    listings,
+    views: viewRows,
+    inquiries: rangeInquiries,
+    summary: {
+      views: viewRows.length,
+      inquiries: rangeInquiries.length,
+      uploaded: rangeListings.length,
+      sold: rangeListings.filter((row) => row.status === 'sold').length,
+      active: allListings.filter((row) => row.status === 'active').length,
+    },
+  };
+}
+
 export async function fetchSavedListings(userId) {
   failIfUnavailable();
   if (!userId) return [];

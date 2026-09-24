@@ -62,6 +62,7 @@ import {
   fetchSavedListings,
   fetchSavedSearches,
   fetchSellerStats,
+  fetchSellerAnalytics,
   fetchSellerEntitlement,
   fetchBoostPackages,
   fetchMyBoosts,
@@ -228,13 +229,80 @@ function ReviewsPage({ user, onBack }) {
 }
 
 function AnalyticsPage({ user, onBack }) {
-  const [stats, setStats] = useState(null);
+  const [range, setRange] = useState('month');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+  const [report, setReport] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => { let mounted = true; fetchSellerStats(user.id).then((data) => mounted && setStats(data)).catch(() => mounted && setStats(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
-  const values = stats || {};
-  return <div className="profile-subpage"><SubpageHeader title="Seller Analytics" eyebrow="SELLER TOOLS" onBack={onBack} />{loading ? <EmptyState title="Loading analytics" description="Calculating your real seller activity." /> : <><div className="analytics-stats"><div><Eye size={17} /><strong>{Number(values.views || 0).toLocaleString()}</strong><span>Total views</span></div><div><MessageCircle size={17} /><strong>{values.inquiries || 0}</strong><span>Buyer inquiries</span></div><div><ShoppingBag size={17} /><strong>{values.sold || 0}</strong><span>Sold listings</span></div><div><Package size={17} /><strong>{values.active || 0}</strong><span>Active listings</span></div></div><div className="analytics-card"><div className="analytics-card-head"><div><div className="eyebrow">LISTING PERFORMANCE</div><h2>Account overview</h2></div><BarChart3 size={20} /></div><p className="profile-help-note">Views and inquiry totals are read from your current marketplace records. Historical charts are not shown because no time-series analytics table exists yet.</p></div><div className="future-card"><Info size={20} /><div><strong>Not enough historical data yet</strong><p>Per-listing trends, conversion rates, and performance-over-time reports will appear after Bese26 adds an analytics event ledger.</p></div></div></>}</div>;
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState('');
+  const pad = (value) => String(value).padStart(2, '0');
+  const dateValue = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const period = useMemo(() => {
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    if (range === 'custom') { const customEndDate = customEnd ? new Date(`${customEnd}T00:00:00`) : end; if (customEnd) customEndDate.setDate(customEndDate.getDate() + 1); return { start: customStart || '', end: dateValue(customEndDate) }; }
+    if (range === 'all') return { start: '', end: '' };
+    const days = range === 'week' ? 7 : range === 'year' ? 365 : 30;
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days + 1);
+    return { start: dateValue(start), end: dateValue(end) };
+  }, [range, customStart, customEnd]);
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const [nextReport, nextProfile, nextBusiness] = await Promise.all([fetchSellerAnalytics({ userId: user.id, startDate: period.start, endDate: period.end }), getProfile(user.id), getBusinessProfile(user.id)]);
+      setReport(nextReport); setProfile(nextProfile); setBusiness(nextBusiness);
+    } catch (requestError) { setError(requestError.message || 'Could not load analytics for this period.'); setReport(null); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, [user.id, period.start, period.end]);
+  const formatDate = (value) => value ? new Date(value).toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const periodLabel = range === 'all' ? 'All time' : range === 'custom' ? `${period.start || 'Start'} – ${period.end || 'Today'}` : range === 'week' ? 'Last 7 days' : range === 'year' ? 'Last 12 months' : 'Last 30 days';
+  const addImage = async (doc, url, x, y, width, height) => {
+    if (!url) return;
+    try { const response = await fetch(url); const blob = await response.blob(); const dataUrl = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob); }); doc.addImage(dataUrl, 'PNG', x, y, width, height, undefined, 'FAST'); } catch {}
+  };
+  const downloadPdf = async () => {
+    if (!report || downloading) return;
+    setDownloading(true);
+    try {
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 16;
+      const beseLogo = '/images/bese26-official-logo.png';
+      const userLogo = (business?.logo_path || profile?.avatar_path) ? getAvatarUrl(business?.logo_path || profile.avatar_path) : '';
+      doc.setFillColor(255, 44, 44); doc.rect(0, 0, pageWidth, 8, 'F');
+      await addImage(doc, beseLogo, margin, 14, 24, 24);
+      if (userLogo) await addImage(doc, userLogo, pageWidth - margin - 24, 14, 24, 24);
+      doc.setTextColor(25, 30, 38); doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.text('Seller Analytics Report', margin + 30, 21);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 106, 116); doc.text('Bese26 marketplace · real account activity', margin + 30, 28);
+      doc.setTextColor(35, 40, 48); doc.setFontSize(10); doc.text(business?.business_name || profile?.display_name || 'Bese26 seller', margin, 47); doc.setTextColor(100, 106, 116); doc.text(`${profile?.username ? `@${profile.username} · ` : ''}${periodLabel}`, margin, 53);
+      doc.setDrawColor(229, 232, 237); doc.line(margin, 59, pageWidth - margin, 59);
+      const cards = [['Views', report.summary.views], ['Buyer inquiries', report.summary.inquiries], ['Uploaded', report.summary.uploaded], ['Sold', report.summary.sold]];
+      const cardWidth = (pageWidth - margin * 2 - 9) / 4;
+      cards.forEach(([label, value], index) => { const x = margin + index * (cardWidth + 3); doc.setFillColor(248, 249, 251); doc.roundedRect(x, 66, cardWidth, 22, 3, 3, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(35, 40, 48); doc.text(Number(value || 0).toLocaleString(), x + 5, 77); doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100, 106, 116); doc.text(label.toUpperCase(), x + 5, 83); });
+      let y = 101; doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(35, 40, 48); doc.text('Listing performance', margin, y); y += 8;
+      doc.setFillColor(245, 247, 250); doc.rect(margin, y, pageWidth - margin * 2, 9, 'F'); doc.setFontSize(8); doc.setTextColor(75, 81, 92); doc.text('LISTING', margin + 3, y + 6); doc.text('STATUS', margin + 101, y + 6); doc.text('VIEWS', margin + 132, y + 6); doc.text('INQUIRIES', margin + 157, y + 6); y += 13;
+      doc.setFont('helvetica', 'normal');
+      const rows = report.listings.slice(0, 28);
+      rows.forEach((item) => { if (y > 270) { doc.addPage(); y = 20; } const title = doc.splitTextToSize(item.title || 'Untitled listing', 92)[0]; doc.setTextColor(35, 40, 48); doc.text(title, margin + 3, y); doc.setTextColor(100, 106, 116); doc.text(String(item.status || '—'), margin + 101, y); doc.text(Number(item.range_views || 0).toLocaleString(), margin + 135, y); doc.text(Number(item.range_inquiries || 0).toLocaleString(), margin + 161, y); doc.setDrawColor(235, 237, 241); doc.line(margin, y + 4, pageWidth - margin, y + 4); y += 10; });
+      if (!rows.length) { doc.setTextColor(100, 106, 116); doc.text('No listings were uploaded in this period.', margin + 3, y); y += 10; }
+      y += 8; if (y > 270) { doc.addPage(); y = 20; } doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(35, 40, 48); doc.text('Report notes', margin, y); y += 6; doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100, 106, 116); doc.text(doc.splitTextToSize('This report contains real Bese26 marketplace records for the selected period. Views come from listing view events, inquiries come from buyer conversations, and listing counts come from your listings.', pageWidth - margin * 2), margin, y);
+      const pages = doc.internal.getNumberOfPages(); for (let page = 1; page <= pages; page += 1) { doc.setPage(page); doc.setFontSize(7); doc.setTextColor(130, 135, 144); doc.text(`Bese26 · ${page}/${pages}`, pageWidth - margin - 22, 289); }
+      doc.save(`bese26-analytics-${period.start || 'all'}-${period.end || 'time'}.pdf`);
+    } catch (requestError) { setError(requestError.message || 'Could not create PDF report.'); }
+    finally { setDownloading(false); }
+  };
+  return <div className="profile-subpage analytics-page"><SubpageHeader title="Seller Analytics" eyebrow="SELLER TOOLS" onBack={onBack} />
+    <section className="analytics-report-hero"><div><div className="eyebrow">REAL MARKETPLACE DATA</div><h2>Understand what is working.</h2><p>Review your listings, views, buyer inquiries and sales for the period you choose.</p></div><button type="button" className="primary-button" onClick={downloadPdf} disabled={loading || !report || downloading}><FileText size={15} /> {downloading ? 'Preparing PDF…' : 'Download PDF'}</button></section>
+    <section className="analytics-period-card"><div><strong>Report period</strong><span>{periodLabel}</span></div><div className="analytics-period-tabs"><button type="button" className={range === 'week' ? 'active' : ''} onClick={() => setRange('week')}>7 days</button><button type="button" className={range === 'month' ? 'active' : ''} onClick={() => setRange('month')}>30 days</button><button type="button" className={range === 'year' ? 'active' : ''} onClick={() => setRange('year')}>1 year</button><button type="button" className={range === 'all' ? 'active' : ''} onClick={() => setRange('all')}>All time</button><button type="button" className={range === 'custom' ? 'active' : ''} onClick={() => setRange('custom')}>Custom</button></div>{range === 'custom' && <div className="analytics-custom-dates"><label>From<input type="date" value={customStart} onChange={(event) => setCustomStart(event.target.value)} /></label><label>To<input type="date" value={customEnd} onChange={(event) => setCustomEnd(event.target.value)} /></label></div>}</section>
+    {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}
+    {loading ? <EmptyState title="Loading analytics" description="Reading real marketplace activity for this period." /> : report && <><div className="analytics-stats"><div><Eye size={17} /><strong>{Number(report.summary.views || 0).toLocaleString()}</strong><span>Views</span></div><div><MessageCircle size={17} /><strong>{Number(report.summary.inquiries || 0).toLocaleString()}</strong><span>Buyer inquiries</span></div><div><ShoppingBag size={17} /><strong>{Number(report.summary.sold || 0).toLocaleString()}</strong><span>Sold listings</span></div><div><Package size={17} /><strong>{Number(report.summary.active || 0).toLocaleString()}</strong><span>Active listings</span></div></div><div className="analytics-card"><div className="analytics-card-head"><div><div className="eyebrow">LISTING PERFORMANCE</div><h2>Your listings</h2></div><BarChart3 size={20} /></div>{report.listings.length ? <div className="analytics-listing-table">{report.listings.map((item) => <div className="analytics-listing-row" key={item.id}><span><strong>{item.title}</strong><small>{item.category_name} · Added {formatDate(item.created_at)}</small></span><b>{Number(item.range_views || 0).toLocaleString()} <small>views</small></b><b>{Number(item.range_inquiries || 0).toLocaleString()} <small>inquiries</small></b></div>)}</div> : <EmptyState icon={Package} title="No listings in this period" description="Choose another period or upload a new listing." />}</div><p className="profile-help-note">The PDF includes your selected period, real listing activity, Bese26 branding, and your account logo when available.</p></>}
+  </div>;
 }
-
 function NotificationPage({ user, onBack }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
