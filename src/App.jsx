@@ -78,8 +78,6 @@ const SellView = lazyWithRetry(() => import('./components/SellView'), 'sell');
 import AuthPanel from './components/AuthPanel';
 import InstallPrompt from './components/InstallPrompt';
 import VerificationBadges from './components/VerificationBadges';
-import { City, Country, State } from 'country-state-city';
-import nigeriaLgas from './data/nigeria-lgas.json';
 import { initAnalytics, trackEvent, trackPageView } from './lib/analytics';
 import { getAvatarUrl, isSupabaseConfigured, supabase } from './lib/supabase';
 import { I18nProvider, useI18n } from './lib/i18n';
