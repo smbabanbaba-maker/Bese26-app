@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '../lib/server/paystack.js';
+import { createClient } from '@supabase/supabase-js';
 
 const SITE_URL = 'https://www.bese26.shop';
 
@@ -13,7 +13,10 @@ function isoDate(value) {
 
 export default async function handler(_req, res) {
   try {
-    const supabase = getSupabaseAdmin();
+    const url = process.env.VITE_SUPABASE_URL;
+    const publishableKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !publishableKey) throw new Error('Supabase public configuration is incomplete.');
+    const supabase = createClient(url, publishableKey, { auth: { autoRefreshToken: false, persistSession: false } });
     const [{ data: businesses, error: businessError }, { data: listings, error: listingError }, { data: profiles, error: profileError }] = await Promise.all([
       supabase.from('business_profiles').select('business_handle,updated_at,created_at,is_active').eq('is_active', true).not('business_handle', 'is', null).neq('business_handle', '').limit(5000),
       supabase.from('listings').select('id,updated_at,created_at').eq('status', 'active').eq('moderation_status', 'approved').limit(10000),
