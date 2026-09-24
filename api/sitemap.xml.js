@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '../lib/server/supabase.js';
+import { getSupabaseAdmin } from '../lib/server/paystack.js';
 
 const SITE_URL = 'https://www.bese26.shop';
 
