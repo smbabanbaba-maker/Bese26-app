@@ -1039,18 +1039,25 @@ function AppContent() {
         if (initial) return;
         if (mounted) showToast(error.message || 'Could not restore your session.');
       }
+      // Let the real marketplace shell paint as soon as auth is resolved. Ads,
+      // categories, and other optional data must not hold the first screen.
+      if (mounted && initial && !startupReadyRef.current) {
+        startupError && setStartupError('');
+        startupReadyRef.current = true;
+        setStartupReady(true);
+      }
       try {
-        const [remoteListings, remoteCategories, remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds] = await Promise.all([fetchActiveListings(), fetchCategories(), fetchActiveAdCampaigns(), fetchActiveAdCampaigns({ placement: 'homepage' }), fetchActiveAdCampaigns({ placement: 'search' }), fetchActiveAdCampaigns({ placement: 'business_directory' })]);
+        const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
         if (mounted) {
           setMarketListings(remoteListings || []);
           setMarketCategories(remoteCategories || []);
-          setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
         }
       } catch (error) {
-        if (mounted && initial) setStartupError('Bese26 is loading marketplace data. Please try again.');
-        if (initial) return;
-        if (mounted) showToast(error.message || 'Could not load live marketplace data.');
+        if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
       }
+      Promise.all([fetchActiveAdCampaigns(), fetchActiveAdCampaigns({ placement: 'homepage' }), fetchActiveAdCampaigns({ placement: 'search' }), fetchActiveAdCampaigns({ placement: 'business_directory' })]).then(([remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds]) => {
+        if (mounted) setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
+      }).catch(() => {});
       if (session?.user) {
         try {
           const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
@@ -1062,11 +1069,7 @@ function AppContent() {
         setSavedIds([]);
         setIsAdmin(false);
       }
-      if (mounted && initial) {
-        setStartupError('');
-        startupReadyRef.current = true;
-        setStartupReady(true);
-      }
+      if (mounted && initial && !startupReadyRef.current) { setStartupError(''); startupReadyRef.current = true; setStartupReady(true); }
       })().finally(() => { loadBackend.inFlight = null; });
       return loadBackend.inFlight;
     };
