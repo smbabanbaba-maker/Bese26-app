@@ -6662,3 +6662,18 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .analytics-custom-dates { flex-direction:column; }
   .analytics-custom-dates label, .analytics-custom-dates input { width:100%; }
 }
+
+
+/* Completed-sale receipt modal */
+.receipt-modal-backdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:18px; background:rgba(18,23,31,.5); backdrop-filter:blur(5px); }
+.receipt-modal { width:min(680px,100%); max-height:min(90vh,760px); overflow:auto; padding:22px; border:1px solid #e6e9ee; border-radius:20px; background:#fff; box-shadow:0 22px 70px rgba(18,23,31,.24); }
+.receipt-modal-head { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; padding-bottom:16px; border-bottom:1px solid #edf0f3; }
+.receipt-modal-head h2 { margin:4px 0 5px; color:#202733; font-size:24px; }
+.receipt-modal-head p { color:#737d89; font-size:12px; }
+.receipt-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; padding:18px 0; }
+.receipt-form-grid label { display:grid; gap:6px; color:#4d5866; font-size:11px; font-weight:700; }
+.receipt-form-grid input, .receipt-form-grid select, .receipt-form-grid textarea { width:100%; min-height:40px; border:1px solid #dfe4ea; border-radius:10px; padding:9px 10px; color:#26303c; background:#fff; font-size:13px; }
+.receipt-form-grid textarea { min-height:78px; resize:vertical; }
+.receipt-form-grid .full-field { grid-column:1 / -1; }
+.receipt-modal-actions { display:flex; justify-content:flex-end; gap:9px; padding-top:14px; border-top:1px solid #edf0f3; }
+@media (max-width:640px) { .receipt-modal-backdrop { padding:0; align-items:end; } .receipt-modal { max-height:94vh; padding:18px; border-radius:20px 20px 0 0; } .receipt-form-grid { grid-template-columns:1fr; } .receipt-form-grid .full-field { grid-column:auto; } .receipt-modal-actions { flex-direction:column-reverse; } .receipt-modal-actions button { width:100%; justify-content:center; } }
