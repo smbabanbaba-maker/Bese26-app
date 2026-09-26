@@ -55,7 +55,10 @@ import {
 } from 'lucide-react';
 
 function lazyWithRetry(importer, chunkName) {
-  return lazy(() => importer().then((module) => {
+  return lazy(() => Promise.race([
+    importer(),
+    new Promise((_, reject) => window.setTimeout(() => reject(new Error(`The ${chunkName} page took too long to load.`)), 12000)),
+  ]).then((module) => {
     if (typeof window !== 'undefined') window.sessionStorage.removeItem(`bese26:chunk-retry:${chunkName}`);
     return module;
   }).catch((error) => {
