@@ -237,6 +237,10 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
   );
 });
 
+function ListingGridSkeleton({ count = 6 }) {
+  return <div className="product-grid listing-grid-skeleton" aria-label="Loading listings" aria-busy="true">{Array.from({ length: count }, (_, index) => <article className="product-card skeleton-product-card" key={index}><div className="skeleton-block skeleton-product-image" /><div className="skeleton-product-copy"><span className="skeleton-block skeleton-line skeleton-line-short" /><span className="skeleton-block skeleton-line skeleton-line-title" /><span className="skeleton-block skeleton-line skeleton-line-price" /><span className="skeleton-block skeleton-line skeleton-line-meta" /><span className="skeleton-block skeleton-button" /></div></article>)}</div>;
+}
+
 function CategoryTile({ category, onClick }) {
   const Icon = iconMap[category.icon] || Package;
   return (
@@ -330,7 +334,7 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
 
-function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   const [geo, setGeo] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState('NG');
   const [selectedState, setSelectedState] = useState('');
@@ -381,7 +385,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
 
       <section>
         <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
-        {marketListings.length ? <><div className="product-grid">{marketListings.slice(0, 50).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
+        {marketLoading && !marketListings.length ? <><div className="loading-section-note"><span className="loading-pulse-dot" /> Loading the newest listings…</div><ListingGridSkeleton count={6} /></> : marketListings.length ? <><div className="product-grid">{marketListings.slice(0, 50).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
       </section>
 
       <section className="trust-strip" aria-label="Why use Bese26">
@@ -396,7 +400,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
   );
 }
 
-function SearchView({ marketListings, categories, search, setSearch, onOpenListing, savedIds, onToggleSave, onBack, adCampaigns = [] }) {
+function SearchView({ marketListings, categories, marketLoading = false, search, setSearch, onOpenListing, savedIds, onToggleSave, onBack, adCampaigns = [] }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sort, setSort] = useState('Recommended');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
@@ -422,7 +426,7 @@ function SearchView({ marketListings, categories, search, setSearch, onOpenListi
       <div className="filter-toolbar"><div className="filter-toolbar-heading"><strong>Categories</strong>{hasFilters && <button type="button" className="clear-filter-button" onClick={clearFilters}>Clear all</button>}</div><div className="filter-scroll"><button type="button" className={activeCategory === 'All' ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory('All')}>All</button>{categories.filter((category) => !category.parent_id).map((category) => <button type="button" key={category.name} className={activeCategory === category.name ? 'filter-chip active' : 'filter-chip'} onClick={() => setActiveCategory(category.name)}>{category.name}</button>)}<button type="button" className={`filter-chip verified-filter-chip ${verifiedOnly ? 'active' : ''}`} aria-pressed={verifiedOnly} onClick={() => setVerifiedOnly((value) => !value)}><ShieldCheck size={14} /> Verified</button></div></div>
 
       <div className="search-results-area"><div className="search-result-head"><span>Recommended listings</span><select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort listings"><option>Recommended</option><option>Newest</option><option>Price low → high</option><option>Price high → low</option></select></div>
-      {filtered.length ? <><div className="product-grid search-grid">{filtered.slice(0, 8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><SponsoredBanner campaigns={adCampaigns} placement="search" className="search-sponsored-slot" /><div className="product-grid search-grid">{filtered.slice(8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div></> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off Verified only or choose another category.' : 'Try a different search word or clear the filters.'}</p><button className="primary-button" onClick={clearFilters}>Clear filters</button></div>}</div>
+      {marketLoading && !marketListings.length ? <><div className="loading-section-note"><span className="loading-pulse-dot" /> Loading listings and categories…</div><ListingGridSkeleton count={6} /></> : filtered.length ? <><div className="product-grid search-grid">{filtered.slice(0, 8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><SponsoredBanner campaigns={adCampaigns} placement="search" className="search-sponsored-slot" /><div className="product-grid search-grid">{filtered.slice(8).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div></> : <div className="empty-state"><Search size={25} /><h3>{verifiedOnly ? 'No verified sellers found' : 'No listings found'}</h3><p>{verifiedOnly ? 'Try turning off Verified only or choose another category.' : 'Try a different search word or clear the filters.'}</p><button className="primary-button" onClick={clearFilters}>Clear filters</button></div>}</div>
     </div>
   );
 }
@@ -920,6 +924,7 @@ function AppContent() {
   const [profileReset, setProfileReset] = useState(0);
   const [chatTargetId, setChatTargetId] = useState(null);
   const [marketListings, setMarketListings] = useState([]);
+  const [marketLoading, setMarketLoading] = useState(isSupabaseConfigured);
   const [marketCategories, setMarketCategories] = useState([]);
   const [adCampaigns, setAdCampaigns] = useState([]);
   const [userPlace, setUserPlace] = useState('');
@@ -1057,6 +1062,8 @@ function AppContent() {
         }
       } catch (error) {
         if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
+      } finally {
+        if (mounted && initial) setMarketLoading(false);
       }
       Promise.all([fetchActiveAdCampaigns(), fetchActiveAdCampaigns({ placement: 'homepage' }), fetchActiveAdCampaigns({ placement: 'search' }), fetchActiveAdCampaigns({ placement: 'business_directory' })]).then(([remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds]) => {
         if (mounted) setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
@@ -1084,6 +1091,7 @@ function AppContent() {
     const startupTimeout = window.setTimeout(() => {
       if (mounted && !startupReadyRef.current) {
         setStartupError('Live listings are taking longer than usual. You can continue and try again shortly.');
+        setMarketLoading(false);
         startupReadyRef.current = true;
         setStartupReady(true);
       }
@@ -1228,8 +1236,8 @@ function AppContent() {
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={goBack} />;
-    if (activeNav === 'home') return <HomeView user={sessionUser} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
-    if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={goBack} />;
+    if (activeNav === 'home') return <HomeView user={sessionUser} marketLoading={marketLoading} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketLoading={marketLoading} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={goBack} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={goBack} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={goBack} />;
