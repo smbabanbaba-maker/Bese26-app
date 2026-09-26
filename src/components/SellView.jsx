@@ -377,7 +377,12 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
       onDemoAction(editMode ? 'Listing updated and active.' : 'Listing submitted successfully. Bese26 will review it before it goes live.');
     } catch (error) {
       setPublishState('idle');
-      setErrors([error.message || 'Could not publish this listing. Please try again.']);
+      const message = error.message || 'Could not publish this listing. Please try again.';
+      if (/active listing limit|free post limit|choose a subscription plan/i.test(message)) {
+        onOpenSubscription?.();
+        return;
+      }
+      setErrors([message]);
       document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
