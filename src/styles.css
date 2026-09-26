@@ -6850,3 +6850,19 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .messages-selected-page .chat-panel { height: 100% !important; min-height: 0 !important; }
   .messages-selected-page .chat-panel { border-radius: 0 !important; }
 }
+
+
+/* Absolute top-edge guarantee for the mobile conversation surface. */
+@media (max-width: 760px) {
+  .messages-selected-page {
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    transform: none !important;
+  }
+  .messages-selected-page .message-layout,
+  .messages-selected-page .chat-panel {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
