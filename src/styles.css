@@ -7152,3 +7152,18 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .bottom-nav .nav-icon svg { width: 22px; height: 22px; }
   .bottom-nav .sell-nav .nav-icon { width: 36px; height: 36px; }
 }
+
+/* Listing Detail trust and metadata polish. */
+.listing-new-price-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.listing-new-price-type { padding: 5px 8px; border: 1px solid #f0d6a3; border-radius: 999px; color: #805d1e; background: #fff8e8; font-size: 10px; font-weight: 800; }
+.listing-new-summary-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.listing-new-summary-tags span { padding: 5px 8px; border: 1px solid #e1e7eb; border-radius: 999px; color: #60707c; background: #f8fafb; font-size: 10px; font-weight: 700; }
+.listing-new-trust { display: flex; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 10px 11px; border: 1px solid #cdebd8; border-radius: 11px; color: #216542; background: #f2fbf5; }
+.listing-new-trust > svg { flex: 0 0 auto; margin-top: 1px; }
+.listing-new-trust div { display: grid; gap: 2px; min-width: 0; }
+.listing-new-trust strong { font-size: 12px; }
+.listing-new-trust span { color: #517560; font-size: 10px; line-height: 1.4; }
+@media (max-width: 430px) {
+  .listing-new-summary-tags span { font-size: 9px; }
+  .listing-new-trust { margin-top: 11px; }
+}
