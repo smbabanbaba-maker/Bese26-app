@@ -7049,3 +7049,20 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
     transform: none !important;
   }
 }
+
+
+/* Profile mobile alignment: move avatar and identity together so the logo never overlaps the name. */
+.premium-profile .profile-heading > .avatar {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+@media (max-width: 700px) {
+  .premium-profile .profile-heading {
+    bottom: 32px !important;
+    align-items: center !important;
+  }
+  .premium-profile .profile-heading > .avatar {
+    position: static !important;
+  }
+}
