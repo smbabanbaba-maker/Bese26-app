@@ -6829,3 +6829,24 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .messages-selected-page .chat-bottom-tools { padding-top: 5px !important; }
   .messages-selected-page .chat-composer { flex-basis: 56px; min-height: 56px; }
 }
+
+
+/* Mobile selected chat must own the viewport; never inherit page/header whitespace. */
+@media (max-width: 760px) {
+  .app-shell:has(.messages-selected-page) { padding-bottom: 92px !important; }
+  .app-shell:has(.messages-selected-page) .main-container { position: static; }
+  .messages-selected-page {
+    position: fixed !important;
+    inset: 0 0 92px 0 !important;
+    z-index: 18;
+    width: 100vw !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    background: #f5f7fb !important;
+  }
+  .messages-selected-page .message-layout,
+  .messages-selected-page .chat-panel { height: 100% !important; min-height: 0 !important; }
+  .messages-selected-page .chat-panel { border-radius: 0 !important; }
+}
