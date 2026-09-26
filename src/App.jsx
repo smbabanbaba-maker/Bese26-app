@@ -137,10 +137,10 @@ const iconMap = {
 
 const mobileNavItems = [
   { key: 'home', label: 'Home', icon: House },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'business', label: 'Shop', icon: Store },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
