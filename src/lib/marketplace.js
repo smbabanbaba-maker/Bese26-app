@@ -708,6 +708,21 @@ export async function submitListingReview({ listingId, reviewerId, revieweeId, r
   return data;
 }
 
+export async function fetchListingComments(listingId) {
+  failIfUnavailable();
+  if (!listingId) return [];
+  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
+  if (error) throw error;
+  return data || [];
+}
+
+export async function submitListingComment({ listingId, userId, body }) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, body: String(body || '').trim() }).select('id,listing_id,user_id,body,status,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchListingReviews(listingId) {
   failIfUnavailable();
   const { data, error } = await supabase.from('reviews').select('id,rating,body,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).eq('status', 'published').order('created_at', { ascending: false }).limit(20);

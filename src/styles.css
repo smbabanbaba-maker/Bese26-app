@@ -7185,3 +7185,20 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 /* Real private comments/questions area on Listing Detail. */
 .listing-new-chat-note { margin: 5px 0 0; color: #71808b; font-size: 11px; line-height: 1.4; }
 .listing-review-empty-note { color: #8a959d; font-size: 10px; }
+
+/* Public listing discussion: moderated, readable, and clearly separate from private chat. */
+.listing-public-comments { display: grid; gap: 12px; }
+.listing-public-comments .listing-new-section-heading { margin-bottom: 0; }
+.listing-comment-form { display: grid; gap: 8px; }
+.listing-comment-form textarea { width: 100%; min-height: 76px; resize: vertical; }
+.listing-comment-form .listing-new-start-chat { justify-self: end; min-width: 142px; min-height: 40px; }
+.listing-comments-list { display: grid; gap: 8px; }
+.listing-public-comment { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; padding: 10px; border: 1px solid #e5eaee; border-radius: 10px; background: #fbfcfd; }
+.listing-public-comment-avatar { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #c9343d; background: #ffe5e7; font-size: 12px; font-weight: 800; }
+.listing-public-comment-head { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.listing-public-comment-head strong { color: #31404a; font-size: 12px; }
+.listing-public-comment-head time { color: #8a959d; font-size: 10px; }
+.listing-public-comment-head span { padding: 2px 5px; border-radius: 999px; color: #795e1d; background: #fff4d4; font-size: 9px; font-weight: 800; }
+.listing-public-comment p { margin: 4px 0 0; color: #53616b; font-size: 12px; line-height: 1.45; white-space: pre-wrap; }
+.listing-comments-empty { display: grid; justify-items: center; gap: 5px; padding: 15px 10px; color: #71808b; text-align: center; }
+.listing-comments-empty p { max-width: 330px; margin: 0; font-size: 11px; line-height: 1.4; }
