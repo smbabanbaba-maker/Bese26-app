@@ -7028,3 +7028,10 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .premium-profile .profile-stats button { min-height: 45px; }
   .premium-profile .profile-stats strong { font-size: 17px !important; }
 }
+
+
+/* Profile avatar alignment: lower the user mark slightly so it sits fully inside the hero. */
+.premium-profile .profile-heading > .avatar { transform: translateY(5px) !important; }
+@media (max-width: 700px) {
+  .premium-profile .profile-heading > .avatar { transform: translateY(7px) !important; }
+}
