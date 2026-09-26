@@ -7066,3 +7066,13 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
     position: static !important;
   }
 }
+
+
+/* Profile hero cleanup: one verification badge beside the name, no empty bio rail below. */
+.premium-profile .profile-cover { min-height: 214px !important; }
+.premium-profile .profile-heading { bottom: 24px !important; }
+.premium-profile .profile-cover-bottom { display: none !important; }
+@media (max-width: 700px) {
+  .premium-profile .profile-cover { min-height: 218px !important; }
+  .premium-profile .profile-heading { bottom: 21px !important; }
+}
