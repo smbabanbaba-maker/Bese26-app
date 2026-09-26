@@ -141,6 +141,13 @@ const navItems = [
   { key: 'business', label: 'Business', icon: Store },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
+const mobileNavItems = [
+  { key: 'home', label: 'Home', icon: House },
+  { key: 'saved', label: 'Saved', icon: Bookmark },
+  { key: 'sell', label: 'Sell', icon: Plus },
+  { key: 'messages', label: 'Messages', icon: MessageCircle },
+  { key: 'profile', label: 'Profile', icon: UserRound },
+];
 
 function formatNaira(value) {
   return `₦${Number(value).toLocaleString('en-NG')}`;
@@ -361,7 +368,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
       </section>}
 
       <section className="search-section">
-        <div className="search-box home-search">
+        <div className="search-box home-search" role="search">
           <Search size={18} />
           <input aria-label="Search listings" value={homeSearch} onChange={(event) => setHomeSearch(event.target.value)} placeholder="Search for products, services and more" onKeyDown={(event) => event.key === 'Enter' && onSearch(homeSearch)} />
           <button className="search-submit" aria-label="Search" onClick={() => onSearch(homeSearch)}><Search size={20} /></button>
@@ -381,10 +388,10 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
         {marketListings.length ? <><div className="product-grid">{marketListings.slice(0, 50).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
       </section>
 
-      <section className="trust-strip">
-        <div className="trust-strip-item"><span className="trust-strip-icon"><ShieldCheck size={16} /></span><span><strong>Verified sellers</strong><small>Trade with more confidence</small></span></div>
-        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-blue"><MessageCircle size={16} /></span><span><strong>Safe conversations</strong><small>Chat before you meet</small></span></div>
-        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-gold"><MapPin size={16} /></span><span><strong>Near you</strong><small>Discover locally</small></span></div>
+      <section className="trust-strip" aria-label="Why use Bese26">
+        <div className="trust-strip-item"><span className="trust-strip-icon"><ShieldCheck size={16} /></span><span><strong>Verified sellers</strong><small>Check seller badges before you chat</small></span></div>
+        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-blue"><MessageCircle size={16} /></span><span><strong>Chat to buy</strong><small>Ask questions before meeting</small></span></div>
+        <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-gold"><MapPin size={16} /></span><span><strong>Find nearby</strong><small>Discover listings by location</small></span></div>
       </section>
 
       {marketListings.length > 1 && <section className="recent-section">
@@ -1222,7 +1229,7 @@ function AppContent() {
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`}>
     <main className="main-container"><AppErrorBoundary key={activeNav}><Suspense fallback={<BrandLoader message="Loading page…" compact />}>{renderView()}</Suspense></AppErrorBoundary></main>
     <footer className="site-footer"><div><strong>Bese26<span>.shop</span></strong><p>Nigerian online marketplace for personal and business transactions.</p></div><nav aria-label="Public information"><a href="/#terms" onClick={(event) => { event.preventDefault(); goPublicSection('terms'); }} title="Read Terms of Service">Terms</a><a href="/#privacy" onClick={(event) => { event.preventDefault(); goPublicSection('privacy'); }} title="Read Privacy Policy">Privacy</a><a href="/#refund-policy" onClick={(event) => { event.preventDefault(); goPublicSection('refund-policy'); }} title="Read Refund Policy">Refunds</a><a href="/#safety" onClick={(event) => { event.preventDefault(); goPublicSection('safety'); }} title="Read Marketplace Safety">Safety</a><a href="mailto:info@bese26.shop?subject=Bese26%20Support" title="Email Bese26 support">info@bese26.shop</a></nav></footer>
-    <nav className="bottom-nav" aria-label="Primary navigation">{navItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{t(label)}</span></button>)}</nav>
+    <nav className="bottom-nav" aria-label="Primary navigation">{mobileNavItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} /></span><span>{t(label)}</span></button>)}</nav>
 
     {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     <ListingDetailsView listing={selectedListing} user={sessionUser} onClose={() => window.history.back()} onAuthRequired={requireAuth} isSaved={selectedListing ? savedIds.includes(selectedListing.id) : false} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setEditingListing(item); navigate('sell'); }} />

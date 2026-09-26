@@ -6698,3 +6698,28 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .receipt-form-grid .full-field { grid-column:1 / -1; }
 .receipt-modal-actions { display:flex; justify-content:flex-end; gap:9px; padding-top:14px; border-top:1px solid #edf0f3; }
 @media (max-width:640px) { .receipt-modal-backdrop { padding:0; align-items:end; } .receipt-modal { max-height:94vh; padding:18px; border-radius:20px 20px 0 0; } .receipt-form-grid { grid-template-columns:1fr; } .receipt-form-grid .full-field { grid-column:auto; } .receipt-modal-actions { flex-direction:column-reverse; } .receipt-modal-actions button { width:100%; justify-content:center; } }
+
+
+/* Bese26 usability pass: compact mobile navigation, truthful status cues, and calm marketplace rhythm. */
+.bottom-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.bottom-nav button { min-width: 0; }
+.bottom-nav button span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-search:focus-within { border-color: var(--red); box-shadow: 0 0 0 4px rgba(227, 41, 45, .11); }
+.trust-strip-item { min-width: 0; }
+.trust-strip-item > span:last-child { min-width: 0; }
+.trust-strip-item small { line-height: 1.35; }
+.publish-success-card p { max-width: 520px; margin-inline: auto; line-height: 1.55; }
+@media (max-width: 760px) {
+  .bottom-nav { padding-inline: 7px; gap: 2px; }
+  .bottom-nav button { padding-inline: 3px; }
+  .bottom-nav button span:last-child { font-size: 9px; }
+  .bottom-nav .nav-icon { width: 36px; height: 30px; }
+  .trust-strip { grid-template-columns: 1fr; gap: 0; padding: 8px 12px; }
+  .trust-strip-item { border-right: 0; border-bottom: 1px solid #eaecf0; padding: 10px 2px; }
+  .trust-strip-item:last-child { border-bottom: 0; }
+  .home-location-picker { grid-template-columns: 1fr; }
+  .home-location-search { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav button, .product-card, .category-tile { transition: none; }
+}
