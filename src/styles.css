@@ -6866,3 +6866,20 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
     padding-top: 0 !important;
   }
 }
+
+
+/* Global top-edge polish: keep every app page close to its header, like the selected Chat view. */
+.main-container { padding-top: 12px !important; }
+.page-stack { gap: 16px !important; }
+.page-title-row { margin-top: 0 !important; margin-bottom: 0 !important; }
+.home-page, .search-page, .messages-page, .messages-inbox-page,
+.profile-page, .profile-subpage, .sell-page, .notifications-page,
+.settings-page, .wallet-page, .boosting-page, .business-page { gap: 14px !important; }
+@media (max-width: 760px) {
+  .main-container { padding-top: 4px !important; }
+  .page-stack { gap: 10px !important; }
+  .home-page, .search-page, .messages-page, .messages-inbox-page,
+  .profile-page, .profile-subpage, .sell-page, .notifications-page,
+  .settings-page, .wallet-page, .boosting-page, .business-page { gap: 9px !important; }
+  .page-title-row { gap: 6px !important; }
+}
