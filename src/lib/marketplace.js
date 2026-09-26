@@ -701,6 +701,13 @@ export async function recordListingView(listingId) {
   return data;
 }
 
+export async function submitListingReview({ listingId, reviewerId, revieweeId, rating, body }) {
+  failIfUnavailable();
+  const { data, error } = await supabase.from('reviews').insert({ listing_id: listingId, reviewer_id: reviewerId, reviewee_id: revieweeId, rating: Number(rating), body: String(body || '').trim() || null }).select('id,listing_id,rating,body,status,created_at').single();
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchListingReviews(listingId) {
   failIfUnavailable();
   const { data, error } = await supabase.from('reviews').select('id,rating,body,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).eq('status', 'published').order('created_at', { ascending: false }).limit(20);

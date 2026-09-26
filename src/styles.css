@@ -7167,3 +7167,17 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .listing-new-summary-tags span { font-size: 9px; }
   .listing-new-trust { margin-top: 11px; }
 }
+
+/* Listing contact preference + moderated feedback UI. */
+.listing-new-contact .listing-new-action-grid:has(> button:only-child) { grid-template-columns: 1fr; }
+.listing-review-heading-actions { display: flex; align-items: center; gap: 10px; }
+.listing-new-no-reviews { display: grid; justify-items: center; gap: 6px; padding: 18px 10px; color: #71808b; text-align: center; }
+.listing-new-no-reviews span { color: #e4a626; font-size: 28px; }
+.listing-new-no-reviews p { margin: 0; font-size: 12px; }
+.listing-review-stars-input { display: flex; gap: 5px; margin: 4px 0 15px; }
+.listing-review-stars-input button { padding: 0 2px; border: 0; color: #d8dee3; background: transparent; font-size: 32px; line-height: 1; cursor: pointer; }
+.listing-review-stars-input button.selected { color: #e4a626; }
+.listing-review-form label { display: grid; gap: 7px; color: #394853; font-size: 12px; font-weight: 750; }
+.listing-review-form textarea { width: 100%; min-height: 100px; resize: vertical; }
+.listing-review-form small { display: block; margin: 9px 0 14px; color: #7b8791; font-size: 11px; line-height: 1.4; }
+@media (max-width: 430px) { .listing-review-heading-actions { gap: 6px; } .listing-review-heading-actions .listing-new-link { font-size: 10px; } }
