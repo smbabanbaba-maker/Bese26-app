@@ -7035,3 +7035,17 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 @media (max-width: 700px) {
   .premium-profile .profile-heading > .avatar { transform: translateY(7px) !important; }
 }
+
+
+/* Mobile Profile hero correction: keep the complete user avatar inside the card, not clipped at the top. */
+.premium-profile .profile-heading > .avatar {
+  position: relative;
+  top: 10px;
+  transform: none !important;
+}
+@media (max-width: 700px) {
+  .premium-profile .profile-heading > .avatar {
+    top: 20px;
+    transform: none !important;
+  }
+}
