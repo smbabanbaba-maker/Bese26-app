@@ -6773,3 +6773,59 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .messages-selected-page .chat-bottom-tools { padding-inline: 10px !important; }
   .messages-selected-page .chat-composer { padding-inline: 9px !important; padding-bottom: max(10px, env(safe-area-inset-bottom)) !important; }
 }
+
+
+/* Final spacing + chat polish: remove dead air and keep page identity close to its content. */
+.main-container { padding-top: 24px; }
+.page-stack { gap: 24px; }
+.profile-page, .profile-subpage, .sell-page, .notifications-page, .messages-inbox-page { gap: 18px; }
+.page-title-row { margin-bottom: 0; }
+@media (max-width: 760px) {
+  .main-container { padding-top: 11px !important; }
+  .page-stack { gap: 16px; }
+  .profile-page, .profile-subpage, .sell-page, .notifications-page, .messages-inbox-page { gap: 13px; }
+  .page-title-row { gap: 8px; }
+}
+
+/* Selected conversation: no artificial top gap, no oversized empty chrome. */
+.main-container:has(.messages-selected-page) { padding-top: 0 !important; padding-bottom: 0 !important; }
+.messages-selected-page { gap: 0 !important; min-height: 0; }
+.messages-selected-page .message-layout { gap: 0; min-height: 0; }
+.messages-selected-page .chat-panel { min-height: 0 !important; }
+.messages-selected-page .chat-header { min-height: 64px !important; padding: 9px 14px !important; }
+.messages-selected-page .chat-person .avatar { width: 39px; height: 39px; }
+.messages-selected-page .chat-person strong { font-size: 14px !important; line-height: 1.1; }
+.messages-selected-page .chat-person > div > span { font-size: 10px !important; }
+.messages-selected-page .chat-context { min-height: 58px; margin: 9px 12px 7px !important; padding: 8px 11px !important; }
+.messages-selected-page .chat-context img,
+.messages-selected-page .chat-context-placeholder { width: 38px; height: 36px; }
+.messages-selected-page .chat-context span { font-size: 8px; }
+.messages-selected-page .chat-context strong { font-size: 11px; }
+.messages-selected-page .chat-messages { min-height: 0 !important; padding: 16px 13px !important; }
+.messages-selected-page .chat-empty-note { padding: 16px; font-size: 12px; }
+.messages-selected-page .chat-bottom-tools { padding: 8px 12px 7px !important; }
+.messages-selected-page .chat-bottom-tools .chat-safety-note { min-height: 28px; padding: 5px 7px; font-size: 9px; }
+.messages-selected-page .chat-bottom-tools .chat-quick-actions { margin-top: 6px; gap: 6px; }
+.messages-selected-page .chat-bottom-tools .chat-quick-actions button { min-height: 30px; padding: 5px 10px; font-size: 9px; }
+.messages-selected-page .chat-composer { min-height: 61px; padding: 8px 10px max(9px, env(safe-area-inset-bottom)) !important; }
+.messages-selected-page .chat-composer input { height: 42px; min-height: 42px; border-radius: 12px !important; font-size: 13px; }
+.messages-selected-page .chat-composer .icon-button { width: 30px; height: 30px; }
+.messages-selected-page .chat-composer .send-button { width: 42px; height: 42px; border-radius: 12px; }
+@media (max-width: 760px) {
+  .messages-selected-page { width: 100%; margin: 0 !important; }
+  .messages-selected-page .chat-panel { height: calc(100dvh - 92px) !important; max-height: none !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; box-shadow: none !important; }
+  .messages-selected-page .chat-header { flex: 0 0 64px; }
+  .messages-selected-page .chat-context { flex: 0 0 58px; }
+  .messages-selected-page .chat-messages { flex: 1 1 auto; overflow-y: auto; }
+  .messages-selected-page .chat-bottom-tools { flex: 0 0 auto; }
+  .messages-selected-page .chat-composer { flex: 0 0 61px; }
+}
+@media (max-height: 640px) and (max-width: 760px) {
+  .messages-selected-page .chat-header { min-height: 56px !important; flex-basis: 56px; }
+  .messages-selected-page .chat-context { min-height: 50px; flex-basis: 50px; margin-block: 5px !important; }
+  .messages-selected-page .chat-context img,
+  .messages-selected-page .chat-context-placeholder { width: 32px; height: 30px; }
+  .messages-selected-page .chat-bottom-tools .chat-safety-note { display: none; }
+  .messages-selected-page .chat-bottom-tools { padding-top: 5px !important; }
+  .messages-selected-page .chat-composer { flex-basis: 56px; min-height: 56px; }
+}
