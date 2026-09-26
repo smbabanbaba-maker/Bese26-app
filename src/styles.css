@@ -7181,3 +7181,7 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .listing-review-form textarea { width: 100%; min-height: 100px; resize: vertical; }
 .listing-review-form small { display: block; margin: 9px 0 14px; color: #7b8791; font-size: 11px; line-height: 1.4; }
 @media (max-width: 430px) { .listing-review-heading-actions { gap: 6px; } .listing-review-heading-actions .listing-new-link { font-size: 10px; } }
+
+/* Real private comments/questions area on Listing Detail. */
+.listing-new-chat-note { margin: 5px 0 0; color: #71808b; font-size: 11px; line-height: 1.4; }
+.listing-review-empty-note { color: #8a959d; font-size: 10px; }
