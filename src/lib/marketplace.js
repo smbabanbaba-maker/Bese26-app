@@ -708,19 +708,28 @@ export async function submitListingReview({ listingId, reviewerId, revieweeId, r
   return data;
 }
 
+async function attachBusinessIdentities(comments = []) {
+  const profileIds = [...new Set(comments.map((comment) => comment.user_id).filter(Boolean))];
+  if (!profileIds.length) return comments;
+  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path').in('profile_id', profileIds).eq('is_active', true).limit(100);
+  const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, business]));
+  return comments.map((comment) => ({ ...comment, business: businesses[comment.user_id] || null }));
+}
+
 export async function fetchListingComments(listingId) {
   failIfUnavailable();
   if (!listingId) return [];
   const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
-  return data || [];
+  return attachBusinessIdentities(data || []);
 }
 
 export async function submitListingComment({ listingId, userId, body }) {
   failIfUnavailable();
   const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, body: String(body || '').trim(), status: 'published' }).select('id,listing_id,user_id,body,status,created_at').single();
   if (error) throw error;
-  return data;
+  const [comment] = await attachBusinessIdentities([data]);
+  return comment || data;
 }
 
 export async function fetchListingReviews(listingId) {
