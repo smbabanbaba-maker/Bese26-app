@@ -6883,3 +6883,13 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .settings-page, .wallet-page, .boosting-page, .business-page { gap: 9px !important; }
   .page-title-row { gap: 6px !important; }
 }
+
+
+/* Miniweb top-edge polish: storefront content should begin immediately under its own bar. */
+.public-business-main { padding-top: 8px !important; }
+.public-business-main .public-business-hero { margin-top: 0 !important; }
+.public-business-main .public-business-hero.storefront-hero-clean { transform: none; }
+@media (max-width: 760px) {
+  .public-business-main { padding-top: 4px !important; }
+  .public-business-main .public-business-hero { margin-top: 0 !important; }
+}
