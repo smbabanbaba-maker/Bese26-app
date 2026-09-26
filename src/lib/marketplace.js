@@ -718,7 +718,7 @@ export async function fetchListingComments(listingId) {
 
 export async function submitListingComment({ listingId, userId, body }) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, body: String(body || '').trim() }).select('id,listing_id,user_id,body,status,created_at').single();
+  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, body: String(body || '').trim(), status: 'published' }).select('id,listing_id,user_id,body,status,created_at').single();
   if (error) throw error;
   return data;
 }

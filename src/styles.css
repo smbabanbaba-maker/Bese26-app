@@ -7202,3 +7202,6 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .listing-public-comment p { margin: 4px 0 0; color: #53616b; font-size: 12px; line-height: 1.45; white-space: pre-wrap; }
 .listing-comments-empty { display: grid; justify-items: center; gap: 5px; padding: 15px 10px; color: #71808b; text-align: center; }
 .listing-comments-empty p { max-width: 330px; margin: 0; font-size: 11px; line-height: 1.4; }
+
+/* Public comments are live after posting; keep the status note reserved for legacy pending rows. */
+.listing-public-comments .listing-new-section-heading > span { white-space: nowrap; color: #7b8791; font-size: 11px; font-weight: 700; }
