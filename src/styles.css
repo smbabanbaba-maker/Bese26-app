@@ -7119,3 +7119,8 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .relations-page > .profile-stats { gap: 9px !important; padding: 7px !important; }
   .relations-page > .profile-stats button { min-height: 74px !important; padding: 13px 6px !important; }
 }
+
+/* Keep Miniweb empty/error states close to the top on phones as well. */
+@media (max-width: 760px) {
+  .public-business-not-found { margin: 8px auto !important; }
+}
