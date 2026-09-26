@@ -132,15 +132,6 @@ const iconMap = {
   'shopping-basket': ShoppingBasket,
 };
 
-const navItems = [
-  { key: 'home', label: 'Home', icon: House },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
-  { key: 'saved', label: 'Saved', icon: Bookmark },
-  { key: 'sell', label: 'Sell', icon: Plus },
-  { key: 'messages', label: 'Messages', icon: MessageCircle },
-  { key: 'business', label: 'Business', icon: Store },
-  { key: 'profile', label: 'Profile', icon: UserRound },
-];
 const mobileNavItems = [
   { key: 'home', label: 'Home', icon: House },
   { key: 'saved', label: 'Saved', icon: Bookmark },
@@ -394,18 +385,7 @@ function HomeView({ user, marketListings, adCampaigns = [], userPlace = '', loca
         <div className="trust-strip-item"><span className="trust-strip-icon trust-strip-gold"><MapPin size={16} /></span><span><strong>Find nearby</strong><small>Discover listings by location</small></span></div>
       </section>
 
-      {marketListings.length > 1 && <section className="recent-section">
-        <SectionHeading eyebrow="RECENTLY VIEWED" title="Explore more listings" action="See all" onAction={() => onNavigate('search')} />
-        <div className="mini-list recent-list">
-          {marketListings.slice(1, 4).map((listing) => <ProductCard key={listing.id} listing={listing} compact onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}
-        </div>
-      </section>}
 
-      <section className="public-trust-section" aria-label="About Bese26">
-        <div className="public-trust-copy"><div className="eyebrow">ABOUT BESE26</div><h2>A trusted Nigerian marketplace for everyday trade.</h2><p>Bese26 connects buyers and sellers for personal and business transactions. Discover products, chat with sellers, and make informed decisions through a secure digital marketplace.</p></div>
-        <div className="public-trust-grid"><article id="how-it-works"><strong>How it works</strong><span>Browse marketplace listings, open the details, and message a seller before you meet.</span></article><article id="safety"><strong>Marketplace safety</strong><span>Use verified profiles, keep conversations on Bese26, and report suspicious listings.</span></article><article id="refunds"><strong>Refunds & support</strong><span>For payment or marketplace concerns, contact our support team for help.</span></article></div>
-      </section>
-      <section className="public-policy-section" aria-label="Bese26 policies"><div id="terms"><strong>Terms of Service</strong><span>Use Bese26 lawfully, provide accurate information, and respect other marketplace members.</span></div><div id="privacy"><strong>Privacy</strong><span>We use account and listing information to provide marketplace, messaging, safety, and support features.</span></div><div id="refund-policy"><strong>Refund policy</strong><span>Payment concerns are reviewed case by case. Contact <a href="mailto:info@bese26.shop">info@bese26.shop</a> with your reference and details.</span></div></section>
 
     </div>
   );
