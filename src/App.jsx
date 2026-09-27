@@ -834,10 +834,10 @@ function AppContent() {
   const [editingListing, setEditingListing] = useState(null);
   const [editingDraft, setEditingDraft] = useState(null);
   const [copySourceListing, setCopySourceListing] = useState(null);
-  const [startupReady, setStartupReady] = useState(!isSupabaseConfigured);
+  const [startupReady, setStartupReady] = useState(true);
   const [startupError, setStartupError] = useState('');
   const [platformSettings, setPlatformSettings] = useState({ maintenance_mode: false });
-  const startupReadyRef = useRef(!isSupabaseConfigured);
+  const startupReadyRef = useRef(true);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
   const privateAdminEntry = new URLSearchParams(window.location.search).get('admin') === 'login';
