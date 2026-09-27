@@ -140,7 +140,7 @@ function Toggle({ checked, onChange, label }) {
   return <button type="button" className={`sell-toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-label={`Toggle ${label}`}><span /></button>;
 }
 
-export default function SellView({ user, isAdmin = false, onAuthRequired, onDemoAction, onOpenSubscription, onNavigate, initialListing = null, initialDraft = null }) {
+export default function SellView({ user, isAdmin = false, onAuthRequired, onDemoAction, onOpenSubscription, onNavigate, initialListing = null, initialDraft = null, copySource = null }) {
   const [form, setForm] = useState(initialForm);
   const [media, setMedia] = useState([]);
   const [draftId, setDraftId] = useState(null);
@@ -218,6 +218,42 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     if (Array.isArray(initialDraft.payload.media)) setMedia(initialDraft.payload.media.map((item) => ({ ...item, file: null, src: item.src || '' })));
   }, [initialDraft]);
 
+  useEffect(() => {
+    if (!copySource) return;
+    const raw = copySource.raw || {};
+    const deliveryItem = Array.isArray(raw.delivery_options) ? raw.delivery_options[0] : null;
+    const deliveryValue = typeof deliveryItem === 'string' ? deliveryItem : deliveryItem?.label || deliveryItem?.type || 'Buyer pickup';
+    setDraftId(null);
+    setEditMode(false);
+    setMedia([]);
+    setForm((current) => ({
+      ...current,
+      ...(raw.attributes || {}),
+      category: copySource.category || current.category,
+      subcategory: copySource.subcategory || current.subcategory,
+      title: copySource.title || '',
+      description: copySource.description || '',
+      condition: raw.condition || current.condition,
+      price: raw.price == null ? '' : String(raw.price),
+      currency: 'NGN',
+      negotiable: raw.pricing_type === 'negotiable',
+      quantity: raw.quantity == null ? current.quantity : String(raw.quantity),
+      unit: raw.unit || current.unit,
+      country: 'Nigeria',
+      state: raw.state || current.state,
+      city: raw.city || current.city,
+      area: '',
+      approximate: true,
+      delivery: deliveryValue,
+      contactChat: true,
+      contactPhone: false,
+      contactWhatsApp: false,
+      sellerName: '',
+      sellerHandle: '',
+      attributes: raw.attributes || current.attributes,
+    }));
+    onDemoAction?.('Listing details copied. Add your own photos and confirm every detail before posting.');
+  }, [copySource]);
   useEffect(() => {
     if (user && !form.sellerName) {
       update('sellerName', user.user_metadata?.display_name || user.email?.split('@')[0] || 'bese26 seller');
