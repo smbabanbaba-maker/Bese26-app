@@ -327,6 +327,8 @@ export default function ListingDetailsView({
   const [listingCommentSocials, setListingCommentSocials] = useState({});
   const [commentText, setCommentText] = useState('');
   const [commentsBusy, setCommentsBusy] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsLoadFailed, setCommentsLoadFailed] = useState(false);
   const [similar, setSimilar] = useState([]);
   const [sellerListings, setSellerListings] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -336,6 +338,7 @@ export default function ListingDetailsView({
   const [actionBusy, setActionBusy] = useState(false);
   const [contact, setContact] = useState({ phone: '', whatsapp: '' });
   const [contactLoading, setContactLoading] = useState(false);
+  const [contactLoadFailed, setContactLoadFailed] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [quickMessage, setQuickMessage] = useState('');
   const [offerOpen, setOfferOpen] = useState(false);
@@ -354,8 +357,11 @@ export default function ListingDetailsView({
   const description = listing?.description || '';
   const phone = contact.phone || '';
   const whatsapp = contact.whatsapp || '';
-  const phoneEnabled = Boolean(String(phone).trim());
-  const whatsappEnabled = Boolean(String(whatsapp).trim());
+  const contactPreference = String(raw.contact_preference || '').toLowerCase();
+  const allowsPhone = !contactPreference || ['call', 'chat_call'].includes(contactPreference);
+  const allowsWhatsApp = !contactPreference || ['whatsapp', 'chat_whatsapp', 'chat_call'].includes(contactPreference);
+  const phoneEnabled = allowsPhone && Boolean(String(phone).trim());
+  const whatsappEnabled = allowsWhatsApp && Boolean(String(whatsapp).trim());
   const categoryText = `${listing?.category || ''} ${listing?.subcategory || ''}`.toLowerCase();
   const categoryFields = categoryText.includes('phone') || categoryText.includes('mobile')
     ? ['brand', 'model', 'condition', 'ram', 'storage', 'colour', 'color']
@@ -415,8 +421,11 @@ export default function ListingDetailsView({
     setOfferAmount('');
     setReportOpen(false);
     setContact({ phone: '', whatsapp: '' });
-    setContactLoading(true);
+    setContactLoading(Boolean(user?.id && !owner && (allowsPhone || allowsWhatsApp)));
+    setContactLoadFailed(false);
     setLoadingDetails(true);
+    setCommentsLoading(true);
+    setCommentsLoadFailed(false);
     setFollowingSeller(false);
     setSellerListings([]);
     setSimilar([]);
@@ -430,12 +439,7 @@ export default function ListingDetailsView({
     Promise.allSettled([
       fetchSellerReviews(listing.sellerId, user?.id || null),
       fetchListingReviews(listing.id, user?.id || null),
-      fetchListingComments(listing.id),
-      fetchSimilarListings(listing),
-      fetchSellerListings(listing),
-      user?.id ? fetchListingContact(listing.id) : Promise.resolve({ phone: '', whatsapp: '' }),
-      user?.id && listing.sellerId ? getFollowState(user.id, listing.sellerId) : Promise.resolve({ following: false }),
-    ]).then(([sellerReviewResult, listingReviewResult, commentsResult, similarResult, sellerListingsResult, contactResult, followResult]) => {
+    ]).then(([sellerReviewResult, listingReviewResult]) => {
       if (!current) return;
       const sellerReviews = sellerReviewResult.status === 'fulfilled' ? sellerReviewResult.value || [] : [];
       const listingReviews = listingReviewResult.status === 'fulfilled' ? listingReviewResult.value || [] : [];
@@ -446,28 +450,46 @@ export default function ListingDetailsView({
           .then((stats) => current && setReviewSocials(stats))
           .catch(() => {});
       }
-      if (commentsResult.status === 'fulfilled') {
-        const rows = commentsResult.value || [];
-        setComments(rows);
-        if (rows.length) {
-          fetchListingCommentSocialStats(rows.map((comment) => comment.id), user?.id || null)
-            .then((stats) => current && setListingCommentSocials(stats))
-            .catch(() => {});
-        }
-      }
-      if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []);
-      if (sellerListingsResult.status === 'fulfilled') setSellerListings(sellerListingsResult.value || []);
-      if (contactResult.status === 'fulfilled') setContact(contactResult.value || { phone: '', whatsapp: '' });
-      if (followResult.status === 'fulfilled') setFollowingSeller(Boolean(followResult.value?.following));
     }).finally(() => {
-      if (current) {
-        setLoadingDetails(false);
-        setContactLoading(false);
-      }
+      if (current) setLoadingDetails(false);
     });
+    fetchListingComments(listing.id).then((rows) => {
+      if (!current) return;
+      const loaded = rows || [];
+      setComments((existing) => {
+        const merged = new Map(loaded.map((comment) => [comment.id, comment]));
+        existing.forEach((comment) => merged.set(comment.id, comment));
+        return [...merged.values()].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      });
+      if (loaded.length) {
+        fetchListingCommentSocialStats(loaded.map((comment) => comment.id), user?.id || null)
+          .then((stats) => current && setListingCommentSocials((previous) => ({ ...stats, ...previous })))
+          .catch(() => {});
+      }
+    }).catch(() => {
+      if (current) setCommentsLoadFailed(true);
+    }).finally(() => {
+      if (current) setCommentsLoading(false);
+    });
+    fetchSimilarListings(listing).then((rows) => current && setSimilar(rows || [])).catch(() => {});
+    fetchSellerListings(listing).then((rows) => current && setSellerListings(rows || [])).catch(() => {});
+    if (user?.id && !owner && (allowsPhone || allowsWhatsApp)) {
+      fetchListingContact(listing.id).then((details) => {
+        if (current) setContact(details || { phone: '', whatsapp: '' });
+      }).catch(() => {
+        if (current) setContactLoadFailed(true);
+      }).finally(() => {
+        if (current) setContactLoading(false);
+      });
+    } else {
+      setContactLoading(false);
+    }
+    if (user?.id && listing.sellerId) {
+      getFollowState(user.id, listing.sellerId).then((state) => current && setFollowingSeller(Boolean(state?.following))).catch(() => {});
+    }
     recordListingView(listing.id).catch(() => {});
     return () => { current = false; };
-  }, [listing?.id, listing?.sellerId, user?.id]);
+  }, [listing?.id, listing?.sellerId, listing?.raw?.contact_preference, user?.id]);
 
   useEffect(() => {
     const node = similarSentinelRef.current;
@@ -664,6 +686,23 @@ export default function ListingDetailsView({
       return null;
     }
   };
+  const retryListingComments = async () => {
+    setCommentsLoading(true);
+    setCommentsLoadFailed(false);
+    try {
+      const rows = await fetchListingComments(listing.id);
+      setComments(rows || []);
+      if (rows?.length) {
+        fetchListingCommentSocialStats(rows.map((comment) => comment.id), user?.id || null)
+          .then((stats) => setListingCommentSocials((current) => ({ ...stats, ...current })))
+          .catch(() => {});
+      }
+    } catch {
+      setCommentsLoadFailed(true);
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
   const toggleListingCommentReaction = async (comment) => {
     if (!user) { onAuthRequired?.('Sign in to like a public comment.'); return; }
     const previous = listingCommentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
@@ -782,9 +821,13 @@ export default function ListingDetailsView({
 
           <section className="listing-new-section listing-new-contact">
             <div className="listing-new-action-grid">
+              {!owner && user?.id && contactLoading && allowsWhatsApp && <button type="button" className="listing-new-whatsapp" disabled aria-busy="true"><MessageCircle size={17} /> WhatsApp</button>}
+              {!owner && user?.id && contactLoading && allowsPhone && <button type="button" className="listing-new-solid-action" disabled aria-busy="true"><Phone size={17} /> Call</button>}
               {whatsappEnabled && !owner && <button type="button" className="listing-new-whatsapp" onClick={openWhatsApp}><MessageCircle size={17} /> WhatsApp</button>}
-              {phoneEnabled && <button type="button" className="listing-new-solid-action" onClick={callSeller}><Phone size={17} /> Call</button>}
-              {!phoneEnabled && !whatsappEnabled && <div className="listing-contact-note">{contactLoading ? 'Loading seller contact…' : user ? 'The seller has not enabled calls or WhatsApp for this listing.' : <><span>Sign in to view the contact options enabled by this seller.</span><button type="button" onClick={() => onAuthRequired?.('Sign in to view seller contact details.')}>Sign in</button></>}</div>}
+              {phoneEnabled && !owner && <button type="button" className="listing-new-solid-action" onClick={callSeller}><Phone size={17} /> Call</button>}
+              {!owner && !user?.id && <div className="listing-contact-note"><span>Sign in to view the contact options enabled by this seller.</span><button type="button" onClick={() => onAuthRequired?.('Sign in to view seller contact details.')}>Sign in</button></div>}
+              {!owner && user?.id && !contactLoading && !contactLoadFailed && !phoneEnabled && !whatsappEnabled && <div className="listing-contact-note">The seller has not enabled calls or WhatsApp for this listing.</div>}
+              {!owner && user?.id && contactLoadFailed && <div className="listing-contact-note">Could not load the seller’s contact details. Reopen this listing to try again.</div>}
             </div>
             {owner && <p className="listing-contact-note">This is your listing. Manage it from the seller controls below.</p>}
           </section>
@@ -832,9 +875,9 @@ export default function ListingDetailsView({
           </section>
 
           <section className="listing-new-section listing-public-comments">
-            <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{comments.length} comments</span></div>
+            <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => setCommentText(event.target.value)} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button></form>
-            <div className="listing-comments-list">{comments.length ? listingCommentThreads.map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? listingCommentThreads.map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>

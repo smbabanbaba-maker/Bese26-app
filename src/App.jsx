@@ -918,14 +918,31 @@ function AppContent() {
       if (!initial && Date.now() - lastRefreshAt < 10000) return loadBackend.inFlight;
       if (loadBackend.inFlight) return loadBackend.inFlight;
       lastRefreshAt = Date.now();
+      if (initial && !startupReadyRef.current) {
+        startupReadyRef.current = true;
+        setStartupError('');
+        setStartupReady(true);
+      }
+      const listingsLoad = fetchActiveListings().then((remoteListings) => {
+        if (mounted) setMarketListings(remoteListings || []);
+      }).catch((error) => {
+        if (mounted && !initial) showToast(error.message || 'Could not load live listings.');
+      }).finally(() => {
+        if (mounted && initial) setMarketLoading(false);
+      });
+      const categoriesLoad = fetchCategories().then((remoteCategories) => {
+        if (mounted) setMarketCategories(remoteCategories || []);
+      }).catch(() => {});
+      fetchActiveAdCampaigns({ placement: ['home_banner', 'homepage', 'search', 'business_directory'] }).then((remoteAds) => {
+        if (mounted) setAdCampaigns(remoteAds || []);
+      }).catch(() => {});
       loadBackend.inFlight = (async () => {
       let session = null;
       try {
         const { data } = await supabase.auth.getSession();
         session = data?.session || null;
-        // Establish auth UI state before loading optional marketplace data. A
-        // listings/categories error must never make a successful login look
-        // like it failed.
+        // Auth restoration and suspension checks run independently from public
+        // listing data so slow private requests never block marketplace browsing.
         if (mounted) setSessionUser(session?.user || null);
         if (session?.user) {
           const { data: accessProfile, error: accessError } = await supabase.from('profiles').select('admin_suspended').eq('id', session.user.id).maybeSingle();
@@ -936,30 +953,7 @@ function AppContent() {
           }
         }
       } catch (error) {
-        if (mounted && initial) setStartupError('Bese26 is still connecting. Please try again.');
-        if (initial) return;
-        if (mounted) showToast(error.message || 'Could not restore your session.');
-      }
-      // Let the real marketplace shell paint as soon as auth is resolved. Ads,
-      // categories, and other optional data must not hold the first screen.
-      if (mounted && initial && !startupReadyRef.current) {
-        startupError && setStartupError('');
-        startupReadyRef.current = true;
-        setStartupReady(true);
-      }
-      fetchActiveAdCampaigns({ placement: ['home_banner', 'homepage', 'search', 'business_directory'] }).then((remoteAds) => {
-        if (mounted) setAdCampaigns(remoteAds || []);
-      }).catch(() => {});
-      try {
-        const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
-        if (mounted) {
-          setMarketListings(remoteListings || []);
-          setMarketCategories(remoteCategories || []);
-        }
-      } catch (error) {
-        if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
-      } finally {
-        if (mounted && initial) setMarketLoading(false);
+        if (mounted && !initial) showToast(error.message || 'Could not restore your session.');
       }
       if (session?.user) {
         try {
@@ -972,7 +966,7 @@ function AppContent() {
         setSavedIds([]);
         setIsAdmin(false);
       }
-      if (mounted && initial && !startupReadyRef.current) { setStartupError(''); startupReadyRef.current = true; setStartupReady(true); }
+      await Promise.allSettled([listingsLoad, categoriesLoad]);
       })().finally(() => { loadBackend.inFlight = null; });
       return loadBackend.inFlight;
     };
@@ -982,12 +976,7 @@ function AppContent() {
     // shell can render its truthful empty/offline states while the background
     // request continues and retries on the normal visibility/focus refreshes.
     const startupTimeout = window.setTimeout(() => {
-      if (mounted && !startupReadyRef.current) {
-        setStartupError('Live listings are taking longer than usual. You can continue and try again shortly.');
-        setMarketLoading(false);
-        startupReadyRef.current = true;
-        setStartupReady(true);
-      }
+      if (mounted) setMarketLoading(false);
     }, 12000);
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
     const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
