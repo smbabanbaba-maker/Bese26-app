@@ -90,8 +90,7 @@ import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
     <div className="brand-loader-orbit" aria-hidden="true"><span className="brand-loader-ring" /><img src="/images/bese26-logo-icon.webp" alt="" /></div>
-    <strong>{offline ? 'Checking your connection…' : message}</strong>
-    <small>{offline ? 'Please wait while Bese26 reconnects.' : 'Your marketplace is getting ready.'}</small>
+    <span className="brand-loader-message">{offline ? 'Checking your connection…' : message}</span>
   </div>;
 }
 
@@ -948,22 +947,21 @@ function AppContent() {
         if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
         if (initial) return;
       }
-      try {
-        const [remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds, remoteSettings] = await Promise.all([
-          fetchActiveAdCampaigns(),
-          fetchActiveAdCampaigns({ placement: 'homepage' }),
-          fetchActiveAdCampaigns({ placement: 'search' }),
-          fetchActiveAdCampaigns({ placement: 'business_directory' }),
-          fetchPlatformSettings(),
+      const [homeAds, homeSlots, searchAds, businessAds, settingsResult] = await Promise.allSettled([
+        fetchActiveAdCampaigns(),
+        fetchActiveAdCampaigns({ placement: 'homepage' }),
+        fetchActiveAdCampaigns({ placement: 'search' }),
+        fetchActiveAdCampaigns({ placement: 'business_directory' }),
+        fetchPlatformSettings(),
+      ]);
+      if (mounted) {
+        setAdCampaigns([
+          ...(homeAds.status === 'fulfilled' ? (homeAds.value || []) : []),
+          ...(homeSlots.status === 'fulfilled' ? (homeSlots.value || []) : []),
+          ...(searchAds.status === 'fulfilled' ? (searchAds.value || []) : []),
+          ...(businessAds.status === 'fulfilled' ? (businessAds.value || []) : []),
         ]);
-        if (mounted) {
-          setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
-          setPlatformSettings(remoteSettings || { maintenance_mode: false });
-        }
-      } catch (error) {
-        if (mounted && initial) setStartupError('Bese26 could not finish loading the app data.');
-        if (mounted && !initial) showToast(error.message || 'Could not load app settings.');
-        if (initial) return;
+        if (settingsResult.status === 'fulfilled') setPlatformSettings(settingsResult.value || { maintenance_mode: false });
       }
       if (session?.user) {
         try {
