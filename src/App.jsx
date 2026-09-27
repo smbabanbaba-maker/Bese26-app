@@ -828,10 +828,10 @@ function AppContent() {
   const [editingListing, setEditingListing] = useState(null);
   const [editingDraft, setEditingDraft] = useState(null);
   const [copySourceListing, setCopySourceListing] = useState(null);
-  const [startupReady, setStartupReady] = useState(true);
+  const [startupReady, setStartupReady] = useState(!isSupabaseConfigured);
   const [startupError, setStartupError] = useState('');
   const [platformSettings, setPlatformSettings] = useState({ maintenance_mode: false });
-  const startupReadyRef = useRef(true);
+  const startupReadyRef = useRef(!isSupabaseConfigured);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
   const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
   const privateAdminEntry = new URLSearchParams(window.location.search).get('admin') === 'login';
@@ -936,8 +936,10 @@ function AppContent() {
         if (mounted) {
           setMarketListings(remoteListings || []);
           setMarketCategories(remoteCategories || []);
+          setMarketLoading(false);
         }
       } catch (error) {
+        if (mounted) setMarketLoading(false);
         if (mounted && initial) setStartupError('Bese26 could not finish loading the marketplace data.');
         if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
         if (initial) return;
