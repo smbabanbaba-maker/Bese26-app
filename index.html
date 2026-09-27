@@ -14,7 +14,7 @@
     <meta name="keywords" content="Bese26, Bese26 marketplace, Nigeria marketplace, buy and sell Nigeria, online marketplace Nigeria, cars for sale Nigeria, phones for sale Nigeria, property Nigeria, business directory Nigeria" />
     <meta name="description" content="Bese26 is a Nigerian online marketplace for buying and selling cars, phones, electronics, property, fashion, services and business products." />
     <link rel="canonical" href="https://www.bese26.shop/" />
-    <link rel="icon" type="image/png" href="/images/bese26-official-logo.png" />
+    <link rel="icon" type="image/webp" href="/images/bese26-logo-icon.webp" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/images/bese26-official-logo.png" />
     <meta property="og:locale" content="en_NG" />
@@ -31,7 +31,17 @@
     <meta name="twitter:image" content="https://www.bese26.shop/images/bese26-official-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" /></noscript>
+    <style>
+      .initial-boot { box-sizing: border-box; min-height: 100svh; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; background: #fff; color: #161616; font: 600 14px/1.4 system-ui, sans-serif; }
+      .initial-boot-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: #000; color: #fff; font-weight: 800; letter-spacing: -1px; }
+      .initial-boot-mark span { color: #ff6868; }
+      .initial-boot-status { display: flex; align-items: center; gap: 9px; }
+      .initial-boot-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff2c2c; animation: initial-boot-pulse 1s ease-in-out infinite; }
+      @keyframes initial-boot-pulse { 50% { opacity: .3; transform: scale(.8); } }
+    </style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -56,7 +66,7 @@
     <title>Bese26</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="initial-boot" role="status" aria-live="polite"><div class="initial-boot-mark" aria-hidden="true">B<span>26</span></div><div class="initial-boot-status"><span class="initial-boot-dot" aria-hidden="true"></span><span>Opening Bese26…</span></div></div></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

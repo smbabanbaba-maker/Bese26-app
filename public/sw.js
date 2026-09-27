@@ -1,5 +1,5 @@
-const CACHE_NAME = 'bese26-shell-v2';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/images/bese26-logo-icon.png', '/images/bese26-official-logo.png'];
+const CACHE_NAME = 'bese26-shell-v3';
+const APP_SHELL = ['/', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));

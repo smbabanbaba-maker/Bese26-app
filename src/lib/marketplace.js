@@ -1,4 +1,4 @@
-import { getAvatarUrl, getListingMediaUrls, supabase } from './supabase';
+import { getAvatarUrl, getListingMediaUrls, getStoragePublicUrl, supabase } from './supabase';
 
 function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
@@ -432,9 +432,13 @@ export async function removeAvatar({ userId, path }) {
   return updateProfile(userId, { avatar_path: null });
 }
 
-export async function fetchActiveAdCampaigns({ placement = 'home_banner' } = {}) {
+export async function fetchActiveAdCampaigns({ placement } = {}) {
   if (!supabase) return [];
-  const { data, error } = await supabase.from('ad_campaigns').select('id,title,body,image_url,image_only,creative_width,creative_height,cta_label,cta_target,placement,status,priority,starts_at,ends_at').eq('placement', placement).eq('status', 'active').lte('starts_at', new Date().toISOString()).or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`).order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(12);
+  const now = new Date().toISOString();
+  let query = supabase.from('ad_campaigns').select('id,title,body,image_url,image_only,creative_width,creative_height,cta_label,cta_target,placement,status,priority,starts_at,ends_at').eq('status', 'active').lte('starts_at', now).or(`ends_at.is.null,ends_at.gt.${now}`);
+  if (Array.isArray(placement) && placement.length) query = query.in('placement', placement);
+  else if (typeof placement === 'string' && placement) query = query.eq('placement', placement);
+  const { data, error } = await query.order('priority', { ascending: false }).order('created_at', { ascending: false }).limit(48);
   if (error) return [];
   return data || [];
 }
@@ -620,19 +624,17 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     ({ data, error } = await fallback);
   }
   if (error) throw error;
-  const listings = await hydrateListingRows(data || [], { firstMediaOnly: true });
-  try {
-    const ids = listings.map((item) => item.id).filter(Boolean);
-    if (!ids.length) return listings;
-    const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
-    if (boostError) return listings;
-    const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
-    return listings
-      .map((item) => ({ ...item, promoted: promoted.has(item.id) }))
-      .sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
-  } catch {
-    return listings;
-  }
+  const rows = data || [];
+  const ids = rows.map((item) => item.id).filter(Boolean);
+  const boostsPromise = ids.length
+    ? Promise.resolve(supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids)).catch(() => ({ data: null, error: true }))
+    : Promise.resolve({ data: [], error: null });
+  const [listings, boostResult] = await Promise.all([hydrateListingRows(rows, { firstMediaOnly: true }), boostsPromise]);
+  if (!ids.length || boostResult.error) return listings;
+  const promoted = new Set((boostResult.data || []).map((item) => item.listing_id));
+  return listings
+    .map((item) => ({ ...item, promoted: promoted.has(item.id) }))
+    .sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
 }
 
 export async function fetchCategories() {
@@ -657,19 +659,38 @@ const listingSelectWithOwnership = `${listingSelect},business_profile_id,publish
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
-  const { data: businessProfiles, error: businessError } = businessIds.length
-    ? await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
-    : { data: [], error: null };
-  if (businessError) throw businessError;
-  const businessById = Object.fromEntries((businessProfiles || []).map((business) => [business.profile_id, business]));
+  const businessProfilesRequest = businessIds.length
+    ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
+    : Promise.resolve({ data: [], error: null });
   const mediaByRow = rows.map((row) => ({
-    row: { ...row, business_profile: businessById[row.business_profile_id] || null },
+    row,
     media: [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order),
   }));
-  const signedEntries = mediaByRow.flatMap(({ row, media }) => (firstMediaOnly ? media.slice(0, 1) : media).map((item) => ({ key: `${row.id}:${item.storage_path}`, path: item.storage_path })));
-  const signedUrls = await getListingMediaUrls(signedEntries.map((entry) => entry.path));
+  const publicImageUrls = {};
+  const signedEntries = [];
+  mediaByRow.forEach(({ row, media }) => {
+    (firstMediaOnly ? media.slice(0, 1) : media).forEach((item) => {
+      if (!item.storage_path) return;
+      const key = `${row.id}:${item.storage_path}`;
+      if (row.status === 'active' && row.moderation_status === 'approved' && item.media_type === 'image') {
+        publicImageUrls[key] = getStoragePublicUrl('listing-media', item.storage_path, { transform: { width: 720, quality: 75, format: 'webp' } });
+      } else {
+        signedEntries.push({ key, path: item.storage_path });
+      }
+    });
+  });
+  const [businessResult, signedUrls] = await Promise.all([businessProfilesRequest, getListingMediaUrls(signedEntries.map((entry) => entry.path))]);
+  if (businessResult.error) throw businessResult.error;
+  const businessById = Object.fromEntries((businessResult.data || []).map((business) => [business.profile_id, business]));
   const signedByKey = Object.fromEntries(signedEntries.map((entry, index) => [entry.key, signedUrls[index] || '']));
-  return mediaByRow.map(({ row, media }) => mapListing({ ...row, listing_media: media.map((item) => ({ ...item, signed_url: signedByKey[`${row.id}:${item.storage_path}`] || '' })) }));
+  return mediaByRow.map(({ row, media }) => mapListing({
+    ...row,
+    business_profile: businessById[row.business_profile_id] || null,
+    listing_media: (firstMediaOnly ? media.slice(0, 1) : media).map((item) => {
+      const key = `${row.id}:${item.storage_path}`;
+      return { ...item, signed_url: publicImageUrls[key] || signedByKey[key] || '' };
+    }),
+  }));
 }
 
 export async function fetchListingDetails(listingId) {

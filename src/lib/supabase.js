@@ -22,9 +22,24 @@ if (typeof window !== 'undefined' && isSupabaseConfigured && !window.__bese26_su
   window.__bese26_supabase__ = supabase;
 }
 
-export function getStoragePublicUrl(bucket, path) {
+export function getStoragePublicUrl(bucket, path, options) {
   if (!supabase || !path) return '';
-  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+  return supabase.storage.from(bucket).getPublicUrl(path, options).data.publicUrl;
+}
+
+export function getOptimizedPublicImageUrl(url, { width = 1024, quality = 75, format = 'webp' } = {}) {
+  if (!supabase || !url) return url || '';
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin !== new URL(supabaseUrl).origin) return url;
+    const match = parsed.pathname.match(/^\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+    if (!match) return url;
+    const bucket = decodeURIComponent(match[1]);
+    const path = decodeURIComponent(match[2]);
+    return getStoragePublicUrl(bucket, path, { transform: { width, quality, format } });
+  } catch {
+    return url;
+  }
 }
 
 const listingMediaUrlCache = new Map();
@@ -60,5 +75,5 @@ export async function getListingMediaUrls(paths = []) {
 }
 
 export function getAvatarUrl(path) {
-  return getStoragePublicUrl('avatars', path);
+  return getStoragePublicUrl('avatars', path, { transform: { width: 256, quality: 75, format: 'webp' } });
 }
