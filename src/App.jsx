@@ -918,24 +918,6 @@ function AppContent() {
       if (!initial && Date.now() - lastRefreshAt < 10000) return loadBackend.inFlight;
       if (loadBackend.inFlight) return loadBackend.inFlight;
       lastRefreshAt = Date.now();
-      if (initial && !startupReadyRef.current) {
-        startupReadyRef.current = true;
-        setStartupError('');
-        setStartupReady(true);
-      }
-      const listingsLoad = fetchActiveListings().then((remoteListings) => {
-        if (mounted) setMarketListings(remoteListings || []);
-      }).catch((error) => {
-        if (mounted && !initial) showToast(error.message || 'Could not load live listings.');
-      }).finally(() => {
-        if (mounted && initial) setMarketLoading(false);
-      });
-      const categoriesLoad = fetchCategories().then((remoteCategories) => {
-        if (mounted) setMarketCategories(remoteCategories || []);
-      }).catch(() => {});
-      fetchActiveAdCampaigns({ placement: ['home_banner', 'homepage', 'search', 'business_directory'] }).then((remoteAds) => {
-        if (mounted) setAdCampaigns(remoteAds || []);
-      }).catch(() => {});
       loadBackend.inFlight = (async () => {
       let session = null;
       try {
@@ -955,6 +937,34 @@ function AppContent() {
       } catch (error) {
         if (mounted && !initial) showToast(error.message || 'Could not restore your session.');
       }
+      try {
+        const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
+        if (mounted) {
+          setMarketListings(remoteListings || []);
+          setMarketCategories(remoteCategories || []);
+        }
+      } catch (error) {
+        if (mounted && initial) setStartupError('Bese26 could not finish loading the marketplace data.');
+        if (mounted && !initial) showToast(error.message || 'Could not load live marketplace data.');
+        if (initial) return;
+      }
+      try {
+        const [remoteHomeAds, remoteHomeSlots, remoteSearchAds, remoteBusinessAds, remoteSettings] = await Promise.all([
+          fetchActiveAdCampaigns(),
+          fetchActiveAdCampaigns({ placement: 'homepage' }),
+          fetchActiveAdCampaigns({ placement: 'search' }),
+          fetchActiveAdCampaigns({ placement: 'business_directory' }),
+          fetchPlatformSettings(),
+        ]);
+        if (mounted) {
+          setAdCampaigns([...(remoteHomeAds || []), ...(remoteHomeSlots || []), ...(remoteSearchAds || []), ...(remoteBusinessAds || [])]);
+          setPlatformSettings(remoteSettings || { maintenance_mode: false });
+        }
+      } catch (error) {
+        if (mounted && initial) setStartupError('Bese26 could not finish loading the app data.');
+        if (mounted && !initial) showToast(error.message || 'Could not load app settings.');
+        if (initial) return;
+      }
       if (session?.user) {
         try {
           const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
@@ -966,18 +976,22 @@ function AppContent() {
         setSavedIds([]);
         setIsAdmin(false);
       }
-      await Promise.allSettled([listingsLoad, categoriesLoad]);
+      if (mounted && initial && !startupReadyRef.current) {
+        setStartupError('');
+        startupReadyRef.current = true;
+        setStartupReady(true);
+      }
       })().finally(() => { loadBackend.inFlight = null; });
       return loadBackend.inFlight;
     };
     loadBackend({ initial: true });
-    // Do not trap visitors on the branded splash screen when an upstream
-    // Supabase request is slow or temporarily unavailable. The marketplace
-    // shell can render its truthful empty/offline states while the background
-    // request continues and retries on the normal visibility/focus refreshes.
+    // Keep the branded splash visible until the initial marketplace data is
+    // complete. This avoids opening the app into a half-empty loading shell.
     const startupTimeout = window.setTimeout(() => {
-      if (mounted) setMarketLoading(false);
-    }, 12000);
+      if (mounted && !startupReadyRef.current) {
+        setStartupError('Bese26 is still loading your marketplace data.');
+      }
+    }, 15000);
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
     const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
     const refreshWhenFocused = () => loadBackend();
