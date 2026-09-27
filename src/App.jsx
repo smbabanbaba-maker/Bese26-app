@@ -103,7 +103,7 @@ function SplashScreen({ message = 'Preparing your marketplace…', error = false
     <div className="splash-status" aria-live="polite"><strong>{message}</strong>{error && onRetry && <button type="button" className="splash-retry" onClick={onRetry}>Try again</button>}</div>
     <div className="splash-credit" aria-label="From SYLUTION">
       <span className="splash-credit-label">From</span>
-      <img className="splash-sylution-logo" src="/branding-sylution-logo.png" alt="SYLUTION" />
+      <img className="splash-sylution-logo" src="/branding-sylution-logo.webp" alt="SYLUTION" />
       <span className="splash-credit-name">SYLUTION</span>
     </div>
   </div>;
@@ -206,7 +206,7 @@ function ListingCardMedia({ listing, children }) {
   useEffect(() => { setActiveImage(0); }, [listing.id]);
   useEffect(() => { if (images.length < 2) return undefined; const timer = window.setInterval(() => setActiveImage((current) => (current + 1) % images.length), 7000); return () => window.clearInterval(timer); }, [images.length]);
   return <div className={`product-image-wrap ${images.length > 1 ? 'has-gallery' : ''}`}>
-    {images.length ? images.map((image, index) => <img key={`${image}-${index}`} src={image} alt={listing.title} className={`product-image product-image-slide ${index === activeImage ? 'is-active' : ''}`} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" onError={(event) => event.currentTarget.classList.add('is-broken')} />) : <div className="product-image-placeholder"><Package size={26} /></div>}
+    {images.length ? images.map((image, index) => <img key={`${image}-${index}`} src={image} alt={listing.title} className={`product-image product-image-slide ${index === activeImage ? 'is-active' : ''}`} loading="lazy" decoding="async" onError={(event) => event.currentTarget.classList.add('is-broken')} />) : <div className="product-image-placeholder"><Package size={26} /></div>}
     {images.length > 1 && <span className="product-gallery-dots" aria-label={`${images.length} listing photos`}>{images.map((image, index) => <i className={index === activeImage ? 'active' : ''} key={`${image}-dot-${index}`} />)}</span>}
     {children}
   </div>;
@@ -336,22 +336,16 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
 
 function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
   const [geo, setGeo] = useState(null);
-  const [selectedCountry, setSelectedCountry] = useState('NG');
   const [selectedState, setSelectedState] = useState('');
   const [selectedLga, setSelectedLga] = useState('');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
-  useEffect(() => { if (!locationPickerOpen || geo) return undefined; let active = true; Promise.all([import('country-state-city'), import('./data/nigeria-lgas.json')]).then(([countryStateModule, lgaModule]) => { if (active) setGeo({ ...countryStateModule, nigeriaLgas: lgaModule.default || lgaModule }); }).catch(() => {}); return () => { active = false; }; }, [locationPickerOpen, geo]);
-  const countries = useMemo(() => geo ? geo.Country.getAllCountries().filter((country) => ['NG', 'GH', 'KE', 'ZA', 'GB', 'US'].includes(country.isoCode)) : [], [geo]);
-  const selectedCountryData = countries.find((country) => country.isoCode === selectedCountry);
-  const states = useMemo(() => selectedCountry === 'NG'
-    ? (geo?.nigeriaLgas || []).map((item) => ({ isoCode: item.state, name: item.state }))
-    : (geo?.State?.getStatesOfCountry(selectedCountry) || []), [selectedCountry, geo]);
+  useEffect(() => { if (!locationPickerOpen || geo) return undefined; let active = true; import('./data/nigeria-lgas.json').then((module) => { if (active) setGeo(module.default || module); }).catch(() => {}); return () => { active = false; }; }, [locationPickerOpen, geo]);
+  const states = useMemo(() => (geo || []).map((item) => ({ isoCode: item.state, name: item.state })), [geo]);
   const localGovernments = useMemo(() => {
     if (!selectedState) return [];
-    if (selectedCountry === 'NG') return (geo?.nigeriaLgas || []).find((item) => item.state === selectedState)?.lgas.map((name) => ({ name })) || [];
-    return geo?.City?.getCitiesOfState(selectedCountry, selectedState) || [];
-  }, [selectedCountry, selectedState, geo]);
-  const findByLocation = () => onSearch([selectedLga, states.find((state) => state.isoCode === selectedState)?.name, selectedCountryData?.name].filter(Boolean).join(' '));
+    return (geo || []).find((item) => item.state === selectedState)?.lgas.map((name) => ({ name })) || [];
+  }, [selectedState, geo]);
+  const findByLocation = () => onSearch([selectedLga, states.find((state) => state.isoCode === selectedState)?.name, 'Nigeria'].filter(Boolean).join(' '));
   const advertisingSlides = adCampaigns.filter((campaign) => campaign.placement === 'home_banner').map((campaign) => ({ type: 'ad', image_only: Boolean(campaign.image_only), creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', image_url: campaign.image_url, onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
   const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
   const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
@@ -375,10 +369,10 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
         </div>
         <button type="button" className="location-picker-trigger" onClick={() => setLocationPickerOpen((open) => !open)} aria-expanded={locationPickerOpen} aria-controls="home-location-picker"><MapPin size={14} /><span>{selectedLga || (userPlace ? `Near ${userPlace}` : 'Choose location')}</span><ChevronDown size={14} className={locationPickerOpen ? 'is-open' : ''} /></button>
         {locationPickerOpen && <div id="home-location-picker" className="home-location-picker" aria-label="Choose listing location">
-          <label><span>Country</span><select value={selectedCountry} onChange={(event) => { setSelectedCountry(event.target.value); setSelectedState(''); setSelectedLga(''); }} disabled={!geo}><option value="">{geo ? 'Select country' : 'Loading locations…'}</option>{countries.map((country) => <option key={country.isoCode} value={country.isoCode}>{country.name}</option>)}</select></label>
-          <label><span>State</span><select value={selectedState} onChange={(event) => { setSelectedState(event.target.value); setSelectedLga(''); }} disabled={!selectedCountry}><option value="">Select state</option>{states.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}</select></label>
+          <label><span>Country</span><select value="NG" disabled><option value="NG">Nigeria</option></select></label>
+          <label><span>State</span><select value={selectedState} onChange={(event) => { setSelectedState(event.target.value); setSelectedLga(''); }} disabled={!geo}><option value="">{geo ? 'Select state' : 'Loading states…'}</option>{states.map((state) => <option key={state.isoCode} value={state.isoCode}>{state.name}</option>)}</select></label>
           <label><span>Local government</span><select value={selectedLga} onChange={(event) => setSelectedLga(event.target.value)} disabled={!selectedState}><option value="">Select local government</option>{localGovernments.map((lga) => <option key={lga.name} value={lga.name}>{lga.name}</option>)}</select></label>
-          <button type="button" className="home-location-search" onClick={findByLocation} disabled={!selectedCountry || !selectedState || !selectedLga}><Search size={16} /> Find listings</button>
+          <button type="button" className="home-location-search" onClick={findByLocation} disabled={!selectedState || !selectedLga}><Search size={16} /> Find listings</button>
         </div>}
       </section>
       <section className="popular-categories"><SectionHeading eyebrow="CHOOSE A CATEGORY" title="What are you looking for?" action="View all" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>

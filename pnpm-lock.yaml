@@ -14,9 +14,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: latest
         version: 6.1.1(vite@8.3.0)
-      country-state-city:
-        specifier: ^3.2.1
-        version: 3.2.1
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -208,9 +205,6 @@ packages:
 
   core-js@3.50.0:
     resolution: {integrity: sha512-BRWgOLKkFeCgRudR6zrs8p9XJZcE14grzKMMssoYrk6krtuEZ7MTKPIY5RzOnqsEKIR9kst7wNzphttraT+Yqw==}
-
-  country-state-city@3.2.1:
-    resolution: {integrity: sha512-kxbanqMc6izjhc/EHkGPCTabSPZ2G6eG4/97akAYHJUN4stzzFEvQPZoF8oXDQ+10gM/O/yUmISCR1ZVxyb6EA==}
 
   css-line-break@2.1.0:
     resolution: {integrity: sha512-FHcKFCZcAha3LwfVBhCQbW2nCNbkZXn7KVUJcsT5/P8YmfsVja0FMPJr0B903j/E69HUphKiV9iQArX8SDYA4w==}
@@ -567,8 +561,6 @@ snapshots:
 
   core-js@3.50.0:
     optional: true
-
-  country-state-city@3.2.1: {}
 
   css-line-break@2.1.0:
     dependencies:

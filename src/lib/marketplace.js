@@ -1423,14 +1423,58 @@ export async function createListing({ sellerId, values }) {
   return Array.isArray(data) ? data[0] : data;
 }
 
+async function optimizeListingPhoto(file) {
+  const compressibleTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/heic', 'image/heif'];
+  const isHeic = file?.type === 'image/heic' || file?.type === 'image/heif';
+  if (!file || !compressibleTypes.includes(file.type) || (!isHeic && file.size < 300_000)) return file;
+  if (typeof createImageBitmap !== 'function' || typeof document === 'undefined') {
+    if (isHeic) throw new Error('This browser cannot convert HEIC photos. Save the photo as JPG, PNG, or WEBP and try again.');
+    return file;
+  }
+  let bitmap;
+  let canvas;
+  try {
+    bitmap = await createImageBitmap(file);
+    const maxEdge = 1920;
+    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size < 450_000) return file;
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { alpha: true });
+    if (!context) {
+      if (isHeic) throw new Error('This browser cannot convert HEIC photos. Save the photo as JPG, PNG, or WEBP and try again.');
+      return file;
+    }
+    context.drawImage(bitmap, 0, 0, width, height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.82));
+    if (!blob || blob.type !== 'image/webp') {
+      if (isHeic) throw new Error('This browser cannot convert HEIC photos. Save the photo as JPG, PNG, or WEBP and try again.');
+      return file;
+    }
+    if (!isHeic && blob.size >= file.size) return file;
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'listing-photo';
+    return new File([blob], `${baseName}.webp`, { type: 'image/webp', lastModified: file.lastModified });
+  } catch {
+    if (isHeic) throw new Error('This browser cannot convert HEIC photos. Save the photo as JPG, PNG, or WEBP and try again.');
+    return file;
+  } finally {
+    bitmap?.close?.();
+    if (canvas) { canvas.width = 0; canvas.height = 0; }
+  }
+}
+
 export async function uploadListingMedia({ userId, listingId, file, sortOrder = 0 }) {
   failIfUnavailable();
-  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+  const uploadFile = await optimizeListingPhoto(file);
+  const safeName = uploadFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
   const path = `${userId}/${listingId}/${crypto.randomUUID()}-${safeName}`;
-  const { error: uploadError } = await supabase.storage.from('listing-media').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  const { error: uploadError } = await supabase.storage.from('listing-media').upload(path, uploadFile, { cacheControl: '3600', upsert: false, contentType: uploadFile.type });
   if (uploadError) throw uploadError;
-  const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
-  const { data, error } = await supabase.from('listing_media').insert({ listing_id: listingId, owner_id: userId, storage_path: path, media_type: mediaType, mime_type: file.type, file_size_bytes: file.size, sort_order: sortOrder }).select().single();
+  const mediaType = uploadFile.type.startsWith('video/') ? 'video' : 'image';
+  const { data, error } = await supabase.from('listing_media').insert({ listing_id: listingId, owner_id: userId, storage_path: path, media_type: mediaType, mime_type: uploadFile.type, file_size_bytes: uploadFile.size, sort_order: sortOrder }).select().single();
   if (error) throw error;
   return data;
 }
