@@ -26,11 +26,13 @@ import {
   X,
 } from 'lucide-react';
 import VerificationBadges from './VerificationBadges';
+import ListingPublicCommentThread from './ListingPublicCommentThread';
 import { getAvatarUrl } from '../lib/supabase';
 import {
   createChatOffer,
   deleteListing,
   fetchListingComments,
+  fetchListingCommentSocialStats,
   fetchListingContact,
   fetchListingReviews,
   fetchReviewComments,
@@ -50,6 +52,7 @@ import {
   toggleFollow,
   toggleReviewCommentLike,
   toggleReviewLike,
+  toggleListingCommentLike as togglePublicListingCommentLike,
 } from '../lib/marketplace';
 
 function safeGalleryUrl(value) {
@@ -321,6 +324,7 @@ export default function ListingDetailsView({
   const [reviews, setReviews] = useState([]);
   const [reviewSocials, setReviewSocials] = useState({});
   const [comments, setComments] = useState([]);
+  const [listingCommentSocials, setListingCommentSocials] = useState({});
   const [commentText, setCommentText] = useState('');
   const [commentsBusy, setCommentsBusy] = useState(false);
   const [similar, setSimilar] = useState([]);
@@ -374,6 +378,19 @@ export default function ListingDetailsView({
     ? (publishedReviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / publishedReviews.length).toFixed(1)
     : null;
   const visibleReviews = [...publishedReviews.slice(0, 2), ...reviews.filter((review) => review.status === 'pending' && review.reviewer_id === user?.id)];
+  const listingCommentThreads = useMemo(() => {
+    const ids = new Set(comments.map((comment) => comment.id));
+    const roots = [];
+    const replies = new Map();
+    comments.forEach((comment) => {
+      if (comment.parent_comment_id && ids.has(comment.parent_comment_id)) {
+        const current = replies.get(comment.parent_comment_id) || [];
+        current.push(comment);
+        replies.set(comment.parent_comment_id, current);
+      } else roots.push(comment);
+    });
+    return roots.map((comment) => ({ comment, replies: replies.get(comment.id) || [] }));
+  }, [comments]);
   const canReview = Boolean(user && !owner && ['sold', 'archived'].includes(String(listingStatus || '').toLowerCase()));
   const titleParts = [listing?.category, listing?.subcategory].filter(Boolean).join(' · ');
   const sellerLocation = listing?.location || 'Nigeria';
@@ -405,13 +422,14 @@ export default function ListingDetailsView({
     setSimilar([]);
     setSimilarVisibleCount(12);
     setComments([]);
+    setListingCommentSocials({});
     setReviews([]);
     setReviewSocials({});
     setListingStatusState(listing.raw?.status || 'active');
 
     Promise.allSettled([
-      fetchSellerReviews(listing.sellerId),
-      fetchListingReviews(listing.id),
+      fetchSellerReviews(listing.sellerId, user?.id || null),
+      fetchListingReviews(listing.id, user?.id || null),
       fetchListingComments(listing.id),
       fetchSimilarListings(listing),
       fetchSellerListings(listing),
@@ -428,7 +446,15 @@ export default function ListingDetailsView({
           .then((stats) => current && setReviewSocials(stats))
           .catch(() => {});
       }
-      if (commentsResult.status === 'fulfilled') setComments(commentsResult.value || []);
+      if (commentsResult.status === 'fulfilled') {
+        const rows = commentsResult.value || [];
+        setComments(rows);
+        if (rows.length) {
+          fetchListingCommentSocialStats(rows.map((comment) => comment.id), user?.id || null)
+            .then((stats) => current && setListingCommentSocials(stats))
+            .catch(() => {});
+        }
+      }
       if (similarResult.status === 'fulfilled') setSimilar(similarResult.value || []);
       if (sellerListingsResult.status === 'fulfilled') setSellerListings(sellerListingsResult.value || []);
       if (contactResult.status === 'fulfilled') setContact(contactResult.value || { phone: '', whatsapp: '' });
@@ -606,22 +632,61 @@ export default function ListingDetailsView({
       setActionBusy(false);
     }
   };
+  const saveListingComment = async (body, parentCommentId = null) => {
+    if (!user) {
+      onAuthRequired?.(parentCommentId ? 'Sign in to reply to this public comment.' : 'Sign in to join the public listing discussion.');
+      return null;
+    }
+    try {
+      const saved = await submitListingComment({ listingId: listing.id, userId: user.id, body, parentCommentId });
+      const normalized = {
+        ...saved,
+        user: saved.user || {
+          display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You',
+          avatar_path: user.user_metadata?.avatar_path || null,
+        },
+      };
+      setComments((current) => [normalized, ...current]);
+      setListingCommentSocials((current) => ({
+        ...current,
+        [normalized.id]: current[normalized.id] || { likeCount: 0, replyCount: 0, liked: false },
+        ...(parentCommentId && saved.status === 'published' ? {
+          [parentCommentId]: {
+            ...(current[parentCommentId] || { likeCount: 0, replyCount: 0, liked: false }),
+            replyCount: Number(current[parentCommentId]?.replyCount || 0) + 1,
+          },
+        } : {}),
+      }));
+      onDemoAction?.(parentCommentId ? 'Reply posted.' : 'Comment posted.');
+      return normalized;
+    } catch (error) {
+      onDemoAction?.(error.message || (parentCommentId ? 'Could not post this reply.' : 'Could not submit the comment.'));
+      return null;
+    }
+  };
+  const toggleListingCommentReaction = async (comment) => {
+    if (!user) { onAuthRequired?.('Sign in to like a public comment.'); return; }
+    const previous = listingCommentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
+    const shouldLike = !previous.liked;
+    setListingCommentSocials((current) => ({
+      ...current,
+      [comment.id]: { ...previous, liked: shouldLike, likeCount: Math.max(0, Number(previous.likeCount || 0) + (shouldLike ? 1 : -1)) },
+    }));
+    try {
+      await togglePublicListingCommentLike({ commentId: comment.id, userId: user.id, shouldLike });
+    } catch (error) {
+      setListingCommentSocials((current) => ({ ...current, [comment.id]: previous }));
+      onDemoAction?.(error.message || 'Could not update your like.');
+    }
+  };
   const submitComment = async (event) => {
     event.preventDefault();
     const body = commentText.trim();
     if (!body) return;
-    if (!user) { onAuthRequired?.('Sign in to join the public listing discussion.'); return; }
     setCommentsBusy(true);
     try {
-      const saved = await submitListingComment({ listingId: listing.id, userId: user.id, body });
-      setComments((current) => [{
-        ...saved,
-        user: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You' },
-      }, ...current]);
-      setCommentText('');
-      onDemoAction?.('Comment posted.');
-    } catch (error) {
-      onDemoAction?.(error.message || 'Could not submit the comment.');
+      const saved = await saveListingComment(body);
+      if (saved) setCommentText('');
     } finally {
       setCommentsBusy(false);
     }
@@ -630,9 +695,14 @@ export default function ListingDetailsView({
     event.preventDefault();
     if (!user) { onAuthRequired?.('Sign in to leave feedback.'); return; }
     if (!listing.sellerId || owner) return;
+    const rating = Number(reviewRating);
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      onDemoAction?.('Choose a rating from 1 to 5 stars.');
+      return;
+    }
     setReviewBusy(true);
     try {
-      const saved = await submitListingReview({ listingId: listing.id, reviewerId: user.id, revieweeId: listing.sellerId, rating: reviewRating, body: reviewBody });
+      const saved = await submitListingReview({ listingId: listing.id, reviewerId: user.id, revieweeId: listing.sellerId, rating, body: reviewBody });
       setReviews((current) => [
         { ...saved, reviewer_id: user.id, reviewer: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You' }, listing: { title: listing.title } },
         ...current,
@@ -758,13 +828,13 @@ export default function ListingDetailsView({
             </div>
             {visibleReviews.length ? visibleReviews.map(renderReview)
               : loadingDetails ? <div className="listing-new-no-reviews"><p>Loading seller feedback…</p></div>
-                : <div className="listing-new-no-reviews"><span>☆</span><p>No published feedback yet.</p><small className="listing-review-empty-note">Seller feedback will appear here after it is approved.</small>{canReview && <button type="button" className="listing-new-link" onClick={() => setReviewOpen(true)}>Be the first to leave feedback</button>}</div>}
+                : <div className="listing-new-no-reviews"><span>☆</span><p>No published feedback yet.</p><small className="listing-review-eligibility-note">{canReview ? 'Choose 1–5 stars and leave your experience; feedback appears after moderation.' : !owner ? 'Seller ratings open after a completed sale. Published feedback will show its stars, likes and comments here.' : 'Buyer ratings and feedback will appear here after publication.'}</small>{canReview && <button type="button" className="listing-new-link" onClick={() => setReviewOpen(true)}>Be the first to leave feedback</button>}</div>}
           </section>
 
           <section className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{comments.length} comments</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => setCommentText(event.target.value)} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button></form>
-            <div className="listing-comments-list">{comments.length ? comments.map((comment) => <article className="listing-public-comment" key={comment.id}><div className="listing-public-comment-avatar">{(comment.business?.business_name || comment.user?.display_name || 'B').slice(0, 1).toUpperCase()}</div><div><div className="listing-public-comment-head"><strong>{comment.business?.business_name || comment.user?.display_name || 'Bese26 member'}</strong>{comment.business?.business_name && <small className="listing-comment-business-label">Business</small>}<time>{new Date(comment.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}</time>{comment.status === 'pending' && comment.user_id === user?.id && <span>Pending review</span>}</div><p>{comment.body}</p></div></article>) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{comments.length ? listingCommentThreads.map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>
@@ -783,7 +853,7 @@ export default function ListingDetailsView({
 
       {zoomed && <div className="listing-gallery-lightbox" role="dialog" aria-label="Fullscreen listing gallery" onClick={() => setZoomed(false)}><button type="button" className="icon-button lightbox-close" onClick={() => setZoomed(false)} aria-label="Close fullscreen"><X size={20} /></button>{validImages.length > 1 && <button type="button" className="gallery-control gallery-control-prev" onClick={(event) => { event.stopPropagation(); previousImage(); }} aria-label="Previous photo"><ArrowLeft size={20} /></button>}{primaryImage && <img src={primaryImage} alt={`${listing.title} fullscreen image ${activeImage + 1}`} onClick={(event) => event.stopPropagation()} />}{validImages.length > 1 && <button type="button" className="gallery-control gallery-control-next" onClick={(event) => { event.stopPropagation(); nextImage(); }} aria-label="Next photo"><ArrowRight size={20} /></button>}</div>}
 
-      {reviewOpen && <div className="listing-action-overlay" role="dialog" aria-modal="true" aria-label="Leave feedback" onClick={(event) => event.target === event.currentTarget && setReviewOpen(false)}><form className="listing-action-sheet listing-review-form" onSubmit={submitReview}><div className="listing-action-sheet-head"><div><span className="listing-new-kicker">SELLER FEEDBACK</span><h2>Rate this seller</h2></div><button type="button" className="icon-button" onClick={() => setReviewOpen(false)} aria-label="Close feedback"><X size={18} /></button></div><div className="listing-review-stars-input" role="radiogroup" aria-label="Rating">{[1, 2, 3, 4, 5].map((value) => <button type="button" key={value} className={value <= reviewRating ? 'selected' : ''} onClick={() => setReviewRating(value)} aria-label={`${value} star${value === 1 ? '' : 's'}`}>★</button>)}</div><label>Comment<textarea value={reviewBody} onChange={(event) => setReviewBody(event.target.value)} maxLength={1000} placeholder="Share your honest experience…" rows={4} required /></label><small>Your feedback will be reviewed before it appears publicly.</small><button className="primary-button" disabled={reviewBusy}>{reviewBusy ? 'Submitting…' : 'Submit feedback'} <Check size={15} /></button></form></div>}
+      {reviewOpen && <div className="listing-action-overlay" role="dialog" aria-modal="true" aria-label="Leave feedback" onClick={(event) => event.target === event.currentTarget && setReviewOpen(false)}><form className="listing-action-sheet listing-review-form" onSubmit={submitReview}><div className="listing-action-sheet-head"><div><span className="listing-new-kicker">SELLER FEEDBACK</span><h2>Rate this seller</h2></div><button type="button" className="icon-button" onClick={() => setReviewOpen(false)} aria-label="Close feedback"><X size={18} /></button></div><div className="listing-review-stars-input" role="radiogroup" aria-label="Rating">{[1, 2, 3, 4, 5].map((value) => <button type="button" role="radio" aria-checked={value === reviewRating} key={value} className={value <= reviewRating ? 'selected' : ''} onClick={() => setReviewRating(value)} aria-label={`${value} star${value === 1 ? '' : 's'}`}>★</button>)}</div><label>Comment<textarea value={reviewBody} onChange={(event) => setReviewBody(event.target.value)} maxLength={1000} placeholder="Share your honest experience…" rows={4} required /></label><small>Your feedback will be reviewed before it appears publicly.</small><button className="primary-button" disabled={reviewBusy}>{reviewBusy ? 'Submitting…' : 'Submit feedback'} <Check size={15} /></button></form></div>}
 
       {offerOpen && <div className="listing-action-overlay" role="dialog" aria-modal="true" aria-label="Make an offer" onClick={(event) => event.target === event.currentTarget && setOfferOpen(false)}><form className="listing-action-sheet" onSubmit={submitListingOffer}><div className="listing-action-sheet-head"><div><span className="listing-new-kicker">NEGOTIATE SAFELY</span><h2>Make an offer</h2></div><button type="button" className="icon-button" onClick={() => setOfferOpen(false)} aria-label="Close offer"><X size={18} /></button></div><p>Listing price: <strong>{listing.price}</strong></p><label>Your offer (NGN)<input type="number" min="1" step="1" value={offerAmount} onChange={(event) => setOfferAmount(event.target.value)} placeholder="Enter amount" autoFocus required /></label><small>Your offer is sent in private chat. It is not a payment.</small><button className="primary-button" disabled={offerBusy}>{offerBusy ? 'Sending offer…' : 'Send offer'}</button></form></div>}
 

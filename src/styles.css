@@ -7335,3 +7335,25 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
   .listing-review-comment-replies { margin-left: 0; padding-left: 8px; }
   .listing-review-comment-actions { gap: 11px; }
 }
+
+
+/* Public listing comments: visible profile photos, reactions and threaded replies. */
+.listing-public-comment { align-items: start; }
+.listing-public-comment-avatar { overflow: hidden; }
+.listing-public-comment-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.listing-public-comment-content { min-width: 0; }
+.listing-public-comment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 7px; }
+.listing-public-comment-actions button { display: inline-flex; align-items: center; gap: 4px; padding: 2px 0; color: #687782; background: transparent; font-size: 10px; font-weight: 700; }
+.listing-public-comment-actions button:hover, .listing-public-comment-actions button.is-liked { color: #d43840; }
+.listing-public-comment-actions button:disabled { opacity: .55; cursor: not-allowed; }
+.listing-public-comment-actions button span { color: #85919a; }
+.listing-public-comment-reply-count { color: #7c8992; font-size: 10px; }
+.listing-public-comment-replies { display: grid; gap: 8px; margin: 9px 0 0 2px; padding-left: 9px; border-left: 2px solid #e8edf0; }
+.listing-public-comment-reply { padding: 8px; background: #f4f7f8; }
+.listing-public-comment-reply-form { display: grid; gap: 6px; margin-top: 8px; padding: 8px; border-radius: 8px; background: #f4f7f8; }
+.listing-public-comment-reply-form > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #687782; font-size: 10px; }
+.listing-public-comment-reply-form > div button { padding: 2px 4px; color: #687782; background: transparent; font-size: 10px; }
+.listing-public-comment-reply-form textarea { width: 100%; min-height: 38px; max-height: 100px; resize: vertical; padding: 8px; border: 1px solid #dfe5e9; border-radius: 7px; color: #26323b; background: #fff; font: inherit; font-size: 11px; }
+.listing-public-comment-reply-form > button { justify-self: end; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 32px; padding: 0 10px; border-radius: 7px; color: #fff; background: #d43840; font-size: 10px; font-weight: 750; }
+.listing-public-comment-reply-form > button:disabled { opacity: .55; cursor: not-allowed; }
+.listing-review-eligibility-note { color: #7b8791; font-size: 10px; line-height: 1.4; }

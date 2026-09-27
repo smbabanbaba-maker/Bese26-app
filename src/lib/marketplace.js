@@ -740,31 +740,69 @@ async function attachBusinessIdentities(comments = []) {
 export async function fetchListingComments(listingId) {
   failIfUnavailable();
   if (!listingId) return [];
-  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
   return attachBusinessIdentities(data || []);
 }
 
-export async function submitListingComment({ listingId, userId, body }) {
+export async function submitListingComment({ listingId, userId, body, parentCommentId = null }) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, body: String(body || '').trim(), status: 'published' }).select('id,listing_id,user_id,body,status,created_at').single();
+  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, parent_comment_id: parentCommentId || null, body: String(body || '').trim(), status: 'published' }).select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').single();
   if (error) throw error;
   const [comment] = await attachBusinessIdentities([data]);
   return comment || data;
 }
 
-export async function fetchListingReviews(listingId) {
+export async function fetchListingCommentSocialStats(commentIds = [], userId = null) {
+  failIfUnavailable();
+  const ids = [...new Set((commentIds || []).filter(Boolean))];
+  if (!ids.length) return {};
+  const ownLikesRequest = userId
+    ? supabase.from('listing_comment_likes').select('comment_id').eq('user_id', userId).in('comment_id', ids)
+    : Promise.resolve({ data: [], error: null });
+  const [countsResult, likesResult] = await Promise.all([
+    supabase.from('listing_comment_social_counts').select('comment_id,like_count,reply_count').in('comment_id', ids),
+    ownLikesRequest,
+  ]);
+  if (countsResult.error) throw countsResult.error;
+  if (likesResult.error) throw likesResult.error;
+  const counts = Object.fromEntries(ids.map((id) => [id, { likeCount: 0, replyCount: 0, liked: false }]));
+  (countsResult.data || []).forEach((row) => {
+    counts[row.comment_id] = { ...counts[row.comment_id], likeCount: Number(row.like_count || 0), replyCount: Number(row.reply_count || 0) };
+  });
+  (likesResult.data || []).forEach((row) => {
+    if (counts[row.comment_id]) counts[row.comment_id].liked = true;
+  });
+  return counts;
+}
+
+export async function toggleListingCommentLike({ commentId, userId, shouldLike }) {
+  failIfUnavailable();
+  if (!commentId || !userId) throw new Error('Sign in before liking a comment.');
+  const request = shouldLike
+    ? supabase.from('listing_comment_likes').insert({ comment_id: commentId, user_id: userId })
+    : supabase.from('listing_comment_likes').delete().eq('comment_id', commentId).eq('user_id', userId);
+  const { error } = await request;
+  if (error && !(shouldLike && error.code === '23505')) throw error;
+  return Boolean(shouldLike);
+}
+
+export async function fetchListingReviews(listingId, userId = null) {
   failIfUnavailable();
   if (!listingId) return [];
-  const { data, error } = await supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).eq('status', 'published').order('created_at', { ascending: false }).limit(20);
+  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(20);
+  query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
 
-export async function fetchSellerReviews(sellerId) {
+export async function fetchSellerReviews(sellerId, userId = null) {
   failIfUnavailable();
   if (!sellerId) return [];
-  const { data, error } = await supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path),listing:listings!reviews_listing_id_fkey(title)').eq('reviewee_id', sellerId).eq('status', 'published').order('created_at', { ascending: false }).limit(50);
+  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path),listing:listings!reviews_listing_id_fkey(title)').eq('reviewee_id', sellerId).order('created_at', { ascending: false }).limit(50);
+  query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
+  const { data, error } = await query;
   if (error) throw error;
   return data || [];
 }
