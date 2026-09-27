@@ -796,7 +796,7 @@ export async function fetchReviewComments(reviewId, userId = null) {
   failIfUnavailable();
   if (!reviewId) return [];
   let query = supabase.from('review_comments')
-    .select('id,review_id,user_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
     .eq('review_id', reviewId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -808,16 +808,50 @@ export async function fetchReviewComments(reviewId, userId = null) {
   return data || [];
 }
 
-export async function submitReviewComment({ reviewId, userId, body }) {
+export async function fetchReviewCommentSocialStats(commentIds = [], userId = null) {
+  failIfUnavailable();
+  const ids = [...new Set((commentIds || []).filter(Boolean))];
+  if (!ids.length) return {};
+  const ownLikesRequest = userId
+    ? supabase.from('review_comment_likes').select('comment_id').eq('user_id', userId).in('comment_id', ids)
+    : Promise.resolve({ data: [], error: null });
+  const [countsResult, likesResult] = await Promise.all([
+    supabase.from('review_comment_social_counts').select('comment_id,like_count,reply_count').in('comment_id', ids),
+    ownLikesRequest,
+  ]);
+  if (countsResult.error) throw countsResult.error;
+  if (likesResult.error) throw likesResult.error;
+  const counts = Object.fromEntries(ids.map((id) => [id, { likeCount: 0, replyCount: 0, liked: false }]));
+  (countsResult.data || []).forEach((row) => {
+    counts[row.comment_id] = { ...counts[row.comment_id], likeCount: Number(row.like_count || 0), replyCount: Number(row.reply_count || 0) };
+  });
+  (likesResult.data || []).forEach((row) => {
+    if (counts[row.comment_id]) counts[row.comment_id].liked = true;
+  });
+  return counts;
+}
+
+export async function submitReviewComment({ reviewId, userId, body, parentCommentId = null }) {
   failIfUnavailable();
   const text = String(body || '').trim();
   if (!reviewId || !userId || !text) throw new Error('Sign in and write a comment before posting.');
   if (text.length > 1000) throw new Error('Review comments must be 1,000 characters or fewer.');
-  const { data, error } = await supabase.from('review_comments').insert({ review_id: reviewId, user_id: userId, body: text })
-    .select('id,review_id,user_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
+  const { data, error } = await supabase.from('review_comments').insert({ review_id: reviewId, user_id: userId, parent_comment_id: parentCommentId || null, body: text })
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function toggleReviewCommentLike({ commentId, userId, shouldLike }) {
+  failIfUnavailable();
+  if (!commentId || !userId) throw new Error('Sign in before liking a comment.');
+  const request = shouldLike
+    ? supabase.from('review_comment_likes').insert({ comment_id: commentId, user_id: userId })
+    : supabase.from('review_comment_likes').delete().eq('comment_id', commentId).eq('user_id', userId);
+  const { error } = await request;
+  if (error && !(shouldLike && error.code === '23505')) throw error;
+  return Boolean(shouldLike);
 }
 
 export async function toggleReviewLike({ reviewId, userId, shouldLike }) {

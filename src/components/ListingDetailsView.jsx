@@ -34,6 +34,7 @@ import {
   fetchListingContact,
   fetchListingReviews,
   fetchReviewComments,
+  fetchReviewCommentSocialStats,
   fetchReviewSocialStats,
   fetchSellerListings,
   fetchSellerReviews,
@@ -47,6 +48,7 @@ import {
   submitListingReview,
   submitReviewComment,
   toggleFollow,
+  toggleReviewCommentLike,
   toggleReviewLike,
 } from '../lib/marketplace';
 
@@ -62,6 +64,70 @@ function safeGalleryUrl(value) {
 
 function displayName(profile, fallback = 'Bese26 member') {
   return profile?.display_name || profile?.username || fallback;
+}
+
+function formatFeedbackDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user, depth = 0, onToggleLike, onReply, onAuthRequired, onNotice }) {
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [busy, setBusy] = useState(false);
+  const commenter = displayName(comment.user, comment.user_id === user?.id ? 'You' : 'Bese26 member');
+  const avatar = getAvatarUrl(comment.user?.avatar_path);
+  const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
+  const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
+
+  const beginReply = () => {
+    if (!user) {
+      onAuthRequired?.('Sign in to reply to seller feedback.');
+      return;
+    }
+    setReplyOpen((open) => !open);
+  };
+
+  const submitReply = async (event) => {
+    event.preventDefault();
+    const body = draft.trim();
+    if (!body || busy) return;
+    setBusy(true);
+    try {
+      const saved = await onReply?.(comment, body);
+      if (saved) {
+        setDraft('');
+        setReplyOpen(false);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <article className={`listing-review-comment${depth ? ' listing-review-comment-reply' : ''}`}>
+      <div className="listing-review-comment-avatar">{avatar ? <img src={avatar} alt="" loading="lazy" /> : commenter.slice(0, 1).toUpperCase()}</div>
+      <div className="listing-review-comment-content">
+        <div className="listing-review-comment-meta"><strong>{commenter}</strong><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
+        <p>{comment.body}</p>
+        <div className="listing-review-comment-actions">
+          <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={comment.status !== 'published'} onClick={() => onToggleLike?.(comment)}><ThumbsUp size={14} /> Like <span>{Number(social.likeCount || 0)}</span></button>
+          {depth === 0 && comment.status === 'published' && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
+          {depth === 0 && replyCount > 0 && <span className="listing-review-reply-count">{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>}
+        </div>
+        {comment.status === 'pending' && comment.user_id === user?.id && <small className="listing-review-comment-pending">Pending review</small>}
+        {replyOpen && <form className="listing-review-reply-form" onSubmit={submitReply}>
+          <div><span>Replying to {commenter}</span><button type="button" onClick={() => setReplyOpen(false)}>Cancel</button></div>
+          <textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={1000} rows={2} placeholder={`Reply to ${commenter}…`} aria-label={`Reply to ${commenter}`} />
+          <button type="submit" disabled={busy || !draft.trim()}>{busy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
+        </form>}
+        {replies.length > 0 && <div className="listing-review-comment-replies" aria-label={`${replyCount} replies`}>
+          {replies.map((reply) => <ReviewCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onReply={onReply} onAuthRequired={onAuthRequired} onNotice={onNotice} />)}
+        </div>}
+      </div>
+    </article>
+  );
 }
 
 function ReviewFeedbackCard({
@@ -82,6 +148,8 @@ function ReviewFeedbackCard({
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentDraft, setCommentDraft] = useState('');
   const [commentBusy, setCommentBusy] = useState(false);
+  const [commentSocials, setCommentSocials] = useState({});
+  const [commentLikeBusyIds, setCommentLikeBusyIds] = useState(() => new Set());
   const [menuOpen, setMenuOpen] = useState(false);
   const canInteract = review.status === 'published';
   const rating = Math.max(0, Math.min(5, Number(review.rating) || 0));
@@ -95,8 +163,15 @@ function ReviewFeedbackCard({
     fetchReviewComments(review.id, user?.id || null)
       .then((rows) => {
         if (!current) return;
-        setComments(rows || []);
+        const loadedComments = rows || [];
+        setComments(loadedComments);
         setCommentsLoaded(true);
+        setCommentSocials({});
+        if (loadedComments.length) {
+          fetchReviewCommentSocialStats(loadedComments.map((row) => row.id), user?.id || null)
+            .then((stats) => current && setCommentSocials(stats))
+            .catch(() => {});
+        }
       })
       .catch((error) => {
         if (current) onNotice?.(error.message || 'Could not load comments.');
@@ -105,29 +180,77 @@ function ReviewFeedbackCard({
     return () => { current = false; };
   }, [commentsOpen, commentsLoaded, canInteract, review.id, user?.id, onNotice]);
 
+  const commentThreads = useMemo(() => {
+    const commentIds = new Set(comments.map((comment) => comment.id));
+    const roots = [];
+    const replies = new Map();
+    comments.forEach((comment) => {
+      if (comment.parent_comment_id && commentIds.has(comment.parent_comment_id)) {
+        const current = replies.get(comment.parent_comment_id) || [];
+        current.push(comment);
+        replies.set(comment.parent_comment_id, current);
+      } else roots.push(comment);
+    });
+    return roots.map((comment) => ({ comment, replies: replies.get(comment.id) || [] }));
+  }, [comments]);
+
+  const saveComment = async (body, parentCommentId = null) => {
+    const saved = await submitReviewComment({ reviewId: review.id, userId: user.id, body, parentCommentId });
+    const normalized = {
+      ...saved,
+      user: saved.user || { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You' },
+    };
+    setComments((current) => [...current, normalized]);
+    setCommentSocials((current) => ({
+      ...current,
+      [normalized.id]: current[normalized.id] || { likeCount: 0, replyCount: 0, liked: false },
+      ...(parentCommentId ? { [parentCommentId]: { ...(current[parentCommentId] || { likeCount: 0, replyCount: 0, liked: false }), replyCount: Number(current[parentCommentId]?.replyCount || 0) + (saved.status === 'published' ? 1 : 0) } } : {}),
+    }));
+    setCommentsLoaded(true);
+    if (saved.status === 'published') onCommentPublished?.(review.id);
+    onNotice?.(saved.status === 'published' ? 'Comment posted.' : 'Your comment is awaiting review.');
+    return normalized;
+  };
+
   const postComment = async (event) => {
     event.preventDefault();
     const body = commentDraft.trim();
     if (!body) return;
-    if (!user) {
-      onAuthRequired?.('Sign in to comment on seller feedback.');
-      return;
-    }
+    if (!user) { onAuthRequired?.('Sign in to comment on seller feedback.'); return; }
     setCommentBusy(true);
     try {
-      const saved = await submitReviewComment({ reviewId: review.id, userId: user.id, body });
-      setComments((current) => [...current, {
-        ...saved,
-        user: saved.user || { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You' },
-      }]);
-      setCommentsLoaded(true);
+      await saveComment(body);
       setCommentDraft('');
-      if (saved.status === 'published') onCommentPublished?.(review.id);
-      onNotice?.(saved.status === 'published' ? 'Comment posted.' : 'Your comment is awaiting review.');
     } catch (error) {
       onNotice?.(error.message || 'Could not post this comment.');
     } finally {
       setCommentBusy(false);
+    }
+  };
+
+  const postReply = async (parent, body) => {
+    try {
+      return await saveComment(body, parent.id);
+    } catch (error) {
+      onNotice?.(error.message || 'Could not post this reply.');
+      return null;
+    }
+  };
+
+  const toggleCommentLike = async (comment) => {
+    if (!user) { onAuthRequired?.('Sign in to like a comment.'); return; }
+    if (commentLikeBusyIds.has(comment.id)) return;
+    const previous = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
+    const shouldLike = !previous.liked;
+    setCommentLikeBusyIds((current) => new Set(current).add(comment.id));
+    setCommentSocials((current) => ({ ...current, [comment.id]: { ...previous, liked: shouldLike, likeCount: Math.max(0, Number(previous.likeCount || 0) + (shouldLike ? 1 : -1)) } }));
+    try {
+      await toggleReviewCommentLike({ commentId: comment.id, userId: user.id, shouldLike });
+    } catch (error) {
+      setCommentSocials((current) => ({ ...current, [comment.id]: previous }));
+      onNotice?.(error.message || 'Could not update your like.');
+    } finally {
+      setCommentLikeBusyIds((current) => { const next = new Set(current); next.delete(comment.id); return next; });
     }
   };
 
@@ -138,7 +261,7 @@ function ReviewFeedbackCard({
           {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" /> : reviewer.slice(0, 1).toUpperCase()}
         </div>
         <strong>{reviewer}</strong>
-        <time>{review.created_at ? new Date(review.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: '2-digit' }) : ''}</time>
+        <time dateTime={review.created_at || undefined}>{formatFeedbackDate(review.created_at)}</time>
         {review.status === 'pending' && review.reviewer_id === user?.id && <span className="listing-review-pending">Pending review</span>}
         <button type="button" className="listing-review-more" aria-label="Review options" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
           <MoreVertical size={17} />
@@ -147,6 +270,7 @@ function ReviewFeedbackCard({
       {menuOpen && <div className="listing-review-menu"><button type="button" onClick={() => { setMenuOpen(false); onReport?.(review); }}><Flag size={14} /> Report feedback</button></div>}
       <div className="listing-new-stars" aria-label={`${rating} out of 5 stars`}>
         {Array.from({ length: 5 }, (_, index) => <span className={index < rating ? 'filled' : ''} key={index}>★</span>)}
+        <span className="listing-review-rating-value">{rating}/5</span>
       </div>
       <p className="listing-review-body">{review.body || 'No written feedback.'}</p>
       {review.listing?.title && <small className="listing-review-listing">About: {review.listing.title}</small>}
@@ -160,18 +284,7 @@ function ReviewFeedbackCard({
       </div>
       {commentsOpen && canInteract && <div className="listing-review-comments">
         {commentsLoading ? <div className="listing-review-comments-state">Loading comments…</div>
-          : comments.length ? comments.map((comment) => {
-            const commenter = displayName(comment.user, comment.user_id === user?.id ? 'You' : 'Bese26 member');
-            const avatar = getAvatarUrl(comment.user?.avatar_path);
-            return <div className="listing-review-comment" key={comment.id}>
-              <div className="listing-review-comment-avatar">{avatar ? <img src={avatar} alt="" loading="lazy" /> : commenter.slice(0, 1).toUpperCase()}</div>
-              <div className="listing-review-comment-content">
-                <div className="listing-review-comment-meta"><strong>{commenter}</strong><time>{comment.created_at ? new Date(comment.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' }) : ''}</time></div>
-                <p>{comment.body}</p>
-                {comment.status === 'pending' && comment.user_id === user?.id && <small>Pending review</small>}
-              </div>
-            </div>;
-          })
+          : comments.length ? commentThreads.map(({ comment, replies }) => <ReviewCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={commentSocials} user={user} onToggleLike={toggleCommentLike} onReply={postReply} onAuthRequired={onAuthRequired} onNotice={onNotice} />)
             : <div className="listing-review-comments-state">No comments yet. Start a respectful conversation.</div>}
         <form className="listing-review-comment-form" onSubmit={postComment}>
           <textarea value={commentDraft} onChange={(event) => setCommentDraft(event.target.value)} maxLength={1000} rows={2} placeholder="Write a comment…" aria-label="Write a comment on this review" />
