@@ -7411,3 +7411,20 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
     font-size: 13px !important;
   }
 }
+
+/* Friendly animated illustration for a seller who has reached plan capacity. */
+.quota-limit-illustration { position: relative; width: 104px; height: 92px; margin: 0 auto 13px; display: grid; place-items: center; }
+.quota-package { position: relative; z-index: 2; width: 65px; height: 65px; display: grid; place-items: center; color: #fff; background: linear-gradient(145deg, #e2393f, #a91620); border: 5px solid #fff; border-radius: 22px 22px 25px 25px; box-shadow: 0 14px 24px rgba(185, 27, 39, .25); animation: quotaPackageFloat 2.8s ease-in-out infinite; }
+.quota-package::before { position: absolute; top: 11px; left: 14px; right: 14px; height: 2px; content: ''; background: rgba(255,255,255,.6); border-radius: 9px; transform: rotate(-18deg); }
+.quota-orbit { position: absolute; display: block; border: 1px solid rgba(226, 57, 63, .22); border-radius: 50%; transform: rotate(-18deg); }
+.quota-orbit-one { width: 94px; height: 48px; animation: quotaOrbit 4.5s linear infinite; }
+.quota-orbit-two { width: 74px; height: 92px; border-color: rgba(244, 170, 77, .28); transform: rotate(42deg); animation: quotaOrbitReverse 5s linear infinite; }
+.quota-sparkle { position: absolute; z-index: 3; display: grid; place-items: center; color: #e5a43d; animation: quotaSparkle 1.9s ease-in-out infinite; }
+.quota-sparkle-one { top: 2px; right: 8px; }
+.quota-sparkle-two { bottom: 8px; left: 4px; animation-delay: .55s; color: #e2393f; }
+.quota-limit-reassurance { margin: 15px auto 0 !important; color: #8a6b6b !important; font-size: 10px !important; }
+@keyframes quotaPackageFloat { 0%, 100% { transform: translateY(2px) rotate(-1deg); } 50% { transform: translateY(-5px) rotate(1deg); } }
+@keyframes quotaOrbit { to { transform: rotate(342deg); } }
+@keyframes quotaOrbitReverse { to { transform: rotate(-318deg); } }
+@keyframes quotaSparkle { 0%, 100% { opacity: .45; transform: scale(.78) rotate(-8deg); } 50% { opacity: 1; transform: scale(1.12) rotate(8deg); } }
+@media (prefers-reduced-motion: reduce) { .quota-package, .quota-orbit, .quota-sparkle { animation: none; } }
