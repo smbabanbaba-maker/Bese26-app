@@ -775,12 +775,28 @@ const seoData = state.data;
 function PublicListingRoute({ listingId }) {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sessionUser, setSessionUser] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authReason, setAuthReason] = useState('');
   useEffect(() => { let mounted = true; fetchListingDetails(listingId).then((data) => mounted && setListing(data)).catch(() => mounted && setListing(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [listingId]);
-const listingDescription = listing ? seoText(listing.description, `${listing.title} — ${listing.price} in ${listing.location}. Find it on Bese26, Nigeria's marketplace.`) : '';
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return undefined;
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => mounted && setSessionUser(data?.session?.user || null)).catch(() => {});
+    const { data: authState } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setSessionUser(session?.user || null);
+    });
+    return () => { mounted = false; authState?.subscription?.unsubscribe?.(); };
+  }, []);
+  const listingDescription = listing ? seoText(listing.description, `${listing.title} — ${listing.price} in ${listing.location}. Find it on Bese26, Nigeria's marketplace.`) : '';
   usePublicSeo({ title: listing ? `${listing.title} | Bese26 Marketplace` : 'Bese26 Marketplace', description: listingDescription, canonical: listing ? `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}` : `${SEO_SITE_URL}/`, image: listing?.image || SEO_DEFAULT_IMAGE, schema: listing ? seoListingSchema(listing) : null });
   if (loading) return <BrandLoader message="Loading listing…" compact />;
   if (!listing) return <div className="empty-state listing-not-found"><Package size={30} /><h1>Listing not found</h1><p>This listing is no longer available or is not public.</p><a className="primary-button" href="/">Back to Bese26</a></div>;
-  return <ListingDetailsView listing={listing} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />;
+  const requireAuth = (message = 'Sign in to join the listing discussion.') => { setAuthReason(message); setShowAuth(true); };
+  return <>
+    <ListingDetailsView listing={listing} user={sessionUser} onAuthRequired={requireAuth} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />
+    {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setShowAuth(false); setAuthReason(''); }} />}
+  </>;
 }
 
 function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
