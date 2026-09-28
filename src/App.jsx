@@ -240,7 +240,7 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
         <div className="product-price">{listing.price}</div>
         <h3>{listing.title}</h3>
         <div className="product-meta"><MapPin size={13} /> {listing.location}</div>
-        <div className="listing-seller-line"><span className={`listing-seller-avatar ${listing.sellerAvatarIsBusinessLogo ? 'is-business-logo' : ''}`}>{listing.sellerAvatar ? <img src={listing.sellerAvatar} alt="" onLoad={listing.sellerAvatarIsBusinessLogo ? handleBusinessLogoLoad : undefined} /> : listing.sellerInitials || 'BE'}</span><div className="listing-seller-copy"><span className="listing-seller-name">{listing.sellerDisplayName || listing.seller}</span><VerificationBadges idVerified={listing.idVerified} cacVerified={listing.cacVerified} compact /></div></div>
+        <div className="listing-seller-line"><span className={`listing-seller-avatar ${listing.sellerAvatarIsBusinessLogo ? 'is-business-logo' : ''}`}>{listing.sellerAvatar ? <img src={listing.sellerAvatar} alt="" onLoad={listing.sellerAvatarIsBusinessLogo ? handleBusinessLogoLoad : undefined} onError={(event) => { event.currentTarget.remove(); event.currentTarget.parentElement.textContent = listing.sellerInitials || 'BE'; }} /> : listing.sellerInitials || 'BE'}</span><div className="listing-seller-copy"><span className="listing-seller-name">{listing.sellerDisplayName || listing.seller}</span><VerificationBadges idVerified={listing.idVerified} cacVerified={listing.cacVerified} compact /></div></div>
         <div className="product-foot">
           <span>{listing.condition}</span>
           <span>{listing.posted}</span>

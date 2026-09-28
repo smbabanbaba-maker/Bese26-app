@@ -24,7 +24,12 @@ if (typeof window !== 'undefined' && isSupabaseConfigured && !window.__bese26_su
 
 export function getStoragePublicUrl(bucket, path, options) {
   if (!supabase || !path) return '';
-  return supabase.storage.from(bucket).getPublicUrl(path, options).data.publicUrl;
+  const value = String(path).trim();
+  if (!value) return '';
+  // Some older rows contain a complete Storage URL rather than a relative path.
+  if (/^https?:\/\//i.test(value)) return value;
+  const cleanPath = value.replace(/^\/+/, '').replace(new RegExp(`^${bucket}/`, 'i'), '');
+  return supabase.storage.from(bucket).getPublicUrl(cleanPath, options).data.publicUrl;
 }
 
 export function getOptimizedPublicImageUrl(url, { width = 1024, quality = 75, format = 'webp' } = {}) {

@@ -109,7 +109,11 @@ function initials(value = 'bese26 user') {
 }
 
 function Avatar({ name, path, size = 'md', tone = 'navy' }) {
-  return path ? <img className={`avatar avatar-${size} profile-avatar-image`} src={getAvatarUrl(path)} alt={`${name || 'Profile'} profile`} /> : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${name || 'Profile'} initials`}>{initials(name)}</div>;
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [path]);
+  return path && !failed
+    ? <img className={`avatar avatar-${size} profile-avatar-image`} src={getAvatarUrl(path)} alt={`${name || 'Profile'} profile`} onError={() => setFailed(true)} />
+    : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${name || 'Profile'} initials`}>{initials(name)}</div>;
 }
 
 function VerifiedBadge({ verified }) {

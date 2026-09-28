@@ -1410,3 +1410,33 @@
   object-position: center 40% !important;
   padding: 0 !important;
 }
+
+/* Final public storefront polish: preserve every logo mark and prevent mobile identity collisions. */
+.public-business-shell, .public-business-main, .public-business-hero, .public-business-listings { min-width: 0; max-width: 100%; }
+.public-business-hero.storefront-hero-clean > .public-business-logo,
+.miniweb-hero-v2-logo { display: grid; place-items: center; overflow: hidden; background: #fff !important; }
+.public-business-hero.storefront-hero-clean > .public-business-logo img,
+.miniweb-hero-v2-logo.has-business-logo img,
+.business-directory-card-head > img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; box-sizing: border-box; object-fit: contain !important; object-position: center !important; padding: 4px !important; background: #fff !important; }
+.public-business-identity, .miniweb-hero-v2-heading { min-width: 0; overflow-wrap: anywhere; }
+.public-business-identity h1, .miniweb-hero-v2-heading h1 { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .public-business-main { padding-inline: 10px !important; }
+  .public-business-topbar { padding-inline: 10px !important; }
+  .public-business-nav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .public-business-nav a { flex: none; white-space: nowrap; }
+  .miniweb-hero-v2 { width: 100%; max-width: 100%; }
+  .miniweb-hero-v2-top { min-width: 0; }
+  .miniweb-hero-v2-logo { flex: 0 0 70px; width: 70px; height: 70px; }
+  .miniweb-hero-v2-heading h1 { font-size: clamp(21px, 7vw, 29px); line-height: 1.08; }
+  .miniweb-hero-v2-share { max-width: 82px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .public-business-listings.storefront-listings-clean { padding-inline: 12px !important; }
+}
+@media (max-width: 380px) {
+  .miniweb-hero-v2 { padding-inline: 10px; }
+  .miniweb-hero-v2-logo { flex-basis: 58px; width: 58px; height: 58px; }
+  .miniweb-hero-v2-top { gap: 8px; }
+  .miniweb-hero-v2-verification { max-width: 100%; overflow: hidden; }
+  .miniweb-hero-v2-verification > span { min-width: 0; overflow: hidden; }
+  .miniweb-hero-v2-stats small { font-size: 6px; }
+}
