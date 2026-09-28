@@ -13,17 +13,10 @@ function mountApp() {
   );
 }
 
-const appStyles = document.querySelector('link[data-bese26-app-css]');
-if (appStyles && appStyles.media !== 'all') {
-  let mounted = false;
-  const mountWhenReady = () => {
-    if (mounted) return;
-    mounted = true;
-    window.clearTimeout(styleFallback);
-    mountApp();
-  };
-  const styleFallback = window.setTimeout(mountWhenReady, 5000);
-  document.addEventListener('bese26:styles-ready', mountWhenReady, { once: true });
+const isVercelHost = typeof window !== 'undefined' && /(^|\.)vercel\.app$/i.test(window.location.hostname);
+if (isVercelHost) {
+  const destination = `https://www.bese26.shop${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.location.replace(destination);
 } else {
   mountApp();
 }

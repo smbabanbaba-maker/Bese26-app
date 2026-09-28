@@ -984,9 +984,13 @@ function AppContent() {
     // complete. This avoids opening the app into a half-empty loading shell.
     const startupTimeout = window.setTimeout(() => {
       if (mounted && !startupReadyRef.current) {
-        setStartupError('Bese26 is still loading your marketplace data.');
+        // Never trap users on a splash screen when marketplace data is slow.
+        // Home/Search skeletons can keep loading while Login/Register stays usable.
+        startupReadyRef.current = true;
+        setStartupError('');
+        setStartupReady(true);
       }
-    }, 15000);
+    }, 12000);
     const refreshTimer = window.setInterval(loadBackend, 5 * 60 * 1000);
     const refreshWhenVisible = () => { if (document.visibilityState === 'visible') loadBackend(); };
     const refreshWhenFocused = () => loadBackend();
