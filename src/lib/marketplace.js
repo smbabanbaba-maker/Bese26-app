@@ -749,10 +749,15 @@ export async function fetchListingComments(listingId) {
 
 export async function submitListingComment({ listingId, userId, body, parentCommentId = null }) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('listing_comments').insert({ listing_id: listingId, user_id: userId, parent_comment_id: parentCommentId || null, body: String(body || '').trim(), status: 'published' }).select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').single();
+  const text = String(body || '').trim();
+  if (!listingId || !userId || !text) throw new Error('Sign in and write a comment before posting.');
+  if (text.length > 1000) throw new Error('Comments must be 1,000 characters or fewer.');
+  const id = globalThis.crypto?.randomUUID?.();
+  const createdAt = new Date().toISOString();
+  const comment = { id, listing_id: listingId, user_id: userId, parent_comment_id: parentCommentId || null, body: text, status: 'published', created_at: createdAt };
+  const { error } = await supabase.from('listing_comments').insert(comment);
   if (error) throw error;
-  const [comment] = await attachBusinessIdentities([data]);
-  return comment || data;
+  return comment;
 }
 
 export async function fetchListingCommentSocialStats(commentIds = [], userId = null) {
