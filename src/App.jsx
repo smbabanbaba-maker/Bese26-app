@@ -93,6 +93,17 @@ function BrandLoader({ message = 'Loading Bese26…', offline = false, compact =
     <span className="brand-loader-message">{offline ? 'Checking your connection…' : message}</span>
   </div>;
 }
+function ConnectionScreen({ children }) {
+  const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && navigator.onLine === false);
+  useEffect(() => {
+    const markOffline = () => setOffline(true);
+    const markOnline = () => setOffline(false);
+    window.addEventListener('offline', markOffline);
+    window.addEventListener('online', markOnline);
+    return () => { window.removeEventListener('offline', markOffline); window.removeEventListener('online', markOnline); };
+  }, []);
+  return <>{children}{offline && <div className="connection-screen" role="status" aria-live="polite"><div className="connection-screen-card"><div className="connection-screen-art" aria-hidden="true"><span className="connection-screen-ring ring-one" /><span className="connection-screen-ring ring-two" /><img src="/images/bese26-logo-icon.webp" alt="" /></div><div className="eyebrow">BESE26</div><h1>We are waiting for your connection</h1><p>Your marketplace is safe. Turn on mobile data or Wi-Fi and Bese26 will continue automatically.</p><span className="connection-screen-dots" aria-hidden="true"><i /><i /><i /></span><button type="button" className="primary-button" onClick={() => window.location.reload()}>Try again</button></div></div>}</>;
+}
 
 function SplashScreen({ message = 'Preparing your marketplace…', error = false, onRetry }) {
   return <div className="splash-screen" role="status" aria-label="Bese26 is loading">
@@ -1164,5 +1175,5 @@ function AppContent() {
 
 
 export default function App() {
-  return <I18nProvider><AppErrorBoundary><AppContent /></AppErrorBoundary></I18nProvider>;
+  return <I18nProvider><AppErrorBoundary><ConnectionScreen><AppContent /></ConnectionScreen></AppErrorBoundary></I18nProvider>;
 }
