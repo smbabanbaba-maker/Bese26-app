@@ -7637,3 +7637,20 @@ img.business-logo-preview-image {
   border-radius: 16px !important;
   background: #fff;
 }
+
+
+/* Fill logo frames only for strongly portrait logos; square and wide logos remain fully contained. */
+.listing-seller-avatar.is-business-logo img.is-tall-business-logo,
+.listing-new-seller-avatar.is-business-logo img.is-tall-business-logo,
+.miniweb-hero-v2-logo.has-business-logo img.is-tall-business-logo,
+.public-business-logo img.is-tall-business-logo,
+.business-directory-logo img.is-tall-business-logo,
+.business-directory-page .business-directory-card-head > img.is-tall-business-logo,
+.business-directory-page img.business-directory-card-logo.is-tall-business-logo,
+.business-logo-upload img.is-tall-business-logo,
+.business-live-preview-logo img.is-tall-business-logo,
+img.business-logo-preview-image.is-tall-business-logo {
+  object-fit: cover !important;
+  object-position: center 40% !important;
+  padding: 0 !important;
+}

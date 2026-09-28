@@ -1402,3 +1402,11 @@
   object-position: center !important;
   background: #fff !important;
 }
+
+
+/* Tall portrait business logos fill the public-store hero; other aspect ratios stay contained. */
+.public-business-hero.storefront-hero-clean > .public-business-logo img.is-tall-business-logo {
+  object-fit: cover !important;
+  object-position: center 40% !important;
+  padding: 0 !important;
+}
