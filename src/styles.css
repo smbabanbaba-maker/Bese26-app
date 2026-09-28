@@ -7377,3 +7377,37 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .theme-dark .sell-limit-usage { background: #2b1d1d; border-color: #5d3030; }
 @keyframes sellLimitLoading { from { transform: translateX(-120%); } to { transform: translateX(260%); } }
 @media (max-width: 420px) { .sell-limit-card { padding: 24px 15px 18px; } .sell-limit-actions { flex-direction: column; } .sell-limit-actions button { width: 100%; } }
+
+
+/* Final user-avatar normalization: one calm size across the profile hero. */
+.premium-profile .profile-heading > .avatar,
+.premium-profile .profile-heading > .profile-avatar-image {
+  width: 60px !important;
+  height: 60px !important;
+  flex: 0 0 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  padding: 0 !important;
+  border: 3px solid rgba(255,255,255,.96) !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  transform: none !important;
+  position: static !important;
+  box-shadow: 0 0 0 3px rgba(227,41,45,.34), 0 8px 16px rgba(0,0,0,.22) !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+@media (max-width: 700px) {
+  .premium-profile .profile-heading > .avatar,
+  .premium-profile .profile-heading > .profile-avatar-image {
+    width: 52px !important;
+    height: 52px !important;
+    flex-basis: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 0 3px rgba(227,41,45,.3), 0 7px 14px rgba(0,0,0,.2) !important;
+    font-size: 13px !important;
+  }
+}
