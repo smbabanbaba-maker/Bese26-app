@@ -1,3 +1,4 @@
+import { SITE_URL } from '../lib/site';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -514,7 +515,7 @@ export default function ListingDetailsView({
   const nextImage = () => setActiveImage((current) => validImages.length ? (current + 1) % validImages.length : 0);
   const previousImage = () => setActiveImage((current) => validImages.length ? (current - 1 + validImages.length) % validImages.length : 0);
   const share = async () => {
-    const url = `https://www.bese26.shop/listing/${encodeURIComponent(listing.id)}`;
+    const url = `${SITE_URL}/listing/${encodeURIComponent(listing.id)}`;
     try {
       if (navigator.share) await navigator.share({ title: `${listing.title} | Bese26`, text: `${listing.title} · ${listing.price}`, url });
       else { await navigator.clipboard?.writeText(url); onDemoAction?.('Listing link copied.'); }

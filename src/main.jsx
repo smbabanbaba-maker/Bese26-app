@@ -1,3 +1,4 @@
+import { SITE_URL } from './lib/site';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -15,7 +16,7 @@ function mountApp() {
 
 const isVercelHost = typeof window !== 'undefined' && /(^|\.)vercel\.app$/i.test(window.location.hostname);
 if (isVercelHost) {
-  const destination = `https://www.bese26.shop${window.location.pathname}${window.location.search}${window.location.hash}`;
+  const destination = `${SITE_URL}${window.location.pathname}${window.location.search}${window.location.hash}`;
   window.location.replace(destination);
 } else {
   mountApp();

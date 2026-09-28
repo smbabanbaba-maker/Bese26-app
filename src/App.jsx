@@ -1,3 +1,4 @@
+import { SITE_URL } from './lib/site';
 import { Component, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
@@ -689,7 +690,7 @@ function PublicPersonalPage({ data }) {
   const share = async () => { const url = `https://www.bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: profile.display_name, text: profile.bio || profile.display_name, url }); else await navigator.clipboard?.writeText(url); };
   return <PublicStorefrontLayout title={profile.display_name} share={share}><PublicProfileHeader profile={profile} listings={listings} share={share} /><PublicListingSection title={`Listings by ${profile.display_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
-const SEO_SITE_URL = 'https://www.bese26.shop';
+const SEO_SITE_URL = SITE_URL;
 const SEO_DEFAULT_IMAGE = `${SEO_SITE_URL}/images/bese26-official-logo.png`;
 function seoText(value, fallback = '') {
   return String(value || fallback).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
