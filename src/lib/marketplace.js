@@ -68,6 +68,7 @@ export function mapListing(row) {
     publishedAsType: row.published_as_type || 'personal',
     sellerId: row.seller_id,
     sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
+    sellerAvatarIsBusinessLogo: Boolean(business.logo_path),
     sellerInitials: initials(business.business_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
     idVerified: verificationIsCurrent(seller),

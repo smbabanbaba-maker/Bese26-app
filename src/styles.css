@@ -7571,3 +7571,69 @@ img.profile-avatar-image {
   object-fit: cover;
   object-position: center;
 }
+
+
+/* Business logos are artwork, not portraits: keep the complete mark visible in every square frame. */
+.listing-seller-avatar.is-business-logo,
+.listing-new-seller-avatar.is-business-logo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+  background: #fff;
+}
+.listing-seller-avatar.is-business-logo img,
+.listing-new-seller-avatar.is-business-logo img,
+.miniweb-hero-v2-logo.has-business-logo img,
+.public-business-logo img,
+.business-directory-logo img,
+.business-directory-page .business-directory-card-head > img,
+.business-directory-page img.business-directory-card-logo,
+.business-logo-upload img,
+.business-live-preview-logo img,
+img.business-logo-preview-image {
+  box-sizing: border-box;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+.listing-seller-avatar.is-business-logo img,
+.listing-new-seller-avatar.is-business-logo img {
+  padding: 3px;
+  background: #fff;
+}
+.miniweb-hero-v2-logo.has-business-logo {
+  background: #fff;
+}
+.miniweb-hero-v2-logo.has-business-logo img {
+  padding: 5px;
+  background: #fff;
+}
+.public-business-logo,
+.business-directory-logo,
+.business-live-preview-logo {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  background: #fff;
+}
+.public-business-logo img,
+.business-directory-logo img,
+.business-live-preview-logo img,
+.business-directory-page .business-directory-card-head > img {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 4px;
+  background: #fff;
+}
+.business-logo-upload img {
+  padding: 3px;
+  background: #fff;
+}
+img.business-logo-preview-image {
+  padding: 7px;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px !important;
+  background: #fff;
+}

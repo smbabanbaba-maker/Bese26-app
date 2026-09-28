@@ -857,7 +857,7 @@ export default function ListingDetailsView({
 
           <section className="listing-new-section listing-new-seller">
             <div className="listing-new-seller-head">
-              <div className="listing-new-seller-avatar">{listing.sellerAvatar ? <img src={listing.sellerAvatar} alt="" loading="lazy" /> : listing.sellerInitials}</div>
+              <div className={`listing-new-seller-avatar ${listing.sellerAvatarIsBusinessLogo ? 'is-business-logo' : ''}`}>{listing.sellerAvatar ? <img src={listing.sellerAvatar} alt="" loading="lazy" /> : listing.sellerInitials}</div>
               <div><h2>{listing.sellerDisplayName || listing.seller}</h2><VerificationBadges idVerified={listing.idVerified} cacVerified={listing.cacVerified} compact /><p><MapPin size={13} /> {sellerLocation}{sellerSince ? ` · Member since ${sellerSince}` : ''}</p></div>
               <button type="button" className="listing-new-link" onClick={() => listing.sellerBusinessHandle ? window.location.assign(`/@${listing.sellerBusinessHandle}`) : listing.sellerId && raw.profiles?.username ? window.location.assign(`/${raw.profiles.username}`) : onDemoAction?.('Seller profile is not public yet.')}>View store <ChevronRight size={15} /></button>
             </div>
