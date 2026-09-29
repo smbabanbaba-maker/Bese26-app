@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
+import { getBusinessLogoDisplayUrl } from '../lib/businessLogoFit';
 
 function commentName(comment) {
   return comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member';
@@ -31,7 +32,9 @@ export default function ListingPublicCommentThread({
   const [avatarFailed, setAvatarFailed] = useState(false);
   const name = commentName(comment);
   const avatarPath = comment.business?.logo_path || comment.user?.avatar_path;
-  const avatarUrl = avatarPath ? getAvatarUrl(avatarPath) : '';
+  const avatarUrl = comment.business
+    ? getBusinessLogoDisplayUrl(comment.business, avatarPath ? getAvatarUrl(avatarPath) : '')
+    : avatarPath ? getAvatarUrl(avatarPath) : '';
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
   const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
   const canInteract = comment.status === 'published';

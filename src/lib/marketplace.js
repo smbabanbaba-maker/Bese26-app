@@ -1,5 +1,6 @@
 import { SITE_URL } from './site';
 import { getAvatarUrl, getListingMediaUrls, getStoragePublicUrl, supabase } from './supabase';
+import { getBusinessLogoDisplayUrl, isOfficialBese26Business } from './businessLogoFit';
 
 function failIfUnavailable() {
   if (!supabase) throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
@@ -68,8 +69,8 @@ export function mapListing(row) {
     sellerBusinessHandle: business.business_handle || '',
     publishedAsType: row.published_as_type || 'personal',
     sellerId: row.seller_id,
-    sellerAvatar: getAvatarUrl(business.logo_path || seller.avatar_path),
-    sellerAvatarIsBusinessLogo: Boolean(business.logo_path),
+    sellerAvatar: getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path || seller.avatar_path)),
+    sellerAvatarIsBusinessLogo: Boolean(business.logo_path || isOfficialBese26Business(business)),
     sellerInitials: initials(business.business_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
     idVerified: verificationIsCurrent(seller),
@@ -1151,7 +1152,7 @@ export async function fetchNotifications(userId) {
   const mediaEntries = (listings || []).flatMap((listing) => [...(listing.listing_media || [])].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).slice(0, 1).map((media) => ({ listingId: listing.id, path: media.storage_path })));
   const mediaUrls = await getListingMediaUrls(mediaEntries.map((entry) => entry.path));
   const profileMap = Object.fromEntries((profiles || []).map((profile) => [profile.id, { ...profile, avatar_url: getAvatarUrl(profile.avatar_path) }]));
-  const businessMap = Object.fromEntries((businesses || []).map((business) => [business.profile_id, { ...business, logo_url: getAvatarUrl(business.logo_path) }]));
+  const businessMap = Object.fromEntries((businesses || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path)) }]));
   const listingMap = Object.fromEntries((listings || []).map((listing) => [listing.id, { ...listing, image_url: mediaUrls[mediaEntries.findIndex((entry) => entry.listingId === listing.id)] || '' }]));
   return rows.map((row) => ({ ...row, actor: profileMap[row.actor_id] || null, business: businessMap[row.data?.business_profile_id] || null, actorBusiness: businessMap[row.actor_id] || null, listing: listingMap[row.data?.listing_id] || null }));
 }
@@ -1681,7 +1682,7 @@ export async function fetchConversations(userId) {
   if (profileError) throw profileError;
   if (businessError) throw businessError;
   const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
-  const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getAvatarUrl(row.logo_path) }]));
+  const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getBusinessLogoDisplayUrl(row, getAvatarUrl(row.logo_path)) }]));
   const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, { ...row, avatar_url: getAvatarUrl(row.avatar_path), business: businessMap[row.id] || null }]));
   return conversations.map((row) => ({ ...row, listing: listingMap[row.listing_id] || null, buyer: profileMap[row.buyer_id] || null, seller: profileMap[row.seller_id] || null }));
 }
