@@ -24,8 +24,9 @@ img, svg, video, canvas { max-width: 100%; }
 .product-card h3, .listing-seller-name, .profile-menu-card strong, .profile-menu-card small { overflow-wrap: anywhere; }
 
 /* User photos and logos use predictable frames; failed images are replaced by initials in React. */
-.avatar > img, .profile-avatar-image, .listing-seller-avatar img, .listing-new-seller-avatar img,
+.avatar > img, .listing-seller-avatar img, .listing-new-seller-avatar img,
 .message-identity-avatar img, .public-follow-avatar img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-position: center; }
+.profile-avatar-image { display: block; max-width: 100%; max-height: 100%; object-position: center; }
 .listing-seller-avatar.is-business-logo img, .listing-new-seller-avatar.is-business-logo img { object-fit: contain !important; padding: 3px; background: #fff; }
 
 @media (max-width: 700px) {
@@ -55,4 +56,221 @@ img, svg, video, canvas { max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   .product-card:hover, .category-tile:hover, .profile-menu-card:hover { transform: none; }
+}
+
+/* Consistent media system: listing photos share one landscape frame everywhere. */
+.product-image-wrap,
+.storefront-listings-clean .public-listing-card .product-image-wrap,
+.public-business-listings .product-image-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto !important;
+  aspect-ratio: 4 / 3 !important;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f4f6f8, #e9edf2) !important;
+}
+.product-image-wrap > img.product-image-slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+.product-image-wrap .product-image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.listing-new-image-frame,
+.listing-new-card-image {
+  aspect-ratio: 4 / 3 !important;
+}
+.listing-new-image-frame {
+  aspect-ratio: auto !important;
+  height: calc(100vh - 78px) !important;
+  height: calc(100svh - 78px) !important;
+  height: calc(100dvh - 78px) !important;
+  min-height: 360px !important;
+  background: linear-gradient(145deg, #f4f6f8, #e5eaf0) !important;
+}
+.listing-details-view { overflow: visible !important; }
+.listing-new-image-section {
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.listing-new-image-button {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+}
+.listing-new-image-button img,
+.listing-new-card-image img,
+.listing-new-thumbs img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+.listing-new-thumbs button {
+  width: 64px;
+  height: 48px;
+  flex: 0 0 64px;
+  overflow: hidden;
+  background: #f1f3f6;
+}
+
+/* Avatars and logos share stable frames; portrait photos and brand marks fill them consistently. */
+.avatar,
+.listing-seller-avatar,
+.listing-new-seller-avatar,
+.message-identity-avatar,
+.listing-public-comment-avatar,
+.listing-review-comment-avatar,
+.notification-feed-media,
+.public-follow-avatar {
+  overflow: hidden;
+}
+.avatar > img:not(.is-business-logo):not(.business-logo-preview-image),
+img.profile-avatar-image:not(.is-business-logo):not(.business-logo-preview-image),
+.listing-seller-avatar:not(.is-business-logo) img,
+.listing-new-seller-avatar:not(.is-business-logo) img,
+.message-identity-avatar:not(.is-business-logo) img,
+.listing-public-comment-avatar:not(.is-business-logo) img,
+.listing-review-comment-avatar img,
+.notification-feed-media:not(.is-business-logo) img,
+.public-follow-avatar:not(.is-business-logo) img {
+  object-fit: cover !important;
+  object-position: center 38% !important;
+}
+.listing-seller-avatar.is-business-logo,
+.listing-new-seller-avatar.is-business-logo,
+.message-identity-avatar.is-business-logo,
+.listing-public-comment-avatar.is-business-logo,
+.notification-feed-media.is-business-logo,
+.public-follow-avatar.is-business-logo,
+.miniweb-hero-v2-logo.has-business-logo,
+.public-business-logo,
+.business-directory-logo,
+.business-live-preview-logo {
+  background: #fff !important;
+}
+.listing-seller-avatar.is-business-logo img,
+.listing-new-seller-avatar.is-business-logo img,
+.message-identity-avatar.is-business-logo img,
+.listing-public-comment-avatar.is-business-logo img,
+.notification-feed-media.is-business-logo img,
+.public-follow-avatar.is-business-logo img,
+.miniweb-hero-v2-logo.has-business-logo img,
+.public-business-logo img,
+.business-directory-logo img,
+.business-directory-page .business-directory-card-head > img,
+.business-directory-page img.business-directory-card-logo,
+.business-logo-upload img,
+.business-live-preview-logo img,
+img.profile-avatar-image.is-business-logo,
+img.business-logo-preview-image {
+  box-sizing: border-box;
+  object-fit: cover !important;
+  object-position: center center !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+/* Fullscreen means the whole original image is visible, with safe-area-aware controls. */
+.listing-gallery-lightbox {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2200 !important;
+  padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)) !important;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: rgba(8, 11, 17, .97) !important;
+  backdrop-filter: blur(12px);
+  touch-action: pan-y;
+}
+.listing-gallery-lightbox > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 96vw !important;
+  max-height: 92vh !important;
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px) !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border-radius: 10px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .38);
+}
+.listing-gallery-lightbox .lightbox-close {
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  z-index: 2;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(25, 30, 39, .82);
+  backdrop-filter: blur(10px);
+}
+.listing-gallery-lightbox .gallery-control {
+  position: fixed;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 50%;
+  color: #fff !important;
+  background: rgba(25, 30, 39, .72) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  transform: translateY(-50%);
+  backdrop-filter: blur(10px);
+}
+.listing-gallery-lightbox .gallery-control-prev { left: max(14px, env(safe-area-inset-left)); }
+.listing-gallery-lightbox .gallery-control-next { right: max(14px, env(safe-area-inset-right)); }
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+@media (max-width: 700px) {
+  .listing-gallery-lightbox > img { max-width: 100vw !important; border-radius: 0; }
+  .listing-gallery-lightbox .gallery-control { width: 42px; height: 42px; }
+}
+@media (max-width: 760px) {
+  .listing-new-image-section { width: 100vw !important; margin: 0 !important; }
+  .listing-new-image-frame {
+    height: calc(100vh - 58px) !important;
+    height: calc(100svh - 58px) !important;
+    height: calc(100dvh - 58px) !important;
+    min-height: 320px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .listing-new-image-button img { transition: none !important; }
 }

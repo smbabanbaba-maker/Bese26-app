@@ -1,5 +1,6 @@
 import { SITE_URL } from '../lib/site';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ArrowLeft,
   ArrowRight,
@@ -320,6 +321,8 @@ export default function ListingDetailsView({
   const [activeImage, setActiveImage] = useState(0);
   const [failedImageUrls, setFailedImageUrls] = useState(() => new Set());
   const [zoomed, setZoomed] = useState(false);
+  const imageTriggerRef = useRef(null);
+  const lightboxCloseRef = useRef(null);
   const [expandedDescription, setExpandedDescription] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewsOpen, setReviewsOpen] = useState(false);
@@ -360,6 +363,8 @@ export default function ListingDetailsView({
   const galleryCandidates = [...(Array.isArray(listing?.gallery) ? listing.gallery : []), listing?.image];
   const validImages = useMemo(() => [...new Set(galleryCandidates.map((image) => typeof image === 'string' ? image.trim() : image)
     .filter((image) => safeGalleryUrl(image) && !failedImageUrls.has(image)))], [listing?.id, listing?.gallery, listing?.image, failedImageUrls]);
+  const validImagesRef = useRef(validImages);
+  validImagesRef.current = validImages;
   const owner = Boolean(user?.id && listing?.sellerId === user.id);
   const description = listing?.description || '';
   const phone = contact.phone || '';
@@ -512,9 +517,42 @@ export default function ListingDetailsView({
 
   useEffect(() => {
     if (!zoomed) return undefined;
-    const onKey = (event) => event.key === 'Escape' && setZoomed(false);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusFrame = window.requestAnimationFrame(() => lightboxCloseRef.current?.focus());
+    const onKey = (event) => {
+      if (event.key === 'Tab') {
+        const controls = document.querySelectorAll('.listing-gallery-lightbox button:not(:disabled)');
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (!first || !last) return;
+        if (!document.querySelector('.listing-gallery-lightbox')?.contains(document.activeElement)) {
+          event.preventDefault();
+          first.focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      } else if (event.key === 'Escape') {
+        setZoomed(false);
+      } else if (validImagesRef.current.length > 1 && event.key === 'ArrowRight') {
+        event.preventDefault();
+        setActiveImage((current) => (current + 1) % validImagesRef.current.length);
+      } else if (validImagesRef.current.length > 1 && event.key === 'ArrowLeft') {
+        event.preventDefault();
+        setActiveImage((current) => (current - 1 + validImagesRef.current.length) % validImagesRef.current.length);
+      }
+    };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+      try { imageTriggerRef.current?.focus({ preventScroll: true }); } catch { imageTriggerRef.current?.focus(); }
+    };
   }, [zoomed]);
 
   if (!listing) return null;
@@ -814,7 +852,7 @@ export default function ListingDetailsView({
               setTouchStart(null);
             }}>
               {primaryImage
-                ? <button type="button" className="listing-new-image-button" onClick={() => setZoomed(true)}><img src={primaryImage} alt={`${listing.title} image ${activeImage + 1}`} onError={() => setFailedImageUrls((current) => new Set([...current, primaryImage]))} /></button>
+                ? <button type="button" className="listing-new-image-button" onClick={(event) => { imageTriggerRef.current = event.currentTarget; setZoomed(true); }} aria-label={`Open photo ${activeImage + 1} of ${validImages.length} full screen`}><img src={primaryImage} alt={`${listing.title} image ${activeImage + 1}`} onError={() => setFailedImageUrls((current) => new Set([...current, primaryImage]))} /></button>
                 : <div className="listing-new-no-image"><ImageIcon size={30} /><span>No listing photo</span></div>}
               {validImages.length > 1 && <>
                 <button type="button" className="listing-new-gallery-arrow prev" onClick={previousImage} aria-label="Previous photo"><ArrowLeft size={17} /></button>
@@ -908,7 +946,29 @@ export default function ListingDetailsView({
         </main>
       </div>
 
-      {zoomed && <div className="listing-gallery-lightbox" role="dialog" aria-label="Fullscreen listing gallery" onClick={() => setZoomed(false)}><button type="button" className="icon-button lightbox-close" onClick={() => setZoomed(false)} aria-label="Close fullscreen"><X size={20} /></button>{validImages.length > 1 && <button type="button" className="gallery-control gallery-control-prev" onClick={(event) => { event.stopPropagation(); previousImage(); }} aria-label="Previous photo"><ArrowLeft size={20} /></button>}{primaryImage && <img src={primaryImage} alt={`${listing.title} fullscreen image ${activeImage + 1}`} onClick={(event) => event.stopPropagation()} />}{validImages.length > 1 && <button type="button" className="gallery-control gallery-control-next" onClick={(event) => { event.stopPropagation(); nextImage(); }} aria-label="Next photo"><ArrowRight size={20} /></button>}</div>}
+      {zoomed && createPortal(
+        <div
+          className="listing-gallery-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${listing.title} photo viewer`}
+          onClick={() => setZoomed(false)}
+          onTouchStart={(event) => setTouchStart(event.changedTouches[0].clientX)}
+          onTouchEnd={(event) => {
+            if (touchStart == null) return;
+            const delta = event.changedTouches[0].clientX - touchStart;
+            if (Math.abs(delta) > 45) delta < 0 ? nextImage() : previousImage();
+            setTouchStart(null);
+          }}
+        >
+          <button ref={lightboxCloseRef} type="button" className="icon-button lightbox-close" onClick={() => setZoomed(false)} aria-label="Close fullscreen"><X size={20} /></button>
+          {validImages.length > 1 && <button type="button" className="gallery-control gallery-control-prev" onClick={(event) => { event.stopPropagation(); previousImage(); }} aria-label="Previous photo"><ArrowLeft size={20} /></button>}
+          {primaryImage && <img src={primaryImage} alt={`${listing.title} fullscreen image ${activeImage + 1}`} onClick={(event) => event.stopPropagation()} />}
+          {validImages.length > 1 && <button type="button" className="gallery-control gallery-control-next" onClick={(event) => { event.stopPropagation(); nextImage(); }} aria-label="Next photo"><ArrowRight size={20} /></button>}
+          <span className="sr-only" aria-live="polite">Photo {validImages.length ? activeImage + 1 : 0} of {validImages.length}</span>
+        </div>,
+        document.body,
+      )}
 
       {reviewOpen && <div className="listing-action-overlay" role="dialog" aria-modal="true" aria-label="Leave feedback" onClick={(event) => event.target === event.currentTarget && setReviewOpen(false)}><form className="listing-action-sheet listing-review-form" onSubmit={submitReview}><div className="listing-action-sheet-head"><div><span className="listing-new-kicker">SELLER FEEDBACK</span><h2>Rate this seller</h2></div><button type="button" className="icon-button" onClick={() => setReviewOpen(false)} aria-label="Close feedback"><X size={18} /></button></div><div className="listing-review-stars-input" role="radiogroup" aria-label="Rating">{[1, 2, 3, 4, 5].map((value) => <button type="button" role="radio" aria-checked={value === reviewRating} key={value} className={value <= reviewRating ? 'selected' : ''} onClick={() => setReviewRating(value)} aria-label={`${value} star${value === 1 ? '' : 's'}`}>★</button>)}</div><label>Comment<textarea value={reviewBody} onChange={(event) => setReviewBody(event.target.value)} maxLength={1000} placeholder="Share your honest experience…" rows={4} required /></label><small>Your feedback will be reviewed before it appears publicly.</small><button className="primary-button" disabled={reviewBusy}>{reviewBusy ? 'Submitting…' : 'Submit feedback'} <Check size={15} /></button></form></div>}
 
