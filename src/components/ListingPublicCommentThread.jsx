@@ -133,7 +133,7 @@ export default function ListingPublicCommentThread({
           <button type="submit" disabled={replyBusy || !draft.trim()}>{replyBusy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
         {replies.length > 0 && <div className="listing-public-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
+          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.comment.id} comment={reply.comment} replies={reply.replies} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
           {replies.length > visibleReplyCount && <button type="button" className="listing-public-comment-more-replies" onClick={() => setVisibleReplyCount(replies.length)}>More replies <span>({replies.length - visibleReplyCount} more)</span><ChevronDown size={14} /></button>}
         </div>}
       </div>
