@@ -7752,3 +7752,27 @@ img.business-logo-preview-image.is-tall-business-logo {
 @media (prefers-reduced-motion: reduce) {
   .listing-new-action-grid button, .listing-new-start-chat { transition: none; }
 }
+
+
+/* Apply one business-logo rule in comments, inbox, chat and notifications too. */
+.message-identity-avatar.is-business-logo,
+.listing-public-comment-avatar.is-business-logo,
+.notification-feed-media.is-business-logo {
+  background: #fff;
+}
+.message-identity-avatar.is-business-logo img,
+.listing-public-comment-avatar.is-business-logo img,
+.notification-feed-media.is-business-logo img {
+  box-sizing: border-box;
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 2px;
+  background: #fff;
+}
+.message-identity-avatar.is-business-logo img.is-tall-business-logo,
+.listing-public-comment-avatar.is-business-logo img.is-tall-business-logo,
+.notification-feed-media.is-business-logo img.is-tall-business-logo {
+  object-fit: cover !important;
+  object-position: center 40% !important;
+  padding: 0 !important;
+}

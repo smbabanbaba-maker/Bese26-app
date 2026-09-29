@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
-import { getBusinessLogoDisplayUrl } from '../lib/businessLogoFit';
+import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
 
 function commentName(comment) {
   return comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member';
@@ -35,6 +35,7 @@ export default function ListingPublicCommentThread({
   const avatarUrl = comment.business
     ? getBusinessLogoDisplayUrl(comment.business, avatarPath ? getAvatarUrl(avatarPath) : '')
     : avatarPath ? getAvatarUrl(avatarPath) : '';
+  const usesBusinessLogo = Boolean(comment.business?.logo_path || isOfficialBese26Business(comment.business));
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
   const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
   const canInteract = comment.status === 'published';
@@ -79,9 +80,9 @@ export default function ListingPublicCommentThread({
 
   return (
     <article className={`listing-public-comment${depth ? ' listing-public-comment-reply' : ''}`}>
-      <div className="listing-public-comment-avatar">
+      <div className={`listing-public-comment-avatar ${usesBusinessLogo && avatarUrl ? 'is-business-logo' : ''}`}>
         {avatarUrl && !avatarFailed
-          ? <img src={avatarUrl} alt="" loading="lazy" onError={() => setAvatarFailed(true)} />
+          ? <img src={avatarUrl} alt="" loading="lazy" onLoad={usesBusinessLogo && avatarUrl ? handleBusinessLogoLoad : undefined} onError={() => setAvatarFailed(true)} />
           : name.slice(0, 1).toUpperCase()}
       </div>
       <div className="listing-public-comment-content">
