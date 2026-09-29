@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
+import { getPublicIdentity } from '../lib/identity';
 import nigeriaLocations from '../data/nigeriaLocations.json';
 import VerificationBadges from './VerificationBadges';
 import { useI18n } from '../lib/i18n';
@@ -108,12 +109,13 @@ function initials(value = 'bese26 user') {
   return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'BE';
 }
 
-function Avatar({ name, path, size = 'md', tone = 'navy' }) {
+function Avatar({ name, path, business = null, size = 'md', tone = 'navy' }) {
   const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [path]);
-  return path && !failed
-    ? <img className={`avatar avatar-${size} profile-avatar-image`} src={getAvatarUrl(path)} alt={`${name || 'Profile'} profile`} onError={() => setFailed(true)} />
-    : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${name || 'Profile'} initials`}>{initials(name)}</div>;
+  const identity = getPublicIdentity({ display_name: name, avatar_path: path, business });
+  useEffect(() => setFailed(false), [path, business?.logo_path]);
+  return identity.image && !failed
+    ? <img className={`avatar avatar-${size} profile-avatar-image ${identity.isBusiness ? 'is-business-logo' : ''}`} src={identity.image} alt={`${identity.name || 'Profile'} profile`} onLoad={identity.isBusiness ? handleBusinessLogoLoad : undefined} onError={() => setFailed(true)} />
+    : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${identity.name || 'Profile'} initials`}>{initials(identity.name)}</div>;
 }
 
 function VerifiedBadge({ verified }) {
@@ -236,7 +238,7 @@ function ReviewsPage({ user, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   useEffect(() => { let mounted = true; setLoading(true); fetchProfileReviews(user.id, mode).then((rows) => mounted && setItems(rows)).catch((requestError) => mounted && setError(requestError.message || 'Could not load reviews.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [mode, user.id]);
-  return <div className="profile-subpage"><SubpageHeader title="Reviews" eyebrow="TRUST & REPUTATION" onBack={onBack} /><div className="profile-tabs"><button type="button" className={mode === 'about' ? 'active' : ''} onClick={() => setMode('about')}>About me</button><button type="button" className={mode === 'mine' ? 'active' : ''} onClick={() => setMode('mine')}>My reviews</button></div>{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading reviews" description="Getting reviews from the marketplace." /> : items.length ? <div className="history-list">{items.map((review) => { const person = mode === 'about' ? review.reviewer : review.reviewee; return <div key={review.id}><Avatar name={person?.display_name} path={person?.avatar_path} /><span><strong>{person?.display_name || 'Bese26 member'}</strong><small><Star size={11} fill="currentColor" /> {review.rating}/5 · {review.listing?.title || 'Marketplace listing'}</small><small>{review.body || 'No written comment.'}</small></span><b>{new Date(review.created_at).toLocaleDateString()}</b></div>; })}</div> : <EmptyState icon={Star} title={mode === 'about' ? 'No reviews yet' : 'You have not reviewed anyone yet'} description={mode === 'about' ? 'Published reviews from real marketplace interactions will appear here.' : 'Reviews you write after eligible interactions will appear here.'} />}</div>;
+  return <div className="profile-subpage"><SubpageHeader title="Reviews" eyebrow="TRUST & REPUTATION" onBack={onBack} /><div className="profile-tabs"><button type="button" className={mode === 'about' ? 'active' : ''} onClick={() => setMode('about')}>About me</button><button type="button" className={mode === 'mine' ? 'active' : ''} onClick={() => setMode('mine')}>My reviews</button></div>{error && <div className="auth-status error">{error}</div>}{loading ? <EmptyState title="Loading reviews" description="Getting reviews from the marketplace." /> : items.length ? <div className="history-list">{items.map((review) => { const person = mode === 'about' ? review.reviewer : review.reviewee; const identity = getPublicIdentity(person); return <div key={review.id}><Avatar name={identity.name} path={person?.avatar_path} business={person?.business} /><span><strong>{identity.name}</strong><small><Star size={11} fill="currentColor" /> {review.rating}/5 · {review.listing?.title || 'Marketplace listing'}</small><small>{review.body || 'No written comment.'}</small></span><b>{new Date(review.created_at).toLocaleDateString()}</b></div>; })}</div> : <EmptyState icon={Star} title={mode === 'about' ? 'No reviews yet' : 'You have not reviewed anyone yet'} description={mode === 'about' ? 'Published reviews from real marketplace interactions will appear here.' : 'Reviews you write after eligible interactions will appear here.'} />}</div>;
 }
 
 function AnalyticsPage({ user, onBack }) {

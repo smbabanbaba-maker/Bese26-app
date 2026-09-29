@@ -735,9 +735,21 @@ export async function submitListingReview({ listingId, reviewerId, revieweeId, r
 async function attachBusinessIdentities(comments = []) {
   const profileIds = [...new Set(comments.map((comment) => comment.user_id).filter(Boolean))];
   if (!profileIds.length) return comments;
-  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path').in('profile_id', profileIds).eq('is_active', true).limit(100);
-  const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, business]));
-  return comments.map((comment) => ({ ...comment, business: businesses[comment.user_id] || null }));
+  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(100);
+  const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
+  return comments.map((comment) => ({ ...comment, user: comment.user ? { ...comment.user, business: businesses[comment.user_id] || null } : comment.user, business: businesses[comment.user_id] || null }));
+}
+
+async function attachBusinessIdentitiesToReviews(reviews = []) {
+  const profileIds = [...new Set(reviews.flatMap((review) => [review.reviewer_id, review.reviewee_id]).filter(Boolean))];
+  if (!profileIds.length) return reviews;
+  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200);
+  const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
+  return reviews.map((review) => ({
+    ...review,
+    reviewer: review.reviewer ? { ...review.reviewer, business: businesses[review.reviewer_id] || null } : review.reviewer,
+    reviewee: review.reviewee ? { ...review.reviewee, business: businesses[review.reviewee_id] || null } : review.reviewee,
+  }));
 }
 
 export async function fetchListingComments(listingId) {
@@ -802,7 +814,7 @@ export async function fetchListingReviews(listingId, userId = null) {
   query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+  return attachBusinessIdentitiesToReviews(data || []);
 }
 
 export async function fetchSellerReviews(sellerId, userId = null) {
@@ -812,7 +824,7 @@ export async function fetchSellerReviews(sellerId, userId = null) {
   query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+  return attachBusinessIdentitiesToReviews(data || []);
 }
 
 export async function fetchReviewSocialStats(reviewIds = [], userId = null) {
@@ -851,7 +863,7 @@ export async function fetchReviewComments(reviewId, userId = null) {
     : query.eq('status', 'published');
   const { data, error } = await query;
   if (error) throw error;
-  return data || [];
+  return attachBusinessIdentities(data || []);
 }
 
 export async function fetchReviewCommentSocialStats(commentIds = [], userId = null) {
@@ -1299,7 +1311,7 @@ export async function fetchProfileReviews(userId, mode = 'about') {
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) throw error;
-  return data || [];
+  return attachBusinessIdentitiesToReviews(data || []);
 }
 
 export async function fetchSavedSearches(userId) {

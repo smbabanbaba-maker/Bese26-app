@@ -28,8 +28,8 @@ import {
 } from 'lucide-react';
 import VerificationBadges from './VerificationBadges';
 import ListingPublicCommentThread from './ListingPublicCommentThread';
-import { getAvatarUrl } from '../lib/supabase';
 import { handleBusinessLogoLoad } from '../lib/businessLogoFit';
+import { getPublicIdentity } from '../lib/identity';
 import {
   createChatOffer,
   deleteListing,
@@ -68,7 +68,7 @@ function safeGalleryUrl(value) {
 }
 
 function displayName(profile, fallback = 'Bese26 member') {
-  return profile?.display_name || profile?.username || fallback;
+  return getPublicIdentity(profile, fallback).name;
 }
 
 function formatFeedbackDate(value) {
@@ -81,8 +81,9 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
   const [replyOpen, setReplyOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
-  const commenter = displayName(comment.user, comment.user_id === user?.id ? 'You' : 'Bese26 member');
-  const avatar = getAvatarUrl(comment.user?.avatar_path);
+  const commenterIdentity = getPublicIdentity(comment.user, comment.user_id === user?.id ? 'You' : 'Bese26 member');
+  const commenter = commenterIdentity.name;
+  const avatar = commenterIdentity.image;
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
   const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
 
@@ -112,7 +113,7 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
 
   return (
     <article className={`listing-review-comment${depth ? ' listing-review-comment-reply' : ''}`}>
-      <div className="listing-review-comment-avatar">{avatar ? <img src={avatar} alt="" loading="lazy" /> : commenter.slice(0, 1).toUpperCase()}</div>
+      <div className={`listing-review-comment-avatar ${commenterIdentity.isBusiness && avatar ? 'is-business-logo' : ''}`}>{avatar ? <img src={avatar} alt="" loading="lazy" onLoad={commenterIdentity.isBusiness ? handleBusinessLogoLoad : undefined} /> : commenter.slice(0, 1).toUpperCase()}</div>
       <div className="listing-review-comment-content">
         <div className="listing-review-comment-meta"><strong>{commenter}</strong><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
         <p>{comment.body}</p>
@@ -158,8 +159,9 @@ function ReviewFeedbackCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const canInteract = review.status === 'published';
   const rating = Math.max(0, Math.min(5, Number(review.rating) || 0));
-  const reviewer = displayName(review.reviewer, 'Buyer');
-  const reviewerAvatar = getAvatarUrl(review.reviewer?.avatar_path);
+  const reviewerIdentity = getPublicIdentity(review.reviewer, 'Buyer');
+  const reviewer = reviewerIdentity.name;
+  const reviewerAvatar = reviewerIdentity.image;
 
   useEffect(() => {
     let current = true;
@@ -262,8 +264,8 @@ function ReviewFeedbackCard({
   return (
     <article className="listing-new-review" aria-label={`Seller feedback by ${reviewer}`}>
       <div className="listing-new-review-top">
-        <div className="listing-new-review-avatar">
-          {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" /> : reviewer.slice(0, 1).toUpperCase()}
+          <div className={`listing-new-review-avatar ${reviewerIdentity.isBusiness && reviewerAvatar ? 'is-business-logo' : ''}`}>
+          {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" onLoad={reviewerIdentity.isBusiness ? handleBusinessLogoLoad : undefined} /> : reviewer.slice(0, 1).toUpperCase()}
         </div>
         <strong>{reviewer}</strong>
         <time dateTime={review.created_at || undefined}>{formatFeedbackDate(review.created_at)}</time>
@@ -303,6 +305,7 @@ function ReviewFeedbackCard({
 export default function ListingDetailsView({
   listing,
   user,
+  activeBusiness = null,
   onClose,
   isSaved,
   onToggleSave,
@@ -670,7 +673,9 @@ export default function ListingDetailsView({
         user: saved.user || {
           display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You',
           avatar_path: user.user_metadata?.avatar_path || null,
+          business: activeBusiness || null,
         },
+        business: activeBusiness || null,
       };
       setComments((current) => [normalized, ...current]);
       setListingCommentSocials((current) => ({
@@ -749,7 +754,7 @@ export default function ListingDetailsView({
     try {
       const saved = await submitListingReview({ listingId: listing.id, reviewerId: user.id, revieweeId: listing.sellerId, rating, body: reviewBody });
       setReviews((current) => [
-        { ...saved, reviewer_id: user.id, reviewer: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You' }, listing: { title: listing.title } },
+        { ...saved, reviewer_id: user.id, reviewer: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You', avatar_path: user.user_metadata?.avatar_path || null, business: activeBusiness || null }, listing: { title: listing.title } },
         ...current,
       ]);
       setReviewSocials((current) => ({ ...current, [saved.id]: { likeCount: 0, commentCount: 0, liked: false } }));
