@@ -328,6 +328,7 @@ export default function ListingDetailsView({
   const [comments, setComments] = useState([]);
   const [listingCommentSocials, setListingCommentSocials] = useState({});
   const [commentText, setCommentText] = useState('');
+  const [commentError, setCommentError] = useState('');
   const [commentsBusy, setCommentsBusy] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsLoadFailed, setCommentsLoadFailed] = useState(false);
@@ -662,6 +663,7 @@ export default function ListingDetailsView({
       return null;
     }
     try {
+      setCommentError('');
       const saved = await submitListingComment({ listingId: listing.id, userId: user.id, body, parentCommentId });
       const normalized = {
         ...saved,
@@ -684,7 +686,9 @@ export default function ListingDetailsView({
       onDemoAction?.(parentCommentId ? 'Reply posted.' : 'Comment posted.');
       return normalized;
     } catch (error) {
-      onDemoAction?.(error.message || (parentCommentId ? 'Could not post this reply.' : 'Could not submit the comment.'));
+      const message = error?.message || (parentCommentId ? 'Could not post this reply.' : 'Could not submit the comment.');
+      setCommentError(message);
+      onDemoAction?.(message);
       return null;
     }
   };
@@ -878,7 +882,7 @@ export default function ListingDetailsView({
 
           <section className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
-            <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => setCommentText(event.target.value)} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button></form>
+            <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => { setCommentError(''); setCommentText(event.target.value); }} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button>{commentError && <p className="listing-comment-error" role="alert">{commentError}</p>}</form>
             <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? listingCommentThreads.map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
