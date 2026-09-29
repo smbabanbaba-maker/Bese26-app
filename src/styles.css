@@ -7349,6 +7349,9 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .listing-public-comment-reply-count { color: #7c8992; font-size: 10px; }
 .listing-public-comment-replies { display: grid; gap: 8px; margin: 9px 0 0 2px; padding-left: 9px; border-left: 2px solid #e8edf0; }
 .listing-public-comment-reply { padding: 8px; background: #f4f7f8; }
+.listing-public-comment-more-replies { display: inline-flex; align-items: center; justify-content: flex-start; gap: 5px; width: max-content; max-width: 100%; padding: 3px 4px; color: #687782; font-size: 10px; font-weight: 800; }
+.listing-public-comment-more-replies:hover { color: #d43840; }
+.listing-public-comment-more-replies span { color: #9aa5ad; font-weight: 650; }
 .listing-public-comment-reply-form { display: grid; gap: 6px; margin-top: 8px; padding: 8px; border-radius: 8px; background: #f4f7f8; }
 .listing-public-comment-reply-form > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #687782; font-size: 10px; }
 .listing-public-comment-reply-form > div button { padding: 2px 4px; color: #687782; background: transparent; font-size: 10px; }

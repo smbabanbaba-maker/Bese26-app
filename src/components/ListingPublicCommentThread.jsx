@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageCircle, Send, ThumbsUp } from 'lucide-react';
+import { ChevronDown, MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
 
@@ -33,6 +33,7 @@ export default function ListingPublicCommentThread({
   const [likeBusy, setLikeBusy] = useState(false);
   const [reactionOpen, setReactionOpen] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState('');
+  const [visibleReplyCount, setVisibleReplyCount] = useState(1);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const name = commentName(comment);
   const avatarPath = comment.business?.logo_path || comment.user?.avatar_path;
@@ -125,7 +126,8 @@ export default function ListingPublicCommentThread({
           <button type="submit" disabled={replyBusy || !draft.trim()}>{replyBusy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
         {replies.length > 0 && <div className="listing-public-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.map((reply) => <ListingPublicCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onReply={onReply} onAuthRequired={onAuthRequired} />)}
+          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onReply={onReply} onAuthRequired={onAuthRequired} />)}
+          {replies.length > visibleReplyCount && <button type="button" className="listing-public-comment-more-replies" onClick={() => setVisibleReplyCount(replies.length)}>More replies <span>({replies.length - visibleReplyCount} more)</span><ChevronDown size={14} /></button>}
         </div>}
       </div>
     </article>
