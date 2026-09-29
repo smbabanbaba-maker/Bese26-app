@@ -260,6 +260,60 @@ img.business-logo-preview-image {
   .listing-gallery-lightbox > img { max-width: 100vw !important; border-radius: 0; }
   .listing-gallery-lightbox .gallery-control { width: 42px; height: 42px; }
 }
+.listing-new-price { color: #d43840 !important; }
+.listing-new-summary h1, .listing-new-section-heading h2 { color: #111827; }
+.listing-new-price-type { color: #30343b; background: #f7f7f8; border-color: #e1e4e8; }
+.listing-new-contact { background: #fff; }
+.listing-new-action-grid.has-one-action { grid-template-columns: minmax(0, 1fr); }
+.listing-new-action-grid > .listing-new-whatsapp,
+.listing-new-action-grid > .listing-new-solid-action,
+.listing-new-action-grid > .listing-new-message-action {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+}
+.listing-new-action-grid .listing-new-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #d43840 !important;
+  color: #d43840 !important;
+  background: #fff !important;
+}
+.listing-new-action-grid .listing-new-solid-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #d43840 !important;
+  color: #fff !important;
+  background: #d43840 !important;
+  box-shadow: none !important;
+}
+.listing-new-action-grid .listing-new-message-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #17191d;
+  color: #fff;
+  background: #17191d;
+  cursor: pointer;
+}
+.listing-new-action-grid button:disabled { cursor: progress; opacity: .65; }
+.listing-new-action-grid button:focus-visible, .listing-new-start-chat:focus-visible { outline: 3px solid rgba(212, 56, 64, .25); outline-offset: 2px; }
+.listing-new-action-grid .listing-new-whatsapp:hover { background: #fff5f5 !important; }
+.listing-new-action-grid .listing-new-solid-action:hover, .listing-new-start-chat:hover { background: #bd3038 !important; }
+.listing-new-action-grid .listing-new-message-action:hover { border-color: #d43840; background: #30343b; }
+.listing-new-quick-actions button { border-color: #d9dce1; color: #24272c; background: #fff; }
+.listing-new-start-chat { background: #d43840 !important; box-shadow: none !important; }
+.listing-new-summary .listing-new-trust { border-color: #e5e7eb; color: #25282d; background: #f7f7f8; }
 @media (max-width: 760px) {
   .listing-new-image-section { width: 100% !important; margin: 0 !important; }
   .listing-new-image-frame {
@@ -273,28 +327,28 @@ img.business-logo-preview-image {
   .listing-new-section { margin: 0 8px; border-radius: 13px; }
   .listing-new-summary { margin-bottom: -8px !important; padding: 11px 12px 12px; border-radius: 13px 13px 0 0 !important; }
   .listing-new-summary h1 { margin: 7px 0 6px; font-size: 20px; }
-  .listing-new-price { color: #159b56 !important; font-size: 22px; }
-  .listing-new-price-type { color: #4e715c; background: #f0f8f2; border-color: #d8eddd; }
+  .listing-new-price { color: #d43840 !important; font-size: 22px; }
+  .listing-new-price-type { color: #30343b; background: #f7f7f8; border-color: #e1e4e8; }
   .listing-new-contact { margin-top: 0 !important; padding: 6px 12px 12px; border-top: 0 !important; border-radius: 0 0 13px 13px !important; }
   .listing-new-contact .listing-new-action-grid .listing-new-whatsapp {
-    color: #169a55 !important;
-    border-color: #28a963 !important;
+    color: #d43840 !important;
+    border-color: #d43840 !important;
     background: #fff !important;
   }
   .listing-new-contact .listing-new-action-grid .listing-new-solid-action {
-    background: #09ae55 !important;
+    background: #d43840 !important;
     box-shadow: none !important;
   }
   .listing-new-chat { padding: 12px !important; }
-  .listing-new-quick-actions button { border-color: #62bc88; color: #239455; background: #fff; }
+  .listing-new-quick-actions button { border-color: #d9dce1; color: #24272c; background: #fff; }
   .listing-new-chat textarea { min-height: 58px; }
-  .listing-new-start-chat { background: #f5a03a !important; box-shadow: none !important; }
-  .listing-new-summary .listing-new-trust { margin-top: 8px; padding: 8px 10px; border-radius: 10px; }
+  .listing-new-start-chat { background: #d43840 !important; box-shadow: none !important; }
+  .listing-new-summary .listing-new-trust { margin-top: 8px; padding: 8px 10px; border-radius: 10px; border-color: #e5e7eb; background: #f7f7f8; }
   body:has(.listing-details-backdrop) .bottom-nav { z-index: 90 !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; min-height: 88px !important; padding: 8px 8px max(12px, env(safe-area-inset-bottom)) !important; border-top-color: #e4e9e7 !important; }
   body:has(.listing-details-backdrop) .bottom-nav button { gap: 4px; font-size: 10px !important; }
   body:has(.listing-details-backdrop) .bottom-nav button span:last-child { font-size: 10px !important; line-height: 1.15; }
   body:has(.listing-details-backdrop) .bottom-nav .nav-icon svg { width: 22px; height: 22px; }
-  body:has(.listing-details-backdrop) .bottom-nav button.active { color: #159b56 !important; }
+  body:has(.listing-details-backdrop) .bottom-nav button.active { color: #d43840 !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .listing-new-image-button img { transition: none !important; }

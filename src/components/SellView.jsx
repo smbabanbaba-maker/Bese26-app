@@ -198,8 +198,9 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
       city: raw.city || current.city,
       delivery: raw.delivery_options?.[0] || current.delivery,
       deliveryFee: raw.delivery_options?.[1] || current.deliveryFee,
-      contactPhone: ['call', 'chat_call'].includes(String(raw.contact_preference || 'chat').toLowerCase()),
-      contactWhatsApp: ['whatsapp', 'chat_call'].includes(String(raw.contact_preference || 'chat').toLowerCase()),
+      contactChat: true,
+      contactPhone: ['call', 'chat_call', 'both'].includes(String(raw.contact_preference || 'chat').toLowerCase()),
+      contactWhatsApp: ['whatsapp', 'chat_whatsapp', 'chat_call', 'both'].includes(String(raw.contact_preference || 'chat').toLowerCase()),
       attributes: raw.attributes || current.attributes,
       sellerName: initialListing.seller || current.sellerName,
     }));
@@ -350,6 +351,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     const nextErrors = [];
     if (isSupabaseConfigured && !editMode && !profileContact?.phone) nextErrors.push('Add and verify a phone number in your Profile before publishing.');
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
+    if (!form.contactChat && !form.contactPhone && !form.contactWhatsApp) nextErrors.push('Select at least one way for buyers to contact you.');
     if (!form.title.trim()) nextErrors.push('Add a short, searchable title.');
     if (!form.category) nextErrors.push('Choose a category.');
     if (form.description.trim().length < 5) nextErrors.push('Description must be at least 5 characters.');
@@ -371,6 +373,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
       if (!form.price || Number(form.price) <= 0) nextErrors.push('Enter a valid price greater than zero.');
     }
     if (step === 3 && (!form.state || !form.city)) nextErrors.push('Choose a state and city for the listing.');
+    if (step === 3 && !form.contactChat && !form.contactPhone && !form.contactWhatsApp) nextErrors.push('Select at least one way for buyers to contact you.');
     setErrors(nextErrors);
     return nextErrors;
   };

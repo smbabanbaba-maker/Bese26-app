@@ -31,6 +31,7 @@ import VerificationBadges from './VerificationBadges';
 import ListingPublicCommentThread from './ListingPublicCommentThread';
 import { handleBusinessLogoLoad } from '../lib/businessLogoFit';
 import { getPublicIdentity } from '../lib/identity';
+import { getListingContactActions } from '../lib/listingContactActions';
 import {
   createChatOffer,
   deleteListing,
@@ -370,10 +371,16 @@ export default function ListingDetailsView({
   const phone = contact.phone || '';
   const whatsapp = contact.whatsapp || '';
   const contactPreference = String(raw.contact_preference || '').toLowerCase();
-  const allowsPhone = !contactPreference || ['call', 'chat_call'].includes(contactPreference);
-  const allowsWhatsApp = !contactPreference || ['whatsapp', 'chat_whatsapp', 'chat_call'].includes(contactPreference);
+  const allowsPhone = !contactPreference || ['call', 'chat_call', 'both'].includes(contactPreference);
+  const allowsWhatsApp = !contactPreference || ['whatsapp', 'chat_whatsapp', 'chat_call', 'both'].includes(contactPreference);
   const phoneEnabled = allowsPhone && Boolean(String(phone).trim());
   const whatsappEnabled = allowsWhatsApp && Boolean(String(whatsapp).trim());
+  const contactActions = getListingContactActions({
+    contactPreference,
+    phoneAvailable: phoneEnabled,
+    whatsappAvailable: whatsappEnabled,
+    loading: contactLoading,
+  });
   const categoryText = `${listing?.category || ''} ${listing?.subcategory || ''}`.toLowerCase();
   const categoryFields = categoryText.includes('phone') || categoryText.includes('mobile')
     ? ['brand', 'model', 'condition', 'ram', 'storage', 'colour', 'color']
@@ -594,6 +601,11 @@ export default function ListingDetailsView({
     const href = whatsappHref(whatsapp);
     if (!href) { onDemoAction?.(contactLoading ? 'Loading the seller contact details…' : 'The seller has not enabled WhatsApp for this listing.'); return; }
     window.location.assign(href);
+  };
+  const openAppMessage = () => {
+    if (!user) { onAuthRequired?.('Sign in to chat with this seller.'); return; }
+    if (typeof onStartChat === 'function') onStartChat(listing, 'message', '');
+    else onDemoAction?.('Bese26 Chat is not available right now.');
   };
   const followSeller = async () => {
     if (!user) { onAuthRequired?.('Sign in to follow sellers and receive new listing alerts.'); return; }
@@ -872,13 +884,14 @@ export default function ListingDetailsView({
           </section>
 
           <section className="listing-new-section listing-new-contact">
-            <div className="listing-new-action-grid">
-              {!owner && user?.id && contactLoading && allowsWhatsApp && <button type="button" className="listing-new-whatsapp" disabled aria-busy="true"><MessageCircle size={17} /> WhatsApp</button>}
-              {!owner && user?.id && contactLoading && allowsPhone && <button type="button" className="listing-new-solid-action" disabled aria-busy="true"><Phone size={17} /> Call</button>}
-              {whatsappEnabled && !owner && <button type="button" className="listing-new-whatsapp" onClick={openWhatsApp}><MessageCircle size={17} /> WhatsApp</button>}
-              {phoneEnabled && !owner && <button type="button" className="listing-new-solid-action" onClick={callSeller}><Phone size={17} /> Call</button>}
+            <div className={`listing-new-action-grid ${contactActions.length === 1 ? 'has-one-action' : ''}`}>
+              {!owner && user?.id && contactActions.map((action) => {
+                if (action === 'whatsapp') return <button key="whatsapp" type="button" className="listing-new-whatsapp" onClick={openWhatsApp} disabled={!whatsappEnabled} aria-busy={!whatsappEnabled || undefined}><MessageCircle size={17} /> WhatsApp</button>;
+                if (action === 'call') return <button key="call" type="button" className="listing-new-solid-action" onClick={callSeller} disabled={!phoneEnabled} aria-busy={!phoneEnabled || undefined}><Phone size={17} /> Call</button>;
+                return <button key="message" type="button" className="listing-new-message-action" onClick={openAppMessage}><MessageCircle size={17} /> Message</button>;
+              })}
               {!owner && !user?.id && <div className="listing-contact-note"><span>Sign in to view the contact options enabled by this seller.</span><button type="button" onClick={() => onAuthRequired?.('Sign in to view seller contact details.')}>Sign in</button></div>}
-              {!owner && user?.id && !contactLoading && !contactLoadFailed && !phoneEnabled && !whatsappEnabled && <div className="listing-contact-note">The seller has not enabled calls or WhatsApp for this listing.</div>}
+              {!owner && user?.id && !contactLoading && !contactLoadFailed && !phoneEnabled && !whatsappEnabled && <div className="listing-contact-note">Calls and WhatsApp are unavailable for this listing. You can still message the seller through Bese26.</div>}
               {!owner && user?.id && contactLoadFailed && <div className="listing-contact-note">Could not load the seller’s contact details. Reopen this listing to try again.</div>}
             </div>
             {owner && <p className="listing-contact-note">This is your listing. Manage it from the seller controls below.</p>}
