@@ -7355,6 +7355,21 @@ html, body, #root { max-width: 100%; overflow-x: hidden; }
 .listing-public-comment-reply-form textarea { width: 100%; min-height: 38px; max-height: 100px; resize: vertical; padding: 8px; border: 1px solid #dfe5e9; border-radius: 7px; color: #26323b; background: #fff; font: inherit; font-size: 11px; }
 .listing-public-comment-reply-form > button { justify-self: end; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 32px; padding: 0 10px; border-radius: 7px; color: #fff; background: #d43840; font-size: 10px; font-weight: 750; }
 .listing-public-comment-reply-form > button:disabled { opacity: .55; cursor: not-allowed; }
+.listing-comments-visible { display: grid; gap: 8px; }
+.listing-comments-more { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; margin: 3px auto 0; padding: 0 14px; border: 1px solid #e2e8eb; border-radius: 999px; color: #687782; background: #fff; font-size: 11px; font-weight: 800; }
+.listing-comments-more:hover { border-color: #d43840; color: #d43840; background: #fff8f8; }
+.listing-comments-more span { color: #9aa5ad; font-weight: 650; }
+.listing-comment-reaction-wrap { position: relative; display: inline-flex; align-items: center; }
+.listing-comment-reaction-wrap > button:first-child { border-radius: 999px 0 0 999px; }
+.listing-comment-reaction-current { display: inline-flex; align-items: center; justify-content: center; min-width: 14px; }
+.listing-comment-reaction-trigger { min-width: 25px; margin-left: -1px; padding: 0 5px !important; border-left: 1px solid #e4e9ec !important; border-radius: 0 999px 999px 0 !important; color: #8a969e !important; font-size: 14px !important; }
+.listing-comment-reaction-picker { position: absolute; z-index: 3; bottom: calc(100% + 7px); left: 0; display: flex; flex-wrap: wrap; gap: 2px; width: 214px; padding: 6px; border: 1px solid #e4e9ec; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(31, 47, 57, .14); }
+.listing-comment-reaction-picker button { display: grid; place-items: center; width: 34px; height: 30px; padding: 0 !important; border-radius: 7px !important; font-size: 17px !important; }
+.listing-comment-reaction-picker button:hover { background: #fff0f0; transform: scale(1.1); }
+@media (max-width: 430px) {
+  .listing-comments-more { width: 100%; }
+  .listing-comment-reaction-picker { left: -3px; width: 204px; }
+}
 .listing-review-eligibility-note { color: #7b8791; font-size: 10px; line-height: 1.4; }
 /* Fail-closed seller quota states: keep the Sell route clear on small screens. */
 .sell-limit-page { min-height: calc(100svh - 104px); display: grid; place-items: start center; padding: 18px 12px 100px; }

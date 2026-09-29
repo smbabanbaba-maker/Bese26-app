@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
+
+const COMMENT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🙏', '🎉', '💯'];
 
 function commentName(comment) {
   return comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member';
@@ -29,6 +31,8 @@ export default function ListingPublicCommentThread({
   const [draft, setDraft] = useState('');
   const [replyBusy, setReplyBusy] = useState(false);
   const [likeBusy, setLikeBusy] = useState(false);
+  const [reactionOpen, setReactionOpen] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState('');
   const [avatarFailed, setAvatarFailed] = useState(false);
   const name = commentName(comment);
   const avatarPath = comment.business?.logo_path || comment.user?.avatar_path;
@@ -39,6 +43,10 @@ export default function ListingPublicCommentThread({
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
   const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
   const canInteract = comment.status === 'published';
+
+  useEffect(() => {
+    if (!social.liked) setSelectedReaction('');
+  }, [social.liked, comment.id]);
 
   const beginReply = () => {
     if (!user) {
@@ -56,6 +64,13 @@ export default function ListingPublicCommentThread({
     } finally {
       setLikeBusy(false);
     }
+  };
+
+  const chooseReaction = async (reaction) => {
+    if (!canInteract || likeBusy) return;
+    setSelectedReaction(reaction);
+    setReactionOpen(false);
+    if (!social.liked) await toggleLike();
   };
 
   const submitReply = async (event) => {
@@ -94,11 +109,15 @@ export default function ListingPublicCommentThread({
         </div>
         <p>{comment.body}</p>
         <div className="listing-public-comment-actions">
-          <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={!canInteract || likeBusy} onClick={toggleLike}>
-            <ThumbsUp size={14} /> Like <span>{Number(social.likeCount || 0)}</span>
-          </button>
-          {depth === 0 && canInteract && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
-          {depth === 0 && <span className="listing-public-comment-reply-count">{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>}
+          <span className="listing-comment-reaction-wrap">
+            <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={!canInteract || likeBusy} onClick={toggleLike}>
+              <span className="listing-comment-reaction-current">{selectedReaction || <ThumbsUp size={14} />}</span> Like <span>{Number(social.likeCount || 0)}</span>
+            </button>
+            <button type="button" className="listing-comment-reaction-trigger" aria-label="Choose a reaction" aria-expanded={reactionOpen} onClick={() => setReactionOpen((open) => !open)}>☺</button>
+            {reactionOpen && <span className="listing-comment-reaction-picker" role="menu" aria-label="Comment reactions">{COMMENT_REACTIONS.map((reaction) => <button type="button" key={reaction} role="menuitem" aria-label={`React ${reaction}`} onClick={() => chooseReaction(reaction)}>{reaction}</button>)}</span>}
+          </span>
+          {canInteract && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
+          {replyCount > 0 && <span className="listing-public-comment-reply-count">{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>}
         </div>
         {replyOpen && <form className="listing-public-comment-reply-form" onSubmit={submitReply}>
           <div><span>Replying to {name}</span><button type="button" onClick={() => setReplyOpen(false)}>Cancel</button></div>

@@ -119,8 +119,8 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
         <p>{comment.body}</p>
         <div className="listing-review-comment-actions">
           <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={comment.status !== 'published'} onClick={() => onToggleLike?.(comment)}><ThumbsUp size={14} /> Like <span>{Number(social.likeCount || 0)}</span></button>
-          {depth === 0 && comment.status === 'published' && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
-          {depth === 0 && replyCount > 0 && <span className="listing-review-reply-count">{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>}
+          {comment.status === 'published' && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
+          {replyCount > 0 && <span className="listing-review-reply-count">{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>}
         </div>
         {comment.status === 'pending' && comment.user_id === user?.id && <small className="listing-review-comment-pending">Pending review</small>}
         {replyOpen && <form className="listing-review-reply-form" onSubmit={submitReply}>
@@ -330,6 +330,7 @@ export default function ListingDetailsView({
   const [reviewSocials, setReviewSocials] = useState({});
   const [comments, setComments] = useState([]);
   const [listingCommentSocials, setListingCommentSocials] = useState({});
+  const [commentsVisibleCount, setCommentsVisibleCount] = useState(4);
   const [commentText, setCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
   const [commentsBusy, setCommentsBusy] = useState(false);
@@ -401,7 +402,8 @@ export default function ListingDetailsView({
         replies.set(comment.parent_comment_id, current);
       } else roots.push(comment);
     });
-    return roots.map((comment) => ({ comment, replies: replies.get(comment.id) || [] }));
+    const buildThread = (comment) => ({ comment, replies: (replies.get(comment.id) || []).map(buildThread) });
+    return roots.map(buildThread);
   }, [comments]);
   const canReview = Boolean(user && !owner && ['sold', 'archived'].includes(String(listingStatus || '').toLowerCase()));
   const titleParts = [listing?.category, listing?.subcategory].filter(Boolean).join(' · ');
@@ -437,6 +439,7 @@ export default function ListingDetailsView({
     setSimilar([]);
     setSimilarVisibleCount(12);
     setComments([]);
+    setCommentsVisibleCount(4);
     setListingCommentSocials({});
     setReviews([]);
     setReviewSocials({});
@@ -888,7 +891,7 @@ export default function ListingDetailsView({
           <section className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => { setCommentError(''); setCommentText(event.target.value); }} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button>{commentError && <p className="listing-comment-error" role="alert">{commentError}</p>}</form>
-            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? listingCommentThreads.map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />) : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>
