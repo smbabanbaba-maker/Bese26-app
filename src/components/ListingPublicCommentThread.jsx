@@ -24,6 +24,7 @@ export default function ListingPublicCommentThread({
   user,
   depth = 0,
   onToggleLike,
+  onSelectReaction,
   onReply,
   onAuthRequired,
 }) {
@@ -31,6 +32,7 @@ export default function ListingPublicCommentThread({
   const [draft, setDraft] = useState('');
   const [replyBusy, setReplyBusy] = useState(false);
   const [likeBusy, setLikeBusy] = useState(false);
+  const [reactionBusy, setReactionBusy] = useState(false);
   const [reactionOpen, setReactionOpen] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState('');
   const [visibleReplyCount, setVisibleReplyCount] = useState(1);
@@ -41,7 +43,7 @@ export default function ListingPublicCommentThread({
     ? getBusinessLogoDisplayUrl(comment.business, avatarPath ? getAvatarUrl(avatarPath) : '')
     : avatarPath ? getAvatarUrl(avatarPath) : '';
   const usesBusinessLogo = Boolean(comment.business?.logo_path || isOfficialBese26Business(comment.business));
-  const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
+  const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false, reaction: '' };
   const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
   const canInteract = comment.status === 'published';
 
@@ -68,10 +70,15 @@ export default function ListingPublicCommentThread({
   };
 
   const chooseReaction = async (reaction) => {
-    if (!canInteract || likeBusy) return;
+    if (!canInteract || likeBusy || reactionBusy) return;
+    setReactionBusy(true);
     setSelectedReaction(reaction);
     setReactionOpen(false);
-    if (!social.liked) await toggleLike();
+    try {
+      await onSelectReaction?.(comment, reaction);
+    } finally {
+      setReactionBusy(false);
+    }
   };
 
   const submitReply = async (event) => {
@@ -112,9 +119,9 @@ export default function ListingPublicCommentThread({
         <div className="listing-public-comment-actions">
           <span className="listing-comment-reaction-wrap">
             <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={!canInteract || likeBusy} onClick={toggleLike}>
-              <span className="listing-comment-reaction-current">{selectedReaction || <ThumbsUp size={14} />}</span> Like <span>{Number(social.likeCount || 0)}</span>
+              <span className="listing-comment-reaction-current">{selectedReaction || social.reaction || <ThumbsUp size={14} />}</span> Like <span>{Number(social.likeCount || 0)}</span>
             </button>
-            <button type="button" className="listing-comment-reaction-trigger" aria-label="Choose a reaction" aria-expanded={reactionOpen} onClick={() => setReactionOpen((open) => !open)}>☺</button>
+            <button type="button" className="listing-comment-reaction-trigger" aria-label="Choose a reaction" aria-expanded={reactionOpen} disabled={!canInteract || reactionBusy} onClick={(event) => { event.stopPropagation(); setReactionOpen((open) => !open); }}>☺</button>
             {reactionOpen && <span className="listing-comment-reaction-picker" role="menu" aria-label="Comment reactions">{COMMENT_REACTIONS.map((reaction) => <button type="button" key={reaction} role="menuitem" aria-label={`React ${reaction}`} onClick={() => chooseReaction(reaction)}>{reaction}</button>)}</span>}
           </span>
           {canInteract && <button type="button" aria-expanded={replyOpen} onClick={beginReply}><MessageCircle size={14} /> Reply</button>}
@@ -126,7 +133,7 @@ export default function ListingPublicCommentThread({
           <button type="submit" disabled={replyBusy || !draft.trim()}>{replyBusy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
         {replies.length > 0 && <div className="listing-public-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onReply={onReply} onAuthRequired={onAuthRequired} />)}
+          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
           {replies.length > visibleReplyCount && <button type="button" className="listing-public-comment-more-replies" onClick={() => setVisibleReplyCount(replies.length)}>More replies <span>({replies.length - visibleReplyCount} more)</span><ChevronDown size={14} /></button>}
         </div>}
       </div>

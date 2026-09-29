@@ -57,6 +57,7 @@ import {
   toggleReviewCommentLike,
   toggleReviewLike,
   toggleListingCommentLike as togglePublicListingCommentLike,
+  toggleListingCommentReaction as persistListingCommentReaction,
 } from '../lib/marketplace';
 
 function safeGalleryUrl(value) {
@@ -723,17 +724,15 @@ export default function ListingDetailsView({
       const saved = await submitListingComment({ listingId: listing.id, userId: user.id, body, parentCommentId });
       const normalized = {
         ...saved,
-        user: saved.user || {
-          display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You',
-          avatar_path: user.user_metadata?.avatar_path || null,
-          business: activeBusiness || null,
-        },
-        business: activeBusiness || null,
+        user: saved.user
+          ? { ...saved.user, business: saved.business || saved.user.business || activeBusiness || null }
+          : { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You', avatar_path: user.user_metadata?.avatar_path || null, business: saved.business || activeBusiness || null },
+        business: saved.business || activeBusiness || null,
       };
       setComments((current) => [normalized, ...current]);
       setListingCommentSocials((current) => ({
         ...current,
-        [normalized.id]: current[normalized.id] || { likeCount: 0, replyCount: 0, liked: false },
+        [normalized.id]: current[normalized.id] || { likeCount: 0, replyCount: 0, liked: false, reaction: '' },
         ...(parentCommentId && saved.status === 'published' ? {
           [parentCommentId]: {
             ...(current[parentCommentId] || { likeCount: 0, replyCount: 0, liked: false }),
@@ -780,6 +779,21 @@ export default function ListingDetailsView({
     } catch (error) {
       setListingCommentSocials((current) => ({ ...current, [comment.id]: previous }));
       onDemoAction?.(error.message || 'Could not update your like.');
+    }
+  };
+  const setListingCommentReaction = async (comment, reaction) => {
+    if (!user) { onAuthRequired?.('Sign in to react to a public comment.'); return; }
+    const previous = listingCommentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false, reaction: '' };
+    setListingCommentSocials((current) => ({
+      ...current,
+      [comment.id]: { ...previous, liked: true, reaction, likeCount: previous.liked ? previous.likeCount : Number(previous.likeCount || 0) + 1 },
+    }));
+    try {
+      if (!previous.liked) await togglePublicListingCommentLike({ commentId: comment.id, userId: user.id, shouldLike: true });
+      await persistListingCommentReaction({ commentId: comment.id, userId: user.id, reaction });
+    } catch (error) {
+      setListingCommentSocials((current) => ({ ...current, [comment.id]: previous }));
+      onDemoAction?.(error.message || 'Could not save your reaction.');
     }
   };
   const submitComment = async (event) => {
@@ -942,7 +956,7 @@ export default function ListingDetailsView({
           <section className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => { setCommentError(''); setCommentText(event.target.value); }} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button>{commentError && <p className="listing-comment-error" role="alert">{commentError}</p>}</form>
-            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onSelectReaction={setListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>

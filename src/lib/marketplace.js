@@ -768,9 +768,10 @@ export async function submitListingComment({ listingId, userId, body, parentComm
   const id = globalThis.crypto?.randomUUID?.();
   const createdAt = new Date().toISOString();
   const comment = { id, listing_id: listingId, user_id: userId, parent_comment_id: parentCommentId || null, body: text, status: 'published', created_at: createdAt };
-  const { error } = await supabase.from('listing_comments').insert(comment);
+  const { data, error } = await supabase.from('listing_comments').insert(comment).select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').single();
   if (error) throw error;
-  return comment;
+  const [hydrated] = await attachBusinessIdentities([data || comment]);
+  return hydrated || comment;
 }
 
 export async function fetchListingCommentSocialStats(commentIds = [], userId = null) {
@@ -778,7 +779,7 @@ export async function fetchListingCommentSocialStats(commentIds = [], userId = n
   const ids = [...new Set((commentIds || []).filter(Boolean))];
   if (!ids.length) return {};
   const ownLikesRequest = userId
-    ? supabase.from('listing_comment_likes').select('comment_id').eq('user_id', userId).in('comment_id', ids)
+    ? supabase.from('listing_comment_likes').select('comment_id,reaction').eq('user_id', userId).in('comment_id', ids)
     : Promise.resolve({ data: [], error: null });
   const [countsResult, likesResult] = await Promise.all([
     supabase.from('listing_comment_social_counts').select('comment_id,like_count,reply_count').in('comment_id', ids),
@@ -786,12 +787,12 @@ export async function fetchListingCommentSocialStats(commentIds = [], userId = n
   ]);
   if (countsResult.error) throw countsResult.error;
   if (likesResult.error) throw likesResult.error;
-  const counts = Object.fromEntries(ids.map((id) => [id, { likeCount: 0, replyCount: 0, liked: false }]));
+  const counts = Object.fromEntries(ids.map((id) => [id, { likeCount: 0, replyCount: 0, liked: false, reaction: '' }]));
   (countsResult.data || []).forEach((row) => {
     counts[row.comment_id] = { ...counts[row.comment_id], likeCount: Number(row.like_count || 0), replyCount: Number(row.reply_count || 0) };
   });
   (likesResult.data || []).forEach((row) => {
-    if (counts[row.comment_id]) counts[row.comment_id].liked = true;
+    if (counts[row.comment_id]) counts[row.comment_id] = { ...counts[row.comment_id], liked: true, reaction: row.reaction || '👍' };
   });
   return counts;
 }
@@ -805,6 +806,16 @@ export async function toggleListingCommentLike({ commentId, userId, shouldLike }
   const { error } = await request;
   if (error && !(shouldLike && error.code === '23505')) throw error;
   return Boolean(shouldLike);
+}
+
+export async function toggleListingCommentReaction({ commentId, userId, reaction = '👍' }) {
+  failIfUnavailable();
+  if (!commentId || !userId) throw new Error('Sign in before reacting to a comment.');
+  const allowed = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🙏', '🎉', '💯'];
+  if (!allowed.includes(reaction)) throw new Error('That reaction is not available.');
+  const { error } = await supabase.from('listing_comment_likes').upsert({ comment_id: commentId, user_id: userId, reaction }, { onConflict: 'comment_id,user_id' });
+  if (error) throw error;
+  return reaction;
 }
 
 export async function fetchListingReviews(listingId, userId = null) {
