@@ -92,19 +92,17 @@ img, svg, video, canvas { max-width: 100%; }
 .listing-new-card-image {
   aspect-ratio: 4 / 3 !important;
 }
+/* Match the reference: a full-width, compact listing photo followed by visible details. */
 .listing-new-image-frame {
-  aspect-ratio: auto !important;
-  height: calc(100vh - 78px) !important;
-  height: calc(100svh - 78px) !important;
-  height: calc(100dvh - 78px) !important;
-  min-height: 360px !important;
+  aspect-ratio: 16 / 10 !important;
+  height: auto !important;
+  min-height: 0 !important;
   background: linear-gradient(145deg, #f4f6f8, #e5eaf0) !important;
 }
-.listing-details-view { overflow: visible !important; }
+.listing-details-view { overflow: hidden !important; }
 .listing-new-image-section {
-  width: 100vw !important;
-  margin-left: calc(50% - 50vw) !important;
-  margin-right: calc(50% - 50vw) !important;
+  width: 100% !important;
+  margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
@@ -263,13 +261,40 @@ img.business-logo-preview-image {
   .listing-gallery-lightbox .gallery-control { width: 42px; height: 42px; }
 }
 @media (max-width: 760px) {
-  .listing-new-image-section { width: 100vw !important; margin: 0 !important; }
+  .listing-new-image-section { width: 100% !important; margin: 0 !important; }
   .listing-new-image-frame {
-    height: calc(100vh - 58px) !important;
-    height: calc(100svh - 58px) !important;
-    height: calc(100dvh - 58px) !important;
-    min-height: 320px !important;
+    aspect-ratio: 16 / 10 !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
+  .listing-new-thumbs { display: none !important; }
+  .listing-new-counter { right: auto !important; left: 12px !important; }
+  .listing-new-content { gap: 8px; padding-bottom: 108px !important; }
+  .listing-new-section { margin: 0 8px; border-radius: 13px; }
+  .listing-new-summary { margin-bottom: -8px !important; padding: 11px 12px 12px; border-radius: 13px 13px 0 0 !important; }
+  .listing-new-summary h1 { margin: 7px 0 6px; font-size: 20px; }
+  .listing-new-price { color: #159b56 !important; font-size: 22px; }
+  .listing-new-price-type { color: #4e715c; background: #f0f8f2; border-color: #d8eddd; }
+  .listing-new-contact { margin-top: 0 !important; padding: 6px 12px 12px; border-top: 0 !important; border-radius: 0 0 13px 13px !important; }
+  .listing-new-contact .listing-new-action-grid .listing-new-whatsapp {
+    color: #169a55 !important;
+    border-color: #28a963 !important;
+    background: #fff !important;
+  }
+  .listing-new-contact .listing-new-action-grid .listing-new-solid-action {
+    background: #09ae55 !important;
+    box-shadow: none !important;
+  }
+  .listing-new-chat { padding: 12px !important; }
+  .listing-new-quick-actions button { border-color: #62bc88; color: #239455; background: #fff; }
+  .listing-new-chat textarea { min-height: 58px; }
+  .listing-new-start-chat { background: #f5a03a !important; box-shadow: none !important; }
+  .listing-new-summary .listing-new-trust { margin-top: 8px; padding: 8px 10px; border-radius: 10px; }
+  body:has(.listing-details-backdrop) .bottom-nav { z-index: 90 !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; min-height: 88px !important; padding: 8px 8px max(12px, env(safe-area-inset-bottom)) !important; border-top-color: #e4e9e7 !important; }
+  body:has(.listing-details-backdrop) .bottom-nav button { gap: 4px; font-size: 10px !important; }
+  body:has(.listing-details-backdrop) .bottom-nav button span:last-child { font-size: 10px !important; line-height: 1.15; }
+  body:has(.listing-details-backdrop) .bottom-nav .nav-icon svg { width: 22px; height: 22px; }
+  body:has(.listing-details-backdrop) .bottom-nav button.active { color: #159b56 !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .listing-new-image-button img { transition: none !important; }
