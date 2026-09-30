@@ -7794,3 +7794,39 @@ img.business-logo-preview-image.is-tall-business-logo {
   object-position: center 40% !important;
   padding: 0 !important;
 }
+
+/* Reference-inspired seller feedback cards: visual-only layer; data and actions stay unchanged. */
+.listing-new-reviews { background: #fff; }
+.listing-new-reviews .listing-new-section-heading { align-items: center; padding-bottom: 8px; border-bottom: 1px solid #edf2f5; }
+.listing-new-reviews .listing-new-section-heading h2 { color: #182a38; font-size: 17px; letter-spacing: -.01em; }
+.listing-new-reviews .listing-review-heading-actions .listing-new-link { color: #2a9b63; font-weight: 750; }
+.listing-new-review { margin-top: 10px; padding: 13px 12px 11px; border: 0; border-radius: 8px; background: #eaf4fb; box-shadow: none; }
+.listing-new-review-top { gap: 8px; }
+.listing-new-review-top strong { color: #263b4a; font-size: 14px; font-weight: 750; }
+.listing-new-review-top time { color: #788b99; font-size: 11px; }
+.listing-new-review-avatar { width: 30px; height: 30px; color: #fff; background: #8ca7b8; }
+.listing-new-review .listing-new-stars { gap: 1px; margin: 8px 0 5px 38px; }
+.listing-new-review .listing-new-stars span { color: #d8e0e5; font-size: 18px; }
+.listing-new-review .listing-new-stars span.filled { color: #f2a82f; }
+.listing-new-review .listing-review-body { margin-left: 38px; color: #243746; font-size: 13px; line-height: 1.5; }
+.listing-review-actions { gap: 18px; margin: 12px 0 0 38px; padding-top: 10px; border-top: 0; }
+.listing-review-actions button { color: #587080; font-size: 12px; font-weight: 650; }
+.listing-review-actions button:hover, .listing-review-actions button.is-liked { color: #247da8; }
+.listing-review-actions button svg { width: 16px; height: 16px; }
+.listing-review-comments { margin: 11px 0 0 38px; padding: 9px 0 0; border-top: 1px solid rgba(103, 143, 166, .22); border-radius: 0; background: transparent; }
+.listing-review-comment { grid-template-columns: 28px minmax(0, 1fr); gap: 8px; padding: 9px 0; }
+.listing-review-comment-avatar { width: 28px; height: 28px; }
+.listing-review-comment-meta strong { color: #304653; font-size: 11px; }
+.listing-review-comment-meta time { color: #8395a0; font-size: 10px; }
+.listing-review-comment-content p { color: #405765; font-size: 12px; }
+.listing-review-comment-actions { margin: 7px 0 0; padding: 0; border: 0; }
+.listing-review-comment-replies { margin-top: 7px; padding-left: 9px; border-left-color: #c8dce8; }
+.listing-public-comments { background: #fff; }
+.listing-public-comments .listing-public-comment { border: 0; border-radius: 8px; background: #eaf4fb; }
+@media (max-width: 430px) {
+  .listing-new-reviews, .listing-public-comments { padding: 16px 12px; }
+  .listing-new-reviews .listing-new-section-heading h2 { font-size: 16px; }
+  .listing-new-review { padding: 12px 10px 10px; }
+  .listing-new-review .listing-new-stars, .listing-new-review .listing-review-body, .listing-review-actions, .listing-review-comments { margin-left: 36px; }
+  .listing-review-actions { gap: 14px; }
+}
