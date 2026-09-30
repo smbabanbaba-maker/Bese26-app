@@ -10,8 +10,8 @@ function getPreviewSource(source) {
   try {
     const url = new URL(source, window.location.href);
     if (url.pathname.includes('/storage/v1/render/image/public/')) {
-      url.searchParams.set('width', '768');
-      url.searchParams.set('quality', '85');
+      url.pathname = url.pathname.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/');
+      url.search = '';
     }
     return url.href;
   } catch {
