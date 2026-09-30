@@ -821,7 +821,7 @@ export default function ListingDetailsView({
     try {
       const saved = await submitListingReview({ listingId: listing.id, reviewerId: user.id, revieweeId: listing.sellerId, rating, body: reviewBody });
       setReviews((current) => [
-        { ...saved, reviewer_id: user.id, reviewer: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You', avatar_path: user.user_metadata?.avatar_path || null, business: activeBusiness || null }, listing: { title: listing.title } },
+        { ...saved, reviewer_id: user.id, reviewer: { display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'You', avatar_path: user.user_metadata?.avatar_path || null, business: saved.reviewer?.business || activeBusiness || null }, listing: { title: listing.title } },
         ...current,
       ]);
       setReviewSocials((current) => ({ ...current, [saved.id]: { likeCount: 0, commentCount: 0, liked: false } }));

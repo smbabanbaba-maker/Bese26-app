@@ -47,6 +47,7 @@ export function mapListing(row) {
   const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
   const seller = row.profiles || {};
   const business = row.business_profile || {};
+  const sellerName = business.business_name || seller.display_name || 'bese26 seller';
   const category = row.category || row.categories || {};
   const subcategory = row.subcategory || {};
   const location = normalizeLocation(row.city, row.state, row.country);
@@ -63,8 +64,8 @@ export function mapListing(row) {
     gallery,
     category: category.name || 'Marketplace',
     subcategory: subcategory.name || '',
-    seller: seller.display_name || 'bese26 seller',
-    sellerDisplayName: business.business_name || seller.display_name || 'bese26 seller',
+    seller: sellerName,
+    sellerDisplayName: sellerName,
     sellerBusinessName: business.business_name || '',
     sellerBusinessHandle: business.business_handle || '',
     publishedAsType: row.published_as_type || 'personal',
@@ -661,7 +662,7 @@ const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description
 const listingSelectWithOwnership = `${listingSelect},business_profile_id,published_as_type`;
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
-  const businessIds = [...new Set(rows.map((row) => row.business_profile_id).filter(Boolean))];
+  const businessIds = [...new Set(rows.flatMap((row) => [row.business_profile_id, row.seller_id]).filter(Boolean))];
   const businessProfilesRequest = businessIds.length
     ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active,phone,whatsapp,country,state,city').in('profile_id', businessIds).eq('is_active', true)
     : Promise.resolve({ data: [], error: null });
@@ -688,7 +689,7 @@ async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
   const signedByKey = Object.fromEntries(signedEntries.map((entry, index) => [entry.key, signedUrls[index] || '']));
   return mediaByRow.map(({ row, media }) => mapListing({
     ...row,
-    business_profile: businessById[row.business_profile_id] || null,
+    business_profile: businessById[row.business_profile_id] || businessById[row.seller_id] || null,
     listing_media: (firstMediaOnly ? media.slice(0, 1) : media).map((item) => {
       const key = `${row.id}:${item.storage_path}`;
       return { ...item, signed_url: publicImageUrls[key] || signedByKey[key] || '' };
@@ -729,7 +730,8 @@ export async function submitListingReview({ listingId, reviewerId, revieweeId, r
   failIfUnavailable();
   const { data, error } = await supabase.from('reviews').insert({ listing_id: listingId, reviewer_id: reviewerId, reviewee_id: revieweeId, rating: Number(rating), body: String(body || '').trim() || null }).select('id,listing_id,rating,body,status,created_at').single();
   if (error) throw error;
-  return data;
+  const [hydrated] = await attachBusinessIdentitiesToReviews([{ ...data, reviewer_id: reviewerId, reviewer: {} }]);
+  return hydrated || data;
 }
 
 async function attachBusinessIdentities(comments = []) {
@@ -919,7 +921,8 @@ export async function submitReviewComment({ reviewId, userId, body, parentCommen
     .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)')
     .single();
   if (error) throw error;
-  return data;
+  const [hydrated] = await attachBusinessIdentities([data]);
+  return hydrated || data;
 }
 
 export async function toggleReviewCommentLike({ commentId, userId, shouldLike }) {
@@ -1025,10 +1028,28 @@ export async function fetchPublicProfile(username) {
   const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
   if (profileError) throw profileError;
   if (!profile) return null;
+  let { data: businessRow, error: businessError } = await supabase.from('business_profiles')
+    .select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,is_verified,verification_expires_at,is_active')
+    .eq('profile_id', profile.id)
+    .eq('is_active', true)
+    .maybeSingle();
+  if (businessError && /verification_expires_at|column/i.test(businessError.message || '')) {
+    ({ data: businessRow, error: businessError } = await supabase.from('business_profiles')
+      .select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,is_verified,is_active')
+      .eq('profile_id', profile.id)
+      .eq('is_active', true)
+      .maybeSingle());
+  }
+  if (businessError) throw businessError;
+  const business = businessRow ? {
+    ...businessRow,
+    is_verified: verificationIsCurrent(businessRow),
+    logo_url: getBusinessLogoDisplayUrl(businessRow, businessRow.logo_path ? getAvatarUrl(businessRow.logo_path) : ''),
+  } : null;
   let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60));
   if (listingsError) throw listingsError;
-  return { profile: { ...profile, is_verified: verificationIsCurrent(profile) }, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
+  return { profile: { ...profile, is_verified: verificationIsCurrent(profile), business }, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
 }
 
 export async function fetchBusinessDirectory(search = '') {
@@ -1501,7 +1522,21 @@ export async function fetchProfileRelations(userId, mode = 'followers') {
   const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,is_verified)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,is_verified)';
   const { data, error } = await supabase.from('profile_follows').select(`follower_id,following_id,created_at,${relation}`).eq(column, userId).order('created_at', { ascending: false }).limit(200);
   if (error) throw error;
-  return data || [];
+  const rows = data || [];
+  const relationKey = isFollowers ? 'follower' : 'following';
+  const profileIds = [...new Set(rows.map((row) => row[relationKey]?.id).filter(Boolean))];
+  if (!profileIds.length) return rows;
+  const { data: businesses, error: businessError } = await supabase.from('business_profiles')
+    .select('profile_id,business_name,business_handle,logo_path,is_active')
+    .in('profile_id', profileIds)
+    .eq('is_active', true)
+    .limit(200);
+  if (businessError) throw businessError;
+  const businessByProfile = Object.fromEntries((businesses || []).map((business) => [business.profile_id, business]));
+  return rows.map((row) => ({
+    ...row,
+    [relationKey]: row[relationKey] ? { ...row[relationKey], business: businessByProfile[row[relationKey].id] || null } : row[relationKey],
+  }));
 }
 
 export async function fetchFollowSummary(userId) {

@@ -632,12 +632,16 @@ function PublicFollowShowcase({ targetId, name }) {
     setBusy(true); setIsFollowing(next); setSummary((current) => ({ ...current, followers: Math.max(0, current.followers + (next ? 1 : -1)) }));
     try { await toggleFollow(sessionUser.id, targetId, next); } catch { setIsFollowing(!next); setSummary((current) => ({ ...current, followers: Math.max(0, current.followers + (next ? -1 : 1)) })); window.alert('Could not update follow status. Try again.'); } finally { setBusy(false); }
   };
-  const person = (item) => <a className="public-follow-person" href={item.username ? `/@${item.username}` : '#'} key={item.id}><span className="public-follow-avatar">{item.avatar_path ? <img src={getAvatarUrl(item.avatar_path)} alt="" /> : (item.display_name || item.username || 'B').slice(0, 1).toUpperCase()}</span><span><strong>{item.display_name || item.username || 'Bese26 member'}</strong><small>@{item.username || 'member'}</small></span>{item.is_verified && <BadgeCheck size={14} className="unified-verified-icon" />}</a>;
+  const person = (item) => {
+    const identity = getPublicIdentity(item);
+    return <a className="public-follow-person" href={item.username ? `/@${item.username}` : '#'} key={item.id}><span className="public-follow-avatar">{item.avatar_path ? <img src={getAvatarUrl(item.avatar_path)} alt="" /> : identity.name.slice(0, 1).toUpperCase()}</span><span><strong>{identity.name}</strong><small>@{item.username || 'member'}</small></span>{item.is_verified && <BadgeCheck size={14} className="unified-verified-icon" />}</a>;
+  };
   return <section className="public-follow-showcase" aria-labelledby="public-follow-title"><div className="public-follow-heading"><div><div className="eyebrow">COMMUNITY & TRUST</div><h2 id="public-follow-title">Stay connected with {name}</h2><p>Follow new listings, updates, and trusted activity from this Miniweb.</p></div><button type="button" className={`public-follow-button ${isFollowing ? 'following' : ''}`} onClick={handleFollow} disabled={busy || sessionUser?.id === targetId}><UserPlus size={15} /> {isFollowing ? 'Following' : 'Follow profile'}</button></div><div className="public-follow-stats"><div><strong>{summary.followers}</strong><span>People following</span></div><div><strong>{summary.following}</strong><span>Following</span></div><div><strong>{summary.followers + summary.following}</strong><span>Community links</span></div></div><div className="public-follow-columns"><div className="public-follow-list"><div className="public-follow-list-heading"><strong>People following this profile</strong><span>{summary.followers}</span></div>{followers.length ? followers.map(person) : <p className="public-follow-empty">No followers to show yet. Be the first to follow this profile.</p>}</div><div className="public-follow-list"><div className="public-follow-list-heading"><strong>{name} follows</strong><span>{summary.following}</span></div>{following.length ? following.map(person) : <p className="public-follow-empty">This profile has not followed anyone publicly yet.</p>}</div></div></section>;
 }
 
-function PublicProfileHeader({ profile, business, listings, share }) {
-  const isBusiness = Boolean(business);
+function PublicProfileHeader({ profile, business: suppliedBusiness, listings, share }) {
+  const business = suppliedBusiness || profile?.business || null;
+  const isBusiness = Boolean(business?.business_name);
   const name = business?.business_name || profile?.display_name || 'Bese26 seller';
   const handle = business?.business_handle || profile?.username;
   const location = [business?.city || profile?.city, business?.state || profile?.state].filter(Boolean).filter((value, index, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === index).join(', ');
@@ -692,8 +696,10 @@ function PublicStorefrontLayout({ title, share, children }) {
 }
 function PublicPersonalPage({ data }) {
   const { profile, listings } = data;
-  const share = async () => { const url = `https://www.bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: profile.display_name, text: profile.bio || profile.display_name, url }); else await navigator.clipboard?.writeText(url); };
-  return <PublicStorefrontLayout title={profile.display_name} share={share}><PublicProfileHeader profile={profile} listings={listings} share={share} /><PublicListingSection title={`Listings by ${profile.display_name}`} listings={listings} /></PublicStorefrontLayout>;
+  const identity = getPublicIdentity(profile);
+  const business = profile.business || null;
+  const share = async () => { const url = `https://www.bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: identity.name, text: business?.description || profile.bio || identity.name, url }); else await navigator.clipboard?.writeText(url); };
+  return <PublicStorefrontLayout title={identity.name} share={share}><PublicProfileHeader profile={profile} business={business} listings={listings} share={share} /><PublicListingSection title={`Listings from ${identity.name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 const SEO_SITE_URL = SITE_URL;
 const SEO_DEFAULT_IMAGE = `${SEO_SITE_URL}/images/bese26-official-logo.png`;
@@ -762,7 +768,7 @@ function PublicBusinessPage({ handle }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => { let mounted = true; fetchPublicBusiness(handle).then((data) => data || fetchPublicProfile(handle)).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load this public profile.' })); return () => { mounted = false; }; }, [handle]);
 const seoData = state.data;
-  const seoBusiness = seoData?.business;
+  const seoBusiness = seoData?.business || seoData?.profile?.business;
   const seoProfile = seoData?.profile || seoData?.ownerProfile;
   const seoListings = seoData?.listings || [];
   const seoName = seoBusiness?.business_name || seoProfile?.display_name || handle;
