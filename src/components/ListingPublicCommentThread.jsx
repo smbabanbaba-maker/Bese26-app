@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
 import VerificationBadges from './VerificationBadges';
 
 const COMMENT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🙏', '🎉', '💯'];
+
+function threadContainsComment(threads, targetId) {
+  return (threads || []).some(({ comment: child, replies: childReplies = [] }) =>
+    child?.id === targetId || threadContainsComment(childReplies, targetId));
+}
 
 function commentName(comment) {
   return comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member';
@@ -24,6 +29,7 @@ export default function ListingPublicCommentThread({
   commentSocials = {},
   user,
   depth = 0,
+  focusCommentId = null,
   onToggleLike,
   onSelectReaction,
   onReply,
@@ -38,6 +44,8 @@ export default function ListingPublicCommentThread({
   const [selectedReaction, setSelectedReaction] = useState('');
   const [visibleReplyCount, setVisibleReplyCount] = useState(1);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const articleRef = useRef(null);
+  const isNotificationTarget = Boolean(focusCommentId && comment.id === focusCommentId);
   const name = commentName(comment);
   const avatarPath = comment.business?.logo_path || comment.user?.avatar_path;
   const avatarUrl = comment.business
@@ -51,6 +59,20 @@ export default function ListingPublicCommentThread({
   useEffect(() => {
     if (!social.liked) setSelectedReaction('');
   }, [social.liked, comment.id]);
+
+  useEffect(() => {
+    if (focusCommentId && threadContainsComment(replies, focusCommentId)) setVisibleReplyCount(replies.length);
+  }, [focusCommentId, replies]);
+
+  useEffect(() => {
+    if (!isNotificationTarget || !articleRef.current) return undefined;
+    const element = articleRef.current;
+    const frame = window.requestAnimationFrame(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [isNotificationTarget]);
 
   const beginReply = () => {
     if (!user) {
@@ -103,7 +125,7 @@ export default function ListingPublicCommentThread({
   };
 
   return (
-    <article className={`listing-public-comment${depth ? ' listing-public-comment-reply' : ''}`}>
+    <article ref={articleRef} id={`listing-comment-${comment.id}`} tabIndex={isNotificationTarget ? -1 : undefined} className={`listing-public-comment${depth ? ' listing-public-comment-reply' : ''}${isNotificationTarget ? ' is-notification-target' : ''}`}>
       <div className={`listing-public-comment-avatar ${usesBusinessLogo && avatarUrl ? 'is-business-logo' : ''}`}>
         {avatarUrl && !avatarFailed
           ? <img src={avatarUrl} alt="" loading="lazy" onLoad={usesBusinessLogo && avatarUrl ? handleBusinessLogoLoad : undefined} onError={() => setAvatarFailed(true)} />
@@ -135,7 +157,7 @@ export default function ListingPublicCommentThread({
           <button type="submit" disabled={replyBusy || !draft.trim()}>{replyBusy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
         {replies.length > 0 && <div className="listing-public-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.comment.id} comment={reply.comment} replies={reply.replies} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
+          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.comment.id} comment={reply.comment} replies={reply.replies} commentSocials={commentSocials} user={user} depth={depth + 1} focusCommentId={focusCommentId} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
           {replies.length > visibleReplyCount && <button type="button" className="listing-public-comment-more-replies" onClick={() => setVisibleReplyCount(replies.length)}>More replies <span>({replies.length - visibleReplyCount} more)</span><ChevronDown size={14} /></button>}
         </div>}
       </div>

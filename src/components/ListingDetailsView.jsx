@@ -319,6 +319,8 @@ export default function ListingDetailsView({
   onOpenListing,
   onCopyListing,
   savedIds = [],
+  focusSection = null,
+  focusCommentId = null,
 }) {
   const [activeImage, setActiveImage] = useState(0);
   const [failedImageUrls, setFailedImageUrls] = useState(() => new Set());
@@ -341,6 +343,7 @@ export default function ListingDetailsView({
   const [commentsBusy, setCommentsBusy] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsLoadFailed, setCommentsLoadFailed] = useState(false);
+  const [commentsResolved, setCommentsResolved] = useState(false);
   const [similar, setSimilar] = useState([]);
   const [sellerListings, setSellerListings] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -418,6 +421,21 @@ export default function ListingDetailsView({
     const buildThread = (comment) => ({ comment, replies: (replies.get(comment.id) || []).map(buildThread) });
     return roots.map(buildThread);
   }, [comments]);
+  useEffect(() => {
+    if (!focusCommentId || commentsLoading || !commentsResolved) return;
+    if (comments.some((comment) => comment.id === focusCommentId)) {
+      setCommentsVisibleCount(listingCommentThreads.length);
+      return;
+    }
+    document.getElementById('listing-public-discussion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [focusCommentId, commentsLoading, commentsResolved, commentsLoadFailed, comments, listingCommentThreads.length]);
+  useEffect(() => {
+    if (!focusSection || (focusSection === 'discussion' && focusCommentId)) return undefined;
+    const targetId = focusSection === 'contact' ? 'listing-contact-actions' : focusSection === 'discussion' ? 'listing-public-discussion' : null;
+    if (!targetId) return undefined;
+    const frame = window.requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [focusSection, focusCommentId, listing?.id]);
   const canReview = Boolean(user && !owner && ['sold', 'archived'].includes(String(listingStatus || '').toLowerCase()));
   const titleParts = [listing?.category, listing?.subcategory].filter(Boolean).join(' · ');
   const sellerLocation = listing?.location || 'Nigeria';
@@ -453,6 +471,7 @@ export default function ListingDetailsView({
     setSimilarVisibleCount(12);
     setComments([]);
     setCommentsVisibleCount(4);
+    setCommentsResolved(false);
     setListingCommentSocials({});
     setReviews([]);
     setReviewSocials({});
@@ -491,7 +510,7 @@ export default function ListingDetailsView({
     }).catch(() => {
       if (current) setCommentsLoadFailed(true);
     }).finally(() => {
-      if (current) setCommentsLoading(false);
+      if (current) { setCommentsLoading(false); setCommentsResolved(true); }
     });
     fetchSimilarListings(listing).then((rows) => current && setSimilar(rows || [])).catch(() => {});
     fetchSellerListings(listing).then((rows) => current && setSellerListings(rows || [])).catch(() => {});
@@ -897,7 +916,7 @@ export default function ListingDetailsView({
             <div className="listing-new-trust"><ShieldCheck size={19} /><div><strong>{listing.verified ? 'Verified seller' : 'Seller profile'}</strong><span>{listing.verified ? 'Identity or business status reviewed by Bese26.' : 'Check the seller profile and keep arrangements clear.'}</span></div></div>
           </section>
 
-          <section className="listing-new-section listing-new-contact">
+          <section id="listing-contact-actions" className="listing-new-section listing-new-contact">
             <div className={`listing-new-action-grid ${contactActions.length === 1 ? 'has-one-action' : ''}`}>
               {!owner && user?.id && contactActions.map((action) => {
                 if (action === 'whatsapp') return <button key="whatsapp" type="button" className="listing-new-whatsapp" onClick={openWhatsApp} disabled={!whatsappEnabled} aria-busy={!whatsappEnabled || undefined}><MessageCircle size={17} /> WhatsApp</button>;
@@ -953,10 +972,10 @@ export default function ListingDetailsView({
                 : <div className="listing-new-no-reviews"><span>☆</span><p>No published feedback yet.</p><small className="listing-review-eligibility-note">{canReview ? 'Choose 1–5 stars and leave your experience; feedback appears after moderation.' : !owner ? 'Seller ratings open after a completed sale. Published feedback will show its stars, likes and comments here.' : 'Buyer ratings and feedback will appear here after publication.'}</small>{canReview && <button type="button" className="listing-new-link" onClick={() => setReviewOpen(true)}>Be the first to leave feedback</button>}</div>}
           </section>
 
-          <section className="listing-new-section listing-public-comments">
+          <section id="listing-public-discussion" className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => { setCommentError(''); setCommentText(event.target.value); }} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button>{commentError && <p className="listing-comment-error" role="alert">{commentError}</p>}</form>
-            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} onToggleLike={toggleListingCommentReaction} onSelectReaction={setListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} focusCommentId={focusCommentId} onToggleLike={toggleListingCommentReaction} onSelectReaction={setListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>
