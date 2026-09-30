@@ -1612,3 +1612,35 @@
     font-size: 8px !important;
   }
 }
+
+/* Final public Miniweb dashboard: replace the old social-profile storefront look. */
+.miniweb-dashboard-live { display:grid !important; grid-template-columns:88px minmax(0,1fr) !important; gap:18px !important; align-items:center !important; margin:0 0 18px !important; padding:24px !important; border:1px solid #111315 !important; border-radius:22px !important; background:#fff !important; color:#111315 !important; box-shadow:0 10px 26px rgba(17,19,21,.08) !important; }
+.miniweb-dashboard-live::after { display:none !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-top { display:contents !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-logo { grid-column:1 !important; grid-row:1 / span 2 !important; width:88px !important; height:88px !important; border:1px solid #111315 !important; border-radius:18px !important; background:#f7f7f5 !important; box-shadow:none !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-logo span { color:#111315 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-heading { grid-column:2 !important; grid-row:1 !important; padding:0 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-eyebrow { color:#d9212a !important; letter-spacing:.16em !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-heading h1 { color:#111315 !important; font-size:clamp(26px,4vw,42px) !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-verification { border-color:#e1e1de !important; background:#f7f7f5 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-verification strong { color:#111315 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-verification small { display:none !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-share { grid-column:2 !important; grid-row:1 !important; align-self:start !important; justify-self:end !important; color:#111315 !important; border:1px solid #111315 !important; background:#fff !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-meta { grid-column:2 !important; grid-row:2 !important; color:#60666d !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-description { grid-column:1 / -1 !important; color:#60666d !important; max-width:680px !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-bottom { grid-column:1 / -1 !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; align-items:center !important; gap:12px !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-stats { border:1px solid #e1e1de !important; background:#fff !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-stats span { border-color:#e1e1de !important; background:#fff !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-stats strong { color:#111315 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-stats small { color:#73787e !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-follow { color:#111315 !important; background:#fff !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-listings { color:#fff !important; background:#d9212a !important; }
+.public-business-about, .public-business-listings.storefront-listings-clean { border:1px solid #e1e1de !important; border-radius:20px !important; box-shadow:0 8px 22px rgba(17,19,21,.05) !important; }
+@media (max-width:700px) {
+  .miniweb-dashboard-live { grid-template-columns:60px minmax(0,1fr) !important; gap:12px !important; padding:16px !important; border-radius:17px !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-logo { width:60px !important; height:60px !important; border-radius:14px !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-heading h1 { font-size:clamp(21px,7vw,29px) !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-bottom { grid-template-columns:1fr !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-actions { width:100% !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-listings { width:100% !important; }
+}
