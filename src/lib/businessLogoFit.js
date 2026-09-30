@@ -17,16 +17,14 @@ export function handleBusinessLogoLoad(event) {
 
   const isTallPortrait = image.naturalWidth > 0 && image.naturalHeight / image.naturalWidth > 1.1;
   image.classList.toggle('is-tall-business-logo', isTallPortrait);
-  if (!isTallPortrait) return;
-
+  image.classList.add('is-business-logo-previewable');
   image.title = image.title || 'Open full logo';
-  if (image.closest('button, a, [role="button"], [role="link"]')) return;
-
   image.tabIndex = 0;
   image.setAttribute('role', 'button');
   if (!image.hasAttribute('aria-label')) {
     image.setAttribute('aria-label', `Open full ${image.alt || 'business logo'}`);
   }
+
   if (image.dataset.businessLogoPreviewKeyBound !== 'true') {
     image.dataset.businessLogoPreviewKeyBound = 'true';
     image.addEventListener('keydown', (keyEvent) => {

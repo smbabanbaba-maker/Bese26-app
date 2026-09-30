@@ -2,27 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-const BUSINESS_LOGO_ANCESTORS = [
-  '.is-business-logo',
-  '.public-business-logo',
-  '.business-directory-logo',
-  '.business-directory-card-head',
-  '.business-logo-upload',
-  '.business-live-preview-logo',
-  '.miniweb-hero-v2-logo',
-].join(',');
-
-function findTallBusinessLogo(target) {
-  const image = target?.closest?.('img.is-tall-business-logo');
-  if (!image) return null;
-
-  const isBusinessLogo = image.classList.contains('is-business-logo')
-    || image.classList.contains('business-logo-preview-image')
-    || image.classList.contains('profile-avatar-image')
-    || image.classList.contains('business-directory-card-logo')
-    || Boolean(image.closest(BUSINESS_LOGO_ANCESTORS));
-
-  return isBusinessLogo ? image : null;
+function findBusinessLogoPreviewTarget(target) {
+  return target?.closest?.('img.is-business-logo-previewable') || null;
 }
 
 function getPreviewSource(source) {
@@ -53,12 +34,12 @@ export default function BusinessLogoPreview() {
     const openPreview = (image) => {
       const source = image.currentSrc || image.src;
       if (!source) return;
-      openerRef.current = image.closest('button, a, [role="button"], [role="link"]') || image;
+      openerRef.current = image;
       setPreview({ source: getPreviewSource(source), alt: getLogoLabel(image) });
     };
 
     const handleClick = (event) => {
-      const image = findTallBusinessLogo(event.target);
+      const image = findBusinessLogoPreviewTarget(event.target);
       if (!image) return;
       event.preventDefault();
       event.stopPropagation();

@@ -481,3 +481,54 @@ img.is-tall-business-logo[role="button"]:focus-visible {
     max-height: calc(88dvh - 20px);
   }
 }
+
+
+/* All business logos (square, wide or tall) open their full image on tap/click. */
+img.is-business-logo-previewable {
+  cursor: zoom-in !important;
+}
+img.is-business-logo-previewable:focus-visible {
+  outline: 2px solid #c9343d !important;
+  outline-offset: 2px;
+}
+.listing-seller-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.listing-new-seller-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.listing-new-review-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.message-identity-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.listing-public-comment-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.listing-review-comment-avatar.is-business-logo:has(> img.is-business-logo-previewable),
+.notification-feed-media.is-business-logo:has(> img.is-business-logo-previewable),
+.miniweb-hero-v2-logo.has-business-logo:has(> img.is-business-logo-previewable),
+.public-business-logo:has(> img.is-business-logo-previewable),
+.business-directory-logo:has(> img.is-business-logo-previewable),
+.business-live-preview-logo:has(> img.is-business-logo-previewable) {
+  position: relative;
+}
+.listing-seller-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.listing-new-seller-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.listing-new-review-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.message-identity-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.listing-public-comment-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.listing-review-comment-avatar.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.notification-feed-media.is-business-logo:has(> img.is-business-logo-previewable)::after,
+.miniweb-hero-v2-logo.has-business-logo:has(> img.is-business-logo-previewable)::after,
+.public-business-logo:has(> img.is-business-logo-previewable)::after,
+.business-directory-logo:has(> img.is-business-logo-previewable)::after,
+.business-live-preview-logo:has(> img.is-business-logo-previewable)::after {
+  content: '\2197';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  background: #c9343d;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+  font: 800 9px/1 system-ui, sans-serif;
+  pointer-events: none;
+}
