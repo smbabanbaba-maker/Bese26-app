@@ -2,8 +2,8 @@ import { BadgeCheck } from 'lucide-react';
 import { useState } from 'react';
 
 const badgeCopy = {
-  id: { label: 'ID Verified', title: 'Identity Verified', description: "Bese26 has verified this seller's identity." },
-  cac: { label: 'CAC Verified', title: 'Business Verified', description: "This seller's business registration has been verified by Bese26." },
+  id: { label: 'ID VERIFIED', title: 'Identity Verified', description: "Bese26 has verified this seller's identity." },
+  cac: { label: 'CAC VERIFIED', title: 'Business Verified', description: "This seller's business registration has been verified by Bese26." },
 };
 
 export default function VerificationBadges({ idVerified = false, cacVerified = false, compact = false }) {

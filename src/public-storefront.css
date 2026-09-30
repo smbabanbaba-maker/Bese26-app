@@ -1570,3 +1570,45 @@
   fill: #0A6B4A !important;
   stroke: #FFFFFF !important;
 }
+
+
+/* Final public storefront verification treatment: highly visible and separated. */
+.public-business-badges .verification-badge-group,
+.miniweb-hero-v2-verification .verification-badge-group {
+  gap: 8px !important;
+}
+.public-business-badges .verification-badge,
+.miniweb-hero-v2-verification .verification-badge {
+  min-height: 25px !important;
+  padding: 5px 9px !important;
+  border-radius: 999px !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  letter-spacing: .02em !important;
+  box-shadow: 0 4px 12px rgba(16,24,40,.16) !important;
+}
+.public-business-badges .verification-badge-id,
+.miniweb-hero-v2-verification .verification-badge-id {
+  color: #fff !important;
+  background: #1268d8 !important;
+  border-color: #8fc3ff !important;
+}
+.public-business-badges .verification-badge-cac,
+.miniweb-hero-v2-verification .verification-badge-cac {
+  color: #fff !important;
+  background: #11864e !important;
+  border-color: #8ae0b2 !important;
+}
+@media (max-width: 600px) {
+  .public-business-badges .verification-badge-group,
+  .miniweb-hero-v2-verification .verification-badge-group {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .public-business-badges .verification-badge,
+  .miniweb-hero-v2-verification .verification-badge {
+    min-height: 23px !important;
+    padding: 4px 7px !important;
+    font-size: 8px !important;
+  }
+}
