@@ -8527,3 +8527,70 @@ img.avatar.is-business-logo {
   .home-featured-grid .listing-seller-copy .verification-badge { min-height: 18px !important; padding: 2px 4px !important; font-size: 6.6px !important; gap: 2px !important; }
   .home-featured-grid .listing-seller-copy .verification-badge svg { width: 9px; height: 9px; }
 }
+
+/* Miniweb loading: branded center-stage animation while a public shop opens. */
+.miniweb-loading-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 32px 20px;
+  color: #182230;
+  background: radial-gradient(circle at 50% 35%, #fff8f7 0%, #fff 44%, #f6f8fb 100%);
+  text-align: center;
+}
+.miniweb-loading-orbit {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.98) 0 39%, rgba(255,244,242,.76) 40% 61%, transparent 62%);
+  animation: miniwebLoaderFloat 3.1s ease-in-out infinite;
+}
+.miniweb-loading-orbit img {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  border-radius: 19px;
+  box-shadow: 0 14px 28px rgba(212,56,64,.24), 0 0 0 8px rgba(255,255,255,.78);
+  animation: miniwebLoaderLogo 1.8s ease-in-out infinite;
+}
+.miniweb-loading-ring {
+  position: absolute;
+  inset: 9px;
+  border: 2px solid transparent;
+  border-top-color: #e53935;
+  border-right-color: #ff9a82;
+  border-radius: 50%;
+  animation: miniwebLoaderSpin 1.25s linear infinite;
+}
+.miniweb-loading-ring.ring-two {
+  inset: 22px;
+  border-top-color: #1769d2;
+  border-left-color: #81b7ff;
+  animation-duration: 1.75s;
+  animation-direction: reverse;
+}
+.miniweb-loading-spark { position: absolute; z-index: 3; width: 8px; height: 8px; border-radius: 50%; background: #e53935; box-shadow: 0 0 0 5px rgba(229,57,53,.12); animation: miniwebLoaderSpark 1.8s ease-in-out infinite; }
+.miniweb-loading-spark.spark-one { top: 8px; right: 35px; }
+.miniweb-loading-spark.spark-two { bottom: 19px; left: 18px; width: 6px; height: 6px; background: #1769d2; box-shadow: 0 0 0 4px rgba(23,105,210,.12); animation-delay: -.8s; }
+.miniweb-loading-brand { color: #202938; font: 900 22px/1 Manrope, sans-serif; letter-spacing: -.06em; }
+.miniweb-loading-brand span { color: #d9363e; }
+.miniweb-loading-screen strong { color: #202938; font: 800 14px/1.2 Manrope, sans-serif; }
+.miniweb-loading-screen p { color: #667085; font-size: 11px; }
+.miniweb-loading-dots { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+.miniweb-loading-dots i { width: 6px; height: 6px; border-radius: 50%; background: #d9363e; animation: miniwebLoaderDots 1.15s ease-in-out infinite; }
+.miniweb-loading-dots i:nth-child(2) { animation-delay: .15s; background: #1769d2; }
+.miniweb-loading-dots i:nth-child(3) { animation-delay: .3s; background: #2e9b70; }
+@keyframes miniwebLoaderSpin { to { transform: rotate(360deg); } }
+@keyframes miniwebLoaderFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes miniwebLoaderLogo { 0%,100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.07) rotate(2deg); } }
+@keyframes miniwebLoaderSpark { 0%,100% { transform: scale(.75); opacity: .42; } 50% { transform: scale(1.25); opacity: 1; } }
+@keyframes miniwebLoaderDots { 0%,100% { transform: translateY(0); opacity: .4; } 50% { transform: translateY(-4px); opacity: 1; } }
+@media (max-width: 480px) { .miniweb-loading-orbit { width: 132px; height: 132px; } .miniweb-loading-orbit img { width: 58px; height: 58px; } .miniweb-loading-brand { font-size: 20px; } }
+@media (prefers-reduced-motion: reduce) { .miniweb-loading-orbit, .miniweb-loading-orbit img, .miniweb-loading-ring, .miniweb-loading-spark, .miniweb-loading-dots i { animation: none; } }

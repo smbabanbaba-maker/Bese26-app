@@ -124,6 +124,22 @@ function SplashScreen({ message = 'Preparing your marketplace…', error = false
   </div>;
 }
 
+function MiniwebLoadingScreen() {
+  return <div className="miniweb-loading-screen" role="status" aria-label="Loading Bese26 shop">
+    <div className="miniweb-loading-orbit" aria-hidden="true">
+      <span className="miniweb-loading-ring ring-one" />
+      <span className="miniweb-loading-ring ring-two" />
+      <span className="miniweb-loading-spark spark-one" />
+      <span className="miniweb-loading-spark spark-two" />
+      <img src="/images/bese26-logo-icon.webp" alt="" />
+    </div>
+    <div className="miniweb-loading-brand">Bese26<span>.shop</span></div>
+    <strong>Opening this shop</strong>
+    <p>Getting the store and latest listings ready…</p>
+    <span className="miniweb-loading-dots" aria-hidden="true"><i /><i /><i /></span>
+  </div>;
+}
+
 class AppErrorBoundary extends Component {
   state = { hasError: false, error: null };
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -832,7 +848,7 @@ const seoData = state.data;
   const seoCanonical = `${SEO_SITE_URL}/@${String(seoBusiness?.business_handle || seoProfile?.username || handle).toLowerCase()}`;
   const seoBusinessImage = getBusinessLogoDisplayUrl(seoBusiness, getAvatarUrl(seoBusiness?.logo_path)) || SEO_DEFAULT_IMAGE;
   usePublicSeo({ title: `${seoName} | Bese26 Miniweb`, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage, schema: seoData ? { '@context': 'https://schema.org', '@type': seoBusiness ? 'Store' : 'Person', name: seoName, url: seoCanonical, description: seoDescription, image: seoBusinessImage, address: { '@type': 'PostalAddress', addressLocality: seoBusiness?.city || seoProfile?.city || '', addressRegion: seoBusiness?.state || seoProfile?.state || '', addressCountry: 'NG' }, hasOfferCatalog: { '@type': 'OfferCatalog', name: `Listings from ${seoName}`, itemListElement: seoListings.slice(0, 60).map((item, index) => ({ '@type': 'Offer', position: index + 1, url: `${SEO_SITE_URL}/listing/${encodeURIComponent(item.id)}`, itemOffered: { '@type': 'Product', name: seoText(item.title), image: item.image || SEO_DEFAULT_IMAGE, offers: { '@type': 'Offer', priceCurrency: 'NGN', availability: 'https://schema.org/InStock' } } })) } } : null });
-  if (state.loading) return <SplashScreen />;
+  if (state.loading) return <MiniwebLoadingScreen />;
   if (state.error || !state.data) return <div className="public-business-shell"><section className="public-business-not-found"><div className="brand-mark">B</div><div className="eyebrow">BESE26 SHOP</div><h1>Shop not found</h1><p>This public shop does not exist, is inactive, or has no public profile.</p><a className="primary-button" href="https://www.bese26.shop/">Back to Bese26 <ArrowRight size={16} /></a></section></div>;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
