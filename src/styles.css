@@ -8494,3 +8494,36 @@ img.avatar.is-business-logo {
   .home-featured-grid .listing-seller-copy .verification-badge { font-size: 6.5px; }
 }
 @media (prefers-reduced-motion: reduce) { .home-featured-grid .product-card:hover { transform: none; } .home-featured-grid .product-image { transition: none; } }
+
+/* Final mobile verification treatment: ID blue and CAC green stay together on one line. */
+.home-featured-grid .listing-seller-copy .verification-badge-group {
+  flex-wrap: nowrap !important;
+  gap: 3px !important;
+  white-space: nowrap;
+  overflow: visible;
+}
+.home-featured-grid .listing-seller-copy .verification-badge-wrap { flex: 0 0 auto; }
+.home-featured-grid .listing-seller-copy .verification-badge {
+  min-height: 20px !important;
+  padding: 3px 6px !important;
+  font-size: 7.5px !important;
+  font-weight: 900 !important;
+}
+.home-featured-grid .listing-seller-copy .verification-badge-id {
+  color: #0757c9 !important;
+  background: #dbeafe !important;
+  border-color: #73a9ff !important;
+  box-shadow: 0 3px 9px rgba(37,99,235,.2) !important;
+}
+.home-featured-grid .listing-seller-copy .verification-badge-cac {
+  color: #08743f !important;
+  background: #dcfce7 !important;
+  border-color: #6ed99d !important;
+  box-shadow: 0 3px 9px rgba(22,163,74,.18) !important;
+}
+@media (max-width: 700px) {
+  .home-featured-grid .listing-seller-copy { overflow: visible; }
+  .home-featured-grid .listing-seller-copy .verification-badge-group { gap: 2px !important; }
+  .home-featured-grid .listing-seller-copy .verification-badge { min-height: 18px !important; padding: 2px 4px !important; font-size: 6.6px !important; gap: 2px !important; }
+  .home-featured-grid .listing-seller-copy .verification-badge svg { width: 9px; height: 9px; }
+}
