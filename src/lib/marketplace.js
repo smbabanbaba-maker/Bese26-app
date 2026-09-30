@@ -768,10 +768,15 @@ export async function submitListingComment({ listingId, userId, body, parentComm
   const id = globalThis.crypto?.randomUUID?.();
   const createdAt = new Date().toISOString();
   const comment = { id, listing_id: listingId, user_id: userId, parent_comment_id: parentCommentId || null, body: text, status: 'published', created_at: createdAt };
-  const { data, error } = await supabase.from('listing_comments').insert(comment).select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').single();
+  const { error } = await supabase.from('listing_comments').insert(comment);
   if (error) throw error;
-  const [hydrated] = await attachBusinessIdentities([data || comment]);
-  return hydrated || comment;
+  try {
+    const { data: hydratedRow } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('id', id).maybeSingle();
+    const [hydrated] = await attachBusinessIdentities([hydratedRow || comment]);
+    return hydrated || comment;
+  } catch {
+    return comment;
+  }
 }
 
 export async function fetchListingCommentSocialStats(commentIds = [], userId = null) {
