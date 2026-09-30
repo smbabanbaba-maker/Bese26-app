@@ -80,5 +80,9 @@ export async function getListingMediaUrls(paths = []) {
 }
 
 export function getAvatarUrl(path) {
-  return getStoragePublicUrl('avatars', path, { transform: { width: 256, quality: 75, format: 'webp' } });
+  // Personal avatars render in square/circular frames throughout the app. Use
+  // a true square cover transform so portrait photos are cropped consistently
+  // instead of returning a tall image that can appear undersized or distorted.
+  // Business logos are separately normalized to `contain` by their display helper.
+  return getStoragePublicUrl('avatars', path, { transform: { width: 256, height: 256, resize: 'cover', quality: 75, format: 'webp' } });
 }
