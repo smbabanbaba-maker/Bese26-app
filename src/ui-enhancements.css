@@ -331,9 +331,9 @@ img.profile-avatar-image.is-business-logo.is-tall-business-logo,
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border: 1px solid #d43840 !important;
-  color: #d43840 !important;
-  background: #fff !important;
+  border: 1px solid #0A6B4A !important;
+  color: #fff !important;
+  background: #0A6B4A !important;
 }
 .listing-new-action-grid .listing-new-solid-action {
   display: inline-flex;
@@ -357,7 +357,7 @@ img.profile-avatar-image.is-business-logo.is-tall-business-logo,
 }
 .listing-new-action-grid button:disabled { cursor: progress; opacity: .65; }
 .listing-new-action-grid button:focus-visible, .listing-new-start-chat:focus-visible { outline: 3px solid rgba(212, 56, 64, .25); outline-offset: 2px; }
-.listing-new-action-grid .listing-new-whatsapp:hover { background: #fff5f5 !important; }
+.listing-new-action-grid .listing-new-whatsapp:hover { border-color: #075E54 !important; color: #fff !important; background: #075E54 !important; }
 .listing-new-action-grid .listing-new-solid-action:hover, .listing-new-start-chat:hover { background: #bd3038 !important; }
 .listing-new-action-grid .listing-new-message-action:hover { border-color: #d43840; background: #30343b; }
 .listing-new-quick-actions button { border-color: #d9dce1; color: #24272c; background: #fff; }
@@ -380,9 +380,9 @@ img.profile-avatar-image.is-business-logo.is-tall-business-logo,
   .listing-new-price-type { color: #30343b; background: #f7f7f8; border-color: #e1e4e8; }
   .listing-new-contact { margin-top: 0 !important; padding: 6px 12px 12px; border-top: 0 !important; border-radius: 0 0 13px 13px !important; }
   .listing-new-contact .listing-new-action-grid .listing-new-whatsapp {
-    color: #d43840 !important;
-    border-color: #d43840 !important;
-    background: #fff !important;
+    color: #fff !important;
+    border-color: #0A6B4A !important;
+    background: #0A6B4A !important;
   }
   .listing-new-contact .listing-new-action-grid .listing-new-solid-action {
     background: #d43840 !important;
@@ -531,4 +531,24 @@ img.is-business-logo-previewable:focus-visible {
   box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
   font: 800 9px/1 system-ui, sans-serif;
   pointer-events: none;
+}
+
+/* Keep WhatsApp actions clearly green across listing and business-share surfaces. */
+.business-owner-actions > button:nth-child(4),
+.publish-success-actions > button:nth-child(4) {
+  border: 1px solid #0A6B4A !important;
+  color: #fff !important;
+  background: #0A6B4A !important;
+}
+.business-owner-actions > button:nth-child(4):hover,
+.publish-success-actions > button:nth-child(4):hover {
+  border-color: #075E54 !important;
+  color: #fff !important;
+  background: #075E54 !important;
+}
+.business-owner-actions > button:nth-child(4):focus-visible,
+.publish-success-actions > button:nth-child(4):focus-visible,
+.listing-new-action-grid .listing-new-whatsapp:focus-visible {
+  outline: 3px solid rgba(37, 211, 102, .4) !important;
+  outline-offset: 2px;
 }
