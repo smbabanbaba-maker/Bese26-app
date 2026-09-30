@@ -8729,3 +8729,57 @@ img.avatar.is-business-logo {
   .profile-page .profile-menu-card { min-height:64px !important; padding:10px 11px !important; }
   .profile-page .profile-menu-card-icon { width:32px !important; height:32px !important; }
 }
+
+/* Premium Profile dashboard v2: clearer hierarchy, grouped cards, better scanability. */
+.profile-page { max-width:1080px !important; margin-inline:auto !important; gap:20px !important; padding-bottom:32px !important; }
+.profile-page .profile-cover { position:relative !important; overflow:hidden !important; min-height:250px !important; padding:28px !important; border:0 !important; border-radius:24px !important; background:linear-gradient(135deg,#101b3f 0%,#263f83 52%,#6b315f 100%) !important; box-shadow:0 18px 40px rgba(28,42,91,.18) !important; }
+.profile-page .profile-cover::after { content:""; position:absolute; width:240px; height:240px; right:-70px; top:-90px; border:1px solid rgba(255,255,255,.18); border-radius:50%; box-shadow:0 0 0 25px rgba(255,255,255,.035),0 0 0 50px rgba(255,255,255,.025); pointer-events:none; }
+.profile-page .profile-heading { position:relative !important; z-index:1 !important; }
+.profile-page .profile-identity h1, .profile-page .profile-identity .product-meta, .profile-page .profile-identity .seller-stats { color:#fff !important; }
+.profile-page .profile-account-type { color:#b9d8ff !important; background:rgba(255,255,255,.11) !important; border:1px solid rgba(255,255,255,.18) !important; border-radius:999px !important; padding:5px 9px !important; }
+.profile-page .profile-heading .outline-button { border:1px solid rgba(255,255,255,.45) !important; background:rgba(255,255,255,.12) !important; color:#fff !important; backdrop-filter:blur(8px); }
+.profile-page .profile-completion { display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; gap:12px 20px !important; align-items:center !important; margin-top:-34px !important; position:relative !important; z-index:2 !important; padding:18px 20px !important; border:1px solid #e5e7ef !important; border-radius:18px !important; background:#fff !important; box-shadow:0 12px 28px rgba(27,43,85,.10) !important; }
+.profile-page .profile-completion .completion-track { grid-column:1 / -1 !important; height:9px !important; border-radius:999px !important; background:#edf0f7 !important; }
+.profile-page .profile-completion .completion-track span { border-radius:999px !important; background:linear-gradient(90deg,#3b82f6,#7c3aed) !important; }
+.profile-page .profile-completion .text-action { color:#4f46e5 !important; font-weight:800 !important; }
+.profile-page .profile-stats { display:grid !important; grid-template-columns:repeat(5,minmax(0,1fr)) !important; gap:10px !important; padding:0 !important; background:transparent !important; border:0 !important; box-shadow:none !important; }
+.profile-page .profile-stats button { min-height:84px !important; padding:14px 10px !important; border:1px solid #e7eaf1 !important; border-radius:16px !important; background:#fff !important; box-shadow:0 5px 14px rgba(27,43,85,.045) !important; transition:transform .18s ease,box-shadow .18s ease !important; }
+.profile-page .profile-stats button:hover { transform:translateY(-3px) !important; box-shadow:0 12px 24px rgba(27,43,85,.10) !important; }
+.profile-page .profile-stats button:nth-child(1) strong { color:#2563eb !important; }
+.profile-page .profile-stats button:nth-child(2) strong { color:#dc2626 !important; }
+.profile-page .profile-stats button:nth-child(3) strong { color:#16a34a !important; }
+.profile-page .profile-stats button:nth-child(4) strong { color:#7c3aed !important; }
+.profile-page .profile-stats button:nth-child(5) strong { color:#b7791f !important; }
+.profile-page .profile-stats button span { color:#697386 !important; font-size:10px !important; }
+.profile-page .profile-quick-actions { padding:20px !important; border:1px solid #e5e7ef !important; border-radius:20px !important; background:linear-gradient(135deg,#f7f9ff 0%,#fff 70%) !important; box-shadow:0 8px 22px rgba(27,43,85,.055) !important; }
+.profile-page .profile-quick-heading { padding-bottom:12px !important; border-bottom:1px solid #e8ebf2 !important; }
+.profile-page .profile-quick-heading .eyebrow { color:#4f46e5 !important; }
+.profile-page .profile-quick-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:10px !important; }
+.profile-page .profile-quick-grid > button { min-height:72px !important; padding:13px !important; border:1px solid #e5e7ef !important; border-radius:14px !important; background:#fff !important; box-shadow:0 4px 12px rgba(27,43,85,.035) !important; }
+.profile-page .profile-menu-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; padding:14px !important; border:1px solid #e7eaf1 !important; border-radius:18px !important; background:#fafbfe !important; }
+.profile-page .profile-section-label { margin-bottom:10px !important; padding:0 4px 0 12px !important; border-left:4px solid #4f46e5 !important; }
+.profile-page .profile-marketplace-section .profile-section-label { border-left-color:#2563eb !important; }
+.profile-page .profile-seller-section .profile-section-label { border-left-color:#7c3aed !important; }
+.profile-page .profile-payments-section .profile-section-label { border-left-color:#b7791f !important; }
+.profile-page .profile-safety-section .profile-section-label { border-left-color:#15803d !important; }
+.profile-page .profile-support-section .profile-section-label { border-left-color:#0891b2 !important; }
+.profile-page .profile-menu-card { min-height:78px !important; padding:13px 14px !important; border:1px solid #e4e8f0 !important; border-left-width:4px !important; border-radius:14px !important; background:#fff !important; box-shadow:0 3px 10px rgba(27,43,85,.03) !important; }
+.profile-page .profile-menu-card strong { font-size:12px !important; letter-spacing:-.01em !important; }
+.profile-page .profile-menu-card small { line-height:1.35 !important; color:#6b7280 !important; }
+.profile-page .profile-account-actions { display:flex !important; justify-content:flex-end !important; gap:10px !important; padding:16px !important; border:1px solid #fee2e2 !important; border-radius:16px !important; background:#fff8f8 !important; }
+.profile-page .profile-account-actions button { min-height:42px !important; border-radius:11px !important; }
+.profile-page .profile-account-actions button:first-child { color:#b4232f !important; background:#fff !important; border:1px solid #f2b8bd !important; }
+.profile-page .profile-account-actions button:last-child { color:#fff !important; background:#b4232f !important; border-color:#b4232f !important; }
+@media (max-width:700px) {
+  .profile-page { gap:14px !important; padding:0 12px 24px !important; }
+  .profile-page .profile-cover { min-height:230px !important; padding:19px !important; border-radius:19px !important; }
+  .profile-page .profile-completion { grid-template-columns:1fr !important; margin-top:-24px !important; padding:15px !important; }
+  .profile-page .profile-completion .text-action { justify-self:start !important; }
+  .profile-page .profile-stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .profile-page .profile-stats button:last-child { grid-column:1 / -1 !important; }
+  .profile-page .profile-quick-grid, .profile-page .profile-menu-grid { grid-template-columns:1fr !important; }
+  .profile-page .profile-menu-grid { padding:9px !important; border-radius:14px !important; }
+  .profile-page .profile-quick-actions { padding:14px !important; border-radius:16px !important; }
+  .profile-page .profile-account-actions { flex-direction:column !important; }
+  .profile-page .profile-account-actions button { width:100% !important; }
+}
