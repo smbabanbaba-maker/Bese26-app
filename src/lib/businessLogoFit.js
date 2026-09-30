@@ -34,7 +34,10 @@ export function isOfficialBese26Business(business) {
 
 export function getBusinessLogoDisplayUrl(business, logoUrl = '') {
   if (isOfficialBese26Business(business)) return OFFICIAL_BESE26_LOGO;
-  if (business?.logo_path || business?.logo_url) return getContainedBusinessLogoUrl(logoUrl);
+  const businessLogoUrl = business?.logo_path
+    ? logoUrl || business?.logo_url || ''
+    : business?.logo_url || logoUrl;
+  if (business?.logo_path || business?.logo_url) return getContainedBusinessLogoUrl(businessLogoUrl);
   return logoUrl || '';
 }
 
