@@ -8783,3 +8783,18 @@ img.avatar.is-business-logo {
   .profile-page .profile-account-actions { flex-direction:column !important; }
   .profile-page .profile-account-actions button { width:100% !important; }
 }
+
+/* Home marketplace refinement: a deliberate featured-listings hierarchy. */
+.home-featured-section { display:grid; gap:12px; }
+.home-featured-heading { display:flex; align-items:end; justify-content:space-between; gap:12px; padding:0 2px 2px; }
+.home-featured-heading .eyebrow { color:#c94b4b !important; font-weight:850; letter-spacing:.12em; }
+.home-featured-heading h2 { margin:4px 0 0; color:#182230 !important; font-size:clamp(21px,3vw,28px); letter-spacing:-.035em; }
+.home-featured-heading > span { color:#667085; font-size:10px; font-weight:750; white-space:nowrap; }
+.home-featured-section .home-view-all-button { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:42px; margin:2px auto 0; padding:0 18px; border:1px solid #e2a6a8; border-radius:999px; color:#a9363b; background:#fff7f7; font-size:11px; font-weight:850; }
+.home-featured-section .home-view-all-button:hover { color:#fff; background:#c94b4b; border-color:#c94b4b; transform:translateY(-1px); }
+@media (max-width:700px) {
+  .home-featured-heading { align-items:start; }
+  .home-featured-heading h2 { font-size:21px; }
+  .home-featured-heading > span { padding-top:7px; font-size:9px; }
+  .home-featured-section .home-view-all-button { width:100%; min-height:40px; }
+}
