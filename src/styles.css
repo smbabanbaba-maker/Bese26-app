@@ -7591,7 +7591,7 @@ img.profile-avatar-image {
 }
 
 
-/* Business logos are artwork, not portraits: keep the complete mark visible in every square frame. */
+/* Keep square/wide marks intact; portrait logos are cropped to fill their square frame. */
 .listing-seller-avatar.is-business-logo,
 .listing-new-seller-avatar.is-business-logo {
   display: grid;
@@ -7661,15 +7661,18 @@ img.business-logo-preview-image {
 .listing-seller-avatar.is-business-logo img.is-tall-business-logo,
 .listing-new-seller-avatar.is-business-logo img.is-tall-business-logo,
 .miniweb-hero-v2-logo.has-business-logo img.is-tall-business-logo,
+.listing-review-comment-avatar.is-business-logo img.is-tall-business-logo,
+.listing-new-review-avatar.is-business-logo img.is-tall-business-logo,
 .public-business-logo img.is-tall-business-logo,
 .business-directory-logo img.is-tall-business-logo,
 .business-directory-page .business-directory-card-head > img.is-tall-business-logo,
 .business-directory-page img.business-directory-card-logo.is-tall-business-logo,
 .business-logo-upload img.is-tall-business-logo,
 .business-live-preview-logo img.is-tall-business-logo,
-img.business-logo-preview-image.is-tall-business-logo {
+img.business-logo-preview-image.is-tall-business-logo,
+img.avatar.is-business-logo.is-tall-business-logo {
   object-fit: cover !important;
-  object-position: center 40% !important;
+  object-position: center !important;
   padding: 0 !important;
 }
 
@@ -7775,11 +7778,15 @@ img.business-logo-preview-image.is-tall-business-logo {
 /* Apply one business-logo rule in comments, inbox, chat and notifications too. */
 .message-identity-avatar.is-business-logo,
 .listing-public-comment-avatar.is-business-logo,
+.listing-review-comment-avatar.is-business-logo,
+.listing-new-review-avatar.is-business-logo,
 .notification-feed-media.is-business-logo {
   background: #fff;
 }
 .message-identity-avatar.is-business-logo img,
 .listing-public-comment-avatar.is-business-logo img,
+.listing-review-comment-avatar.is-business-logo img,
+.listing-new-review-avatar.is-business-logo img,
 .notification-feed-media.is-business-logo img {
   box-sizing: border-box;
   object-fit: contain !important;
@@ -7789,10 +7796,21 @@ img.business-logo-preview-image.is-tall-business-logo {
 }
 .message-identity-avatar.is-business-logo img.is-tall-business-logo,
 .listing-public-comment-avatar.is-business-logo img.is-tall-business-logo,
+.listing-review-comment-avatar.is-business-logo img.is-tall-business-logo,
+.listing-new-review-avatar.is-business-logo img.is-tall-business-logo,
 .notification-feed-media.is-business-logo img.is-tall-business-logo {
   object-fit: cover !important;
-  object-position: center 40% !important;
+  object-position: center !important;
   padding: 0 !important;
+}
+
+/* Profile avatars are standalone images; preserve logo marks by default and crop only portrait logos. */
+img.avatar.is-business-logo {
+  box-sizing: border-box;
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 2px;
+  background: #fff;
 }
 
 /* Reference-inspired seller feedback cards: visual-only layer; data and actions stay unchanged. */

@@ -14,6 +14,7 @@ export function getBusinessLogoDisplayUrl(business, logoUrl = '') {
 export function handleBusinessLogoLoad(event) {
   const image = event?.currentTarget;
   if (!image) return;
-  // Remove the old aspect-ratio-specific variant so every logo uses the same centered frame.
-  image.classList.remove('is-tall-business-logo');
+  // Keep normal/square marks fully visible; crop tall portrait marks to fill their square frame.
+  const isTallPortrait = image.naturalWidth > 0 && image.naturalHeight / image.naturalWidth > 1.1;
+  image.classList.toggle('is-tall-business-logo', isTallPortrait);
 }

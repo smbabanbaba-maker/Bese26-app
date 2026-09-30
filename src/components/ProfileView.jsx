@@ -114,7 +114,7 @@ function Avatar({ name, path, business = null, size = 'md', tone = 'navy' }) {
   const identity = getPublicIdentity({ display_name: name, avatar_path: path, business });
   useEffect(() => setFailed(false), [path, business?.logo_path]);
   return identity.image && !failed
-    ? <img className={`avatar avatar-${size} profile-avatar-image ${identity.isBusiness ? 'is-business-logo' : ''}`} src={identity.image} alt={`${identity.name || 'Profile'} profile`} onLoad={identity.isBusiness ? handleBusinessLogoLoad : undefined} onError={() => setFailed(true)} />
+    ? <img className={`avatar avatar-${size} profile-avatar-image ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`} src={identity.image} alt={`${identity.name || 'Profile'} profile`} onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} onError={() => setFailed(true)} />
     : <div className={`avatar avatar-${tone} avatar-${size}`} aria-label={`${identity.name || 'Profile'} initials`}>{initials(identity.name)}</div>;
 }
 

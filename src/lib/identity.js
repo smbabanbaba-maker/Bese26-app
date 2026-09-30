@@ -13,6 +13,7 @@ export function getPublicIdentity(profile, fallback = 'Bese26 member') {
     name: businessName || personalName,
     image: businessLogo || personalLogo,
     business,
+    hasBusinessLogo: Boolean(businessLogo),
     isBusiness: Boolean(businessName || businessLogo || isOfficialBese26Business(business)),
   };
 }

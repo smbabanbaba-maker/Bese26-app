@@ -116,7 +116,7 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
 
   return (
     <article className={`listing-review-comment${depth ? ' listing-review-comment-reply' : ''}`}>
-      <div className={`listing-review-comment-avatar ${commenterIdentity.isBusiness && avatar ? 'is-business-logo' : ''}`}>{avatar ? <img src={avatar} alt="" loading="lazy" onLoad={commenterIdentity.isBusiness ? handleBusinessLogoLoad : undefined} /> : commenter.slice(0, 1).toUpperCase()}</div>
+      <div className={`listing-review-comment-avatar ${commenterIdentity.hasBusinessLogo && avatar ? 'is-business-logo' : ''}`}>{avatar ? <img src={avatar} alt="" loading="lazy" onLoad={commenterIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : commenter.slice(0, 1).toUpperCase()}</div>
       <div className="listing-review-comment-content">
         <div className="listing-review-comment-meta"><strong>{commenter}</strong><VerificationBadges idVerified={Boolean(comment.id_verified || comment.user?.id_verified)} cacVerified={Boolean(comment.cac_verified || comment.user?.cac_verified)} compact /><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
         <p>{comment.body}</p>
@@ -267,8 +267,8 @@ function ReviewFeedbackCard({
   return (
     <article className="listing-new-review" aria-label={`Seller feedback by ${reviewer}`}>
       <div className="listing-new-review-top">
-          <div className={`listing-new-review-avatar ${reviewerIdentity.isBusiness && reviewerAvatar ? 'is-business-logo' : ''}`}>
-          {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" onLoad={reviewerIdentity.isBusiness ? handleBusinessLogoLoad : undefined} /> : reviewer.slice(0, 1).toUpperCase()}
+          <div className={`listing-new-review-avatar ${reviewerIdentity.hasBusinessLogo && reviewerAvatar ? 'is-business-logo' : ''}`}>
+          {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" onLoad={reviewerIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : reviewer.slice(0, 1).toUpperCase()}
         </div>
         <strong>{reviewer}</strong>
         <time dateTime={review.created_at || undefined}>{formatFeedbackDate(review.created_at)}</time>
