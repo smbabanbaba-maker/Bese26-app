@@ -42,7 +42,6 @@ import {
   fetchReviewComments,
   fetchReviewCommentSocialStats,
   fetchReviewSocialStats,
-  fetchSellerListings,
   fetchSellerReviews,
   fetchSimilarListings,
   getFollowState,
@@ -355,7 +354,6 @@ export default function ListingDetailsView({
   const [commentsLoadFailed, setCommentsLoadFailed] = useState(false);
   const [commentsResolved, setCommentsResolved] = useState(false);
   const [similar, setSimilar] = useState([]);
-  const [sellerListings, setSellerListings] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('scam');
@@ -504,7 +502,6 @@ export default function ListingDetailsView({
     setCommentsLoading(true);
     setCommentsLoadFailed(false);
     setFollowingSeller(false);
-    setSellerListings([]);
     setSimilar([]);
     setSimilarVisibleCount(12);
     setComments([]);
@@ -552,7 +549,6 @@ export default function ListingDetailsView({
       if (current) { setCommentsLoading(false); setCommentsResolved(true); }
     });
     fetchSimilarListings(listing).then((rows) => current && setSimilar(rows || [])).catch(() => {});
-    fetchSellerListings(listing).then((rows) => current && setSellerListings(rows || [])).catch(() => {});
     if (user?.id && !owner && (allowsPhone || allowsWhatsApp)) {
       fetchListingContact(listing.id).then((details) => {
         if (current) setContact(details || { phone: '', whatsapp: '' });
@@ -1028,7 +1024,6 @@ export default function ListingDetailsView({
 
           {owner && <section className="listing-owner-controls"><div><strong>Manage your listing</strong><span>{Number(raw.views_count || 0).toLocaleString('en-NG')} real views · status: {listingStatus}</span></div><div><button type="button" onClick={() => onEditListing?.(listing)}>Edit listing</button><button type="button" disabled={actionBusy} onClick={() => manage(listingStatus === 'paused' ? 'active' : 'paused')}>{listingStatus === 'paused' ? 'Make available' : 'Mark unavailable'}</button>{listingStatus !== 'sold' && <button type="button" disabled={actionBusy} onClick={() => manage('sold')}>Mark sold</button>}<button type="button" disabled={actionBusy} onClick={removeListing}>Delete</button></div></section>}
 
-          {sellerListings.length > 0 && <section className="listing-new-section listing-new-similar"><div className="listing-new-section-heading"><h2>More from {listing.sellerDisplayName || listing.seller}</h2><button type="button" className="listing-new-link" onClick={() => listing.sellerBusinessHandle ? window.location.assign(`/@${listing.sellerBusinessHandle}`) : raw.profiles?.username ? window.location.assign(`/${raw.profiles.username}`) : onDemoAction?.('Seller profile is not public yet.')}>View store <ChevronRight size={15} /></button></div><div className="listing-new-feed">{sellerListings.map((item) => <SimilarListingCard key={item.id} item={item} savedIds={savedIds} onOpenListing={onOpenListing} onToggleSave={onToggleSave} />)}</div></section>}
           {similar.length > 0 && <section className="listing-new-section listing-new-similar"><div className="listing-new-section-heading"><h2>Similar ads</h2><span>{similar.length} available</span></div><div className="listing-new-feed">{similar.filter((item, index, items) => item.id !== listing.id && items.findIndex((candidate) => candidate.id === item.id) === index).slice(0, similarVisibleCount).map((item) => <SimilarListingCard key={item.id} item={item} savedIds={savedIds} onOpenListing={onOpenListing} onToggleSave={onToggleSave} />)}</div>{similarVisibleCount < similar.length && <div ref={similarSentinelRef} className="listing-new-feed-sentinel" aria-hidden="true">Loading more ads…</div>}</section>}
         </main>
       </div>
