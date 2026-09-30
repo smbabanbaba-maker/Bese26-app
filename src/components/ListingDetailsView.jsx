@@ -80,15 +80,16 @@ function formatFeedbackDate(value) {
   return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user, depth = 0, onToggleLike, onReply, onAuthRequired, onNotice }) {
+function ReviewCommentThread({ comment, replyTo = null, replyCountFallback = 0, commentSocials = {}, user, onToggleLike, onReply, onAuthRequired }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const commenterIdentity = getPublicIdentity(comment.user, comment.user_id === user?.id ? 'You' : 'Bese26 member');
   const commenter = commenterIdentity.name;
   const avatar = commenterIdentity.image;
+  const replyToName = replyTo ? getPublicIdentity(replyTo.user, 'Bese26 member').name : '';
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false };
-  const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
+  const replyCount = Math.max(Number(social.replyCount || 0), Number(replyCountFallback || 0));
 
   const beginReply = () => {
     if (!user) {
@@ -115,10 +116,11 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
   };
 
   return (
-    <article className={`listing-review-comment${depth ? ' listing-review-comment-reply' : ''}`}>
+    <article className={`listing-review-comment${replyTo ? ' listing-review-comment-reply' : ''}`}>
       <div className={`listing-review-comment-avatar ${commenterIdentity.hasBusinessLogo && avatar ? 'is-business-logo' : ''}`}>{avatar ? <img src={avatar} alt="" loading="lazy" onLoad={commenterIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : commenter.slice(0, 1).toUpperCase()}</div>
       <div className="listing-review-comment-content">
         <div className="listing-review-comment-meta"><strong>{commenter}</strong><VerificationBadges idVerified={Boolean(comment.id_verified || comment.user?.id_verified)} cacVerified={Boolean(comment.cac_verified || comment.user?.cac_verified)} compact /><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
+        {replyToName && <small className="listing-review-comment-reply-context"><span aria-hidden="true">↳</span> Reply to {replyToName}</small>}
         <p>{comment.body}</p>
         <div className="listing-review-comment-actions">
           <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={comment.status !== 'published'} onClick={() => onToggleLike?.(comment)}><ThumbsUp size={14} /> Like <span>{Number(social.likeCount || 0)}</span></button>
@@ -131,9 +133,6 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
           <textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={1000} rows={2} placeholder={`Reply to ${commenter}…`} aria-label={`Reply to ${commenter}`} />
           <button type="submit" disabled={busy || !draft.trim()}>{busy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
-        {replies.length > 0 && <div className="listing-review-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.map((reply) => <ReviewCommentThread key={reply.id} comment={reply} commentSocials={commentSocials} user={user} depth={depth + 1} onToggleLike={onToggleLike} onReply={onReply} onAuthRequired={onAuthRequired} onNotice={onNotice} />)}
-        </div>}
       </div>
     </article>
   );
@@ -201,8 +200,18 @@ function ReviewFeedbackCard({
         replies.set(comment.parent_comment_id, current);
       } else roots.push(comment);
     });
-    return roots.map((comment) => ({ comment, replies: replies.get(comment.id) || [] }));
+    const buildThread = (comment) => ({ comment, replies: (replies.get(comment.id) || []).map(buildThread) });
+    return roots.map(buildThread);
   }, [comments]);
+  const commentRows = useMemo(() => {
+    const rows = [];
+    const append = (thread, replyTo = null) => {
+      rows.push({ comment: thread.comment, replyTo, replyCount: thread.replies.length });
+      thread.replies.forEach((reply) => append(reply, thread.comment));
+    };
+    commentThreads.forEach((thread) => append(thread));
+    return rows;
+  }, [commentThreads]);
 
   const saveComment = async (body, parentCommentId = null) => {
     const saved = await submitReviewComment({ reviewId: review.id, userId: user.id, body, parentCommentId });
@@ -294,7 +303,7 @@ function ReviewFeedbackCard({
       </div>
       {commentsOpen && canInteract && <div className="listing-review-comments">
         {commentsLoading ? <div className="listing-review-comments-state">Loading comments…</div>
-          : comments.length ? commentThreads.map(({ comment, replies }) => <ReviewCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={commentSocials} user={user} onToggleLike={toggleCommentLike} onReply={postReply} onAuthRequired={onAuthRequired} onNotice={onNotice} />)
+          : comments.length ? <div className="listing-review-comment-list">{commentRows.map(({ comment, replyTo, replyCount }) => <ReviewCommentThread key={comment.id} comment={comment} replyTo={replyTo} replyCountFallback={replyCount} commentSocials={commentSocials} user={user} onToggleLike={toggleCommentLike} onReply={postReply} onAuthRequired={onAuthRequired} />)}</div>
             : <div className="listing-review-comments-state">No comments yet. Start a respectful conversation.</div>}
         <form className="listing-review-comment-form" onSubmit={postComment}>
           <textarea value={commentDraft} onChange={(event) => setCommentDraft(event.target.value)} maxLength={1000} rows={2} placeholder="Write a comment…" aria-label="Write a comment on this review" />
@@ -338,6 +347,7 @@ export default function ListingDetailsView({
   const [comments, setComments] = useState([]);
   const [listingCommentSocials, setListingCommentSocials] = useState({});
   const [commentsVisibleCount, setCommentsVisibleCount] = useState(4);
+  const [expandedReplyCounts, setExpandedReplyCounts] = useState({});
   const [commentText, setCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
   const [commentsBusy, setCommentsBusy] = useState(false);
@@ -421,6 +431,34 @@ export default function ListingDetailsView({
     const buildThread = (comment) => ({ comment, replies: (replies.get(comment.id) || []).map(buildThread) });
     return roots.map(buildThread);
   }, [comments]);
+  const listingCommentRows = useMemo(() => {
+    const rows = [];
+    const containsTarget = (thread) => thread.comment.id === focusCommentId || thread.replies.some(containsTarget);
+    const append = (thread, replyTo = null) => {
+      const parent = replyTo?.comment;
+      const replyToName = parent
+        ? parent.business?.business_name || parent.user?.display_name || parent.user?.username || 'Bese26 member'
+        : '';
+      rows.push({ kind: 'comment', comment: thread.comment, replyToName, replyCountFallback: thread.replies.length });
+      const focusIsBelow = Boolean(focusCommentId && thread.replies.some(containsTarget));
+      const visibleReplyCount = focusIsBelow
+        ? thread.replies.length
+        : Math.min(thread.replies.length, Math.max(1, Number(expandedReplyCounts[thread.comment.id] || 1)));
+      thread.replies.slice(0, visibleReplyCount).forEach((reply) => append(reply, thread));
+      if (visibleReplyCount < thread.replies.length) {
+        const comment = thread.comment;
+        rows.push({
+          kind: 'more',
+          parent: comment,
+          parentName: comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member',
+          remaining: thread.replies.length - visibleReplyCount,
+          total: thread.replies.length,
+        });
+      }
+    };
+    listingCommentThreads.slice(0, commentsVisibleCount).forEach((thread) => append(thread));
+    return rows;
+  }, [listingCommentThreads, commentsVisibleCount, expandedReplyCounts, focusCommentId]);
   useEffect(() => {
     if (!focusCommentId || commentsLoading || !commentsResolved) return;
     if (comments.some((comment) => comment.id === focusCommentId)) {
@@ -471,6 +509,7 @@ export default function ListingDetailsView({
     setSimilarVisibleCount(12);
     setComments([]);
     setCommentsVisibleCount(4);
+    setExpandedReplyCounts({});
     setCommentsResolved(false);
     setListingCommentSocials({});
     setReviews([]);
@@ -975,7 +1014,9 @@ export default function ListingDetailsView({
           <section id="listing-public-discussion" className="listing-new-section listing-public-comments">
             <div className="listing-new-section-heading"><div><span className="listing-new-kicker">PUBLIC DISCUSSION</span><h2>Comments & questions</h2><p className="listing-new-chat-note">Share a useful question or experience about this listing.</p></div><span>{commentsLoading ? 'Loading…' : `${comments.length} comments`}</span></div>
             <form className="listing-comment-form" onSubmit={submitComment}><textarea value={commentText} onChange={(event) => { setCommentError(''); setCommentText(event.target.value); }} maxLength={1000} placeholder="Write a public comment or question…" rows={3} aria-label="Public listing comment" /><button type="submit" className="listing-new-start-chat" disabled={commentsBusy}>{commentsBusy ? 'Posting…' : 'Post comment'} <Send size={15} /></button>{commentError && <p className="listing-comment-error" role="alert">{commentError}</p>}</form>
-            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentThreads.slice(0, commentsVisibleCount).map(({ comment, replies }) => <ListingPublicCommentThread key={comment.id} comment={comment} replies={replies} commentSocials={listingCommentSocials} user={user} focusCommentId={focusCommentId} onToggleLike={toggleListingCommentReaction} onSelectReaction={setListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
+            <div className="listing-comments-list">{commentsLoading ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Loading the public discussion…</p></div> : commentsLoadFailed ? <div className="listing-comments-empty"><MessageCircle size={20} /><p>Comments could not be loaded.</p><button type="button" className="listing-new-link" onClick={retryListingComments}>Try again</button></div> : comments.length ? <><div className="listing-comments-visible">{listingCommentRows.map((row) => row.kind === 'more'
+                ? <button key={`more-replies-${row.parent.id}`} type="button" className="listing-comments-more-replies" onClick={() => setExpandedReplyCounts((current) => ({ ...current, [row.parent.id]: Math.min(Number(current[row.parent.id] || 1) + 5, row.total) }))}>↳ Show {row.remaining} more {row.remaining === 1 ? 'reply' : 'replies'} to {row.parentName}</button>
+                : <ListingPublicCommentThread key={row.comment.id} comment={row.comment} replyToName={row.replyToName} replyCountFallback={row.replyCountFallback} commentSocials={listingCommentSocials} user={user} focusCommentId={focusCommentId} onToggleLike={toggleListingCommentReaction} onSelectReaction={setListingCommentReaction} onReply={(parent, body) => saveListingComment(body, parent.id)} onAuthRequired={onAuthRequired} />)}</div>{listingCommentThreads.length > commentsVisibleCount && <button type="button" className="listing-comments-more" onClick={() => setCommentsVisibleCount((count) => Math.min(count + 4, listingCommentThreads.length))}>More comments <span>({listingCommentThreads.length - commentsVisibleCount} more)</span><ChevronDown size={15} /></button>}</> : <div className="listing-comments-empty"><MessageCircle size={20} /><p>No comments yet. Be the first to share a useful question or experience.</p></div>}</div>
           </section>
 
           <section className="listing-new-safety"><ShieldCheck size={20} /><div><strong>Stay safe</strong><p>Meet in a public place, inspect the item before paying, and never share OTPs, passwords or PINs.</p></div></section>

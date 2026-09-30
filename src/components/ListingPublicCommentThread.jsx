@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, MessageCircle, Send, ThumbsUp } from 'lucide-react';
+import { CornerDownRight, MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
 import VerificationBadges from './VerificationBadges';
 
 const COMMENT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🙏', '🎉', '💯'];
-
-function threadContainsComment(threads, targetId) {
-  return (threads || []).some(({ comment: child, replies: childReplies = [] }) =>
-    child?.id === targetId || threadContainsComment(childReplies, targetId));
-}
 
 function commentName(comment) {
   return comment.business?.business_name || comment.user?.display_name || comment.user?.username || 'Bese26 member';
@@ -25,10 +20,10 @@ function formatDate(value) {
 
 export default function ListingPublicCommentThread({
   comment,
-  replies = [],
+  replyToName = '',
+  replyCountFallback = 0,
   commentSocials = {},
   user,
-  depth = 0,
   focusCommentId = null,
   onToggleLike,
   onSelectReaction,
@@ -42,7 +37,6 @@ export default function ListingPublicCommentThread({
   const [reactionBusy, setReactionBusy] = useState(false);
   const [reactionOpen, setReactionOpen] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState('');
-  const [visibleReplyCount, setVisibleReplyCount] = useState(1);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const articleRef = useRef(null);
   const isNotificationTarget = Boolean(focusCommentId && comment.id === focusCommentId);
@@ -53,16 +47,12 @@ export default function ListingPublicCommentThread({
     : avatarPath ? getAvatarUrl(avatarPath) : '';
   const usesBusinessLogo = Boolean(comment.business?.logo_path || isOfficialBese26Business(comment.business));
   const social = commentSocials[comment.id] || { likeCount: 0, replyCount: 0, liked: false, reaction: '' };
-  const replyCount = Math.max(Number(social.replyCount || 0), replies.length);
+  const replyCount = Math.max(Number(social.replyCount || 0), Number(replyCountFallback || 0));
   const canInteract = comment.status === 'published';
 
   useEffect(() => {
     if (!social.liked) setSelectedReaction('');
   }, [social.liked, comment.id]);
-
-  useEffect(() => {
-    if (focusCommentId && threadContainsComment(replies, focusCommentId)) setVisibleReplyCount(replies.length);
-  }, [focusCommentId, replies]);
 
   useEffect(() => {
     if (!isNotificationTarget || !articleRef.current) return undefined;
@@ -125,7 +115,7 @@ export default function ListingPublicCommentThread({
   };
 
   return (
-    <article ref={articleRef} id={`listing-comment-${comment.id}`} tabIndex={isNotificationTarget ? -1 : undefined} className={`listing-public-comment${depth ? ' listing-public-comment-reply' : ''}${isNotificationTarget ? ' is-notification-target' : ''}`}>
+    <article ref={articleRef} id={`listing-comment-${comment.id}`} tabIndex={isNotificationTarget ? -1 : undefined} className={`listing-public-comment${replyToName ? ' listing-public-comment-reply' : ''}${isNotificationTarget ? ' is-notification-target' : ''}`}>
       <div className={`listing-public-comment-avatar ${usesBusinessLogo && avatarUrl ? 'is-business-logo' : ''}`}>
         {avatarUrl && !avatarFailed
           ? <img src={avatarUrl} alt="" loading="lazy" onLoad={usesBusinessLogo && avatarUrl ? handleBusinessLogoLoad : undefined} onError={() => setAvatarFailed(true)} />
@@ -139,6 +129,7 @@ export default function ListingPublicCommentThread({
           <time dateTime={comment.created_at || undefined}>{formatDate(comment.created_at)}</time>
           {comment.status === 'pending' && comment.user_id === user?.id && <span>Pending review</span>}
         </div>
+        {replyToName && <small className="listing-public-comment-reply-context"><CornerDownRight size={12} /> Reply to {replyToName}</small>}
         <p>{comment.body}</p>
         <div className="listing-public-comment-actions">
           <span className="listing-comment-reaction-wrap">
@@ -156,10 +147,6 @@ export default function ListingPublicCommentThread({
           <textarea value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={1000} rows={2} placeholder={`Reply to ${name}…`} aria-label={`Reply to ${name}`} />
           <button type="submit" disabled={replyBusy || !draft.trim()}>{replyBusy ? 'Posting…' : <><Send size={14} /> Reply</>}</button>
         </form>}
-        {replies.length > 0 && <div className="listing-public-comment-replies" aria-label={`${replyCount} replies`}>
-          {replies.slice(0, visibleReplyCount).map((reply) => <ListingPublicCommentThread key={reply.comment.id} comment={reply.comment} replies={reply.replies} commentSocials={commentSocials} user={user} depth={depth + 1} focusCommentId={focusCommentId} onToggleLike={onToggleLike} onSelectReaction={onSelectReaction} onReply={onReply} onAuthRequired={onAuthRequired} />)}
-          {replies.length > visibleReplyCount && <button type="button" className="listing-public-comment-more-replies" onClick={() => setVisibleReplyCount(replies.length)}>More replies <span>({replies.length - visibleReplyCount} more)</span><ChevronDown size={14} /></button>}
-        </div>}
       </div>
     </article>
   );
