@@ -737,7 +737,12 @@ async function attachBusinessIdentities(comments = []) {
   if (!profileIds.length) return comments;
   const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(100);
   const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
-  return comments.map((comment) => ({ ...comment, user: comment.user ? { ...comment.user, business: businesses[comment.user_id] || null } : comment.user, business: businesses[comment.user_id] || null }));
+  return comments.map((comment) => {
+    const business = businesses[comment.user_id] || null;
+    const idVerified = verificationIsCurrent(comment.user);
+    const cacVerified = Boolean(business && verificationIsCurrent(business));
+    return { ...comment, user: comment.user ? { ...comment.user, business, id_verified: idVerified, cac_verified: cacVerified } : comment.user, business, id_verified: idVerified, cac_verified: cacVerified };
+  });
 }
 
 async function attachBusinessIdentitiesToReviews(reviews = []) {
@@ -755,7 +760,7 @@ async function attachBusinessIdentitiesToReviews(reviews = []) {
 export async function fetchListingComments(listingId) {
   failIfUnavailable();
   if (!listingId) return [];
-  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
   return attachBusinessIdentities(data || []);
 }
@@ -771,7 +776,7 @@ export async function submitListingComment({ listingId, userId, body, parentComm
   const { error } = await supabase.from('listing_comments').insert(comment);
   if (error) throw error;
   try {
-    const { data: hydratedRow } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path)').eq('id', id).maybeSingle();
+    const { data: hydratedRow } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)').eq('id', id).maybeSingle();
     const [hydrated] = await attachBusinessIdentities([hydratedRow || comment]);
     return hydrated || comment;
   } catch {
@@ -870,7 +875,7 @@ export async function fetchReviewComments(reviewId, userId = null) {
   failIfUnavailable();
   if (!reviewId) return [];
   let query = supabase.from('review_comments')
-    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)')
     .eq('review_id', reviewId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -911,7 +916,7 @@ export async function submitReviewComment({ reviewId, userId, body, parentCommen
   if (!reviewId || !userId || !text) throw new Error('Sign in and write a comment before posting.');
   if (text.length > 1000) throw new Error('Review comments must be 1,000 characters or fewer.');
   const { data, error } = await supabase.from('review_comments').insert({ review_id: reviewId, user_id: userId, parent_comment_id: parentCommentId || null, body: text })
-    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path)')
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)')
     .single();
   if (error) throw error;
   return data;

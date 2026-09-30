@@ -118,7 +118,7 @@ function ReviewCommentThread({ comment, replies = [], commentSocials = {}, user,
     <article className={`listing-review-comment${depth ? ' listing-review-comment-reply' : ''}`}>
       <div className={`listing-review-comment-avatar ${commenterIdentity.isBusiness && avatar ? 'is-business-logo' : ''}`}>{avatar ? <img src={avatar} alt="" loading="lazy" onLoad={commenterIdentity.isBusiness ? handleBusinessLogoLoad : undefined} /> : commenter.slice(0, 1).toUpperCase()}</div>
       <div className="listing-review-comment-content">
-        <div className="listing-review-comment-meta"><strong>{commenter}</strong><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
+        <div className="listing-review-comment-meta"><strong>{commenter}</strong><VerificationBadges idVerified={Boolean(comment.id_verified || comment.user?.id_verified)} cacVerified={Boolean(comment.cac_verified || comment.user?.cac_verified)} compact /><time dateTime={comment.created_at || undefined}>{formatFeedbackDate(comment.created_at)}</time></div>
         <p>{comment.body}</p>
         <div className="listing-review-comment-actions">
           <button type="button" className={social.liked ? 'is-liked' : ''} aria-pressed={Boolean(social.liked)} disabled={comment.status !== 'published'} onClick={() => onToggleLike?.(comment)}><ThumbsUp size={14} /> Like <span>{Number(social.likeCount || 0)}</span></button>

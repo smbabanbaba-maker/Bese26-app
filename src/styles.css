@@ -7823,6 +7823,12 @@ img.business-logo-preview-image.is-tall-business-logo {
 .listing-review-comment-replies { margin-top: 7px; padding-left: 9px; border-left-color: #c8dce8; }
 .listing-public-comments { background: #fff; }
 .listing-public-comments .listing-public-comment { border: 0; border-radius: 8px; background: #eaf4fb; }
+.listing-public-comment-head .verification-badge-group,
+.listing-review-comment-meta .verification-badge-group { flex-wrap: nowrap; gap: 3px; margin: 0; }
+.listing-public-comment-head .verification-badge-group .verification-badge,
+.listing-review-comment-meta .verification-badge-group .verification-badge { min-height: 18px; padding: 2px 5px; font-size: 8px; }
+.listing-public-comment-head .verification-badge-group .verification-badge svg,
+.listing-review-comment-meta .verification-badge-group .verification-badge svg { width: 10px; height: 10px; }
 @media (max-width: 430px) {
   .listing-new-reviews, .listing-public-comments { padding: 16px 12px; }
   .listing-new-reviews .listing-new-section-heading h2 { font-size: 16px; }

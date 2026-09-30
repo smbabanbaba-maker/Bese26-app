@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDown, MessageCircle, Send, ThumbsUp } from 'lucide-react';
 import { getAvatarUrl } from '../lib/supabase';
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from '../lib/businessLogoFit';
+import VerificationBadges from './VerificationBadges';
 
 const COMMENT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🙏', '🎉', '💯'];
 
@@ -111,6 +112,7 @@ export default function ListingPublicCommentThread({
       <div className="listing-public-comment-content">
         <div className="listing-public-comment-head">
           <strong>{name}</strong>
+          <VerificationBadges idVerified={Boolean(comment.id_verified || comment.user?.id_verified)} cacVerified={Boolean(comment.cac_verified || comment.user?.cac_verified)} compact />
           {comment.business?.business_name && <small className="listing-comment-business-label">Business</small>}
           <time dateTime={comment.created_at || undefined}>{formatDate(comment.created_at)}</time>
           {comment.status === 'pending' && comment.user_id === user?.id && <span>Pending review</span>}
