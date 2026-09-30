@@ -552,3 +552,143 @@ img.is-business-logo-previewable:focus-visible {
   outline: 3px solid rgba(37, 211, 102, .4) !important;
   outline-offset: 2px;
 }
+
+/* One semantic color system for action buttons across the app. */
+:root {
+  --bese26-action-primary: #D43840;
+  --bese26-action-primary-hover: #BD3038;
+  --bese26-action-neutral: #17191D;
+  --bese26-action-neutral-border: #D9DCE1;
+  --bese26-action-neutral-surface: #FFFFFF;
+  --bese26-action-neutral-hover: #F5F6F7;
+  --bese26-action-success: #0A6B4A;
+  --bese26-action-success-hover: #075E54;
+  --bese26-action-danger: #B42318;
+  --bese26-action-danger-hover: #8F1D14;
+}
+
+/* Main, publish, search, send, and call actions use Bese26 red. */
+.primary-button,
+.publish-button,
+.send-button,
+.home-ad-cta,
+.search-submit,
+.dashboard-primary-action,
+.company-save-button,
+.listing-new-solid-action,
+.listing-new-start-chat {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+  box-shadow: none;
+}
+.primary-button:hover:not(:disabled),
+.publish-button:hover:not(:disabled),
+.send-button:hover:not(:disabled),
+.home-ad-cta:hover,
+.search-submit:hover:not(:disabled),
+.dashboard-primary-action:hover:not(:disabled),
+.company-save-button:hover:not(:disabled),
+.listing-new-solid-action:hover:not(:disabled),
+.listing-new-start-chat:hover:not(:disabled) {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary-hover) !important;
+  background: var(--bese26-action-primary-hover) !important;
+}
+
+/* Secondary, back, and cancel actions stay quiet and legible. */
+.secondary-button,
+.outline-button,
+.clear-filter-button,
+.clear-sell-button,
+.listing-back-button,
+.directory-back-button,
+.chat-back-button {
+  color: var(--bese26-action-neutral);
+  border-color: var(--bese26-action-neutral-border);
+  background: var(--bese26-action-neutral-surface);
+}
+.secondary-button:hover:not(:disabled),
+.outline-button:hover:not(:disabled),
+.clear-filter-button:hover:not(:disabled),
+.clear-sell-button:hover:not(:disabled),
+.listing-back-button:hover:not(:disabled),
+.directory-back-button:hover:not(:disabled),
+.chat-back-button:hover:not(:disabled) {
+  color: var(--bese26-action-neutral);
+  border-color: #AEB4BC;
+  background: var(--bese26-action-neutral-hover);
+}
+
+/* The dashboard sits on a dark hero, so its secondary CTA remains a white outline. */
+.dashboard-secondary-action {
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, .42) !important;
+  background: rgba(255, 255, 255, .08) !important;
+}
+.dashboard-secondary-action:hover:not(:disabled) {
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, .7) !important;
+  background: rgba(255, 255, 255, .16) !important;
+}
+
+/* Destructive actions are always red; report stays an outlined warning action. */
+.danger-button {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-danger) !important;
+  background: var(--bese26-action-danger) !important;
+}
+.danger-button:hover:not(:disabled) {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-danger-hover) !important;
+  background: var(--bese26-action-danger-hover) !important;
+}
+.danger-outline-button,
+.listing-report-button,
+.business-owner-actions > button:last-child {
+  color: var(--bese26-action-danger) !important;
+  border-color: rgba(180, 35, 24, .38) !important;
+  background: #FFFFFF !important;
+}
+.danger-outline-button:hover:not(:disabled),
+.listing-report-button:hover:not(:disabled),
+.business-owner-actions > button:last-child:hover:not(:disabled) {
+  color: var(--bese26-action-danger-hover) !important;
+  border-color: var(--bese26-action-danger) !important;
+  background: #FFF5F4 !important;
+}
+
+/* Business setup actions follow their job, not their position in a red/black row. */
+.business-owner-actions > button:first-child {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+}
+.business-owner-actions > button:first-child:hover:not(:disabled) {
+  border-color: var(--bese26-action-primary-hover) !important;
+  background: var(--bese26-action-primary-hover) !important;
+}
+.business-owner-actions > button:nth-child(2),
+.business-owner-actions > button:nth-child(3) {
+  color: var(--bese26-action-neutral) !important;
+  border-color: var(--bese26-action-neutral-border) !important;
+  background: #FFFFFF !important;
+}
+.business-owner-actions > button:nth-child(2):hover:not(:disabled),
+.business-owner-actions > button:nth-child(3):hover:not(:disabled) {
+  border-color: #AEB4BC !important;
+  background: var(--bese26-action-neutral-hover) !important;
+}
+
+/* Selected progress is red; completed progress uses success green. */
+.business-upgrade-progress button.active { color: var(--bese26-action-primary) !important; }
+.business-upgrade-progress button.active b {
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+}
+.business-upgrade-progress button.complete { color: var(--bese26-action-success) !important; }
+.business-upgrade-progress button.complete b {
+  border-color: var(--bese26-action-success) !important;
+  background: var(--bese26-action-success) !important;
+}
+.business-mode-card.business svg { color: var(--bese26-action-primary) !important; }
