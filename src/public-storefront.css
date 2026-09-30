@@ -1440,3 +1440,133 @@
   .miniweb-hero-v2-verification > span { min-width: 0; overflow: hidden; }
   .miniweb-hero-v2-stats small { font-size: 6px; }
 }
+
+
+/* Bese26 brand coherence for lazy-loaded public business pages. */
+.public-business-hero.storefront-hero-clean {
+  color: #FFFFFF !important;
+  background: linear-gradient(122deg, #111315 0%, #24272C 58%, #4A2025 100%) !important;
+  border-color: #3A3D43 !important;
+  box-shadow: 0 16px 34px rgba(17,19,21,.2) !important;
+}
+.public-business-hero.storefront-hero-clean::before {
+  background: linear-gradient(#D43840, #F0787F) !important;
+}
+.public-business-hero.storefront-hero-clean::after {
+  background: radial-gradient(circle, rgba(212,56,64,.2), transparent 68%) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-identity h1,
+.public-business-hero.storefront-hero-clean .public-business-identity p,
+.public-business-hero.storefront-hero-clean .public-business-handle,
+.public-business-hero.storefront-hero-clean .public-business-location,
+.public-business-hero.storefront-hero-clean .public-business-trust small { color: #FFFFFF !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity .eyebrow,
+.public-business-hero.storefront-hero-clean .public-miniweb-brand > span > span { color: #FFB3B7 !important; }
+.public-business-hero.storefront-hero-clean .public-business-identity p,
+.public-business-hero.storefront-hero-clean .public-business-location,
+.public-business-hero.storefront-hero-clean .public-business-handle,
+.public-business-hero.storefront-hero-clean .public-business-trust small { color: #E1E2E4 !important; }
+.public-business-hero.storefront-hero-clean .public-business-location svg { color: #FF858B !important; stroke: #FF858B !important; }
+.public-business-hero.storefront-hero-clean .public-business-category {
+  color: #FFD6D8 !important;
+  border-color: rgba(212,56,64,.42) !important;
+  background: rgba(212,56,64,.18) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge,
+.public-business-hero.storefront-hero-clean > .verified-badge {
+  color: #FFFFFF !important;
+  border-color: rgba(142,231,198,.42) !important;
+  background: #0A6B4A !important;
+  box-shadow: none !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-trust .verified-badge svg,
+.public-business-hero.storefront-hero-clean > .verified-badge svg { color: #FFFFFF !important; }
+.public-business-hero.storefront-hero-clean .public-business-trust .unverified-badge {
+  color: #FFFFFF !important;
+  border-color: rgba(255,255,255,.2) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-stats span {
+  border-color: rgba(255,255,255,.17) !important;
+  background: rgba(255,255,255,.1) !important;
+}
+.public-business-hero.storefront-hero-clean .public-business-stats strong { color: #FFFFFF !important; }
+.public-business-hero.storefront-hero-clean .public-business-stats small { color: #D6D8DB !important; }
+.public-business-actions .primary-button {
+  color: #FFFFFF !important;
+  border-color: #D43840 !important;
+  background: #D43840 !important;
+}
+.public-business-actions .primary-button:hover { background: #BD3038 !important; border-color: #BD3038 !important; }
+.public-business-actions .secondary-button {
+  color: #FFFFFF !important;
+  border-color: rgba(255,255,255,.42) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+.public-business-actions .secondary-button:hover {
+  color: #FFFFFF !important;
+  border-color: rgba(255,255,255,.72) !important;
+  background: rgba(255,255,255,.16) !important;
+}
+.public-business-hero.storefront-hero-clean .public-browse-cta {
+  color: #FFFFFF !important;
+  border-color: #D43840 !important;
+  background: #D43840 !important;
+}
+.public-business-hero.storefront-hero-clean .public-browse-cta:hover {
+  color: #FFFFFF !important;
+  border-color: #BD3038 !important;
+  background: #BD3038 !important;
+}
+.public-business-hero.storefront-hero-clean .public-hero-share:hover,
+.miniweb-hero-v2-share:hover {
+  border-color: #F0787F !important;
+  background: rgba(212,56,64,.2) !important;
+}
+.public-about-link,
+.public-business-listings .public-card-action,
+.public-business-listings .product-price { color: #D43840 !important; }
+
+/* The standalone Miniweb hero shares the same charcoal/red and semantic verification colors. */
+.miniweb-hero-v2 {
+  color: #FFFFFF !important;
+  border-color: #3A3D43 !important;
+  background: linear-gradient(122deg, #111315 0%, #24272C 58%, #4A2025 100%) !important;
+}
+.miniweb-hero-v2::after { background: radial-gradient(circle, rgba(212,56,64,.18), transparent 70%) !important; }
+.miniweb-hero-v2-eyebrow { color: #FFB3B7 !important; }
+.miniweb-hero-v2-verification svg { color: #D6D8DB !important; }
+.miniweb-hero-v2-verification.is-verified {
+  border-color: rgba(142,231,198,.42) !important;
+  background: rgba(10,107,74,.28) !important;
+}
+.miniweb-hero-v2-verification.is-verified svg { color: #8EE7C6 !important; }
+.miniweb-hero-v2-verification small { color: #E1E2E4 !important; }
+.miniweb-hero-v2-category {
+  color: #FFD6D8 !important;
+  border-color: rgba(212,56,64,.42) !important;
+  background: rgba(212,56,64,.18) !important;
+}
+
+
+/* Verified means trusted: keep its badge green on both miniweb implementations. */
+.public-business-hero.storefront-hero-clean .verified-badge {
+  color: #FFFFFF !important;
+  border-color: rgba(142,231,198,.42) !important;
+  background: #0A6B4A !important;
+  box-shadow: none !important;
+}
+.public-business-hero.storefront-hero-clean .verified-badge svg {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+
+.public-name-verified {
+  color: #0A6B4A !important;
+  filter: drop-shadow(0 3px 5px rgba(10,107,74,.28)) !important;
+}
+.public-name-verified svg {
+  fill: #0A6B4A !important;
+  stroke: #FFFFFF !important;
+}

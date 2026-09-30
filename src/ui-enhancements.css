@@ -692,3 +692,314 @@ img.is-business-logo-previewable:focus-visible {
   background: var(--bese26-action-success) !important;
 }
 .business-mode-card.business svg { color: var(--bese26-action-primary) !important; }
+
+
+/* Global palette coherence: Bese26 red, charcoal, white, with purposeful status colors. */
+:root {
+  --red: #D43840;
+  --dark-red: #BD3038;
+  --blue: #D43840;
+  --purple: #D43840;
+  --green: #0A6B4A;
+  --blue-soft: #FFF0F0;
+  --blue-line: #F0BFC3;
+  --hero-navy: #111315;
+  --hero-indigo: #24272C;
+  --hero-purple: #4A2025;
+  --hero-cyan: #D43840;
+  --hero-pink: #F0787F;
+  --brand-gradient: linear-gradient(135deg, #D43840 0%, #A9272F 100%);
+  --dark-gradient: linear-gradient(135deg, #111315 0%, #25282D 100%);
+  --purple-gradient: linear-gradient(135deg, #D43840 0%, #BD3038 100%);
+  --gold-gradient: linear-gradient(135deg, #B97817 0%, #E4B34B 100%);
+}
+
+/* Keep dark-theme status surfaces readable instead of reusing light-mode fills. */
+.app-shell.theme-dark {
+  --success-soft: rgba(10, 107, 74, .2);
+  --warning-soft: rgba(185, 120, 23, .18);
+  --danger-soft: rgba(180, 35, 24, .18);
+}
+.app-shell.theme-dark .product-meta,
+.app-shell.theme-dark .product-foot,
+.app-shell.theme-dark .location-row,
+.app-shell.theme-dark .seller-card-copy .seller-stats {
+  color: var(--muted) !important;
+}
+
+/* Align all primary hero surfaces around charcoal and a restrained deep-red accent. */
+.dashboard-welcome-card,
+.dashboard-welcome,
+.hero-panel,
+.discovery-banner,
+.home-ad-banner:not(.dashboard-welcome-card),
+.home-ad-dashboard,
+.listing-management-hero,
+.business-directory-hero,
+.subscription-hero,
+.payment-history-hero,
+.boosting-hero,
+.wallet-hero,
+.auth-welcome-panel,
+.public-info-hero,
+.miniweb-cover-banner {
+  background: linear-gradient(122deg, #111315 0%, #24272C 58%, #4A2025 100%) !important;
+  background-size: 100% 100% !important;
+  border-color: #3A3D43 !important;
+  color: #FFFFFF !important;
+}
+.notifications-page .notifications-heading {
+  background: linear-gradient(122deg, #111315 0%, #24272C 65%, #4A2025 100%) !important;
+  border-color: #3A3D43 !important;
+}
+.dashboard-welcome-copy h1 span,
+.dashboard-welcome-card h1 span,
+.hero-panel h1 span,
+.discovery-copy h1 span { color: #FF858B !important; }
+.dashboard-welcome-card .eyebrow,
+.hero-panel .eyebrow,
+.discovery-banner .eyebrow,
+.home-ad-copy .eyebrow,
+.business-directory-hero .eyebrow,
+.subscription-hero .eyebrow,
+.listing-management-hero .eyebrow { color: #FFB3B7 !important; }
+.business-directory-hero-icon { color: #FF858B !important; }
+.dashboard-metrics span:nth-child(1),
+.dashboard-metrics span:nth-child(2),
+.dashboard-metrics span:nth-child(3) { border-color: rgba(255,255,255,.3) !important; }
+.dashboard-orbit-art {
+  background: radial-gradient(circle at 45% 48%, rgba(212,56,64,.2), rgba(17,19,21,.02) 70%) !important;
+}
+.dashboard-orbit-one,
+.dashboard-orbit-two {
+  border-color: rgba(240,120,127,.32) !important;
+  background-color: rgba(212,56,64,.06) !important;
+}
+.home-ad-dashboard .dashboard-primary-action {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+}
+.home-ad-dashboard .dashboard-secondary-action,
+.home-ad-dashboard .dashboard-secondary-action:hover {
+  color: #FFFFFF !important;
+  border-color: rgba(255,255,255,.5) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+
+/* Decorative category/profile icons and active navigation use the brand accent, not blue/purple. */
+.category-tile .category-icon,
+.popular-category > span,
+.quick-action .quick-action-icon,
+.notification-icon,
+.profile-menu-card-icon,
+.premium-profile .profile-menu-card-icon,
+.premium-profile .profile-menu-card:nth-child(3n) .profile-menu-card-icon {
+  color: var(--bese26-action-primary) !important;
+  background: #FFF0F0 !important;
+}
+.category-tile:hover,
+.popular-category:hover,
+.product-card:hover,
+.profile-menu-card:hover,
+.quick-action:hover {
+  border-color: #F0BFC3 !important;
+  box-shadow: 0 10px 24px rgba(212,56,64,.1) !important;
+}
+.bottom-nav button.active,
+.bottom-nav button:nth-child(n).active { color: var(--bese26-action-primary) !important; }
+
+/* Search, setup and form focus states stay on-brand; selected filters use the same red accent. */
+.search-page > .page-title-row,
+.notifications-page .notifications-heading {
+  border-color: #3A3D43 !important;
+}
+.search-page .large-search:focus-within,
+.business-directory-search:focus-within,
+.auth-form input:focus,
+.company-link-form input:focus,
+.company-link-form textarea:focus {
+  border-color: var(--bese26-action-primary) !important;
+  box-shadow: 0 0 0 3px rgba(212,56,64,.14) !important;
+}
+.search-page .filter-chip:hover {
+  border-color: #E6A3A8 !important;
+  color: var(--bese26-action-primary) !important;
+}
+.search-page .filter-chip.active {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+  box-shadow: 0 6px 14px rgba(212,56,64,.16) !important;
+}
+.search-page .verified-filter-chip.active {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-success) !important;
+  background: var(--bese26-action-success) !important;
+}
+.business-directory-logo,
+.business-directory-card-footer > span {
+  color: var(--bese26-action-primary) !important;
+  background: #FFF0F0 !important;
+}
+.business-directory-copy strong,
+.business-directory-card-head span { color: var(--bese26-action-primary) !important; }
+.business-verified-icon { color: var(--bese26-action-success) !important; }
+.auth-backdrop {
+  background: radial-gradient(circle at 8% 15%, rgba(212,56,64,.2), transparent 28%),
+              radial-gradient(circle at 92% 84%, rgba(212,56,64,.12), transparent 30%),
+              rgba(13,15,20,.72) !important;
+}
+.help-guide-hero,
+.safety-hero {
+  color: #17191D !important;
+  border-color: #E6E7EA !important;
+  background: linear-gradient(130deg, #FFFFFF 0%, #FFF8F8 100%) !important;
+}
+.help-guide-hero .eyebrow,
+.safety-hero svg { color: var(--bese26-action-primary) !important; }
+
+/* Purple legacy listing actions and in-app chat surfaces return to the Bese26 palette. */
+.listing-primary-actions button:first-child,
+.listing-bottom-actions button:first-child,
+.listing-mobile-chat,
+.listing-details-premium .primary-contact-button,
+.listing-details-premium .listing-start-chat {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+}
+.listing-details-premium .secondary-contact-button,
+.listing-details-premium .callback-contact-button,
+.listing-details-premium .make-offer-wide {
+  color: var(--bese26-action-neutral) !important;
+  border-color: var(--bese26-action-neutral-border) !important;
+  background: #FFFFFF !important;
+}
+.listing-details-premium .listing-detail-actions button:hover,
+.listing-details-premium .listing-similar-grid button:hover {
+  color: var(--bese26-action-primary) !important;
+  border-color: #F0BFC3 !important;
+  background: #FFF5F5 !important;
+}
+.chat-quick-actions button {
+  color: var(--bese26-action-primary) !important;
+  border-color: #F0BFC3 !important;
+  background: #FFF7F7 !important;
+}
+.chat-quick-actions button:hover {
+  border-color: var(--bese26-action-primary) !important;
+  background: #FFF0F0 !important;
+}
+.message-bubble.mine {
+  color: #542126 !important;
+  background: #FFF0F0 !important;
+}
+.app-shell.theme-dark .message-bubble.mine {
+  color: #FFE9EA !important;
+  background: #4A2025 !important;
+}
+.app-shell.theme-dark .message-bubble.other {
+  color: #F8F7F6 !important;
+  background: #242629 !important;
+}
+.app-shell.theme-dark .chat-quick-actions button {
+  color: #F3A3A8 !important;
+  border-color: #64363A !important;
+  background: #242629 !important;
+}
+.app-shell.theme-dark .chat-quick-actions button:hover { background: #352326 !important; }
+
+/* Subscription uses red for current actions and a restrained gold accent for premium tier. */
+.subscription-plan-card.popular {
+  border-color: rgba(212,56,64,.45) !important;
+  box-shadow: 0 10px 25px rgba(212,56,64,.1) !important;
+}
+.subscription-plan-card.current { outline-color: var(--bese26-action-primary) !important; }
+.subscription-plan-card.premium::before { background: linear-gradient(90deg, #B97817, #E4B34B) !important; }
+.subscription-usage::before { background: linear-gradient(#D43840, #BD3038) !important; }
+.subscription-usage-track span { background: #D43840 !important; }
+.subscription-payment-note > svg { color: var(--bese26-action-primary) !important; }
+.subscription-payment-note b {
+  color: #FFFFFF !important;
+  background: var(--bese26-action-primary) !important;
+}
+.connection-screen-ring.ring-two::after,
+.connection-screen-dots i:nth-child(2) { background: var(--bese26-action-primary) !important; }
+.connection-screen-card .primary-button {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+}
+.notifications-page .notifications-heading .eyebrow { color: #FFB3B7 !important; }
+.notifications-page .notifications-heading > svg {
+  color: #FF858B !important;
+  border-color: rgba(255,133,139,.38) !important;
+  background: rgba(212,56,64,.15) !important;
+}
+
+
+/* Final page-specific accents found in the palette audit. */
+.search-page > .page-title-row {
+  color: #FFFFFF !important;
+  border-color: #3A3D43 !important;
+  background: linear-gradient(122deg, #111315 0%, #24272C 58%, #4A2025 100%) !important;
+}
+.search-page > .page-title-row h1,
+.search-page > .page-title-row > div:first-child,
+.search-page > .page-title-row .eyebrow { color: #FFFFFF !important; }
+.search-page > .page-title-row .eyebrow { color: #FFB3B7 !important; }
+.search-page > .page-title-row::after {
+  border-color: rgba(240,120,127,.35) !important;
+  box-shadow: 0 0 0 22px rgba(212,56,64,.08), 0 0 0 46px rgba(212,56,64,.04) !important;
+}
+.search-page .search-grid .product-card:hover {
+  border-color: #F0BFC3 !important;
+  box-shadow: 0 12px 26px rgba(212,56,64,.12) !important;
+}
+.notifications-page .notifications-heading h1 { color: #FFFFFF !important; }
+.notifications-page .notifications-heading p { color: #D6D8DB !important; }
+.notifications-page .reminder-center > .eyebrow { color: var(--bese26-action-primary) !important; }
+
+
+/* Remaining account/status and billing accents from the legacy palette. */
+.profile-name-row .verified-badge {
+  color: #FFFFFF !important;
+  border-color: rgba(142,231,198,.42) !important;
+  background: #0A6B4A !important;
+  box-shadow: none !important;
+}
+.profile-name-row .verified-badge svg { color: #FFFFFF !important; fill: #FFFFFF !important; }
+.profile-subpage:has(.notification-list) .profile-subpage-header .eyebrow {
+  color: var(--bese26-action-primary) !important;
+}
+.subscription-plan-card.basic { background: #FFFFFF !important; }
+.subscription-plan-card.premium {
+  border-color: rgba(185,120,23,.35) !important;
+  background: #FFFCF3 !important;
+}
+.subscription-plan-card.business {
+  border-color: rgba(212,56,64,.25) !important;
+  background: #FFF7F7 !important;
+}
+.subscription-plan-card .primary-button,
+.subscription-page .primary-button,
+.boosting-page .primary-button {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary) !important;
+  background: var(--bese26-action-primary) !important;
+  box-shadow: none !important;
+}
+.subscription-plan-card .primary-button:hover,
+.subscription-page .primary-button:hover,
+.boosting-page .primary-button:hover {
+  color: #FFFFFF !important;
+  border-color: var(--bese26-action-primary-hover) !important;
+  background: var(--bese26-action-primary-hover) !important;
+}
+
+
+.popular-category[class*="tone-"] > span {
+  color: var(--bese26-action-primary) !important;
+  background: #FFF0F0 !important;
+}
