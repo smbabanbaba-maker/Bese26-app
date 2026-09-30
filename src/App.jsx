@@ -818,13 +818,58 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
   }, []);
   useEffect(() => { loadBusinesses(); }, [loadBusinesses]);
   const submitSearch = (event) => { event.preventDefault(); loadBusinesses(query); };
-  return <div className="page-stack business-directory-page">
-    <div className="back-row"><button className="icon-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={18} /></button><span>Business directory</span></div>
-    <section className="business-directory-hero"><div><div className="eyebrow light">BESE26 MINIWEBS</div><h1>Business directory</h1><p>Find the company or store you need.</p></div><Store size={28} /></section>
+  return <div className="page-stack directory-premium">
+    <div className="directory-topbar">
+      <button type="button" className="directory-back-button" onClick={onBack} aria-label="Back to marketplace"><ArrowLeft size={17} /><span>Back to marketplace</span></button>
+      <div className="directory-brand-pill"><Sparkles size={13} aria-hidden="true" /><span>BESE26 MINIWEBS</span></div>
+    </div>
+    <section className="directory-hero">
+      <div className="directory-hero-copy">
+        <div className="directory-eyebrow"><span /> BUSINESS DIRECTORY</div>
+        <h1>Discover businesses worth <span>knowing.</span></h1>
+        <p>Find the company or store you need. Explore local businesses and their miniwebs, all in one place.</p>
+        <div className="directory-hero-proof"><span className="directory-proof-icon"><Check size={13} /></span><span>Local stores. Trusted businesses. Easy discovery.</span></div>
+      </div>
+      <div className="directory-hero-art" aria-hidden="true">
+        <span className="directory-orbit directory-orbit-one" />
+        <span className="directory-orbit directory-orbit-two" />
+        <span className="directory-hero-store"><Store size={37} strokeWidth={1.7} /></span>
+        <span className="directory-hero-note"><Sparkles size={13} /><span><strong>Made for discovery</strong><small>Find your next favourite</small></span></span>
+      </div>
+      <form className="directory-search" onSubmit={submitSearch} role="search">
+        <Search size={19} aria-hidden="true" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search business, category or city" aria-label="Search businesses by name, category or city" />
+        <button type="submit" className="directory-search-submit"><span>Search</span><ArrowRight size={16} /></button>
+      </form>
+    </section>
     <SponsoredBanner campaigns={adCampaigns} placement="business_directory" className="business-sponsored-slot" />
-    <form className="business-directory-search" onSubmit={submitSearch}><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search business, category or city" aria-label="Search businesses" /><button className="search-submit" type="submit" aria-label="Search businesses"><Search size={17} /></button></form>
     {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}
-    {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="business-directory-grid">{businesses.map((business) => { const name = business.business_name || 'Bese26 business'; const handle = business.business_handle; const logoUrl = getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path)); return <article className="business-directory-card" key={business.profile_id || handle} onClick={() => handle && window.location.assign(`/@${handle}`)} role="link" tabIndex={0} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && handle) window.location.assign(`/@${handle}`); }}><div className="business-directory-card-head">{business.logo_path || isOfficialBese26Business(business) ? <img src={logoUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <div className="business-directory-card-logo">{name.slice(0, 1).toUpperCase()}</div>}<div><h2><span className="business-directory-name">{name}</span></h2><VerificationBadges idVerified={business.id_verified} cacVerified={business.cac_verified} compact /><span className="business-directory-handle">@{handle || 'public-store'}</span></div></div><p className="business-directory-location">{[business.city, business.state].filter(Boolean).join(', ') || 'Nigeria'}</p><div className="business-listing-actions"><a className="primary-button" href={handle ? `/@${handle}` : '#'} onClick={(event) => { if (!handle) event.preventDefault(); }}>Open miniweb <ArrowUpRight size={15} /></a></div></article>; })}</div> : <div className="empty-state"><Store size={28} /><h2>No public miniwebs found</h2><p>Try another business name, category or city.</p></div>}
+    <section className="directory-results" aria-labelledby="directory-results-title">
+      <div className="directory-results-heading">
+        <div><span className="directory-section-kicker">CURATED FOR YOU</span><h2 id="directory-results-title">Miniwebs to explore</h2><p>Meet businesses and stores from around your community.</p></div>
+        {!loading && <span className="directory-results-count"><strong>{businesses.length}</strong> {businesses.length === 1 ? 'business' : 'businesses'}</span>}
+      </div>
+      {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="directory-business-grid">{businesses.map((business) => {
+        const name = business.business_name || 'Bese26 business';
+        const handle = business.business_handle;
+        const logoUrl = getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path));
+        const location = [business.city, business.state].filter(Boolean).join(', ') || 'Nigeria';
+        return <article className="directory-business-card" key={business.profile_id || handle} role={handle ? 'link' : undefined} tabIndex={handle ? 0 : -1} aria-label={handle ? `Open ${name} miniweb` : name} onClick={(event) => { if (!handle || event.target.closest?.('a, button')) return; window.location.assign(`/@${handle}`); }} onKeyDown={(event) => { if (!handle || event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return; event.preventDefault(); window.location.assign(`/@${handle}`); }}>
+          <div className="directory-business-card-main">
+            <div className="directory-business-logo">{business.logo_path || isOfficialBese26Business(business) ? <img src={logoUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div>
+            <div className="directory-business-identity">
+              <div className="directory-business-title"><h3>{name}</h3><ArrowUpRight size={16} aria-hidden="true" /></div>
+              <span className="directory-business-handle">@{handle || 'public-store'}</span>
+              <VerificationBadges idVerified={business.id_verified} cacVerified={business.cac_verified} compact />
+            </div>
+          </div>
+          <div className="directory-business-footer">
+            <span className="directory-business-location"><MapPin size={15} aria-hidden="true" /><span>{location}</span></span>
+            {handle ? <a className="directory-visit-link" href={`/@${handle}`}>Visit miniweb <ArrowRight size={15} aria-hidden="true" /></a> : <span className="directory-visit-link is-unavailable">Miniweb</span>}
+          </div>
+        </article>;
+      })}</div> : <div className="directory-empty-state"><span className="directory-empty-icon"><Store size={24} /></span><h3>No public miniwebs found</h3><p>Try another business name, category or city to find what you need.</p>{query && <button type="button" className="directory-clear-search" onClick={() => { setQuery(''); loadBusinesses(); }}>Clear search</button>}</div>}
+    </section>
   </div>;
 }
 
