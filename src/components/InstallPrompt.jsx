@@ -73,6 +73,10 @@ export default function InstallPrompt() {
 
 export function registerBese26ServiceWorker() {
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}), { once: true });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+        .then((registration) => registration.update().catch(() => {}))
+        .catch(() => {});
+    }, { once: true });
   }
 }
