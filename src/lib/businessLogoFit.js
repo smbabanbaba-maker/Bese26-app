@@ -14,7 +14,26 @@ export function getBusinessLogoDisplayUrl(business, logoUrl = '') {
 export function handleBusinessLogoLoad(event) {
   const image = event?.currentTarget;
   if (!image) return;
-  // Keep normal/square marks fully visible; crop tall portrait marks to fill their square frame.
+
   const isTallPortrait = image.naturalWidth > 0 && image.naturalHeight / image.naturalWidth > 1.1;
   image.classList.toggle('is-tall-business-logo', isTallPortrait);
+  if (!isTallPortrait) return;
+
+  image.title = image.title || 'Open full logo';
+  if (image.closest('button, a, [role="button"], [role="link"]')) return;
+
+  image.tabIndex = 0;
+  image.setAttribute('role', 'button');
+  if (!image.hasAttribute('aria-label')) {
+    image.setAttribute('aria-label', `Open full ${image.alt || 'business logo'}`);
+  }
+  if (image.dataset.businessLogoPreviewKeyBound !== 'true') {
+    image.dataset.businessLogoPreviewKeyBound = 'true';
+    image.addEventListener('keydown', (keyEvent) => {
+      if (keyEvent.key !== 'Enter' && keyEvent.key !== ' ') return;
+      keyEvent.preventDefault();
+      keyEvent.stopPropagation();
+      image.click();
+    });
+  }
 }

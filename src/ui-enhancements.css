@@ -213,7 +213,7 @@ img.avatar.is-business-logo {
   max-height: 100%;
   object-fit: contain !important;
   object-position: center center !important;
-  padding: 6% !important;
+  padding: 0 !important;
   background: #fff !important;
 }
 
@@ -237,7 +237,7 @@ img.profile-avatar-image.is-business-logo.is-tall-business-logo,
 .notification-feed-media.is-business-logo img.is-tall-business-logo {
   object-fit: contain !important;
   object-position: center center !important;
-  padding: 6% !important;
+  padding: 0 !important;
 }
 
 /* Fullscreen means the whole original image is visible, with safe-area-aware controls. */
@@ -401,4 +401,83 @@ img.profile-avatar-image.is-business-logo.is-tall-business-logo,
 }
 @media (prefers-reduced-motion: reduce) {
   .listing-new-image-button img { transition: none !important; }
+}
+
+
+/* Tall business logos stay whole in tiny avatars and open in a larger preview on tap. */
+img.is-tall-business-logo {
+  cursor: zoom-in !important;
+}
+img.is-tall-business-logo[role="button"]:focus-visible {
+  outline: 2px solid #d43840 !important;
+  outline-offset: 2px;
+}
+.business-logo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 5500;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(9, 12, 18, .88);
+  backdrop-filter: blur(8px);
+  overscroll-behavior: contain;
+}
+.business-logo-lightbox-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  max-width: min(92vw, 900px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 36px);
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 24, 39, .08);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .38);
+}
+.business-logo-lightbox-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(86vw, 860px);
+  max-height: calc(88dvh - 28px);
+  object-fit: contain;
+  object-position: center;
+  padding: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+.business-logo-lightbox-close {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, .5);
+  border-radius: 50%;
+  color: #151515;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .28);
+}
+.business-logo-lightbox-close:hover {
+  color: #d43840;
+}
+@media (max-width: 600px) {
+  .business-logo-lightbox {
+    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  .business-logo-lightbox-panel {
+    max-width: calc(100vw - 28px);
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
+    padding: 10px;
+    border-radius: 14px;
+  }
+  .business-logo-lightbox-image {
+    max-width: 82vw;
+    max-height: calc(88dvh - 20px);
+  }
 }
