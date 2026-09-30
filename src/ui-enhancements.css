@@ -134,10 +134,11 @@ img, svg, video, canvas { max-width: 100%; }
   background: #f1f3f6;
 }
 
-/* Avatars and logos share stable frames; portrait photos and brand marks fill them consistently. */
+/* Personal photos crop inside their frames; business logos remain completely visible. */
 .avatar,
 .listing-seller-avatar,
 .listing-new-seller-avatar,
+.listing-new-review-avatar,
 .message-identity-avatar,
 .listing-public-comment-avatar,
 .listing-review-comment-avatar,
@@ -151,7 +152,8 @@ img.profile-avatar-image:not(.is-business-logo):not(.business-logo-preview-image
 .listing-new-seller-avatar:not(.is-business-logo) img,
 .message-identity-avatar:not(.is-business-logo) img,
 .listing-public-comment-avatar:not(.is-business-logo) img,
-.listing-review-comment-avatar img,
+.listing-review-comment-avatar:not(.is-business-logo) img,
+.listing-new-review-avatar:not(.is-business-logo) img,
 .notification-feed-media:not(.is-business-logo) img,
 .public-follow-avatar:not(.is-business-logo) img {
   object-fit: cover !important;
@@ -159,8 +161,10 @@ img.profile-avatar-image:not(.is-business-logo):not(.business-logo-preview-image
 }
 .listing-seller-avatar.is-business-logo,
 .listing-new-seller-avatar.is-business-logo,
+.listing-new-review-avatar.is-business-logo,
 .message-identity-avatar.is-business-logo,
 .listing-public-comment-avatar.is-business-logo,
+.listing-review-comment-avatar.is-business-logo,
 .notification-feed-media.is-business-logo,
 .public-follow-avatar.is-business-logo,
 .miniweb-hero-v2-logo.has-business-logo,
@@ -171,8 +175,27 @@ img.profile-avatar-image:not(.is-business-logo):not(.business-logo-preview-image
 }
 .listing-seller-avatar.is-business-logo img,
 .listing-new-seller-avatar.is-business-logo img,
+.listing-new-review-avatar.is-business-logo img,
 .message-identity-avatar.is-business-logo img,
 .listing-public-comment-avatar.is-business-logo img,
+.listing-review-comment-avatar.is-business-logo img,
+.notification-feed-media.is-business-logo img,
+.public-follow-avatar.is-business-logo img,
+.miniweb-hero-v2-logo.has-business-logo img,
+.public-business-logo img,
+.business-directory-logo img,
+.business-live-preview-logo img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+.listing-seller-avatar.is-business-logo img,
+.listing-new-seller-avatar.is-business-logo img,
+.listing-new-review-avatar.is-business-logo img,
+.message-identity-avatar.is-business-logo img,
+.listing-public-comment-avatar.is-business-logo img,
+.listing-review-comment-avatar.is-business-logo img,
 .notification-feed-media.is-business-logo img,
 .public-follow-avatar.is-business-logo img,
 .miniweb-hero-v2-logo.has-business-logo img,
@@ -183,12 +206,38 @@ img.profile-avatar-image:not(.is-business-logo):not(.business-logo-preview-image
 .business-logo-upload img,
 .business-live-preview-logo img,
 img.profile-avatar-image.is-business-logo,
-img.business-logo-preview-image {
+img.business-logo-preview-image,
+img.avatar.is-business-logo {
   box-sizing: border-box;
-  object-fit: cover !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain !important;
   object-position: center center !important;
-  padding: 0 !important;
+  padding: 6% !important;
   background: #fff !important;
+}
+
+/* Keep legacy tall-logo classes contained too; older rules used cover and cropped artwork. */
+.listing-seller-avatar.is-business-logo img.is-tall-business-logo,
+.listing-new-seller-avatar.is-business-logo img.is-tall-business-logo,
+.listing-new-review-avatar.is-business-logo img.is-tall-business-logo,
+.miniweb-hero-v2-logo.has-business-logo img.is-tall-business-logo,
+.public-business-logo img.is-tall-business-logo,
+.business-directory-logo img.is-tall-business-logo,
+.business-directory-page .business-directory-card-head > img.is-tall-business-logo,
+.business-directory-page img.business-directory-card-logo.is-tall-business-logo,
+.business-logo-upload img.is-tall-business-logo,
+.business-live-preview-logo img.is-tall-business-logo,
+img.business-logo-preview-image.is-tall-business-logo,
+img.avatar.is-business-logo.is-tall-business-logo,
+img.profile-avatar-image.is-business-logo.is-tall-business-logo,
+.message-identity-avatar.is-business-logo img.is-tall-business-logo,
+.listing-public-comment-avatar.is-business-logo img.is-tall-business-logo,
+.listing-review-comment-avatar.is-business-logo img.is-tall-business-logo,
+.notification-feed-media.is-business-logo img.is-tall-business-logo {
+  object-fit: contain !important;
+  object-position: center center !important;
+  padding: 6% !important;
 }
 
 /* Fullscreen means the whole original image is visible, with safe-area-aware controls. */
