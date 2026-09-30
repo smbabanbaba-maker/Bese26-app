@@ -227,13 +227,13 @@ function ListingCardMedia({ listing, children }) {
   </div>;
 }
 
-const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onToggleSave, compact = false }) {
+const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onToggleSave, compact = false, featured = false }) {
   const isNew = Boolean(listing.raw?.created_at && Date.now() - new Date(listing.raw.created_at).getTime() < 24 * 60 * 60 * 1000);
   const isTopRated = Number(listing.sellerRating || 0) >= 4.5;
   return (
     <article className={`product-card ${compact ? 'product-card-compact' : ''}`} role="button" tabIndex={0} aria-label={`Open listing: ${listing.title}`} onClick={() => onOpen(listing)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); onOpen(listing); } }}>
       <ListingCardMedia listing={listing}>
-        <div className="listing-card-badges">{listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> BOOSTED</span>}{isNew && <span className="fresh-pill">NEW</span>}{isTopRated && <span className="trust-pill"><BadgeCheck size={11} /> TOP RATED</span>}</div>
+        <div className="listing-card-badges">{featured && <span className="featured-pill"><Star size={11} fill="currentColor" /> FEATURED</span>}{listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> BOOSTED</span>}{isNew && <span className="fresh-pill">NEW</span>}{isTopRated && <span className="trust-pill"><BadgeCheck size={11} /> TOP RATED</span>}</div>
         <button className={`save-button ${isSaved ? 'saved' : ''}`} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} onClick={(event) => { event.stopPropagation(); onToggleSave(listing.id); }}>
           <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
@@ -404,6 +404,15 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
   useEffect(() => { setPromoIndex(0); }, [user?.id, adCampaigns.length]);
   useEffect(() => { if (promoSlides.length < 2) return undefined; const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
   const promo = promoSlides[promoIndex];
+  const featuredListings = useMemo(() => {
+    const seen = new Set();
+    return marketListings.filter((listing) => {
+      const key = String(listing.title || listing.id || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 50);
+  }, [marketListings]);
   return (
     <div className="page-stack home-page">
       {promo && <section className={`home-ad-banner ${promo.type === 'dashboard' ? 'home-ad-dashboard dashboard-welcome-card' : `home-ad-slide-${promoIndex}`}`} aria-label={promo.type === 'dashboard' ? 'Your Bese26 dashboard' : 'Sponsored promotion'}>
@@ -428,8 +437,7 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
       <section className="popular-categories"><SectionHeading eyebrow="CHOOSE A CATEGORY" title="What are you looking for?" action="View all" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>
 
       <section>
-        <SectionHeading eyebrow="CURATED FOR YOU" title="Featured listings" action={marketListings.length ? 'View all' : null} onAction={() => onNavigate('search')} />
-        {marketLoading && !marketListings.length ? <><div className="loading-section-note"><span className="loading-pulse-dot" /> Loading the newest listings…</div><ListingGridSkeleton count={6} /></> : marketListings.length ? <><div className="product-grid">{marketListings.slice(0, 50).map((listing) => <ProductCard key={listing.id} listing={listing} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
+        {marketLoading && !marketListings.length ? <><div className="loading-section-note"><span className="loading-pulse-dot" /> Loading the newest listings…</div><ListingGridSkeleton count={6} /></> : featuredListings.length ? <><div className="product-grid home-featured-grid">{featuredListings.map((listing, index) => <ProductCard key={listing.id} listing={listing} featured={index < 4} onOpen={onOpenListing} isSaved={savedIds.includes(listing.id)} onToggleSave={onToggleSave} />)}</div><button type="button" className="home-view-all-button" onClick={() => onNavigate('search')}>View all listings <ArrowRight size={16} /></button></> : <div className="empty-state"><Package size={25} /><h3>No live listings yet</h3><p>Be one of the first sellers to add a product. New listings appear here after review.</p><div className="empty-state-actions"><button className="primary-button" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button className="secondary-button" onClick={() => onNavigate('business')}><Store size={15} /> Explore businesses</button></div></div>}
       </section>
 
       <section className="trust-strip" aria-label="Why use Bese26">
