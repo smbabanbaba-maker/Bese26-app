@@ -877,7 +877,7 @@ function PublicListingRoute({ listingId }) {
   const [sessionUser, setSessionUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
-  const [authInitialMode, setAuthInitialMode] = useState('signup');
+  const [authInitialMode, setAuthInitialMode] = useState('signin');
   useEffect(() => { let mounted = true; fetchListingDetails(listingId).then((data) => mounted && setListing(data)).catch(() => mounted && setListing(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [listingId]);
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined;
@@ -892,7 +892,7 @@ function PublicListingRoute({ listingId }) {
   usePublicSeo({ title: listing ? `${listing.title} | Bese26 Marketplace` : 'Bese26 Marketplace', description: listingDescription, canonical: listing ? `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}` : `${SEO_SITE_URL}/`, image: listing?.image || SEO_DEFAULT_IMAGE, schema: listing ? seoListingSchema(listing) : null });
   if (loading) return <BrandLoader message="Loading listing…" compact />;
   if (!listing) return <div className="empty-state listing-not-found"><Package size={30} /><h1>Listing not found</h1><p>This listing is no longer available or is not public.</p><a className="primary-button" href="/">Back to Bese26</a></div>;
-  const requireAuth = (message = 'Create an account or sign in to join the listing discussion.') => { setAuthReason(message); setAuthInitialMode('signup'); setShowAuth(true); };
+  const requireAuth = (message = 'Create an account or sign in to join the listing discussion.') => { setAuthReason(message); setAuthInitialMode('signin'); setShowAuth(true); };
   return <>
     <ListingDetailsView listing={listing} user={sessionUser} onAuthRequired={requireAuth} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />
     {showAuth && <AuthPanel reason={authReason} initialMode={authInitialMode} onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setShowAuth(false); setAuthInitialMode('signin'); setAuthReason(''); }} />}
@@ -1060,7 +1060,7 @@ function AppContent() {
       return bMatch - aMatch;
     });
   }, [marketListings, userPlace]);
-  const requireAuth = useCallback((message = 'Create an account or sign in to continue with your marketplace account.', initialMode = 'signup') => { setAuthReason(message); setAuthInitialMode(initialMode === 'signin' ? 'signin' : 'signup'); setShowAuth(true); }, []);  useEffect(() => {
+  const requireAuth = useCallback((message = 'Create an account or sign in to continue with your marketplace account.', initialMode = 'signin') => { setAuthReason(message); setAuthInitialMode(initialMode === 'signin' ? 'signin' : 'signup'); setShowAuth(true); }, []);  useEffect(() => {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
@@ -1229,7 +1229,7 @@ function AppContent() {
   const navigate = (page) => {
     const protectedPages = new Set(['notifications', 'saved', 'sell', 'messages', 'business', 'profile', 'subscription', 'admin']);
     if (protectedPages.has(page) && !sessionUser) {
-      requireAuth('Create your free Bese26 account to continue.', 'signup');
+      requireAuth('Login or create a free Bese26 account to continue.', 'signin');
       return;
     }
     if (page !== 'sell') { setEditingListing(null); setCopySourceListing(null); }
