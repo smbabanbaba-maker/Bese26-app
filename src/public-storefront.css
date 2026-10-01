@@ -2069,3 +2069,21 @@
   .public-business-topbar { justify-content: flex-start !important; padding-left: 12px !important; }
   .public-business-main { padding-top: 0 !important; }
 }
+
+
+/* Zero-gap brand junction: compact bar height keeps the hero directly under the logo/name. */
+.public-business-topbar {
+  height: 46px !important;
+  min-height: 46px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.public-business-topbar .public-brand-logo { width: 28px !important; height: 28px !important; }
+.public-business-topbar .public-brand strong { font-size: 16px !important; }
+.public-business-main { padding-top: 0 !important; margin-top: 0 !important; }
+.public-business-main > .miniweb-hero-v2:first-child { margin-top: 0 !important; transform: none !important; }
+@media (max-width: 600px) {
+  .public-business-topbar { height: 44px !important; min-height: 44px !important; }
+  .public-business-topbar .public-brand-logo { width: 27px !important; height: 27px !important; }
+  .public-business-topbar .public-brand strong { font-size: 15px !important; }
+}
