@@ -1644,3 +1644,18 @@
   .miniweb-dashboard-live .miniweb-hero-v2-actions { width:100% !important; }
   .miniweb-dashboard-live .miniweb-hero-v2-listings { width:100% !important; }
 }
+
+
+/* Miniweb hero: remove the large standalone logo panel; open directly into dashboard content. */
+.miniweb-dashboard-live { grid-template-columns: minmax(0, 1fr) auto !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-heading { grid-column: 1 !important; grid-row: 1 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-share { grid-column: 2 !important; grid-row: 1 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-meta { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-description,
+.miniweb-dashboard-live .miniweb-hero-v2-bottom { grid-column: 1 / -1 !important; }
+@media (max-width:700px) {
+  .miniweb-dashboard-live { grid-template-columns: minmax(0, 1fr) auto !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-heading { grid-column: 1 !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-share { grid-column: 2 !important; position: static !important; align-self: start !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-meta { grid-column: 1 / -1 !important; }
+}
