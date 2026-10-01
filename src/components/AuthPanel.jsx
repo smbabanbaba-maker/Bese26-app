@@ -15,7 +15,7 @@ function MarketArt({ register = false }) {
     {!register && <div className="auth-market-copy"><h2>Buy. Sell. <em>Connect.</em></h2><p>Real people. Real businesses.<br />Bigger opportunities across Nigeria.</p></div>}
     <div className="auth-market-red" />
     <div className="auth-market-car"><i /><i /></div><div className="auth-market-house"><i /><b /></div><div className="auth-market-bag" />
-    <div className="auth-market-phone"><span className="auth-phone-notch" /><strong>Bese<span>26</span></strong><small>Search for anything...</small><div className="auth-mini-categories"><i>P</i><i>C</i><i>H</i><i>F</i><i>A</i><i>G</i><i>E</i><i>+</i></div></div>
+    <div className="auth-market-phone"><span className="auth-phone-notch" /><img className="auth-dashboard-screen" src="/images/auth-dashboard-home.png" alt="Bese26 dashboard" /></div>
     {register && <div className="auth-register-skyline"><i /><i /><i /><i /><i /><i /><i /></div>}
     {register && <div className="auth-register-wave" />}
   </div>;
