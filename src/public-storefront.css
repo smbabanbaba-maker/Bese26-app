@@ -1991,3 +1991,56 @@
     height: auto !important;
   }
 }
+
+
+/* Final visibility correction: never clip the contentful Miniweb hero. */
+.miniweb-hero-v2 {
+  aspect-ratio: auto !important;
+  min-height: 300px !important;
+  height: auto !important;
+  overflow: visible !important;
+  color: #fff !important;
+  background: linear-gradient(135deg,#111722 0%,#1d273a 52%,#442b36 100%) !important;
+}
+.miniweb-hero-v2-top {
+  display: flex !important;
+  align-items: flex-start !important;
+  min-width: 0 !important;
+}
+.miniweb-hero-v2-logo {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 92px !important;
+  width: 92px !important;
+  height: 92px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.miniweb-hero-v2-logo img { display: block !important; visibility: visible !important; opacity: 1 !important; }
+.miniweb-hero-v2-heading,
+.miniweb-hero-v2-heading h1,
+.miniweb-hero-v2-description,
+.miniweb-hero-v2-meta,
+.miniweb-hero-v2-meta > span:first-child { color: #fff !important; visibility: visible !important; opacity: 1 !important; }
+.miniweb-hero-v2-heading h1 { font-size: clamp(30px, 5vw, 48px) !important; line-height: 1.04 !important; }
+.miniweb-hero-v2-description { color: #dce4ef !important; }
+.miniweb-hero-v2-meta { color: #e5ebf4 !important; }
+.miniweb-hero-v2-bottom,
+.miniweb-hero-v2-stats,
+.miniweb-hero-v2-actions { visibility: visible !important; opacity: 1 !important; }
+.miniweb-hero-v2-stats { display: flex !important; width: 100% !important; }
+.miniweb-hero-v2-stats span,
+.miniweb-hero-v2-stats strong,
+.miniweb-hero-v2-stats small,
+.miniweb-hero-v2-follow { visibility: visible !important; opacity: 1 !important; }
+@media (min-width: 601px) {
+  .miniweb-hero-v2 { padding: 24px !important; }
+  .miniweb-hero-v2-bottom { display: grid !important; grid-template-columns: minmax(0,1fr) !important; gap: 10px !important; }
+  .miniweb-hero-v2-actions { width: 100% !important; }
+  .miniweb-hero-v2-listings { width: 100% !important; min-height: 38px !important; }
+}
+@media (max-width: 600px) {
+  .miniweb-hero-v2 { min-height: 230px !important; }
+  .miniweb-hero-v2-logo { flex-basis: 62px !important; width: 62px !important; height: 62px !important; }
+  .miniweb-hero-v2-heading h1 { font-size: 27px !important; }
+}
