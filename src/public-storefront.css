@@ -2052,3 +2052,20 @@
 @media (max-width: 600px) {
   .public-business-main { padding-top: 2px !important; }
 }
+
+
+/* Final topbar alignment: brand sits to one side, hero moves closer upward. */
+.public-business-topbar {
+  justify-content: flex-start !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+.public-business-topbar .public-brand {
+  margin-right: auto !important;
+  justify-content: flex-start !important;
+}
+.public-business-main { padding-top: 1px !important; }
+@media (max-width: 600px) {
+  .public-business-topbar { justify-content: flex-start !important; padding-left: 12px !important; }
+  .public-business-main { padding-top: 0 !important; }
+}
