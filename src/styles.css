@@ -8640,11 +8640,11 @@ img.avatar.is-business-logo {
 .payment-verifying-overlay { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; background: rgba(255,255,255,.82); backdrop-filter: blur(10px); }
 .payment-verifying-overlay .brand-loader { width: min(100%, 360px); min-height: 280px; padding: 24px; border: 1px solid rgba(255,44,44,.12); border-radius: 24px; background: rgba(255,255,255,.96); box-shadow: 0 24px 70px rgba(25,20,20,.16); }
 
-/* Public shops open directly: keep the transition quiet without the full-screen branded splash. */
-.miniweb-route-loading { min-height: 100dvh; background: #fff; }
+/* Public shops open directly into the dashboard-shaped shell, never a white splash. */
+.miniweb-route-loading { min-height: 100dvh; background: #f7f8fa; }
 
 /* Instant Miniweb dashboard shell: the route opens into the storefront UI, never a splash screen. */
-.miniweb-dashboard-shell { min-height: 100dvh; background: #f7f8fa; color: #17181b; }
+.miniweb-dashboard-shell { min-height: 100dvh; background: #f7f8fa; color: #17181b; border-top: 3px solid #e53935; }
 .miniweb-dashboard-shell-topbar { display:flex; align-items:center; justify-content:space-between; height:66px; max-width:1120px; margin:0 auto; padding:0 24px; border-bottom:1px solid #e7e8eb; background:#fff; }
 .miniweb-dashboard-shell-brand { display:inline-flex; align-items:center; gap:9px; font-size:17px; letter-spacing:-.045em; }
 .miniweb-dashboard-shell-brand img { width:32px; height:32px; object-fit:contain; border-radius:9px; }
@@ -8652,20 +8652,21 @@ img.avatar.is-business-logo {
 .miniweb-dashboard-shell-action { width:82px; height:34px; border-radius:10px; background:#eef0f3; }
 .miniweb-dashboard-shell-main { width:100%; max-width:1120px; margin:0 auto; padding:32px 24px 72px; }
 .miniweb-dashboard-shell-hero { display:grid; grid-template-columns:112px minmax(0,1fr); align-items:center; gap:24px; min-height:210px; padding:28px; border-radius:24px; background:linear-gradient(135deg,#111827 0%,#1f2a44 56%,#3a2035 100%); }
-.miniweb-shell-avatar { width:112px; height:112px; border:4px solid rgba(255,255,255,.45); border-radius:24px; background:rgba(255,255,255,.18); }
+.miniweb-shell-avatar { width:112px; height:112px; border:4px solid rgba(255,255,255,.45); border-radius:24px; background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(229,57,53,.32)); box-shadow:0 14px 28px rgba(0,0,0,.18); }
 .miniweb-shell-copy { display:grid; gap:13px; max-width:420px; }
-.miniweb-shell-copy span { display:block; height:13px; border-radius:99px; background:rgba(255,255,255,.22); }
+.miniweb-shell-copy span { display:block; height:13px; border-radius:99px; background:linear-gradient(90deg,rgba(255,255,255,.16),rgba(255,255,255,.42),rgba(255,255,255,.16)); background-size:220% 100%; animation:miniwebShellShimmer 1.6s ease-in-out infinite; }
 .miniweb-shell-copy span:first-child { width:58%; height:27px; }
 .miniweb-shell-copy span:nth-child(2) { width:84%; }
 .miniweb-shell-copy span:nth-child(3) { width:66%; }
 .miniweb-dashboard-shell-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0; }
-.miniweb-dashboard-shell-stats span { height:66px; border:1px solid #e5e7eb; border-radius:16px; background:#fff; }
+.miniweb-dashboard-shell-stats span { height:66px; border:1px solid #e5e7eb; border-radius:16px; background:linear-gradient(90deg,#fff,#f1f3f5,#fff); background-size:220% 100%; animation:miniwebShellShimmer 1.8s ease-in-out infinite; }
 .miniweb-dashboard-shell-card { padding:22px; border:1px solid #e5e7eb; border-radius:22px; background:#fff; }
 .miniweb-shell-heading { display:flex; justify-content:space-between; margin-bottom:18px; }
 .miniweb-shell-heading span { width:190px; height:20px; border-radius:99px; background:#e8ebef; }
 .miniweb-shell-heading i { width:74px; height:20px; border-radius:99px; background:#f0f2f5; }
 .miniweb-shell-listings { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-.miniweb-shell-listings span { height:190px; border-radius:16px; background:linear-gradient(180deg,#edf0f3 0 62%,#f7f8fa 62%); }
+.miniweb-shell-listings span { height:190px; border-radius:16px; background:linear-gradient(110deg,#edf0f3 0 38%,#fafafa 50%,#edf0f3 62%); background-size:220% 100%; animation:miniwebShellShimmer 1.9s ease-in-out infinite; }
+@keyframes miniwebShellShimmer { 0%,100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
 @media (max-width:700px) {
   .miniweb-dashboard-shell-topbar { height:58px; padding:0 16px; }
   .miniweb-dashboard-shell-main { padding:16px 14px 42px; }

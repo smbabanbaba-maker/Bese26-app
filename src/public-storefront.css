@@ -1644,3 +1644,80 @@
   .miniweb-dashboard-live .miniweb-hero-v2-actions { width:100% !important; }
   .miniweb-dashboard-live .miniweb-hero-v2-listings { width:100% !important; }
 }
+
+
+/* Miniweb hero: remove the large standalone logo panel; open directly into dashboard content. */
+.miniweb-dashboard-live { grid-template-columns: minmax(0, 1fr) auto !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-heading { grid-column: 1 !important; grid-row: 1 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-share { grid-column: 2 !important; grid-row: 1 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-meta { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+.miniweb-dashboard-live .miniweb-hero-v2-description,
+.miniweb-dashboard-live .miniweb-hero-v2-bottom { grid-column: 1 / -1 !important; }
+@media (max-width:700px) {
+  .miniweb-dashboard-live { grid-template-columns: minmax(0, 1fr) auto !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-heading { grid-column: 1 !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-share { grid-column: 2 !important; position: static !important; align-self: start !important; }
+  .miniweb-dashboard-live .miniweb-hero-v2-meta { grid-column: 1 / -1 !important; }
+}
+
+/* Real public Miniweb dashboard: replace the old profile-page presentation. */
+.miniweb-public-dashboard { min-height: 100vh; background: #f6f7f9; color: #17191d; }
+.miniweb-public-dashboard-bar { position: sticky; top: 0; z-index: 20; display:flex; align-items:center; justify-content:space-between; min-height:64px; padding:0 24px; border-bottom:1px solid #e4e6ea; background:rgba(255,255,255,.94); backdrop-filter:blur(18px); }
+.miniweb-public-dashboard-brand { display:inline-flex; align-items:center; gap:9px; color:#17191d; text-decoration:none; font-size:17px; letter-spacing:-.05em; }
+.miniweb-public-dashboard-brand img { width:34px; height:34px; border-radius:10px; }
+.miniweb-public-dashboard-brand span { color:#d9212a; }
+.miniweb-public-dashboard-bar-actions { display:flex; align-items:center; gap:12px; }
+.miniweb-public-dashboard-bar-actions button { display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:7px 11px; border:1px solid #17191d; border-radius:9px; background:#fff; font-size:10px; font-weight:800; }
+.miniweb-live-pill { display:inline-flex; align-items:center; gap:5px; color:#5f6872; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+.miniweb-live-pill i { width:7px; height:7px; border-radius:50%; background:#21a366; box-shadow:0 0 0 4px rgba(33,163,102,.12); }
+.miniweb-public-dashboard-main { width:min(1120px,100%); margin:0 auto; padding:28px 24px 72px; }
+.miniweb-public-dashboard-hero { display:flex; align-items:center; justify-content:space-between; gap:20px; min-height:220px; padding:30px; border-radius:24px; color:#fff; background:linear-gradient(125deg,#111315 0%,#24272c 57%,#5b2028 100%); box-shadow:0 20px 44px rgba(17,19,21,.16); }
+.miniweb-public-dashboard-identity { display:flex; align-items:center; gap:20px; min-width:0; }
+.miniweb-dashboard-avatar { display:grid; place-items:center; flex:0 0 104px; width:104px; height:104px; overflow:hidden; border:4px solid rgba(255,255,255,.28); border-radius:24px; background:rgba(255,255,255,.12); color:#fff; font-size:34px; font-weight:900; }
+.miniweb-dashboard-avatar img { width:100%; height:100%; object-fit:contain; padding:5px; background:#fff; }
+.miniweb-dashboard-eyebrow, .miniweb-dashboard-section-label { color:#ffb3b7; font-size:9px; font-weight:900; letter-spacing:.15em; text-transform:uppercase; }
+.miniweb-public-dashboard-hero h1 { margin:8px 0 7px; color:#fff; font-size:clamp(30px,5vw,54px); line-height:1; letter-spacing:-.06em; }
+.miniweb-public-dashboard-hero p { color:#e2e5e9; font-size:12px; }
+.miniweb-dashboard-primary { display:inline-flex; align-items:center; gap:7px; flex:none; min-height:40px; padding:9px 14px; border-radius:10px; color:#fff; background:#d9212a; font-size:10px; font-weight:900; }
+.miniweb-public-dashboard-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0; }
+.miniweb-public-dashboard-stats > div { display:flex; flex-direction:column; gap:6px; min-height:86px; padding:17px; border:1px solid #e1e4e8; border-radius:15px; background:#fff; }
+.miniweb-public-dashboard-stats strong { color:#17191d; font-size:20px; line-height:1.1; overflow-wrap:anywhere; }
+.miniweb-public-dashboard-stats span { color:#747b84; font-size:10px; }
+.miniweb-public-dashboard-overview, .miniweb-public-dashboard-listings { padding:24px; border:1px solid #e1e4e8; border-radius:20px; background:#fff; box-shadow:0 8px 22px rgba(17,19,21,.04); }
+.miniweb-public-dashboard-overview { display:flex; justify-content:space-between; gap:24px; margin-bottom:18px; }
+.miniweb-public-dashboard-overview h2, .miniweb-dashboard-section-heading h2 { margin:7px 0 8px; color:#17191d; font-size:25px; letter-spacing:-.05em; }
+.miniweb-dashboard-section-label { color:#d9212a; }
+.miniweb-public-dashboard-overview p { max-width:620px; color:#68717a; font-size:12px; line-height:1.6; }
+.miniweb-dashboard-service-list { display:flex; flex-direction:column; gap:8px; min-width:210px; padding-top:8px; }
+.miniweb-dashboard-service-list span { display:inline-flex; align-items:center; gap:7px; color:#3b444d; font-size:10px; font-weight:800; }
+.miniweb-dashboard-service-list svg { color:#21a366; }
+.miniweb-dashboard-section-heading { display:flex; align-items:end; justify-content:space-between; gap:14px; padding-bottom:14px; border-bottom:1px solid #eceef1; }
+.miniweb-dashboard-section-heading > span { color:#747b84; font-size:10px; font-weight:800; }
+.miniweb-dashboard-product-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:18px; }
+.miniweb-public-dashboard-listings .product-card { border-color:#e1e4e8; box-shadow:0 6px 18px rgba(17,19,21,.04); }
+.miniweb-public-dashboard-listings .product-image-wrap { height:200px; }
+.miniweb-dashboard-empty { display:grid; place-items:center; min-height:190px; color:#747b84; font-size:12px; }
+.miniweb-public-dashboard-footer { display:flex; justify-content:space-between; gap:16px; width:min(1120px,100%); margin:0 auto; padding:22px 24px 34px; border-top:1px solid #e1e4e8; color:#747b84; font-size:10px; }
+.miniweb-public-dashboard-footer strong { color:#17191d; font-size:13px; }
+.miniweb-public-dashboard-footer strong span { color:#d9212a; }
+@media (max-width:700px) {
+  .miniweb-public-dashboard-bar { min-height:56px; padding:0 12px; }
+  .miniweb-public-dashboard-brand { font-size:15px; }
+  .miniweb-public-dashboard-brand img { width:30px; height:30px; }
+  .miniweb-live-pill { display:none; }
+  .miniweb-public-dashboard-main { padding:16px 12px 48px; }
+  .miniweb-public-dashboard-hero { align-items:flex-start; flex-direction:column; min-height:220px; padding:20px; border-radius:18px; }
+  .miniweb-public-dashboard-identity { gap:13px; }
+  .miniweb-dashboard-avatar { flex-basis:68px; width:68px; height:68px; border-radius:17px; font-size:24px; }
+  .miniweb-public-dashboard-hero h1 { font-size:clamp(27px,9vw,40px); }
+  .miniweb-dashboard-primary { width:100%; justify-content:center; }
+  .miniweb-public-dashboard-stats { grid-template-columns:repeat(2,1fr); gap:8px; margin:12px 0; }
+  .miniweb-public-dashboard-stats > div { min-height:70px; padding:12px; }
+  .miniweb-public-dashboard-stats strong { font-size:17px; }
+  .miniweb-public-dashboard-overview, .miniweb-public-dashboard-listings { padding:16px; border-radius:17px; }
+  .miniweb-public-dashboard-overview { flex-direction:column; gap:16px; }
+  .miniweb-dashboard-service-list { min-width:0; }
+  .miniweb-dashboard-product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .miniweb-public-dashboard-listings .product-image-wrap { height:145px; }
+  .miniweb-public-dashboard-footer { padding:18px 12px 26px; flex-direction:column; gap:5px; }
+}
