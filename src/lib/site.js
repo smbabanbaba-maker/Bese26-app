@@ -1,4 +1,4 @@
-export const SITE_URL = 'https://www.bese26.shop';
+export const SITE_URL = 'https://bese26.shop';
 
 export function siteUrl(path = '') {
   const suffix = String(path || '');
