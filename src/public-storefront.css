@@ -1721,3 +1721,104 @@
   .miniweb-public-dashboard-listings .product-image-wrap { height:145px; }
   .miniweb-public-dashboard-footer { padding:18px 12px 26px; flex-direction:column; gap:5px; }
 }
+
+/* Final Miniweb storefront redesign: calm ivory surfaces, red brand signal, clear shop-first hierarchy. */
+.miniweb-public-dashboard {
+  --mw-ink:#18212b;
+  --mw-muted:#687381;
+  --mw-red:#d74343;
+  --mw-red-deep:#a92e36;
+  --mw-soft:#fff4f2;
+  --mw-line:#e9e3df;
+  min-height:100vh !important;
+  color:var(--mw-ink) !important;
+  background:#f8f7f5 !important;
+}
+.miniweb-public-dashboard-bar {
+  min-height:66px !important;
+  padding:0 max(18px, calc((100vw - 1160px) / 2)) !important;
+  border-bottom:1px solid rgba(24,33,43,.08) !important;
+  background:rgba(255,255,255,.92) !important;
+  box-shadow:0 5px 20px rgba(28,32,38,.04) !important;
+}
+.miniweb-public-dashboard-brand { font-weight:900 !important; letter-spacing:-.06em !important; }
+.miniweb-public-dashboard-brand img { width:32px !important; height:32px !important; border-radius:10px !important; box-shadow:0 5px 12px rgba(215,67,67,.18); }
+.miniweb-public-dashboard-brand span { color:var(--mw-red) !important; }
+.miniweb-public-dashboard-bar-actions { gap:10px !important; }
+.miniweb-live-pill { color:#5d7667 !important; background:#eef8f0; padding:6px 9px; border-radius:999px; letter-spacing:.06em; }
+.miniweb-live-pill i { background:#27a466 !important; }
+.miniweb-public-dashboard-bar-actions button { min-height:35px !important; padding:7px 12px !important; border:1px solid #e3c1bc !important; border-radius:10px !important; color:var(--mw-red-deep) !important; background:#fff !important; transition:transform .18s ease, background .18s ease; }
+.miniweb-public-dashboard-bar-actions button:hover { background:var(--mw-soft) !important; transform:translateY(-1px); }
+.miniweb-public-dashboard-main { max-width:1160px !important; padding:30px 22px 72px !important; }
+.miniweb-public-dashboard-hero {
+  position:relative !important;
+  min-height:246px !important;
+  padding:32px !important;
+  overflow:hidden !important;
+  border:1px solid #2b3038 !important;
+  border-radius:26px !important;
+  background:linear-gradient(125deg,#151922 0%,#232936 58%,#71343c 100%) !important;
+  box-shadow:0 20px 42px rgba(27,32,42,.16) !important;
+}
+.miniweb-public-dashboard-hero::after { content:""; position:absolute; width:360px; height:360px; right:-110px; top:-190px; border:1px solid rgba(255,255,255,.14); border-radius:50%; box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 56px rgba(255,255,255,.025); pointer-events:none; }
+.miniweb-public-dashboard-identity { position:relative; z-index:1; gap:18px !important; }
+.miniweb-dashboard-avatar { flex-basis:94px !important; width:94px !important; height:94px !important; border:4px solid rgba(255,255,255,.65) !important; border-radius:24px !important; background:#fff !important; color:var(--mw-red) !important; box-shadow:0 12px 24px rgba(0,0,0,.18) !important; }
+.miniweb-dashboard-avatar img { padding:8px !important; background:#fff !important; }
+.miniweb-dashboard-eyebrow, .miniweb-dashboard-section-label { color:#ffb9b1 !important; letter-spacing:.16em !important; }
+.miniweb-public-dashboard-hero h1 { max-width:680px; margin:8px 0 6px !important; font-size:clamp(32px,5vw,58px) !important; letter-spacing:-.065em !important; }
+.miniweb-public-dashboard-hero p { color:#dce2e9 !important; font-size:12px !important; }
+.miniweb-dashboard-primary { position:relative; z-index:1; min-height:42px !important; padding:10px 15px !important; border-radius:11px !important; color:#fff !important; background:linear-gradient(110deg,#e45b56,#c93b43) !important; box-shadow:0 8px 16px rgba(198,57,65,.25); transition:transform .18s ease, box-shadow .18s ease; }
+.miniweb-dashboard-primary:hover { transform:translateY(-2px); box-shadow:0 12px 22px rgba(198,57,65,.34); }
+.miniweb-public-dashboard-stats { grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:10px !important; margin:16px 0 !important; }
+.miniweb-public-dashboard-stats > div { min-height:82px !important; padding:15px !important; border:1px solid var(--mw-line) !important; border-radius:16px !important; background:#fff !important; box-shadow:0 7px 18px rgba(35,39,46,.045) !important; }
+.miniweb-public-dashboard-stats > div:first-child { border-top:3px solid #d74343 !important; }
+.miniweb-public-dashboard-stats > div:nth-child(2) { border-top:3px solid #3b82c4 !important; }
+.miniweb-public-dashboard-stats > div:nth-child(3) { border-top:3px solid #d39b3d !important; }
+.miniweb-public-dashboard-stats > div:nth-child(4) { border-top:3px solid #37a26e !important; }
+.miniweb-public-dashboard-stats strong { font-size:20px !important; letter-spacing:-.04em; }
+.miniweb-public-dashboard-stats span { color:var(--mw-muted) !important; font-size:10px !important; }
+.miniweb-public-dashboard-overview, .miniweb-public-dashboard-listings { border:1px solid var(--mw-line) !important; border-radius:20px !important; background:#fff !important; box-shadow:0 9px 24px rgba(35,39,46,.045) !important; }
+.miniweb-public-dashboard-overview { align-items:center !important; gap:30px !important; margin-bottom:16px !important; padding:25px !important; }
+.miniweb-public-dashboard-overview h2, .miniweb-dashboard-section-heading h2 { margin:7px 0 8px !important; font-size:27px !important; letter-spacing:-.055em !important; }
+.miniweb-public-dashboard-overview p { color:var(--mw-muted) !important; font-size:12px !important; line-height:1.65 !important; }
+.miniweb-dashboard-service-list { min-width:230px !important; padding:13px 15px !important; border:1px solid #dcefe3; border-radius:14px; background:#f4fbf6; }
+.miniweb-dashboard-service-list span { color:#35614b !important; font-size:10px !important; }
+.miniweb-public-dashboard-listings { padding:25px !important; }
+.miniweb-dashboard-section-heading { padding-bottom:15px !important; border-bottom:1px solid #eee9e6 !important; }
+.miniweb-dashboard-section-heading > span { padding:6px 10px; border-radius:999px; color:var(--mw-red-deep) !important; background:var(--mw-soft); }
+.miniweb-dashboard-product-grid { gap:14px !important; margin-top:18px !important; }
+.miniweb-public-dashboard-listings .product-card { overflow:hidden; border:1px solid #e7e2de !important; border-radius:16px !important; box-shadow:0 5px 15px rgba(35,39,46,.04) !important; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.miniweb-public-dashboard-listings .product-card:hover { transform:translateY(-4px); border-color:#e4b3af !important; box-shadow:0 14px 26px rgba(35,39,46,.11) !important; }
+.miniweb-public-dashboard-listings .product-image-wrap { height:205px !important; background:#f2f1ee !important; }
+.miniweb-dashboard-empty { min-height:170px !important; color:var(--mw-muted) !important; }
+.miniweb-public-dashboard-footer { max-width:1160px !important; padding:22px 22px 34px !important; border-top:1px solid var(--mw-line) !important; }
+.miniweb-public-dashboard-footer strong { font-weight:900 !important; }
+@media (max-width:700px) {
+  .miniweb-public-dashboard-bar { min-height:58px !important; padding:0 13px !important; }
+  .miniweb-public-dashboard-brand { font-size:15px !important; }
+  .miniweb-public-dashboard-brand img { width:30px !important; height:30px !important; }
+  .miniweb-live-pill { display:none !important; }
+  .miniweb-public-dashboard-main { padding:16px 12px 48px !important; }
+  .miniweb-public-dashboard-hero { min-height:230px !important; padding:21px !important; border-radius:20px !important; }
+  .miniweb-public-dashboard-identity { align-items:flex-start !important; gap:13px !important; }
+  .miniweb-dashboard-avatar { flex-basis:70px !important; width:70px !important; height:70px !important; border-radius:18px !important; }
+  .miniweb-public-dashboard-hero h1 { font-size:clamp(27px,9vw,40px) !important; line-height:1.02 !important; }
+  .miniweb-dashboard-primary { width:100%; justify-content:center; margin-top:8px; }
+  .miniweb-public-dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px !important; margin:12px 0 !important; }
+  .miniweb-public-dashboard-stats > div { min-height:72px !important; padding:12px !important; }
+  .miniweb-public-dashboard-stats strong { font-size:17px !important; }
+  .miniweb-public-dashboard-overview, .miniweb-public-dashboard-listings { padding:17px !important; border-radius:17px !important; }
+  .miniweb-public-dashboard-overview { gap:15px !important; }
+  .miniweb-public-dashboard-overview h2, .miniweb-dashboard-section-heading h2 { font-size:22px !important; }
+  .miniweb-dashboard-service-list { min-width:0 !important; }
+  .miniweb-dashboard-product-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; }
+  .miniweb-public-dashboard-listings .product-image-wrap { height:145px !important; }
+  .miniweb-public-dashboard-footer { padding:18px 13px 26px !important; flex-direction:column; gap:5px; }
+}
+@media (max-width:380px) {
+  .miniweb-public-dashboard-bar-actions button { font-size:0; width:34px; justify-content:center; padding:0 !important; }
+  .miniweb-public-dashboard-hero { padding:17px !important; }
+  .miniweb-dashboard-avatar { flex-basis:60px !important; width:60px !important; height:60px !important; }
+  .miniweb-public-dashboard-hero h1 { font-size:25px !important; }
+  .miniweb-public-dashboard-listings .product-image-wrap { height:132px !important; }
+}
