@@ -1381,6 +1381,7 @@
 .public-boosted-label { position: absolute; z-index: 4; top: 10px; right: 10px; display: inline-flex; align-items: center; padding: 5px 8px; border-radius: 999px; color: #fff; background: #c92020; font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 5px 12px rgba(201,32,32,.22); }
 
 
+<<<<<<< HEAD
 /* Preserve complete business logo artwork on every public storefront size. */
 .public-business-hero.storefront-hero-clean > .public-business-logo {
   display: grid !important;
@@ -1822,3 +1823,70 @@
   .miniweb-public-dashboard-hero h1 { font-size:25px !important; }
   .miniweb-public-dashboard-listings .product-image-wrap { height:132px !important; }
 }
+
+/* Final Miniweb reference pass: compact premium storefront, optimized for 375px phones. */
+.public-business-shell { background: linear-gradient(180deg, #fafbfc 0%, #f5f7fa 100%) !important; }
+.public-business-topbar { height: 66px !important; max-width: 100% !important; justify-content: center !important; padding: 0 16px !important; border-bottom: 0 !important; background: rgba(255,255,255,.94) !important; box-shadow: 0 5px 20px rgba(21,31,48,.05) !important; }
+.public-brand { gap: 8px !important; }
+.public-brand-logo { width: 31px !important; height: 31px !important; border-radius: 9px !important; }
+.public-brand strong { font-size: 18px !important; }
+.public-business-nav { display: none !important; }
+.public-business-main { max-width: 760px !important; padding: 12px 14px 64px !important; }
+.miniweb-hero-v2 { gap: 13px !important; min-height: 0 !important; margin-bottom: 14px !important; padding: 20px 18px 16px !important; border: 1px solid rgba(117,215,255,.2) !important; border-radius: 20px !important; background: linear-gradient(135deg,#121722 0%,#1c2436 48%,#3b2733 100%) !important; box-shadow: 0 16px 32px rgba(15,23,42,.17) !important; }
+.miniweb-hero-v2::before { position: absolute; right: -48px; bottom: -130px; width: 260px; height: 260px; content: ''; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; box-shadow: 0 0 0 24px rgba(255,140,145,.045), 0 0 0 49px rgba(117,215,255,.035); animation: miniwebReferenceOrbit 11s ease-in-out infinite; pointer-events: none; }
+.miniweb-hero-v2-top { gap: 14px !important; }
+.miniweb-hero-v2-logo { flex-basis: 78px !important; width: 78px !important; height: 78px !important; border: 4px solid rgba(255,255,255,.95) !important; border-radius: 19px !important; box-shadow: 0 10px 22px rgba(0,0,0,.2) !important; }
+.miniweb-hero-v2-logo img { object-fit: contain !important; }
+.miniweb-hero-v2-heading h1 { font-size: clamp(26px,7.2vw,38px) !important; }
+.miniweb-hero-v2-eyebrow { color: #ffb6c4 !important; font-size: 8px !important; }
+.miniweb-hero-v2-verification { margin-top: 7px !important; padding: 5px 7px !important; background: rgba(255,255,255,.09) !important; }
+.miniweb-hero-v2-meta { gap: 7px !important; font-size: 9px !important; }
+.miniweb-hero-v2-category { color: #ffd1d4 !important; border-color: rgba(255,167,174,.5) !important; background: rgba(255,115,128,.16) !important; }
+.miniweb-hero-v2-description { color: #d9e0ec !important; font-size: 10px !important; }
+.miniweb-hero-v2-bottom { gap: 9px !important; }
+.miniweb-hero-v2-stats { width: 100% !important; border: 1px solid rgba(255,255,255,.26) !important; border-radius: 12px !important; background: rgba(255,255,255,.09) !important; }
+.miniweb-hero-v2-stats span { min-width: 0 !important; padding: 9px 5px !important; }
+.miniweb-hero-v2-stats strong { font-size: 17px !important; }
+.miniweb-hero-v2-stats small { font-size: 7px !important; }
+.miniweb-hero-v2-actions { width: 100% !important; }
+.miniweb-hero-v2-follow, .miniweb-hero-v2-listings { min-height: 35px !important; border-radius: 9px !important; }
+.miniweb-hero-v2-follow { flex: 1 !important; color: #fff !important; background: rgba(255,255,255,.12) !important; }
+.miniweb-hero-v2-follow.following { color: #13253a !important; background: #8ee7c6 !important; }
+.miniweb-hero-v2-listings { flex: 1 !important; color: #17233a !important; background: #fff !important; }
+.public-business-about { position: relative !important; margin: 0 0 14px !important; padding: 17px 16px 16px 19px !important; border: 1px solid #e4e7ec !important; border-radius: 18px !important; background: #fff !important; box-shadow: 0 9px 24px rgba(23,30,43,.055) !important; }
+.public-business-about::before { width: 4px !important; border-radius: 12px 0 0 12px !important; background: linear-gradient(#ef4c56,#e4a64b) !important; }
+.public-about-heading { margin-bottom: 10px !important; }
+.public-about-heading .eyebrow { margin-bottom: 3px !important; color: #6d7582 !important; font-size: 8px !important; }
+.public-about-heading h2 { font-size: 21px !important; }
+.public-about-description { margin: 0 0 13px !important; color: #697386 !important; font-size: 11px !important; line-height: 1.45 !important; }
+.public-about-grid { gap: 8px !important; }
+.public-about-item { min-height: 66px !important; padding: 11px 10px !important; border: 1px solid #e6e8ed !important; border-radius: 13px !important; background: #fbfcfd !important; }
+.public-about-item > svg { color: #b84f4f !important; }
+.public-about-item > span { color: #697386 !important; font-size: 9px !important; }
+.public-about-item b { color: #252b36 !important; font-size: 10px !important; }
+.public-business-listings.storefront-listings-clean { margin-top: 0 !important; padding: 17px 15px 15px !important; border: 1px solid #e4e7ec !important; border-radius: 18px !important; background: #fff !important; box-shadow: 0 9px 24px rgba(23,30,43,.055) !important; }
+.storefront-listings-clean .section-heading { margin-bottom: 13px !important; }
+.storefront-listings-clean .section-heading .eyebrow { margin-bottom: 4px !important; color: #6d7582 !important; font-size: 8px !important; }
+.storefront-listings-clean .section-heading h2 { font-size: 22px !important; }
+.storefront-listings-clean .section-heading > span { padding: 6px 9px; color: #a75055 !important; background: #fff1f2 !important; border-radius: 999px; font-size: 10px !important; }
+.storefront-listings-clean .product-grid { gap: 10px !important; }
+.storefront-listings-clean .public-listing-card { border: 1px solid #e4e7ec !important; border-radius: 15px !important; box-shadow: 0 6px 16px rgba(23,30,43,.055) !important; }
+.storefront-listings-clean .public-listing-card .product-image-wrap { aspect-ratio: 1.08 / 1 !important; background: #f3f5f7 !important; }
+.storefront-listings-clean .public-listing-card .product-info { padding: 10px !important; }
+.storefront-listings-clean .public-listing-card .product-price { color: #b6343b !important; font-size: 14px !important; }
+.storefront-listings-clean .public-listing-card .product-info h3 { margin: 4px 0 7px !important; color: #202631 !important; font-size: 11px !important; }
+.storefront-listings-clean .public-listing-card .product-meta { color: #6d7784 !important; font-size: 9px !important; }
+.storefront-listings-clean .public-listing-card .product-foot { color: #7d8792 !important; font-size: 8px !important; }
+.storefront-listings-clean .public-card-action { margin-top: 8px !important; color: #a9363e !important; font-size: 9px !important; }
+.public-business-footer { max-width: 760px !important; padding: 20px 14px 40px !important; font-size: 10px; }
+@keyframes miniwebReferenceOrbit { 0%,100% { transform: translate3d(0,0,0) rotate(-14deg); } 50% { transform: translate3d(-10px,-8px,0) rotate(-8deg); } }
+@media (max-width: 390px) {
+  .public-business-main { padding-inline: 12px !important; }
+  .miniweb-hero-v2 { padding: 17px 14px 14px !important; }
+  .miniweb-hero-v2-logo { flex-basis: 68px !important; width: 68px !important; height: 68px !important; }
+  .miniweb-hero-v2-top { gap: 10px !important; }
+  .miniweb-hero-v2-heading h1 { font-size: 25px !important; }
+  .miniweb-hero-v2-stats strong { font-size: 15px !important; }
+  .public-business-about { padding-left: 16px !important; }
+}
+@media (prefers-reduced-motion: reduce) { .miniweb-hero-v2::before { animation: none; } }
