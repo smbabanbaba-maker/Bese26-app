@@ -20,7 +20,7 @@ Use **Production** for the production deployment. Add the same non-live values t
 
 ## Paystack dashboard setup
 
-In Paystack Test Mode, create three monthly plans using these amounts: Basic `₦2,999`, Premium `₦7,000`, and Business `₦14,999`. Copy only each returned plan code into its matching Vercel Config variable. Do not put a plan code in the secret-key field.
+In Paystack Test Mode, create three monthly plans using these confirmed amounts: Basic `₦2,500`, Premium `₦4,500`, and Business `₦7,000`. Copy only each returned plan code into its matching Vercel Config variable. Do not put a plan code in the secret-key field. These prices must match the amounts enforced by the Bese26 server checkout routes.
 
 In **Settings → API Keys & Webhooks**, set the Test Webhook URL to:
 
