@@ -6,8 +6,8 @@ function BrandHeader() {
   return <div className="auth-reference-brand"><div className="auth-reference-logo"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div><div className="auth-reference-name">Bese<span>26</span></div><div className="auth-reference-tagline">BUY · SELL · CONNECT</div></div>;
 }
 function Field({ icon: Icon, children, className = '' }) { return <div className={`auth-reference-field ${className}`}><span className="auth-reference-field-icon"><Icon size={18} /></span>{children}</div>; }
-function PasswordField({ id, value, onChange, placeholder, visible, onToggle }) {
-  return <Field icon={LockKeyhole}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required /><button type="button" className="auth-reference-eye" onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
+function PasswordField({ id, value, onChange, placeholder, visible, onToggle, validationState = '' }) {
+  return <Field icon={LockKeyhole} className={validationState ? `auth-reference-field-${validationState}` : ''}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required />{validationState && <span className="auth-reference-password-status" aria-label={validationState === 'valid' ? 'Password is valid' : 'Passwords do not match'}>{validationState === 'valid' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}</span>}<button type="button" className="auth-reference-eye" onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
 }
 function AuthLoading({ label }) { return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>; }
 function MarketArt({ register = false }) {
@@ -34,6 +34,8 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   const [visiblePasswords, setVisiblePasswords] = useState({ login: false, register: false, confirm: false });
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setRegistrationSent(false); };
+  const passwordValidation = form.password ? (form.password.length >= 6 ? 'valid' : 'invalid') : '';
+  const confirmPasswordValidation = form.confirmPassword ? (form.confirmPassword === form.password && form.password.length >= 6 ? 'valid' : 'invalid') : '';
   const submit = async (event) => {
     event.preventDefault(); setStatus({ type: '', message: '' });
     if (mode === 'reset') return;
@@ -72,8 +74,8 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
           <Field icon={UserRound}><input type="text" value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Full Name" autoComplete="name" required /></Field>
           <Field icon={Phone}><input type="tel" value={form.phone} onChange={(event) => update('phone', event.target.value)} placeholder="Phone Number" autoComplete="tel" required /><span className="auth-reference-prefix">🇳🇬 +234</span></Field>
           <Field icon={Mail}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Email Address" autoComplete="email" required /></Field>
-          <PasswordField id="registerPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="Password" visible={visiblePasswords.register} onToggle={() => setVisiblePasswords((v) => ({ ...v, register: !v.register }))} />
-          <PasswordField id="confirmPassword" value={form.confirmPassword} onChange={(event) => update('confirmPassword', event.target.value)} placeholder="Confirm Password" visible={visiblePasswords.confirm} onToggle={() => setVisiblePasswords((v) => ({ ...v, confirm: !v.confirm }))} />
+          <PasswordField id="registerPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="Password" visible={visiblePasswords.register} validationState={passwordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, register: !v.register }))} />
+          <PasswordField id="confirmPassword" value={form.confirmPassword} onChange={(event) => update('confirmPassword', event.target.value)} placeholder="Confirm Password" visible={visiblePasswords.confirm} validationState={confirmPasswordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, confirm: !v.confirm }))} />
           <label className="auth-reference-terms"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I agree to the <b>Terms of Service</b> and <b>Privacy Policy.</b></span></label>
           <button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Please wait…' : 'Create Account'}</span><ArrowRight size={23} /></button>
         </form>}

@@ -9064,3 +9064,15 @@ img.avatar.is-business-logo {
 @keyframes authReferenceLogoGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(242,13,26,.32); } 48% { box-shadow: 0 0 0 10px rgba(242,13,26,0); } }
 @keyframes authReferenceBrandIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .auth-reference-logo, .auth-reference-logo::before, .auth-reference-logo::after, .auth-reference-logo img, .auth-reference-name, .auth-reference-tagline, .auth-loading-orbit img { animation: none; } }
+
+/* Register password validation states. */
+.auth-reference-field-valid { border-color: #22a566; background: #f5fff9; box-shadow: 0 0 0 3px rgba(34,165,102,.08); }
+.auth-reference-field-invalid { border-color: #df3340; background: #fff8f8; box-shadow: 0 0 0 3px rgba(223,51,64,.07); }
+.auth-reference-password-status { width: 25px; height: 25px; flex: 0 0 25px; display: grid; place-items: center; margin-right: 2px; border-radius: 50%; }
+.auth-reference-field-valid .auth-reference-password-status { color: #168b52; background: #dff8e9; animation: authPasswordStatusIn .22s ease both; }
+.auth-reference-field-invalid .auth-reference-password-status { color: #c52432; background: #ffe1e4; animation: authPasswordStatusIn .22s ease both; }
+.auth-reference-field-valid .auth-reference-password-status svg, .auth-reference-field-invalid .auth-reference-password-status svg { stroke-width: 3; }
+.auth-reference-field-valid input { color: #12683e; }
+.auth-reference-field-invalid input { color: #a91d2a; }
+@keyframes authPasswordStatusIn { from { opacity: 0; transform: scale(.65); } 70% { transform: scale(1.08); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .auth-reference-field-valid .auth-reference-password-status, .auth-reference-field-invalid .auth-reference-password-status { animation: none; } }
