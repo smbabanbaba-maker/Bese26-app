@@ -8861,3 +8861,28 @@ img.avatar.is-business-logo {
   .home-page .trust-strip { grid-template-columns:1fr !important; gap:8px !important; }
   .home-page .trust-strip-item { min-height:62px; }
 }
+
+/* Single-line category rail: swipe horizontally instead of wrapping into rows. */
+.home-page .popular-category-rail {
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  grid-template-columns:none !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  justify-content:flex-start !important;
+  gap:10px !important;
+  padding:3px 2px 8px !important;
+  margin-right:-4px !important;
+  scrollbar-width:thin;
+  scrollbar-color:#c94b4b #f2f4f7;
+  overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+}
+.home-page .popular-category-rail::-webkit-scrollbar { height:5px; }
+.home-page .popular-category-rail::-webkit-scrollbar-track { background:#f2f4f7; border-radius:999px; }
+.home-page .popular-category-rail::-webkit-scrollbar-thumb { background:#c94b4b; border-radius:999px; }
+.home-page .popular-category { flex:0 0 92px !important; width:92px !important; scroll-snap-align:start; }
+@media (max-width:700px) {
+  .home-page .popular-category-rail { gap:8px !important; padding-bottom:7px !important; }
+  .home-page .popular-category { flex-basis:82px !important; width:82px !important; }
+}
