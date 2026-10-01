@@ -8680,3 +8680,43 @@ img.avatar.is-business-logo {
   .miniweb-shell-listings { grid-template-columns:repeat(2,1fr); gap:9px; }
   .miniweb-shell-listings span { height:148px; border-radius:12px; }
 }
+
+/* Sponsored banner fit: keep artwork inside the allocated hero slot on every device. */
+.home-page .home-ad-banner:has(.home-ad-image-only) {
+  width:100% !important;
+  height:clamp(120px, 28vw, 270px) !important;
+  min-height:120px !important;
+  max-height:270px !important;
+  aspect-ratio:16 / 5 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  display:block !important;
+  background:#111216 !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center !important;
+}
+@media (max-width:700px) {
+  .home-page .home-ad-banner:has(.home-ad-image-only) {
+    height:clamp(118px, 31vw, 180px) !important;
+    min-height:118px !important;
+    max-height:180px !important;
+    border-radius:16px !important;
+  }
+}
