@@ -21,8 +21,8 @@ function MarketArt({ register = false }) {
   </div>;
 }
 
-export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
-  const [mode, setMode] = useState('signin');
+export default function AuthPanel({ onClose, onAuthenticated, reason = '', initialMode = 'signin' }) {
+  const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'signin');
   const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', displayName: '', username: '', phone: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(false);

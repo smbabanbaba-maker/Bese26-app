@@ -877,6 +877,7 @@ function PublicListingRoute({ listingId }) {
   const [sessionUser, setSessionUser] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
+  const [authInitialMode, setAuthInitialMode] = useState('signup');
   useEffect(() => { let mounted = true; fetchListingDetails(listingId).then((data) => mounted && setListing(data)).catch(() => mounted && setListing(null)).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [listingId]);
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined;
@@ -891,10 +892,10 @@ function PublicListingRoute({ listingId }) {
   usePublicSeo({ title: listing ? `${listing.title} | Bese26 Marketplace` : 'Bese26 Marketplace', description: listingDescription, canonical: listing ? `${SEO_SITE_URL}/listing/${encodeURIComponent(listing.id)}` : `${SEO_SITE_URL}/`, image: listing?.image || SEO_DEFAULT_IMAGE, schema: listing ? seoListingSchema(listing) : null });
   if (loading) return <BrandLoader message="Loading listing…" compact />;
   if (!listing) return <div className="empty-state listing-not-found"><Package size={30} /><h1>Listing not found</h1><p>This listing is no longer available or is not public.</p><a className="primary-button" href="/">Back to Bese26</a></div>;
-  const requireAuth = (message = 'Sign in to join the listing discussion.') => { setAuthReason(message); setShowAuth(true); };
+  const requireAuth = (message = 'Create an account or sign in to join the listing discussion.') => { setAuthReason(message); setAuthInitialMode('signup'); setShowAuth(true); };
   return <>
     <ListingDetailsView listing={listing} user={sessionUser} onAuthRequired={requireAuth} onClose={() => window.location.assign('/')} onDemoAction={(message) => window.alert(message)} onStartChat={(_listing, intent = 'message', draft = '') => { const params = new URLSearchParams({ chat_listing: listing.id, chat_intent: intent }); if (draft) params.set('chat_draft', draft); window.location.assign(`/?${params.toString()}`); }} />
-    {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setShowAuth(false); setAuthReason(''); }} />}
+    {showAuth && <AuthPanel reason={authReason} initialMode={authInitialMode} onClose={() => setShowAuth(false)} onAuthenticated={(nextUser) => { setSessionUser(nextUser); setShowAuth(false); setAuthInitialMode('signin'); setAuthReason(''); }} />}
   </>;
 }
 
@@ -1001,6 +1002,7 @@ function AppContent() {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
+  const [authInitialMode, setAuthInitialMode] = useState('signin');
   const [chatListing, setChatListing] = useState(null);
   const [chatDealPanel, setChatDealPanel] = useState('');
   const [chatDraft, setChatDraft] = useState('');
@@ -1058,7 +1060,7 @@ function AppContent() {
       return bMatch - aMatch;
     });
   }, [marketListings, userPlace]);
-  const requireAuth = useCallback((message = 'Sign in to continue with your marketplace account.') => { setAuthReason(message); setShowAuth(true); }, []);  useEffect(() => {
+  const requireAuth = useCallback((message = 'Create an account or sign in to continue with your marketplace account.', initialMode = 'signup') => { setAuthReason(message); setAuthInitialMode(initialMode === 'signin' ? 'signin' : 'signup'); setShowAuth(true); }, []);  useEffect(() => {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
@@ -1225,6 +1227,11 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
   const navigate = (page) => {
+    const protectedPages = new Set(['notifications', 'saved', 'sell', 'messages', 'business', 'profile', 'subscription', 'admin']);
+    if (protectedPages.has(page) && !sessionUser) {
+      requireAuth('Create your free Bese26 account to continue.', 'signup');
+      return;
+    }
     if (page !== 'sell') { setEditingListing(null); setCopySourceListing(null); }
     if (page === 'sell') trackEvent('open_sell');
     if (page === 'subscription') trackEvent('view_pricing');
@@ -1361,7 +1368,7 @@ function AppContent() {
     <footer className="site-footer"><div><strong>Bese26<span>.shop</span></strong><p>Nigerian online marketplace for personal and business transactions.</p></div><nav aria-label="Public information"><a href="/#terms" onClick={(event) => { event.preventDefault(); goPublicSection('terms'); }} title="Read Terms of Service">Terms</a><a href="/#privacy" onClick={(event) => { event.preventDefault(); goPublicSection('privacy'); }} title="Read Privacy Policy">Privacy</a><a href="/#refund-policy" onClick={(event) => { event.preventDefault(); goPublicSection('refund-policy'); }} title="Read Refund Policy">Refunds</a><a href="/#safety" onClick={(event) => { event.preventDefault(); goPublicSection('safety'); }} title="Read Marketplace Safety">Safety</a><a href="mailto:info@bese26.shop?subject=Bese26%20Support" title="Email Bese26 support">info@bese26.shop</a></nav></footer>
     <nav className="bottom-nav" aria-label="Primary navigation">{mobileNavItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => key === 'sell' ? openSell() : navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="bottom-nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{t(label)}</span></button>)}</nav>
 
-    {showAuth && <AuthPanel reason={authReason} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
+    {showAuth && <AuthPanel reason={authReason} initialMode={authInitialMode} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthInitialMode('signin'); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     {selectedListing && <Suspense fallback={<BrandLoader message="Loading listing…" compact />}><ListingDetailsView listing={selectedListing} user={sessionUser} activeBusiness={businessOwnerProfile} focusSection={listingFocusTarget?.section || null} focusCommentId={listingFocusTarget?.commentId || null} onClose={() => { setListingFocusTarget(null); window.history.back(); }} onAuthRequired={requireAuth} isSaved={savedIds.includes(selectedListing.id)} savedIds={savedIds} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setCopySourceListing(null); setEditingListing(item); navigate('sell'); }} onCopyListing={openSell} /></Suspense>}
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
     {paymentVerifying && <div className="payment-verifying-overlay"><BrandLoader message="Verifying your Bese26 payment…" /></div>}
