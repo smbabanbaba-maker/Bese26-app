@@ -92,12 +92,12 @@ export async function getCurrentSession() {
   return { session: data.session, user: data.session?.user || null };
 }
 
-export async function signUp({ email, password, displayName, username }) {
+export async function signUp({ email, password, displayName, username, phone }) {
   failIfUnavailable();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username }, emailRedirectTo: getAuthRedirectUrl() },
+    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: getAuthRedirectUrl() },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
