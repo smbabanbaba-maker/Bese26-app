@@ -2087,3 +2087,26 @@
   .public-business-topbar .public-brand-logo { width: 27px !important; height: 27px !important; }
   .public-business-topbar .public-brand strong { font-size: 15px !important; }
 }
+
+
+/* Share belongs in the topbar, aligned opposite the Bese26 brand. */
+.public-topbar-share {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-height: 30px !important;
+  margin-left: auto !important;
+  padding: 5px 10px !important;
+  border: 1px solid #e2a6aa !important;
+  border-radius: 8px !important;
+  color: #8e3038 !important;
+  background: #fff !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+}
+.public-topbar-share:hover { background: #fff4f4 !important; }
+@media (max-width: 600px) {
+  .public-topbar-share { min-height: 28px !important; padding: 4px 8px !important; font-size: 9px !important; }
+}
