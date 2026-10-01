@@ -1381,7 +1381,6 @@
 .public-boosted-label { position: absolute; z-index: 4; top: 10px; right: 10px; display: inline-flex; align-items: center; padding: 5px 8px; border-radius: 999px; color: #fff; background: #c92020; font-size: 8px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 5px 12px rgba(201,32,32,.22); }
 
 
-<<<<<<< HEAD
 /* Preserve complete business logo artwork on every public storefront size. */
 .public-business-hero.storefront-hero-clean > .public-business-logo {
   display: grid !important;
@@ -1890,3 +1889,83 @@
   .public-business-about { padding-left: 16px !important; }
 }
 @media (prefers-reduced-motion: reduce) { .miniweb-hero-v2::before { animation: none; } }
+
+
+/* Exact reference composition: match the supplied 375px Miniweb screenshot. */
+@media (max-width: 600px) {
+  .public-business-topbar {
+    height: 66px !important;
+    min-height: 66px !important;
+    justify-content: center !important;
+    padding: 0 14px !important;
+    box-shadow: none !important;
+  }
+  .public-brand-logo { width: 31px !important; height: 31px !important; }
+  .public-brand strong { font-size: 17px !important; }
+  .public-business-main { padding: 12px 14px 48px !important; }
+  .miniweb-hero-v2 {
+    display: flex !important;
+    gap: 11px !important;
+    margin-bottom: 14px !important;
+    padding: 15px 13px 13px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 26px rgba(14,20,33,.16) !important;
+  }
+  .miniweb-hero-v2-top { gap: 10px !important; min-height: 70px; }
+  .miniweb-hero-v2-logo {
+    flex: 0 0 62px !important;
+    width: 62px !important;
+    height: 62px !important;
+    border-width: 3px !important;
+    border-radius: 15px !important;
+  }
+  .miniweb-hero-v2-heading { padding-top: 1px !important; }
+  .miniweb-hero-v2-heading h1 { font-size: 27px !important; line-height: 1.04 !important; letter-spacing: -.055em !important; }
+  .miniweb-hero-v2-eyebrow { margin-bottom: 4px !important; font-size: 7px !important; letter-spacing: .18em !important; }
+  .miniweb-hero-v2-share { top: 13px !important; right: 13px !important; min-height: 29px !important; padding: 5px 9px !important; border-radius: 8px !important; font-size: 8px !important; }
+  .miniweb-hero-v2-verification { margin-top: 5px !important; }
+  .miniweb-hero-v2-meta { gap: 7px !important; font-size: 8px !important; }
+  .miniweb-hero-v2-category { padding: 4px 7px !important; font-size: 7px !important; }
+  .miniweb-hero-v2-description { font-size: 9px !important; line-height: 1.35 !important; }
+  .miniweb-hero-v2-bottom { display: grid !important; gap: 9px !important; }
+  .miniweb-hero-v2-stats {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 42px !important;
+    border-radius: 10px !important;
+  }
+  .miniweb-hero-v2-stats span,
+  .miniweb-hero-v2-stats .miniweb-hero-v2-follow {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding: 6px 3px !important;
+  }
+  .miniweb-hero-v2-stats strong { font-size: 15px !important; }
+  .miniweb-hero-v2-stats small { font-size: 6px !important; }
+  .miniweb-hero-v2-stats .miniweb-hero-v2-follow { font-size: 7px !important; }
+  .miniweb-hero-v2-actions { display: flex !important; width: 100% !important; }
+  .miniweb-hero-v2-actions .miniweb-hero-v2-listings { width: 100% !important; min-height: 33px !important; font-size: 9px !important; }
+  .public-business-about { margin-bottom: 14px !important; padding: 15px 14px 15px 17px !important; border-radius: 16px !important; }
+  .public-about-heading h2 { font-size: 19px !important; }
+  .public-about-description { margin-bottom: 11px !important; font-size: 10px !important; }
+  .public-about-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 7px !important; }
+  .public-about-item { min-height: 57px !important; padding: 9px 8px !important; border-radius: 12px !important; }
+  .public-about-item > span { gap: 3px !important; font-size: 8px !important; }
+  .public-about-item b { font-size: 9px !important; }
+  .public-business-listings.storefront-listings-clean { padding: 15px 13px 13px !important; border-radius: 16px !important; }
+  .storefront-listings-clean .section-heading { margin-bottom: 11px !important; }
+  .storefront-listings-clean .section-heading h2 { font-size: 20px !important; }
+  .storefront-listings-clean .section-heading > span { padding: 5px 8px !important; font-size: 9px !important; }
+  .storefront-listings-clean .product-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 9px !important; }
+  .storefront-listings-clean .public-listing-card { border-radius: 14px !important; }
+  .storefront-listings-clean .public-listing-card .product-image-wrap { aspect-ratio: 1 / .93 !important; }
+  .storefront-listings-clean .public-listing-card .product-info { padding: 9px 8px !important; }
+  .storefront-listings-clean .public-listing-card .product-price { font-size: 13px !important; }
+  .storefront-listings-clean .public-listing-card .product-info h3 { font-size: 10px !important; }
+}
+@media (max-width: 350px) {
+  .miniweb-hero-v2-heading h1 { font-size: 24px !important; }
+  .miniweb-hero-v2-logo { flex-basis: 58px !important; width: 58px !important; height: 58px !important; }
+  .public-about-grid { grid-template-columns: 1fr !important; }
+}
