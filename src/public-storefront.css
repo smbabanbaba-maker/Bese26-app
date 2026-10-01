@@ -1969,3 +1969,25 @@
   .miniweb-hero-v2-logo { flex-basis: 58px !important; width: 58px !important; height: 58px !important; }
   .public-about-grid { grid-template-columns: 1fr !important; }
 }
+
+
+/* Requested Miniweb hero banner standard: 1600 x 500px / 3.20:1. */
+.miniweb-hero-v2 {
+  aspect-ratio: 1600 / 500 !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+@media (min-width: 601px) {
+  .miniweb-hero-v2 {
+    overflow: hidden !important;
+    padding: clamp(20px, 3vw, 34px) !important;
+  }
+}
+@media (max-width: 600px) {
+  .miniweb-hero-v2 {
+    /* Scale the 3.20:1 banner to the phone width, but allow content to breathe. */
+    aspect-ratio: 1600 / 500 !important;
+    min-height: 208px !important;
+    height: auto !important;
+  }
+}
