@@ -2110,3 +2110,13 @@
 @media (max-width: 600px) {
   .public-topbar-share { min-height: 28px !important; padding: 4px 8px !important; font-size: 9px !important; }
 }
+
+
+/* Micro alignment: lift the hero slightly into the topbar junction. */
+.public-business-main > .miniweb-hero-v2:first-child {
+  margin-top: -3px !important;
+  top: 0 !important;
+}
+@media (max-width: 600px) {
+  .public-business-main > .miniweb-hero-v2:first-child { margin-top: -2px !important; }
+}
