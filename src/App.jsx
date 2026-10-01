@@ -761,12 +761,33 @@ function PublicStorefrontLayout({ title, share, children }) {
   useEffect(() => { import('./public-storefront.css'); document.title = `${title} | Bese26`; return () => { document.title = 'Bese26'; }; }, [title]);
   return <div className="public-business-shell"><header className="public-business-topbar"><a href="https://bese26.shop/" className="public-brand"><img className="public-brand-logo" src="/images/bese26-logo-icon.webp" alt="Bese26" /><strong>Bese26<span>.shop</span></strong></a><nav className="public-business-nav" aria-label="Public shop navigation"><a href="https://bese26.shop/">Marketplace</a><a href="#listings">Listings</a></nav></header><main className="public-business-main">{children}</main><footer className="public-business-footer"><strong>Bese26<span>.shop</span></strong><span>Trusted local buying and selling</span></footer></div>;
 }
+function MiniwebPublicDashboard({ business, profile, listings, share }) {
+  const identity = getPublicIdentity(profile || {});
+  const name = business?.business_name || identity.name || 'Bese26 store';
+  const handle = business?.business_handle || profile?.username || '';
+  const logoSource = business?.logo_path || profile?.avatar_path;
+  const logoUrl = getBusinessLogoDisplayUrl(business, logoSource ? getAvatarUrl(logoSource) : '');
+  const location = [business?.city || profile?.city, business?.state || profile?.state].filter(Boolean).filter((value, index, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === index).join(', ');
+  const description = business?.description || profile?.bio || 'A trusted Miniweb on Bese26.';
+  const services = [business?.delivery_available && 'Delivery available', business?.pickup_available && 'Pickup available'].filter(Boolean);
+  const views = listings.reduce((total, item) => total + Number(item.views_count || 0), 0);
+  return <div className="miniweb-public-dashboard">
+    <header className="miniweb-public-dashboard-bar"><a href="https://bese26.shop/" className="miniweb-public-dashboard-brand"><img src="/images/bese26-logo-icon.webp" alt="Bese26" /><strong>Bese26<span>.shop</span></strong></a><div className="miniweb-public-dashboard-bar-actions"><span className="miniweb-live-pill"><i /> Live Miniweb</span><button type="button" onClick={share} aria-label="Share Miniweb"><Share2 size={15} /> Share</button></div></header>
+    <main className="miniweb-public-dashboard-main">
+      <section className="miniweb-public-dashboard-hero"><div className="miniweb-public-dashboard-identity"><div className="miniweb-dashboard-avatar">{logoUrl ? <img src={logoUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div><div className="miniweb-dashboard-eyebrow">MINIWEB DASHBOARD</div><h1>{name}</h1><p>{handle ? `@${handle}` : 'Public store'}{location ? ` · ${location}` : ''}</p></div></div><button type="button" className="miniweb-dashboard-primary" onClick={() => document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>View listings <ArrowRight size={15} /></button></section>
+      <section className="miniweb-public-dashboard-stats"><div><strong>{listings.length}</strong><span>Active listings</span></div><div><strong>{views}</strong><span>Store views</span></div><div><strong>{business?.category || business?.business_type || 'Marketplace'}</strong><span>Category</span></div><div><strong>{business?.is_verified || profile?.is_verified ? 'Verified' : 'Open'}</strong><span>Store status</span></div></section>
+      <section className="miniweb-public-dashboard-overview"><div><div className="miniweb-dashboard-section-label">STORE OVERVIEW</div><h2>Welcome to {name}</h2><p>{description}</p></div><div className="miniweb-dashboard-service-list">{services.length ? services.map((service) => <span key={service}><CheckCircle2 size={15} /> {service}</span>) : <span><Store size={15} /> Local Bese26 store</span>}</div></section>
+      <section id="listings" className="miniweb-public-dashboard-listings"><div className="miniweb-dashboard-section-heading"><div><div className="miniweb-dashboard-section-label">STORE CATALOG</div><h2>Latest listings</h2></div><span>{listings.length} item{listings.length === 1 ? '' : 's'}</span></div>{listings.length ? <div className="miniweb-dashboard-product-grid">{listings.map((listing, index) => <PublicListingCard key={listing.id} listing={listing} featured={index === 0} />)}</div> : <div className="miniweb-dashboard-empty">No active listings yet.</div>}</section>
+    </main>
+    <footer className="miniweb-public-dashboard-footer"><strong>Bese26<span>.shop</span></strong><span>Trusted local buying and selling</span></footer>
+  </div>;
+}
 function PublicPersonalPage({ data }) {
   const { profile, listings } = data;
   const identity = getPublicIdentity(profile);
   const business = profile.business || null;
   const share = async () => { const url = `https://bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: identity.name, text: business?.description || profile.bio || identity.name, url }); else await navigator.clipboard?.writeText(url); };
-  return <PublicStorefrontLayout title={identity.name} share={share}><PublicProfileHeader profile={profile} business={business} listings={listings} share={share} /><PublicListingSection title={`Listings from ${identity.name}`} listings={listings} /></PublicStorefrontLayout>;
+  return <MiniwebPublicDashboard business={business} profile={profile} listings={listings} share={share} />;
 }
 const SEO_SITE_URL = SITE_URL;
 const SEO_DEFAULT_IMAGE = `${SEO_SITE_URL}/images/bese26-official-logo.png`;
@@ -848,7 +869,7 @@ const seoData = state.data;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
   const share = async () => { const url = `https://bese26.shop/@${business.business_handle}`; if (navigator.share) await navigator.share({ title: business.business_name, text: business.description || business.business_name, url }); else await navigator.clipboard?.writeText(url); };
-  return <PublicStorefrontLayout title={business.business_name} share={share}><PublicProfileHeader business={business} profile={ownerProfile} listings={listings} share={share} /><PublicBusinessAbout business={business} /><PublicListingSection title={`Listings from ${business.business_name}`} listings={listings} /></PublicStorefrontLayout>;
+  return <MiniwebPublicDashboard business={business} profile={ownerProfile} listings={listings} share={share} />;
 }
 function PublicListingRoute({ listingId }) {
   const [listing, setListing] = useState(null);
