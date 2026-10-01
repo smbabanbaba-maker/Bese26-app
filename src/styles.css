@@ -9049,3 +9049,18 @@ img.avatar.is-business-logo {
   .auth-market-car { bottom: 15px; }
   .auth-market-house { bottom: 18px; }
 }
+
+/* Login/Register logo motion: shared by both authentication modes. */
+.auth-reference-logo { position: relative; isolation: isolate; animation: authReferenceLogoFloat 3.8s ease-in-out infinite; }
+.auth-reference-logo::before { content: ''; position: absolute; z-index: 2; top: -80%; left: -95%; width: 58%; height: 260%; pointer-events: none; background: linear-gradient(105deg, transparent 18%, rgba(255,255,255,.78) 48%, transparent 78%); transform: rotate(24deg); animation: authReferenceLogoShimmer 4.2s 1s ease-in-out infinite; }
+.auth-reference-logo::after { content: ''; position: absolute; z-index: -1; inset: -8px; border-radius: 20px; pointer-events: none; box-shadow: 0 0 0 0 rgba(242,13,26,.34); animation: authReferenceLogoGlow 3.1s ease-out infinite; }
+.auth-reference-logo img { position: relative; z-index: 1; animation: authReferenceLogoPulse 3.8s ease-in-out infinite; }
+.auth-reference-name { animation: authReferenceBrandIn .65s .12s both; }
+.auth-reference-tagline { animation: authReferenceBrandIn .65s .24s both; }
+.auth-loading-orbit img { animation: authReferenceLogoPulse 1.7s ease-in-out infinite; }
+@keyframes authReferenceLogoFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes authReferenceLogoPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.055); } }
+@keyframes authReferenceLogoShimmer { 0%, 22% { left: -95%; opacity: 0; } 35% { opacity: 1; } 58%, 100% { left: 150%; opacity: 0; } }
+@keyframes authReferenceLogoGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(242,13,26,.32); } 48% { box-shadow: 0 0 0 10px rgba(242,13,26,0); } }
+@keyframes authReferenceBrandIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .auth-reference-logo, .auth-reference-logo::before, .auth-reference-logo::after, .auth-reference-logo img, .auth-reference-name, .auth-reference-tagline, .auth-loading-orbit img { animation: none; } }
