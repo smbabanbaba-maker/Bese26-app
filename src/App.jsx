@@ -89,7 +89,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, blockUser, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -996,6 +996,8 @@ function AppContent() {
   const [sessionUser, setSessionUser] = useState(null);
   const [businessOwnerProfile, setBusinessOwnerProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminPermissions, setAdminPermissions] = useState([]);
+  const [isOwnerAdmin, setIsOwnerAdmin] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
@@ -1140,10 +1142,10 @@ function AppContent() {
       }
       if (session?.user) {
         try {
-          const [remoteSaved, admin] = await Promise.all([fetchSavedIds(session.user.id), isAdminUser(session.user.id)]);
-          if (mounted) { setSavedIds(remoteSaved || []); setIsAdmin(Boolean(admin)); }
+          const [remoteSaved, access] = await Promise.all([fetchSavedIds(session.user.id), fetchAdminAccess()]);
+          if (mounted) { setSavedIds(remoteSaved || []); setIsAdmin(Boolean(access?.isAdmin)); setAdminPermissions(access?.permissions || []); setIsOwnerAdmin(Boolean(access?.isOwner)); }
         } catch (error) {
-          if (mounted) { setSavedIds([]); setIsAdmin(false); }
+          if (mounted) { setSavedIds([]); setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); }
         }
       } else if (mounted) {
         setSavedIds([]);
@@ -1180,9 +1182,9 @@ function AppContent() {
       if (event === 'SIGNED_IN' && session?.user) {
         loadBackend();
         fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
-        isAdminUser(session.user.id).then(setIsAdmin).catch(() => setIsAdmin(false));
+        fetchAdminAccess().then((access) => { setIsAdmin(Boolean(access?.isAdmin)); setAdminPermissions(access?.permissions || []); setIsOwnerAdmin(Boolean(access?.isOwner)); }).catch(() => { setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); });
       }
-      if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); setSelectedListing(null); setChatListing(null); setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); setChatDraft(''); setEditingListing(null); setSearch(''); setActiveNav('home'); loadBackend(); }
+      if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); setSelectedListing(null); setChatListing(null); setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); setChatDraft(''); setEditingListing(null); setSearch(''); setActiveNav('home'); loadBackend(); }
     });
     return () => { mounted = false; window.clearTimeout(startupTimeout); window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', refreshWhenVisible); window.removeEventListener('focus', refreshWhenFocused); subscription.unsubscribe(); };
   }, []);
@@ -1350,7 +1352,7 @@ function AppContent() {
     if (activeNav === 'business') return <BusinessDirectoryView adCampaigns={adCampaigns} onBack={goBack} />;
     if (activeNav === 'sell') return <SellView key={`sell-${editingListing?.id || editingDraft?.id || copySourceListing?.id || 'new'}`} user={sessionUser} isAdmin={canAccessAdmin} initialListing={editingListing} initialDraft={editingDraft} copySource={copySourceListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onOpenListing={openListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialNotificationTarget={chatNotificationTarget} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); setChatNotificationTarget(null); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); }} />;
-    if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} onBack={goBack} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); setCopySourceListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
+    if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} adminPermissions={adminPermissions} isOwnerAdmin={isOwnerAdmin} onBack={goBack} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); setCopySourceListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
     return <ProfileView key={profileReset} user={sessionUser} initialPage={profilePageTarget} onInitialPageConsumed={consumeProfilePageTarget} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
   };
 

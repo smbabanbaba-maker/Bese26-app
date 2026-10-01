@@ -1130,6 +1130,13 @@ export async function isAdminUser(userId) {
   return data === true;
 }
 
+export async function fetchAdminAccess() {
+  failIfUnavailable();
+  const { data, error } = await supabase.rpc('current_user_admin_access');
+  if (error) throw error;
+  return { isAdmin: Boolean(data?.is_admin), isOwner: Boolean(data?.is_owner), permissions: Array.isArray(data?.permissions) ? data.permissions : [] };
+}
+
 export async function fetchPendingListings() {
   failIfUnavailable();
   const { data, error } = await supabase.from('listings').select(listingSelect).eq('status', 'pending').eq('moderation_status', 'pending').order('created_at', { ascending: true }).limit(100);
