@@ -1003,6 +1003,7 @@ function AppContent() {
   const [showAuth, setShowAuth] = useState(false);
   const [authReason, setAuthReason] = useState('');
   const [authInitialMode, setAuthInitialMode] = useState('signin');
+  const [authTarget, setAuthTarget] = useState('');
   const [chatListing, setChatListing] = useState(null);
   const [chatDealPanel, setChatDealPanel] = useState('');
   const [chatDraft, setChatDraft] = useState('');
@@ -1060,7 +1061,14 @@ function AppContent() {
       return bMatch - aMatch;
     });
   }, [marketListings, userPlace]);
-  const requireAuth = useCallback((message = 'Create an account or sign in to continue with your marketplace account.', initialMode = 'signin') => { setAuthReason(message); setAuthInitialMode(initialMode === 'signin' ? 'signin' : 'signup'); setShowAuth(true); }, []);  useEffect(() => {
+  const requireAuth = useCallback((message = 'Create an account or sign in to continue with your marketplace account.', initialMode = 'signin', target = '') => { setAuthReason(message); setAuthInitialMode(initialMode === 'signin' ? 'signin' : 'signup'); setAuthTarget(target); setShowAuth(true); }, []);  useEffect(() => {
+    if (!sessionUser || !authTarget) return undefined;
+    const destination = authTarget;
+    setAuthTarget('');
+    if (destination !== activeNav) navigate(destination);
+    return undefined;
+  }, [sessionUser, authTarget]);
+  useEffect(() => {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
@@ -1229,7 +1237,7 @@ function AppContent() {
   const navigate = (page) => {
     const protectedPages = new Set(['notifications', 'saved', 'sell', 'messages', 'business', 'profile', 'subscription', 'admin']);
     if (protectedPages.has(page) && !sessionUser) {
-      requireAuth('Login or create a free Bese26 account to continue.', 'signin');
+      requireAuth('Login or create a free Bese26 account to continue.', 'signin', page);
       return;
     }
     if (page !== 'sell') { setEditingListing(null); setCopySourceListing(null); }
@@ -1244,7 +1252,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const openSell = async (copySource = null) => {
-    if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in before posting a listing.'); return; }
+    if (isSupabaseConfigured && !sessionUser) { requireAuth('Login before posting a listing.', 'signin', 'sell'); return; }
     if (canAccessAdmin || !isSupabaseConfigured) {
       setEditingDraft(null); setEditingListing(null); setCopySourceListing(copySource); navigate('sell'); return;
     }
@@ -1304,7 +1312,7 @@ function AppContent() {
     window.location.assign(`/@${encodeURIComponent(handle)}`);
   };
   const openChat = async (listing, intent = 'message', draft = '') => {
-    if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Sign in to chat with this seller.'); return; }
+    if (isSupabaseConfigured && !sessionUser) { setSelectedListing(null); requireAuth('Login to chat with this seller.', 'signin', 'messages'); return; }
     if (!isSupabaseConfigured) { showToast('Chat is unavailable right now.'); return; }
     if (!listing.sellerId || listing.sellerId === sessionUser.id) { showToast('This listing is not available for a buyer conversation.'); return; }
     try {
@@ -1327,7 +1335,7 @@ function AppContent() {
     const chatIntent = params.get('chat_intent') || 'message';
     const chatDraft = params.get('chat_draft') || '';
     if (!listingId) return;
-    if (isSupabaseConfigured && !sessionUser) { requireAuth('Sign in to message this business.'); return; }
+    if (isSupabaseConfigured && !sessionUser) { requireAuth('Login to message this business.', 'signin', 'messages'); return; }
     fetchListingDetails(listingId).then((listing) => {
       if (!listing) throw new Error('This listing is no longer available.');
       params.delete('chat_listing');
@@ -1368,7 +1376,7 @@ function AppContent() {
     <footer className="site-footer"><div><strong>Bese26<span>.shop</span></strong><p>Nigerian online marketplace for personal and business transactions.</p></div><nav aria-label="Public information"><a href="/#terms" onClick={(event) => { event.preventDefault(); goPublicSection('terms'); }} title="Read Terms of Service">Terms</a><a href="/#privacy" onClick={(event) => { event.preventDefault(); goPublicSection('privacy'); }} title="Read Privacy Policy">Privacy</a><a href="/#refund-policy" onClick={(event) => { event.preventDefault(); goPublicSection('refund-policy'); }} title="Read Refund Policy">Refunds</a><a href="/#safety" onClick={(event) => { event.preventDefault(); goPublicSection('safety'); }} title="Read Marketplace Safety">Safety</a><a href="mailto:info@bese26.shop?subject=Bese26%20Support" title="Email Bese26 support">info@bese26.shop</a></nav></footer>
     <nav className="bottom-nav" aria-label="Primary navigation">{mobileNavItems.map(({ key, label, icon: Icon }) => <button key={key} aria-current={activeNav === key ? 'page' : undefined} className={`${activeNav === key ? 'active' : ''} ${key === 'sell' ? 'sell-nav' : ''}`} onClick={() => key === 'sell' ? openSell() : navigate(key)}><span className="nav-icon"><Icon size={26} strokeWidth={activeNav === key ? 2.35 : 1.95} />{key === 'notifications' && unreadNotifications > 0 && <b className="bottom-nav-badge">{unreadNotifications > 9 ? '9+' : unreadNotifications}</b>}</span><span>{t(label)}</span></button>)}</nav>
 
-    {showAuth && <AuthPanel reason={authReason} initialMode={authInitialMode} onClose={() => setShowAuth(false)} onAuthenticated={(user) => { setSessionUser(user); setAuthInitialMode('signin'); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
+    {showAuth && <AuthPanel reason={authReason} initialMode={authInitialMode} onClose={() => { setAuthTarget(''); setShowAuth(false); }} onAuthenticated={(user) => { setSessionUser(user); setAuthInitialMode('signin'); setAuthReason(''); showToast('Signed in to bese26.'); }} />}
     {selectedListing && <Suspense fallback={<BrandLoader message="Loading listing…" compact />}><ListingDetailsView listing={selectedListing} user={sessionUser} activeBusiness={businessOwnerProfile} focusSection={listingFocusTarget?.section || null} focusCommentId={listingFocusTarget?.commentId || null} onClose={() => { setListingFocusTarget(null); window.history.back(); }} onAuthRequired={requireAuth} isSaved={savedIds.includes(selectedListing.id)} savedIds={savedIds} onToggleSave={toggleSave} onDemoAction={showToast} onStartChat={openChat} onOpenListing={openListing} onEditListing={(item) => { setSelectedListing(null); setCopySourceListing(null); setEditingListing(item); navigate('sell'); }} onCopyListing={openSell} /></Suspense>}
     {toast && <div className="toast"><CheckCircle2 size={17} />{toast}</div>}
     {paymentVerifying && <div className="payment-verifying-overlay"><BrandLoader message="Verifying your Bese26 payment…" /></div>}

@@ -10,6 +10,23 @@ function PasswordField({ id, value, onChange, placeholder, visible, onToggle, va
   return <Field icon={LockKeyhole} className={validationState ? `auth-reference-field-${validationState}` : ''}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required />{validationState && <span className="auth-reference-password-status" aria-label={validationState === 'valid' ? 'Password is valid' : 'Passwords do not match'}>{validationState === 'valid' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}</span>}<button type="button" className={`auth-reference-eye ${visible ? 'is-visible' : ''}`} onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
 }
 function AuthLoading({ label }) { return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>; }
+function normalizeNigerianPhone(value) {
+  const digits = String(value || '').replace(/[\s()-]/g, '');
+  if (digits.startsWith('+234')) return `+234${digits.slice(4)}`;
+  if (digits.startsWith('234')) return `+${digits}`;
+  if (digits.startsWith('0')) return `+234${digits.slice(1)}`;
+  return digits;
+}
+function isNigerianPhone(value) { return /^\+234[789]\d{9}$/.test(normalizeNigerianPhone(value)); }
+function isEmail(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value || '').trim()); }
+function friendlyAuthError(error) {
+  const message = String(error?.message || '').toLowerCase();
+  if (message.includes('already') || message.includes('registered') || message.includes('user already')) return 'This email already has an account. Please sign in or use Forgot password.';
+  if (message.includes('invalid login') || message.includes('invalid credentials') || message.includes('email or password')) return 'Email or password is not correct. Please try again.';
+  if (message.includes('rate limit') || message.includes('too many')) return 'Too many attempts. Please wait a little and try again.';
+  if (message.includes('confirm')) return 'Please confirm your email before signing in.';
+  return error?.message || 'Authentication failed. Please try again.';
+}
 function MarketArt({ register = false }) {
   return <div className={`auth-market-art ${register ? 'auth-market-art-register' : ''}`} aria-hidden="true">
     {!register && <div className="auth-market-copy"><h2>Buy. Sell. <em>Connect.</em></h2><p>Real people. Real businesses.<br />Bigger opportunities across Nigeria.</p></div>}
@@ -31,6 +48,8 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   const [registrationSent, setRegistrationSent] = useState(false);
   const [resendingConfirmation, setResendingConfirmation] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(0);
   const [visiblePasswords, setVisiblePasswords] = useState({ login: false, register: false, confirm: false });
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setRegistrationSent(false); };
@@ -39,14 +58,17 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   const submit = async (event) => {
     event.preventDefault(); setStatus({ type: '', message: '' });
     if (mode === 'reset') return;
+    if (mode === 'signin' && lockedUntil > Date.now()) { setStatus({ type: 'error', message: 'Too many attempts. Please wait 30 seconds and try again.' }); return; }
+    if (!isEmail(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address.' }); return; }
     if (form.password.length < 6) { setStatus({ type: 'error', message: 'Use a password with at least 6 characters.' }); return; }
+    if (mode === 'signup' && !isNigerianPhone(form.phone)) { setStatus({ type: 'error', message: 'Enter a valid Nigerian phone number, for example 08012345678.' }); return; }
     if (mode === 'signup' && form.password !== form.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match.' }); return; }
     if (mode === 'signup' && !termsAccepted) { setStatus({ type: 'error', message: 'Please agree to the Terms of Service and Privacy Policy.' }); return; }
     setLoading(true); setLoadingLabel(mode === 'signin' ? 'Signing you in…' : 'Creating your account…');
     try {
-      const data = mode === 'signin' ? await signIn({ email: form.email, password: form.password }) : await signUp({ email: form.email, password: form.password, displayName: form.displayName, username: form.username, phone: form.phone });
-      if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); } else { onAuthenticated?.(data.user); onClose?.(); }
-    } catch (error) { setStatus({ type: 'error', message: error.message || 'Authentication failed. Please try again.' }); } finally { setLoading(false); }
+      const data = mode === 'signin' ? await signIn({ email: form.email.trim().toLowerCase(), password: form.password }) : await signUp({ email: form.email.trim().toLowerCase(), password: form.password, displayName: form.displayName, username: form.username, phone: normalizeNigerianPhone(form.phone) });
+      if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
+    } catch (error) { if (mode === 'signin') { const nextAttempts = loginAttempts + 1; setLoginAttempts(nextAttempts); if (nextAttempts >= 5) setLockedUntil(Date.now() + 30000); } setStatus({ type: 'error', message: friendlyAuthError(error) }); } finally { setLoading(false); }
   };
   const resetPassword = async (event) => { event?.preventDefault(); setStatus({ type: '', message: '' }); if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email first.' }); return; } setResetting(true); try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset instructions sent. Check your email.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send reset instructions.' }); } finally { setResetting(false); } };
   const resendConfirmation = async () => { setStatus({ type: '', message: '' }); setResendingConfirmation(true); try { await resendSignupConfirmation(form.email); setStatus({ type: 'success', message: 'Confirmation email sent again. Check your inbox.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the confirmation email.' }); } finally { setResendingConfirmation(false); } };
