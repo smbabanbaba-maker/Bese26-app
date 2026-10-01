@@ -6,6 +6,7 @@ import BusinessLogoPreview from './components/BusinessLogoPreview';
 import { registerBese26ServiceWorker } from './components/InstallPrompt';
 import './styles.css';
 import './ui-enhancements.css';
+import './public-storefront.css';
 
 function mountApp() {
   ReactDOM.createRoot(document.getElementById('root')).render(
