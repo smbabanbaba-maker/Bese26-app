@@ -89,7 +89,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -506,6 +506,19 @@ function SavedView({ marketListings, savedIds, onOpenListing, onToggleSave }) {
 
 
 
+function formatChatDuration(seconds = 0) {
+  const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+  return `${String(Math.floor(safeSeconds / 60)).padStart(2, '0')}:${String(safeSeconds % 60).padStart(2, '0')}`;
+}
+
+function chatAttachmentKind(message) {
+  const mimeType = String(message?.attachment_mime_type || '').split(';')[0].toLowerCase();
+  const path = String(message?.attachment_path || message?.name || '').toLowerCase();
+  if (mimeType.startsWith('audio/') || /\.(webm|ogg|mp3|m4a|wav|mp4)$/i.test(path)) return 'audio';
+  if (mimeType === 'application/pdf' || /\.pdf$/i.test(path)) return 'file';
+  return 'image';
+}
+
 function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenListing, initialMessageId, initialNotificationTarget = null, initialDealPanel = '', initialText = '', onSelectConversation, onBackToInbox }) {
   const [conversations, setConversations] = useState([]);
   const [conversationLoading, setConversationLoading] = useState(false);
@@ -526,16 +539,33 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
   const [attachmentPreview, setAttachmentPreview] = useState('');
   const [mediaBusy, setMediaBusy] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [callPhone, setCallPhone] = useState('');
+  const [callLoading, setCallLoading] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [messageReactions, setMessageReactions] = useState({});
   const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const recordingTimerRef = useRef(null);
+  const recordingStartedAtRef = useRef(0);
+  const recordingCancelledRef = useRef(false);
   const recordedChunksRef = useRef([]);
+  const messageEndRef = useRef(null);
   const emojis = ['😀', '😂', '😍', '🥰', '👍', '❤️', '✅', '👏', '🔥', '😮', '🙏', '🎉'];
   const selectedConversation = conversations.find((conversation) => conversation.id === initialMessageId) || null;
+  const currentMessages = liveMessages.filter((item) => item.conversation_id === selectedConversation?.id);
   const liveMode = Boolean(isSupabaseConfigured && user && selectedConversation);
   const isSeller = Boolean(selectedConversation?.seller_id === user?.id);
   const conversationIdentity = (conversation) => { const profile = conversation?.buyer_id === user?.id ? conversation?.seller : conversation?.buyer; return { profile, ...getPublicIdentity(profile || {}) }; };
+  const mergeMessageRows = (current, incomingRows) => {
+    const byId = new Map(current.map((item) => [item.id, item]));
+    for (const item of incomingRows || []) {
+      const previous = byId.get(item.id) || {};
+      byId.set(item.id, { ...previous, ...item, attachment_url: item.attachment_url || previous.attachment_url || '' });
+    }
+    return [...byId.values()].sort((left, right) => new Date(left.created_at) - new Date(right.created_at));
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -549,13 +579,39 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
     if (!liveMode) { setLiveMessages([]); setDeals({ offers: [], meetings: [] }); return undefined; }
     let mounted = true;
     setLiveLoading(true);
-    fetchMessages(selectedConversation.id).then((items) => { if (mounted) setLiveMessages(items); }).catch((error) => onDemoAction(error.message || 'Could not load messages.')).finally(() => mounted && setLiveLoading(false));
+    setLiveMessages([]);
+    setDeals({ offers: [], meetings: [] });
+    fetchMessages(selectedConversation.id, initialNotificationTarget?.messageId || null).then((items) => { if (mounted) setLiveMessages((current) => mergeMessageRows(current, items)); }).catch((error) => onDemoAction(error.message || 'Could not load messages.')).finally(() => mounted && setLiveLoading(false));
+    markConversationMessagesRead(selectedConversation.id).then(() => {
+      if (mounted) setConversations((items) => items.map((item) => item.id === selectedConversation.id ? { ...item, unread_count: 0 } : item));
+    }).catch((error) => onDemoAction(error.message || 'Could not update the read status.'));
     fetchConversationDeals(selectedConversation.id).then((items) => mounted && setDeals(items)).catch((error) => onDemoAction(error.message || 'Deal tools need the latest Bese26 database migration.'));
-    const unsubscribe = subscribeToMessages(selectedConversation.id, (incoming) => setLiveMessages((items) => items.some((item) => item.id === incoming.id) ? items : [...items, incoming]));
+    const unsubscribe = subscribeToMessages(selectedConversation.id, (incoming, eventType) => {
+      if (!mounted) return;
+      setLiveMessages((items) => mergeMessageRows(items, [incoming]));
+      setConversations((items) => items.map((item) => {
+        if (item.id !== selectedConversation.id) return item;
+        const isLatest = !item.lastMessage || new Date(incoming.created_at) >= new Date(item.lastMessage.created_at);
+        return { ...item, ...(isLatest ? { last_message_at: incoming.created_at, lastMessage: incoming } : {}), unread_count: incoming.sender_id !== user.id && eventType === 'INSERT' ? Number(item.unread_count || 0) + 1 : Number(item.unread_count || 0) };
+      }));
+      if (incoming.sender_id !== user.id && eventType === 'INSERT') markConversationMessagesRead(selectedConversation.id).then(() => {
+        if (mounted) setConversations((items) => items.map((item) => item.id === selectedConversation.id ? { ...item, unread_count: 0 } : item));
+      }).catch(() => {});
+    });
     return () => { mounted = false; unsubscribe(); };
-  }, [selectedConversation?.id, liveMode, onDemoAction]);
+  }, [selectedConversation?.id, liveMode, onDemoAction, user?.id, initialNotificationTarget?.messageId]);
   useEffect(() => { setDealPanel(initialDealPanel || ''); }, [initialMessageId, initialDealPanel]);
   useEffect(() => { setText(initialText || ''); }, [initialMessageId, initialText]);
+  useEffect(() => {
+    let mounted = true;
+    setCallPhone('');
+    if (!liveMode || isSeller || !selectedConversation?.listing_id) { setCallLoading(false); return () => { mounted = false; }; }
+    setCallLoading(true);
+    fetchListingContact(selectedConversation.listing_id).then((contact) => {
+      if (mounted) setCallPhone(String(contact?.phone || '').trim());
+    }).catch(() => mounted && setCallPhone('')).finally(() => mounted && setCallLoading(false));
+    return () => { mounted = false; };
+  }, [selectedConversation?.id, liveMode, isSeller, user?.id]);
   useEffect(() => {
     if (!liveMode || liveLoading || !initialNotificationTarget) return undefined;
     let targetElement = null;
@@ -563,39 +619,124 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
       targetElement = document.getElementById(`chat-offer-${initialNotificationTarget.offerId}`);
     } else if (initialNotificationTarget.kind === 'message' && initialNotificationTarget.messageId) {
       targetElement = document.getElementById(`chat-message-${initialNotificationTarget.messageId}`);
-    } else if (initialNotificationTarget.kind === 'message' && liveMessages.length) {
+    } else if (initialNotificationTarget.kind === 'message' && currentMessages.length) {
       targetElement = document.querySelector('.chat-messages .message-bubble:last-child');
     }
     if (!targetElement) return undefined;
     const frame = window.requestAnimationFrame(() => targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' }));
     return () => window.cancelAnimationFrame(frame);
-  }, [liveMode, liveLoading, initialNotificationTarget?.kind, initialNotificationTarget?.offerId, initialNotificationTarget?.messageId, liveMessages.length, deals.offers.length]);
+  }, [liveMode, liveLoading, initialNotificationTarget?.kind, initialNotificationTarget?.offerId, initialNotificationTarget?.messageId, currentMessages.length, deals.offers.length]);
+  useEffect(() => {
+    if (!liveMode || liveLoading || initialNotificationTarget?.messageId || initialNotificationTarget?.offerId) return undefined;
+    const frame = window.requestAnimationFrame(() => messageEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [liveMode, liveLoading, currentMessages.length, initialNotificationTarget?.messageId, initialNotificationTarget?.offerId]);
 
-  const send = async (message = text, file = attachment) => {
-    if ((!message.trim() && !file) || !liveMode || mediaBusy) return;
-    setMediaBusy(Boolean(file));
-    try {
-      const uploaded = file ? await uploadChatMedia({ userId: user.id, conversationId: selectedConversation.id, file }) : null;
-      const sent = await sendMessage({ conversationId: selectedConversation.id, senderId: user.id, body: message.trim() || null, attachmentPath: uploaded?.path || null });
-      setLiveMessages((items) => [...items, { ...sent, attachment_url: uploaded?.url || '' }]);
-      setText(''); setAttachment(null); setAttachmentPreview('');
-    } catch (error) { onDemoAction(error.message || 'Could not send this message.'); }
-    finally { setMediaBusy(false); }
+  const clearAttachment = () => {
+    if (attachmentPreview?.startsWith('blob:')) URL.revokeObjectURL(attachmentPreview);
+    setAttachment(null);
+    setAttachmentPreview('');
   };
-  const chooseAttachment = (event) => { const file = event.target.files?.[0]; if (!file) return; setAttachment(file); setAttachmentPreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : ''); event.target.value = ''; };
+  useEffect(() => () => {
+    if (recordingTimerRef.current) window.clearInterval(recordingTimerRef.current);
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== 'inactive') { recordingCancelledRef.current = true; try { recorder.stop(); } catch {} }
+    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+  }, []);
+  useEffect(() => () => {
+    if (attachmentPreview?.startsWith('blob:')) URL.revokeObjectURL(attachmentPreview);
+  }, [attachmentPreview]);
+  const send = async (message = text, file = attachment) => {
+    const body = String(message || '').trim();
+    if ((!body && !file) || !liveMode || mediaBusy) return;
+    setMediaBusy(true);
+    let uploaded = null;
+    try {
+      uploaded = file ? await uploadChatMedia({ userId: user.id, conversationId: selectedConversation.id, file }) : null;
+      const sent = await sendMessage({ conversationId: selectedConversation.id, senderId: user.id, body: body || null, attachmentPath: uploaded?.path || null, attachmentMimeType: uploaded?.mimeType || null, attachmentSizeBytes: uploaded?.sizeBytes ?? null });
+      const messageRow = { ...sent, attachment_url: uploaded?.url || '' };
+      setLiveMessages((items) => mergeMessageRows(items, [messageRow]));
+      setConversations((items) => items.map((item) => item.id === selectedConversation.id ? { ...item, last_message_at: sent.created_at, lastMessage: messageRow, unread_count: 0 } : item));
+      setText('');
+      clearAttachment();
+    } catch (error) {
+      if (uploaded?.path) deleteChatMedia({ userId: user.id, path: uploaded.path }).catch(() => {});
+      onDemoAction(error.message || 'Could not send this message.');
+    } finally { setMediaBusy(false); }
+  };
+  const chooseAttachment = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    const mimeType = String(file.type || '').split(';')[0].toLowerCase();
+    const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf', 'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg']);
+    if (file.size > 8 * 1024 * 1024) { onDemoAction('Choose a photo, PDF, or voice note smaller than 8 MB.'); return; }
+    if (!allowedTypes.has(mimeType)) { onDemoAction('Choose a JPG, PNG, WebP, GIF, PDF, or supported voice note.'); return; }
+    clearAttachment();
+    setAttachment(file);
+    setAttachmentPreview(mimeType.startsWith('image/') || mimeType.startsWith('audio/') ? URL.createObjectURL(file) : '');
+  };
   const addEmoji = (emoji) => { setText((value) => `${value}${emoji}`); setEmojiOpen(false); };
   const toggleReaction = (messageId, reaction) => setMessageReactions((current) => ({ ...current, [messageId]: current[messageId] === reaction ? '' : reaction }));
-  const stopRecording = () => mediaRecorderRef.current?.stop();
+  const stopRecording = () => {
+    if (recordingTimerRef.current) { window.clearInterval(recordingTimerRef.current); recordingTimerRef.current = null; }
+    if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
+  };
+  const cancelRecording = () => {
+    recordingCancelledRef.current = true;
+    stopRecording();
+  };
   const startRecording = async () => {
-    if (!liveMode || recording || !navigator.mediaDevices?.getUserMedia) { if (!navigator.mediaDevices?.getUserMedia) onDemoAction('Voice notes are not supported by this browser.'); return; }
+    if (!liveMode || recording || mediaBusy) return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof window.MediaRecorder === 'undefined') { onDemoAction('Voice recording is not supported in this browser. Try opening Bese26 in an up-to-date browser.'); return; }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      recordedChunksRef.current = []; mediaRecorderRef.current = recorder;
-      recorder.ondataavailable = (event) => event.data.size && recordedChunksRef.current.push(event.data);
-      recorder.onstop = () => { stream.getTracks().forEach((track) => track.stop()); const blob = new Blob(recordedChunksRef.current, { type: recorder.mimeType || 'audio/webm' }); setAttachment(new File([blob], `voice-note-${Date.now()}.webm`, { type: blob.type })); setAttachmentPreview(''); setRecording(false); mediaRecorderRef.current = null; };
-      recorder.start(); setRecording(true);
-    } catch (error) { onDemoAction(error.message || 'Microphone permission was not granted.'); }
+      mediaStreamRef.current = stream;
+      const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', 'audio/mp4'];
+      const mimeType = candidates.find((type) => window.MediaRecorder.isTypeSupported?.(type));
+      const recorder = mimeType ? new window.MediaRecorder(stream, { mimeType }) : new window.MediaRecorder(stream);
+      recordedChunksRef.current = [];
+      recordingCancelledRef.current = false;
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (event) => { if (event.data?.size) recordedChunksRef.current.push(event.data); };
+      recorder.onerror = () => { recordingCancelledRef.current = true; onDemoAction('The voice note could not be recorded. Please try again.'); stopRecording(); };
+      recorder.onstop = () => {
+        if (recordingTimerRef.current) { window.clearInterval(recordingTimerRef.current); recordingTimerRef.current = null; }
+        stream.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+        setRecording(false);
+        setRecordingSeconds(0);
+        mediaRecorderRef.current = null;
+        const wasCancelled = recordingCancelledRef.current;
+        recordingCancelledRef.current = false;
+        const actualMime = String(recorder.mimeType || recordedChunksRef.current[0]?.type || 'audio/webm').split(';')[0].toLowerCase();
+        const blob = new Blob(recordedChunksRef.current, { type: actualMime });
+        recordedChunksRef.current = [];
+        if (wasCancelled) return;
+        if (!blob.size) { onDemoAction('No voice was captured. Please try recording again.'); return; }
+        const extension = actualMime.includes('mp4') ? 'm4a' : actualMime.includes('ogg') ? 'ogg' : actualMime.includes('mpeg') ? 'mp3' : 'webm';
+        const voiceFile = new File([blob], `voice-note-${Date.now()}.${extension}`, { type: actualMime });
+        clearAttachment();
+        setAttachment(voiceFile);
+        setAttachmentPreview(URL.createObjectURL(voiceFile));
+      };
+      recorder.start(1000);
+      recordingStartedAtRef.current = Date.now();
+      setRecordingSeconds(0);
+      setRecording(true);
+      recordingTimerRef.current = window.setInterval(() => {
+        const elapsed = Math.min(120, Math.floor((Date.now() - recordingStartedAtRef.current) / 1000));
+        setRecordingSeconds(elapsed);
+        if (elapsed >= 120) {
+          stopRecording();
+          onDemoAction('Voice note limit is 2 minutes. The recording is ready to send.');
+        }
+      }, 1000);
+    } catch (error) {
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+      onDemoAction(error.message || 'Microphone permission was not granted.');
+    }
   };
   const submitOffer = async (event) => {
     event.preventDefault();
@@ -615,24 +756,59 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
   };
   const updateOffer = async (offer, status) => { try { const updated = await updateChatOffer(offer.id, status); setDeals((current) => ({ ...current, offers: current.offers.map((item) => item.id === offer.id ? updated : item) })); onDemoAction(`Offer ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the offer.'); } };
   const updateMeeting = async (meeting, status) => { try { const updated = await updateChatMeeting(meeting.id, status); setDeals((current) => ({ ...current, meetings: current.meetings.map((item) => item.id === meeting.id ? updated : item) })); onDemoAction(`Meeting ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the meeting.'); } };
-  const callSeller = async () => { if (!liveMode) return; setBusy(true); try { const contact = await fetchListingContact(selectedConversation.listing_id || liveListing?.id); const phone = String(contact?.phone || '').trim(); if (!phone) { onDemoAction('The seller has not enabled phone calls for this listing.'); return; } window.location.href = `tel:${phone.replace(/[^+\\d]/g, '')}`; } catch (error) { onDemoAction(error.message || 'Could not load the seller phone number.'); } finally { setBusy(false); } };
+  const callSeller = () => { if (!liveMode || isSeller) return; const phone = String(callPhone || '').trim(); if (!phone) { onDemoAction(callLoading ? 'Checking call availability…' : 'The seller has not enabled phone calls for this listing.'); return; } window.location.href = `tel:${phone.replace(/[^+\d]/g, '')}`; };
   const viewListing = () => { setChatMenuOpen(false); if (liveListing) onOpenListing?.(liveListing); else onDemoAction?.('The listing details are no longer available.'); };
-  const muteConversation = () => { if (!selectedConversation) return; window.localStorage.setItem(`bese26:muted-conversation:${selectedConversation.id}`, '1'); setChatMenuOpen(false); onDemoAction?.('Conversation muted on this device.'); };
+  const muteConversation = () => { if (!selectedConversation) return; try { window.localStorage.setItem(`bese26:muted-conversation:${selectedConversation.id}`, '1'); } catch { onDemoAction?.('Mute is unavailable in this browser session.'); return; } setChatMenuOpen(false); onDemoAction?.('Conversation muted on this device.'); };
   const reportConversation = async () => { if (!selectedConversation?.listing_id || !window.confirm('Report this conversation and its listing?')) return; setBusy(true); try { await reportListing({ listingId: selectedConversation.listing_id, reporterId: user.id, reason: 'harassment', details: 'Reported from a private conversation.' }); setChatMenuOpen(false); onDemoAction?.('Report submitted securely.'); } catch (error) { onDemoAction?.(error.message || 'Could not submit the report.'); } finally { setBusy(false); } };
-  const blockConversation = async () => { if (!selectedConversation?.seller_id || !window.confirm('Block this seller?')) return; setBusy(true); try { await blockUser(user.id, selectedConversation.seller_id); setChatMenuOpen(false); onDemoAction?.('Seller blocked.'); } catch (error) { onDemoAction?.(error.message || 'Could not block this seller.'); } finally { setBusy(false); } };
+  const blockConversation = async () => {
+    const blockedId = selectedConversation?.buyer_id === user?.id ? selectedConversation?.seller_id : selectedConversation?.buyer_id;
+    if (!blockedId || blockedId === user?.id || !window.confirm(`Block ${personName} on Bese26? They will no longer be able to message you.`)) return;
+    setBusy(true);
+    try {
+      await blockUser(user.id, blockedId);
+      setConversations((items) => items.filter((item) => item.id !== selectedConversation.id));
+      setChatMenuOpen(false);
+      onDemoAction?.(`${personName} has been blocked. You can manage blocked users from your profile.`);
+      onBackToInbox?.();
+    } catch (error) { onDemoAction?.(error.message || `Could not block ${personName}.`); } finally { setBusy(false); }
+  };
   if (!user) return <div className="page-stack notifications-page messages-guest-page"><section className="notifications-empty"><ShieldCheck size={30} /><div className="eyebrow">PRIVATE CONVERSATIONS</div><h1>Sign in to use Messages</h1><p>Your chats, offers, meeting plans, and attachments stay private to you and the other participant.</p><button className="primary-button" onClick={() => onAuthRequired?.('Sign in to open your private messages.')}>Sign in to continue</button></section></div>;
   if (!selectedConversation) {
     const filteredConversations = conversations.filter((conversation) => {
-      const other = conversation.buyer_id === user?.id ? conversation.seller : conversation.buyer;
       const identity = conversationIdentity(conversation);
       const { name } = identity;
       const title = conversation.listing?.title || 'Marketplace listing';
       const query = messageSearch.trim().toLowerCase();
       const matchesSearch = !query || `${name} ${title}`.toLowerCase().includes(query);
-      const isUnanswered = conversation.seller_id === user?.id && !conversation.last_message_at;
-      return matchesSearch && (messageFilter === 'All' || (messageFilter === 'Unanswered' && isUnanswered) || messageFilter === 'Unread');
+      const preview = conversation.lastMessage?.body || (conversation.lastMessage ? (chatAttachmentKind(conversation.lastMessage) === 'audio' ? 'Voice note' : chatAttachmentKind(conversation.lastMessage) === 'file' ? 'Shared a document' : 'Shared a photo') : '');
+      const matchesMessage = !query || preview.toLowerCase().includes(query);
+      const isUnanswered = conversation.seller_id === user?.id && conversation.lastMessage?.sender_id === conversation.buyer_id;
+      const isUnread = Number(conversation.unread_count || 0) > 0;
+      return (matchesSearch || matchesMessage) && (messageFilter === 'All' || (messageFilter === 'Unanswered' && isUnanswered) || (messageFilter === 'Unread' && isUnread));
     });
-    return <div className="messages-inbox-page"><header className="messages-inbox-header"><div className="messages-inbox-title"><div className="eyebrow">YOUR CONVERSATIONS</div><h1>Messages</h1></div><span className="message-count">{conversations.length}</span></header><div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search in Messages" aria-label="Search messages" /></div><div className="message-filter-tabs" role="tablist">{['All', 'Unread', 'Unanswered'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}</button>)}</div>{conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => { const identity = conversationIdentity(conversation); const { name } = identity; const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase(); return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}><span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span><span className="message-inbox-copy"><strong>{name}</strong><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{conversation.last_message_at ? 'Open your conversation' : 'New conversation'}</small></span><time>{conversation.last_message_at ? new Date(conversation.last_message_at).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time><ChevronRight size={17} /></button>; })}</div> : <div className="message-inbox-empty"><MessageCircle size={30} /><strong>{messageSearch ? 'No matching conversations' : 'No conversations yet'}</strong><span>When you message a seller, the conversation will appear here.</span></div>}</div>;
+    const totalUnread = conversations.reduce((total, item) => total + Number(item.unread_count || 0), 0);
+    return <div className="messages-inbox-page messages-premium">
+      <header className="messages-inbox-header">
+        <div className="messages-inbox-title"><div className="eyebrow">PRIVATE MARKETPLACE CHAT</div><h1>Messages</h1><p>Share photos, voice notes and safe plans while you find the right deal.</p></div>
+        <span className="message-count" aria-label={`${conversations.length} conversations`}>{conversations.length}</span>
+      </header>
+      <div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search people, listings or messages" aria-label="Search people, listings or messages" /></div>
+      <div className="message-filter-tabs" role="tablist" aria-label="Filter conversations">{['All', 'Unread', 'Unanswered'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}{filter === 'Unread' && totalUnread > 0 && <span className="message-filter-count">{totalUnread > 99 ? '99+' : totalUnread}</span>}</button>)}</div>
+      {conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => {
+        const identity = conversationIdentity(conversation);
+        const { name } = identity;
+        const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+        const lastMessage = conversation.lastMessage;
+        const preview = lastMessage?.body?.trim() || (lastMessage ? (chatAttachmentKind(lastMessage) === 'audio' ? 'Voice note' : chatAttachmentKind(lastMessage) === 'file' ? 'Shared a document' : 'Shared a photo') : 'Start the conversation');
+        const lastActivity = lastMessage?.created_at || conversation.last_message_at;
+        return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}>
+          <span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span>
+          <span className="message-inbox-copy"><strong>{name}</strong><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{preview}</small></span>
+          <span className="message-inbox-row-meta"><time>{lastActivity ? new Date(lastActivity).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time>{Number(conversation.unread_count || 0) > 0 && <span className="message-unread-badge">{conversation.unread_count > 99 ? '99+' : conversation.unread_count}</span>}</span>
+          <ChevronRight size={17} />
+        </button>;
+      })}</div> : <div className="message-inbox-empty"><MessageCircle size={30} /><strong>{messageSearch ? 'No matching conversations' : messageFilter !== 'All' ? `No ${messageFilter.toLowerCase()} conversations` : 'No conversations yet'}</strong><span>When you message a seller, the conversation will appear here.</span></div>}
+    </div>;
   }
   const selectedIdentity = conversationIdentity(selectedConversation);
   const otherProfile = selectedIdentity.profile;
@@ -641,8 +817,8 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
   const listingImage = liveMode ? liveListing?.image : null;
   const personInitials = liveMode ? (personName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()) : 'BE';
   const personImage = liveMode ? selectedIdentity.image : '';
-  return <div className={`page-stack messages-page ${liveMode ? 'messages-selected-page' : ''}`}><div className="page-title-row"><div><div className="eyebrow">KEEP IT MOVING</div><h1>Messages</h1></div><span className="messages-workspace-pill">Deal workspace</span></div><div className="message-layout"><div className="conversation-list">{conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : conversations.length ? conversations.map((conversation) => { const identity = conversationIdentity(conversation); const { name } = identity; return <button key={conversation.id} className={`conversation-row ${conversation.id === initialMessageId ? 'active' : ''}`} type="button" onClick={() => onSelectConversation?.(conversation)}><span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()} tone="rose" />}</span><div className="conversation-copy"><strong>{name}</strong><span>{conversation.listing?.title || 'Marketplace listing'}</span></div><div className="conversation-meta"><small>{conversation.last_message_at ? new Date(conversation.last_message_at).toLocaleDateString() : 'New'}</small></div></button>; }) : <div className="empty-state compact-empty"><MessageCircle size={24} /><h3>No conversations yet</h3><p>When you chat with a seller, your messages will appear here.</p></div>}</div><div className="chat-panel"><div className="chat-header"><button type="button" className="chat-back-button" onClick={onBackToInbox} aria-label="Back to messages"><ArrowLeft size={25} /></button><div className="chat-person"><span className={`message-identity-avatar chat-person-avatar ${selectedIdentity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{personImage ? <img src={personImage} alt="" onLoad={selectedIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={personInitials} tone="rose" />}</span><div><strong>{personName}{otherProfile?.is_verified && <BadgeCheck size={15} className="chat-verified" />}</strong><span>{liveMode ? 'last seen recently' : 'Marketplace chat'}</span></div></div><div className="chat-header-actions"><button type="button" className="chat-header-icon" aria-label="Call seller" disabled={!liveMode || busy} onClick={callSeller}><Phone size={22} /></button><button type="button" className="chat-header-icon" aria-label="More options" aria-expanded={chatMenuOpen} onClick={() => setChatMenuOpen((value) => !value)}><MoreVertical size={23} /></button></div></div>{chatMenuOpen && <div className="chat-action-menu" role="menu"><button type="button" onClick={viewListing}><Package size={15} /> View listing</button><button type="button" onClick={muteConversation}><BellOff size={15} /> Mute conversation</button><button type="button" onClick={reportConversation} disabled={busy}><Flag size={15} /> Report conversation</button><button type="button" onClick={blockConversation} disabled={busy}><ShieldAlert size={15} /> Block user</button></div>}<div className="chat-context">{listingImage ? <img src={listingImage} alt="" /> : <div className="chat-context-placeholder"><Package size={17} /></div>}<div><span>Item details</span><strong>{listingTitle}</strong>{liveListing?.price && <b className="chat-context-price">{liveListing.price}</b>}</div></div>{dealPanel === 'offer' && <form className="deal-form" onSubmit={submitOffer}><strong>Make an offer</strong><small>Keep the price and agreement inside Bese26 chat.</small><input type="number" min="1" value={offerAmount} onChange={(event) => setOfferAmount(event.target.value)} placeholder="Offer amount in NGN" required /><input value={offerNote} onChange={(event) => setOfferNote(event.target.value)} placeholder="Optional note" maxLength={500} /><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send offer'}</button></div></form>}{dealPanel === 'meeting' && <form className="deal-form safe-meeting-form" onSubmit={submitMeeting}><strong>Plan a safe meeting</strong><small>Choose a public area. Do not share your home address or pay before inspecting the item.</small><label>Date<input type="date" min={new Date().toISOString().slice(0, 10)} value={meetingDate} onChange={(event) => setMeetingDate(event.target.value)} required /></label><label>Time<input type="time" value={meetingTime} onChange={(event) => setMeetingTime(event.target.value)} required /></label><label>General public area<input value={meetingArea} onChange={(event) => setMeetingArea(event.target.value)} placeholder="e.g. mall, fuel station, or police-approved area" maxLength={120} required /></label><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send meeting plan'}</button></div></form>}{deals.offers.map((offer) => <div id={`chat-offer-${offer.id}`} className={`deal-status-card ${initialNotificationTarget?.offerId === offer.id ? 'is-notification-target' : ''}`} key={offer.id}><div><strong>Offer · ₦{Number(offer.amount).toLocaleString('en-NG')}</strong><span>{offer.status}</span></div>{isSeller && offer.status === 'pending' && <div><button type="button" onClick={() => updateOffer(offer, 'accepted')}>Accept</button><button type="button" onClick={() => updateOffer(offer, 'rejected')}>Decline</button></div>}{!isSeller && offer.status === 'pending' && <button type="button" onClick={() => updateOffer(offer, 'cancelled')}>Cancel</button>}</div>)}{deals.meetings.map((meeting) => { const proposedByMe = meeting.proposed_by === user.id; return <div className="deal-status-card meeting-status-card" key={meeting.id}><div><strong>Safe meeting · {meeting.meeting_date} at {String(meeting.meeting_time).slice(0, 5)}</strong><span>{meeting.area} · {meeting.status}</span></div><div>{!proposedByMe && meeting.status === 'proposed' && <><button type="button" onClick={() => updateMeeting(meeting, 'accepted')}>Accept</button><button type="button" onClick={() => updateMeeting(meeting, 'declined')}>Decline</button></>}{proposedByMe && ['proposed', 'accepted'].includes(meeting.status) && <button type="button" onClick={() => updateMeeting(meeting, 'cancelled')}>Cancel</button>}{meeting.status === 'accepted' && <button type="button" onClick={() => updateMeeting(meeting, 'completed')}>Mark complete</button>}</div></div>; })}
-  <div className="chat-messages">{liveMode ? (liveLoading ? <div className="chat-loading-state" role="status"><span className="chat-loading-spinner" /> <span>Loading messages…</span></div> : liveMessages.length ? liveMessages.map((item) => <div id={`chat-message-${item.id}`} className={`message-bubble ${item.sender_id === user.id ? 'mine' : 'other'} ${initialNotificationTarget?.messageId === item.id ? 'is-notification-target' : ''}`} key={item.id}>{item.attachment_url && (item.attachment_path?.match(/\.(webm|ogg|mp3|m4a|wav)$/i) ? <audio controls src={item.attachment_url} className="message-audio" /> : item.attachment_path?.match(/\.pdf$/i) ? <a href={item.attachment_url} target="_blank" rel="noreferrer" className="message-file">PDF · Open file</a> : <a href={item.attachment_url} target="_blank" rel="noreferrer"><img src={item.attachment_url} alt="Chat attachment" className="message-image" /></a>)}{item.body && <span>{item.body}</span>}{!item.body && !item.attachment_url && 'Attachment'}<small>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {item.sender_id === user.id && <Check size={12} />}</small><button type="button" className={`message-reaction ${messageReactions[item.id] ? 'selected' : ''}`} onClick={() => toggleReaction(item.id, messageReactions[item.id] || '👍')} aria-label="React to message">{messageReactions[item.id] || '＋'}</button></div>) : <div className="chat-empty-note">Start the conversation with a clear question about the listing.</div>) : <div className="chat-empty-note">Select a listing to start a real conversation.</div>}</div>{liveMode && <div className="chat-bottom-tools"><div className="chat-safety-note"><ShieldCheck size={14} /><span>Stay safe: inspect before paying. Never share OTPs or PINs.</span></div><div className="chat-quick-actions"><button type="button" onClick={() => setText('Is this listing still available?')}>Available?</button><button type="button" onClick={() => setText('Please share the general location of this item.')}>Location</button><button type="button" onClick={() => setDealPanel('offer')} disabled={isSeller}>Offer</button><button type="button" onClick={() => setDealPanel('meeting')}>Meet safely</button></div></div>}{attachment && <div className="chat-attachment-preview">{attachmentPreview ? <img src={attachmentPreview} alt="Selected preview" /> : <Mic size={16} />}<span>{attachment.name} <small>{Math.ceil(attachment.size / 1024)} KB</small></span><button type="button" onClick={() => { setAttachment(null); setAttachmentPreview(''); }} aria-label="Remove attachment"><X size={15} /></button></div>}{emojiOpen && <div className="emoji-picker" role="dialog" aria-label="Choose an emoji"><div className="emoji-picker-header"><strong>Emojis</strong><button type="button" onClick={() => setEmojiOpen(false)} aria-label="Close emoji picker"><X size={14} /></button></div><div className="emoji-grid">{emojis.map((emoji) => <button type="button" key={emoji} onClick={() => addEmoji(emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div></div>}<div className="chat-composer"><input id="chat-file-input" className="chat-file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,audio/webm,audio/ogg,audio/mpeg" onChange={chooseAttachment} /><label htmlFor="chat-file-input" className="icon-button" aria-label="Attach image or file"><ImageIcon size={18} /></label><button type="button" className={`icon-button chat-record-button ${recording ? 'recording' : ''}`} aria-label={recording ? 'Stop recording' : 'Record voice note'} onClick={recording ? stopRecording : startRecording} disabled={!liveMode || mediaBusy}><Mic size={18} /></button><button type="button" className={`icon-button emoji-toggle ${emojiOpen ? 'active' : ''}`} aria-label="Open emoji picker" onClick={() => setEmojiOpen((value) => !value)} disabled={!liveMode}><span aria-hidden="true">☺</span></button><input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder={recording ? 'Recording voice note…' : 'Write a message...'} disabled={!liveMode || recording || mediaBusy} /><button className="send-button" onClick={() => send()} disabled={!liveMode || mediaBusy || (!text.trim() && !attachment)}>{mediaBusy ? '…' : <Send size={16} />}</button></div></div></div></div>;
+  return <div className={`page-stack messages-page messages-premium ${liveMode ? 'messages-selected-page' : ''}`}><div className="page-title-row"><div><div className="eyebrow">KEEP IT MOVING</div><h1>Messages</h1></div><span className="messages-workspace-pill">Deal workspace</span></div><div className="message-layout"><div className="conversation-list">{conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : conversations.length ? conversations.map((conversation) => { const identity = conversationIdentity(conversation); const { name } = identity; return <button key={conversation.id} className={`conversation-row ${conversation.id === initialMessageId ? 'active' : ''}`} type="button" onClick={() => onSelectConversation?.(conversation)}><span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()} tone="rose" />}</span><div className="conversation-copy"><strong>{name}</strong><span>{conversation.listing?.title || 'Marketplace listing'}</span></div><div className="conversation-meta"><small>{conversation.last_message_at ? new Date(conversation.last_message_at).toLocaleDateString() : 'New'}</small></div></button>; }) : <div className="empty-state compact-empty"><MessageCircle size={24} /><h3>No conversations yet</h3><p>When you chat with a seller, your messages will appear here.</p></div>}</div><div className="chat-panel"><div className="chat-header"><button type="button" className="chat-back-button" onClick={onBackToInbox} aria-label="Back to messages"><ArrowLeft size={25} /></button><div className="chat-person"><span className={`message-identity-avatar chat-person-avatar ${selectedIdentity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{personImage ? <img src={personImage} alt="" onLoad={selectedIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={personInitials} tone="rose" />}</span><div><strong>{personName}{otherProfile?.is_verified && <BadgeCheck size={15} className="chat-verified" />}</strong><span>{liveMode ? 'Private conversation · Bese26' : 'Marketplace chat'}</span></div></div><div className="chat-header-actions">{!isSeller && <button type="button" className="chat-header-icon" aria-label={callPhone ? "Call seller" : "Phone calls are disabled for this listing"} title={callLoading ? "Checking call availability" : callPhone ? "Call seller" : "Phone calls are disabled for this listing"} disabled={!liveMode || callLoading || !callPhone} onClick={callSeller}><Phone size={22} /></button>}<button type="button" className="chat-header-icon" aria-label="More options" aria-expanded={chatMenuOpen} onClick={() => setChatMenuOpen((value) => !value)}><MoreVertical size={23} /></button></div></div>{chatMenuOpen && <div className="chat-action-menu" role="menu"><button type="button" onClick={viewListing}><Package size={15} /> View listing</button><button type="button" onClick={muteConversation}><BellOff size={15} /> Mute conversation</button><button type="button" onClick={reportConversation} disabled={busy}><Flag size={15} /> Report conversation</button><button type="button" onClick={blockConversation} disabled={busy}><ShieldAlert size={15} /> Block user</button></div>}<div className="chat-context">{listingImage ? <img src={listingImage} alt="" /> : <div className="chat-context-placeholder"><Package size={17} /></div>}<div><span>Item details</span><strong>{listingTitle}</strong>{liveListing?.price && <b className="chat-context-price">{liveListing.price}</b>}</div></div>{dealPanel === 'offer' && <form className="deal-form" onSubmit={submitOffer}><strong>Make an offer</strong><small>Keep the price and agreement inside Bese26 chat.</small><input type="number" min="1" value={offerAmount} onChange={(event) => setOfferAmount(event.target.value)} placeholder="Offer amount in NGN" required /><input value={offerNote} onChange={(event) => setOfferNote(event.target.value)} placeholder="Optional note" maxLength={500} /><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send offer'}</button></div></form>}{dealPanel === 'meeting' && <form className="deal-form safe-meeting-form" onSubmit={submitMeeting}><strong>Plan a safe meeting</strong><small>Choose a public area. Do not share your home address or pay before inspecting the item.</small><label>Date<input type="date" min={new Date().toISOString().slice(0, 10)} value={meetingDate} onChange={(event) => setMeetingDate(event.target.value)} required /></label><label>Time<input type="time" value={meetingTime} onChange={(event) => setMeetingTime(event.target.value)} required /></label><label>General public area<input value={meetingArea} onChange={(event) => setMeetingArea(event.target.value)} placeholder="e.g. mall, fuel station, or police-approved area" maxLength={120} required /></label><div><button type="button" className="secondary-button" onClick={() => setDealPanel('')}>Cancel</button><button type="submit" className="primary-button" disabled={busy}>{busy ? 'Sending…' : 'Send meeting plan'}</button></div></form>}{deals.offers.map((offer) => <div id={`chat-offer-${offer.id}`} className={`deal-status-card ${initialNotificationTarget?.offerId === offer.id ? 'is-notification-target' : ''}`} key={offer.id}><div><strong>Offer · ₦{Number(offer.amount).toLocaleString('en-NG')}</strong><span>{offer.status}</span></div>{isSeller && offer.status === 'pending' && <div><button type="button" onClick={() => updateOffer(offer, 'accepted')}>Accept</button><button type="button" onClick={() => updateOffer(offer, 'rejected')}>Decline</button></div>}{!isSeller && offer.status === 'pending' && <button type="button" onClick={() => updateOffer(offer, 'cancelled')}>Cancel</button>}</div>)}{deals.meetings.map((meeting) => { const proposedByMe = meeting.proposed_by === user.id; return <div className="deal-status-card meeting-status-card" key={meeting.id}><div><strong>Safe meeting · {meeting.meeting_date} at {String(meeting.meeting_time).slice(0, 5)}</strong><span>{meeting.area} · {meeting.status}</span></div><div>{!proposedByMe && meeting.status === 'proposed' && <><button type="button" onClick={() => updateMeeting(meeting, 'accepted')}>Accept</button><button type="button" onClick={() => updateMeeting(meeting, 'declined')}>Decline</button></>}{proposedByMe && ['proposed', 'accepted'].includes(meeting.status) && <button type="button" onClick={() => updateMeeting(meeting, 'cancelled')}>Cancel</button>}{meeting.status === 'accepted' && <button type="button" onClick={() => updateMeeting(meeting, 'completed')}>Mark complete</button>}</div></div>; })}
+  <div className="chat-messages">{liveMode ? (liveLoading ? <div className="chat-loading-state" role="status"><span className="chat-loading-spinner" /> <span>Loading messages…</span></div> : currentMessages.length ? currentMessages.map((item) => <div id={`chat-message-${item.id}`} className={`message-bubble ${item.sender_id === user.id ? 'mine' : 'other'} ${initialNotificationTarget?.messageId === item.id ? 'is-notification-target' : ''}`} key={item.id}>{item.attachment_url && (chatAttachmentKind(item) === 'audio' ? <audio controls preload="none" src={item.attachment_url} className="message-audio" /> : chatAttachmentKind(item) === 'file' ? <a href={item.attachment_url} target="_blank" rel="noreferrer" className="message-file">PDF · Open document</a> : <a href={item.attachment_url} target="_blank" rel="noreferrer"><img src={item.attachment_url} alt="Chat attachment" className="message-image" loading="lazy" decoding="async" /></a>)}{item.body && <span>{item.body}</span>}{!item.body && !item.attachment_url && (item.attachment_path ? 'Attachment could not be loaded — ask them to resend.' : 'Attachment')}<small><time dateTime={item.created_at}>{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>{item.sender_id === user.id && <span className={`message-read-status ${item.read_at ? 'is-read' : ''}`} title={item.read_at ? 'Seen' : 'Sent'} aria-label={item.read_at ? 'Seen' : 'Sent'}><Check size={12} />{item.read_at && <Check size={12} />}</span>}</small><button type="button" className={`message-reaction ${messageReactions[item.id] ? 'selected' : ''}`} onClick={() => toggleReaction(item.id, messageReactions[item.id] || '👍')} aria-label="React to message">{messageReactions[item.id] || '＋'}</button></div>) : <div className="chat-empty-note">Start the conversation with a clear question about the listing.</div>) : <div className="chat-empty-note">Select a listing to start a real conversation.</div>}<div ref={messageEndRef} aria-hidden="true" /></div>{liveMode && <div className="chat-bottom-tools"><div className="chat-safety-note"><ShieldCheck size={14} /><span>Stay safe: inspect before paying. Never share OTPs or PINs.</span></div><div className="chat-quick-actions"><button type="button" onClick={() => setText('Is this listing still available?')}>Available?</button><button type="button" onClick={() => setText('Please share the general location of this item.')}>Location</button><button type="button" onClick={() => setDealPanel('offer')} disabled={isSeller}>Offer</button><button type="button" onClick={() => setDealPanel('meeting')}>Meet safely</button></div></div>}{attachment && <div className="chat-attachment-preview">{attachmentPreview && chatAttachmentKind({ name: attachment.name, attachment_mime_type: attachment.type }) === 'image' ? <img src={attachmentPreview} alt="Selected photo preview" /> : attachmentPreview && chatAttachmentKind({ name: attachment.name, attachment_mime_type: attachment.type }) === 'audio' ? <audio controls preload="none" src={attachmentPreview} aria-label="Voice note preview" /> : <span className="chat-attachment-file-kind">PDF</span>}<span>{attachment.name} <small>{Math.ceil(attachment.size / 1024)} KB</small></span><button type="button" onClick={clearAttachment} aria-label="Remove attachment"><X size={15} /></button></div>}{emojiOpen && <div className="emoji-picker" role="dialog" aria-label="Choose an emoji"><div className="emoji-picker-header"><strong>Emojis</strong><button type="button" onClick={() => setEmojiOpen(false)} aria-label="Close emoji picker"><X size={14} /></button></div><div className="emoji-grid">{emojis.map((emoji) => <button type="button" key={emoji} onClick={() => addEmoji(emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div></div>}<div className="chat-composer">{recording ? <div className="chat-recording-status"><span className="chat-recording-pulse" aria-hidden="true" /><div><strong>Recording voice note</strong><small>{formatChatDuration(recordingSeconds)} · max 02:00</small></div><button type="button" className="chat-cancel-recording" onClick={cancelRecording}><X size={15} /> Cancel</button><button type="button" className="chat-finish-recording" onClick={stopRecording}>Finish</button></div> : <><input id="chat-file-input" className="chat-file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,audio/webm,audio/ogg,audio/mp4,audio/mpeg" onChange={chooseAttachment} disabled={!liveMode || mediaBusy} /><label htmlFor="chat-file-input" className="icon-button chat-attach-button" aria-label="Attach a photo, document or voice note"><ImageIcon size={18} /></label><button type="button" className="icon-button chat-record-button" aria-label="Record voice note" onClick={startRecording} disabled={!liveMode || mediaBusy}><Mic size={18} /></button><button type="button" className={`icon-button emoji-toggle ${emojiOpen ? 'active' : ''}`} aria-label="Open emoji picker" onClick={() => setEmojiOpen((value) => !value)} disabled={!liveMode}><span aria-hidden="true">☺</span></button><input value={text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } }} placeholder="Write a message…" disabled={!liveMode || mediaBusy} aria-label="Write a message" /><button type="button" className="send-button" onClick={() => send()} disabled={!liveMode || mediaBusy || (!text.trim() && !attachment)} aria-label="Send message">{mediaBusy ? '…' : <Send size={16} />}</button></>}</div></div></div></div>;
 }
 
 

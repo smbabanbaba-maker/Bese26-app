@@ -1469,7 +1469,7 @@ export async function blockUser(userId, blockedId) {
   failIfUnavailable();
   if (!blockedId || userId === blockedId) throw new Error('You cannot block this profile.');
   const { error } = await supabase.from('profile_blocks').insert({ blocker_id: userId, blocked_id: blockedId });
-  if (error) throw error;
+  if (error && error.code !== '23505') throw error;
 }
 
 export async function unblockUser(userId, blockedId) {
@@ -1746,27 +1746,51 @@ export async function fetchConversations(userId) {
   const { data: rows, error } = await supabase.from('conversations').select('id,listing_id,buyer_id,seller_id,last_message_at,updated_at,created_at').or(`buyer_id.eq.${userId},seller_id.eq.${userId}`).order('updated_at', { ascending: false }).limit(100);
   if (error) throw error;
   const conversations = rows || [];
+  const conversationIds = conversations.map((row) => row.id).filter(Boolean);
   const listingIds = [...new Set(conversations.map((row) => row.listing_id).filter(Boolean))];
   const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
-  const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }] = await Promise.all([
+  const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }, { data: messageRows, error: messageError }, { data: unreadRows, error: unreadError }] = await Promise.all([
     listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200) : Promise.resolve({ data: [], error: null }),
+    conversationIds.length ? supabase.from('messages').select('conversation_id,sender_id,body,attachment_path,attachment_mime_type,created_at,read_at').in('conversation_id', conversationIds).order('created_at', { ascending: false }).limit(300) : Promise.resolve({ data: [], error: null }),
+    conversationIds.length ? supabase.from('messages').select('conversation_id').in('conversation_id', conversationIds).neq('sender_id', userId).is('read_at', null).limit(500) : Promise.resolve({ data: [], error: null }),
   ]);
   if (listingError) throw listingError;
   if (profileError) throw profileError;
   if (businessError) throw businessError;
+  if (messageError) throw messageError;
+  if (unreadError) throw unreadError;
   const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
   const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getBusinessLogoDisplayUrl(row, getAvatarUrl(row.logo_path)) }]));
   const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, { ...row, avatar_url: getAvatarUrl(row.avatar_path), business: businessMap[row.id] || null }]));
-  return conversations.map((row) => ({ ...row, listing: listingMap[row.listing_id] || null, buyer: profileMap[row.buyer_id] || null, seller: profileMap[row.seller_id] || null }));
+  const latestMessageMap = {};
+  for (const message of messageRows || []) if (!latestMessageMap[message.conversation_id]) latestMessageMap[message.conversation_id] = message;
+  const unreadCountMap = {};
+  for (const message of unreadRows || []) unreadCountMap[message.conversation_id] = (unreadCountMap[message.conversation_id] || 0) + 1;
+  return conversations.map((row) => ({ ...row, listing: listingMap[row.listing_id] || null, buyer: profileMap[row.buyer_id] || null, seller: profileMap[row.seller_id] || null, lastMessage: latestMessageMap[row.id] || null, unread_count: unreadCountMap[row.id] || 0 }));
 }
 
-export async function fetchMessages(conversationId) {
+export async function markConversationMessagesRead(conversationId) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('messages').select('id,conversation_id,sender_id,body,attachment_path,created_at,read_at').eq('conversation_id', conversationId).order('created_at', { ascending: true }).limit(200);
+  if (!conversationId) return 0;
+  const { data, error } = await supabase.rpc('mark_conversation_messages_read', { p_conversation_id: conversationId });
   if (error) throw error;
-  const rows = data || [];
+  return Number(data || 0);
+}
+
+export async function fetchMessages(conversationId, targetMessageId = null) {
+  failIfUnavailable();
+  const fields = 'id,conversation_id,sender_id,body,attachment_path,attachment_mime_type,attachment_size_bytes,created_at,read_at';
+  const { data, error } = await supabase.from('messages').select(fields).eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(200);
+  if (error) throw error;
+  const rows = (data || []).reverse();
+  if (targetMessageId && !rows.some((item) => item.id === targetMessageId)) {
+    const { data: target, error: targetError } = await supabase.from('messages').select(fields).eq('conversation_id', conversationId).eq('id', targetMessageId).maybeSingle();
+    if (targetError) throw targetError;
+    if (target) rows.push(target);
+    rows.sort((left, right) => new Date(left.created_at) - new Date(right.created_at));
+  }
   const paths = rows.map((item) => item.attachment_path).filter(Boolean);
   if (!paths.length) return rows;
   const { data: signed, error: signedError } = await supabase.storage.from('chat-media').createSignedUrls(paths, 3600);
@@ -1779,21 +1803,36 @@ export async function uploadChatMedia({ userId, conversationId, file }) {
   failIfUnavailable();
   if (!userId || !conversationId || !file) throw new Error('Choose an image or voice note first.');
   if (file.size > 8 * 1024 * 1024) throw new Error('Chat attachments must be smaller than 8 MB.');
-  const allowed = file.type.startsWith('image/') || file.type.startsWith('audio/') || file.type === 'application/pdf';
-  if (!allowed) throw new Error('Only images, PDFs, and voice notes can be sent in chat.');
-  const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-') || 'attachment';
+  const contentType = String(file.type || '').split(';')[0].toLowerCase();
+  const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf', 'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg']);
+  if (!allowedTypes.has(contentType)) throw new Error('Choose a JPG, PNG, WebP, GIF, PDF, or supported voice note.');
+  const safeName = String(file.name || 'attachment').toLowerCase().replace(/[^a-z0-9._-]+/g, '-') || 'attachment';
   const path = `${userId}/${conversationId}/${crypto.randomUUID()}-${safeName}`;
-  const contentType = file.type.split(';')[0];
   const { error } = await supabase.storage.from('chat-media').upload(path, file, { cacheControl: '3600', upsert: false, contentType });
   if (error) throw error;
   const { data: signed, error: signedError } = await supabase.storage.from('chat-media').createSignedUrl(path, 3600);
-  if (signedError) throw signedError;
-  return { path, url: signed.signedUrl, kind: file.type.startsWith('audio/') ? 'audio' : 'image' };
+  if (signedError) {
+    await supabase.storage.from('chat-media').remove([path]).catch(() => {});
+    throw signedError;
+  }
+  return { path, url: signed.signedUrl, kind: contentType.startsWith('audio/') ? 'audio' : contentType === 'application/pdf' ? 'file' : 'image', mimeType: contentType, sizeBytes: file.size };
 }
 
-export async function sendMessage({ conversationId, senderId, body, attachmentPath = null }) {
+export async function deleteChatMedia({ userId, path }) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('messages').insert({ conversation_id: conversationId, sender_id: senderId, body: body || null, attachment_path: attachmentPath }).select().single();
+  if (!userId || !path || !path.startsWith(`${userId}/`)) return;
+  const { error } = await supabase.storage.from('chat-media').remove([path]);
+  if (error) throw error;
+}
+
+export async function sendMessage({ conversationId, senderId, body, attachmentPath = null, attachmentMimeType = null, attachmentSizeBytes = null }) {
+  failIfUnavailable();
+  const payload = { conversation_id: conversationId, sender_id: senderId, body: body || null, attachment_path: attachmentPath };
+  if (attachmentPath) {
+    payload.attachment_mime_type = attachmentMimeType || null;
+    payload.attachment_size_bytes = Number.isFinite(Number(attachmentSizeBytes)) ? Number(attachmentSizeBytes) : null;
+  }
+  const { data, error } = await supabase.from('messages').insert(payload).select().single();
   if (error) throw error;
   return data;
 }
@@ -1845,7 +1884,16 @@ export async function updateChatMeeting(meetingId, status) {
 
 export function subscribeToMessages(conversationId, onMessage) {
   if (!supabase || !conversationId) return () => {};
-  const channel = supabase.channel(`conversation-${conversationId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => onMessage(payload.new)).subscribe();
+  const deliverMessage = async (incoming, eventType) => {
+    if (!incoming?.attachment_path || incoming.attachment_url) return onMessage(incoming, eventType);
+    try {
+      const { data } = await supabase.storage.from('chat-media').createSignedUrl(incoming.attachment_path, 3600);
+      onMessage({ ...incoming, attachment_url: data?.signedUrl || '' }, eventType);
+    } catch {
+      onMessage({ ...incoming, attachment_url: '' }, eventType);
+    }
+  };
+  const channel = supabase.channel(`conversation-${conversationId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => deliverMessage(payload.new, 'INSERT')).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => deliverMessage(payload.new, 'UPDATE')).subscribe();
   return () => { supabase.removeChannel(channel); };
 }
 
