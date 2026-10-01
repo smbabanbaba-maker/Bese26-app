@@ -125,19 +125,7 @@ function SplashScreen({ message = 'Preparing your marketplace…', error = false
 }
 
 function MiniwebLoadingScreen() {
-  return <div className="miniweb-loading-screen" role="status" aria-label="Loading Bese26 shop">
-    <div className="miniweb-loading-orbit" aria-hidden="true">
-      <span className="miniweb-loading-ring ring-one" />
-      <span className="miniweb-loading-ring ring-two" />
-      <span className="miniweb-loading-spark spark-one" />
-      <span className="miniweb-loading-spark spark-two" />
-      <img src="/images/bese26-logo-icon.webp" alt="" />
-    </div>
-    <div className="miniweb-loading-brand">Bese26<span>.shop</span></div>
-    <strong>Opening this shop</strong>
-    <p>Getting the store and latest listings ready…</p>
-    <span className="miniweb-loading-dots" aria-hidden="true"><i /><i /><i /></span>
-  </div>;
+  return <MiniwebDashboardShell />;
 }
 
 function MiniwebDashboardShell() {
