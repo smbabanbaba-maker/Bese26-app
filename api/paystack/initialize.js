@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     reference = `bese26_${user.id.slice(0, 8)}_${crypto.randomUUID()}`;
     let amountKobo;
     let metadata;
-    let paystackPlanCode = null;
     if (mode === 'boost') {
       const { package: pkg, boost } = await createBoostPayment({ supabase, user, listingId: body.listingId, packageId: body.packageId, reference });
       amountKobo = pkg.price_kobo;
@@ -27,12 +26,11 @@ export default async function handler(req, res) {
       }
       await recordInitializedPayment({ supabase, user, plan, reference });
       amountKobo = plan.amountKobo;
-      paystackPlanCode = plan.planCode;
       metadata = { user_id: user.id, plan_key: plan.key };
     }
     const data = await paystackRequest('/transaction/initialize', {
       method: 'POST',
-      body: JSON.stringify({ email: user.email, amount: amountKobo, reference, callback_url: callbackUrl(req), metadata, ...(paystackPlanCode ? { plan: paystackPlanCode } : {}) }),
+      body: JSON.stringify({ email: user.email, amount: amountKobo, reference, callback_url: callbackUrl(req), metadata }),
     });
     return sendJson(res, 200, { authorization_url: data.authorization_url, access_code: data.access_code, reference, mode });
   } catch (error) {

@@ -16,28 +16,6 @@ async function handleEvent(supabase, event, data) {
     return;
   }
 
-  if (event === 'subscription.create') {
-    const customerCode = data.customer?.customer_code || data.customer?.id?.toString();
-    const planCode = data.plan?.plan_code || data.plan?.code;
-    const planKey = Object.entries({ basic: process.env.PAYSTACK_BASIC_PLAN_CODE, premium: process.env.PAYSTACK_PREMIUM_PLAN_CODE, business: process.env.PAYSTACK_BUSINESS_PLAN_CODE }).find(([, code]) => code && code === planCode)?.[0];
-    if (!customerCode || !planKey) return;
-    await supabase.from('seller_subscriptions').update({ status: 'active', plan_key: planKey, provider: 'paystack', provider_customer_id: customerCode, provider_subscription_id: data.subscription_code || null, current_period_start: data.start ? new Date(data.start * 1000).toISOString() : new Date().toISOString(), current_period_end: data.next_payment_date || null, updated_at: new Date().toISOString() }).eq('provider_customer_id', customerCode);
-    return;
-  }
-
-  if (event === 'invoice.update' || event === 'invoice.payment_failed' || event === 'subscription.not_renew') {
-    const customerCode = data.customer?.customer_code || data.customer?.id?.toString();
-    if (!customerCode) return;
-    const status = event === 'invoice.payment_failed' || event === 'subscription.not_renew' ? 'paused' : 'active';
-    await supabase.from('seller_subscriptions').update({ status, current_period_end: data.next_payment_date || undefined, updated_at: new Date().toISOString() }).eq('provider_customer_id', customerCode);
-    return;
-  }
-
-  if (event === 'subscription.disable') {
-    const customerCode = data.customer?.customer_code || data.customer?.id?.toString();
-    const subscriptionCode = data.subscription_code || data.subscription?.subscription_code;
-    if (customerCode) await supabase.from('seller_subscriptions').update({ status: 'canceled', provider_subscription_id: subscriptionCode || undefined, updated_at: new Date().toISOString() }).eq('provider_customer_id', customerCode);
-  }
 }
 
 export default async function handler(req, res) {

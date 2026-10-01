@@ -1,35 +1,48 @@
 # Bese26 Paystack setup
 
-The Bese26 frontend never receives the Paystack secret key. The secure checkout handlers run under Vercel serverless routes.
+The Bese26 frontend never receives the Paystack secret key. Secure checkout handlers run under Vercel serverless routes.
+
+## Payment model
+
+Bese26 uses **one-time monthly payments**, not recurring Paystack subscriptions. A customer pays for one month of access and manually pays again when the plan expires. This allows Paystack checkout to show the payment channels enabled for the account, such as Card, Transfer, Bank, USSD, OPay, and Zap.
+
+The server still records the paid period in `seller_subscriptions`, but it does not attach a Paystack recurring plan code or automatic renewal.
 
 ## Vercel environment variables
 
-Add these to the Bese26 Vercel project. Choose **Secret** for the two key values and **Config** is acceptable for the non-secret URLs and plan codes.
+Add these to the Bese26 Vercel project. Choose **Secret** for the key values and **Config** is acceptable for the non-secret URL values.
 
 | Name | Type | Value |
 | --- | --- | --- |
-| `PAYSTACK_SECRET_KEY` | Secret | Paystack Test Secret Key beginning `sk_test_...` during testing; use `sk_live_...` only after go-live checks |
+| `PAYSTACK_SECRET_KEY` | Secret | `sk_live_...` for the live deployment; use `sk_test_...` only in a separate test/preview environment |
 | `SUPABASE_SERVICE_ROLE_KEY` | Secret | The service-role key for the authorized Bese26 Supabase project; never paste it into chat or GitHub |
-| `PAYSTACK_BASIC_PLAN_CODE` | Config | Paystack monthly Basic plan code, for example `PLN_...` |
-| `PAYSTACK_PREMIUM_PLAN_CODE` | Config | Paystack monthly Premium plan code |
-| `PAYSTACK_BUSINESS_PLAN_CODE` | Config | Paystack monthly Business plan code |
 | `APP_URL` | Config | `https://www.bese26.shop` |
 | `PAYSTACK_CALLBACK_URL` | Config | `https://www.bese26.shop/?payment=paystack` |
 
-Use **Production** for the production deployment. Add the same non-live values to **Preview** only when testing preview deployments. Keep Test Secret Key in Preview/Development and do not mix it with Live keys.
+The old `PAYSTACK_BASIC_PLAN_CODE`, `PAYSTACK_PREMIUM_PLAN_CODE`, and `PAYSTACK_BUSINESS_PLAN_CODE` variables are no longer required for the one-time flow. They can be removed from Vercel after the new deployment is active.
+
+Use **Production** for the live deployment. Keep live and test keys in separate environments and never mix them.
 
 ## Paystack dashboard setup
 
-In Paystack Test Mode, create three monthly plans using these confirmed amounts: Basic `₦2,500`, Premium `₦4,500`, and Business `₦7,000`. Copy only each returned plan code into its matching Vercel Config variable. Do not put a plan code in the secret-key field. These prices must match the amounts enforced by the Bese26 server checkout routes.
+You do not need to create recurring Paystack plans for the Bese26 subscription page. The Bese26 server sends the selected one-time amount directly:
 
-In **Settings → API Keys & Webhooks**, set the Test Webhook URL to:
+- Basic: `₦2,500`
+- Premium: `₦4,500`
+- Business: `₦7,000`
+
+In the Paystack Live dashboard, enable the payment channels available to your account. The checkout will show channels such as Card, Transfer, Bank, USSD, OPay, and Zap when Paystack makes them available for the transaction/account.
+
+In **Settings → API Keys & Webhooks**, set the Live Webhook URL to:
 
 `https://www.bese26.shop/api/paystack/webhook`
 
-The callback URL is already sent by the server, but it is also safe to set the same callback URL in the dashboard.
+The callback URL is sent by the server, but it is also safe to set the same callback URL in the dashboard.
 
 ## Secure flow
 
-A signed-in user clicks a paid plan. Bese26 sends the user session token to `/api/paystack/initialize`. The server validates the user and plan, creates a unique reference, initializes Paystack with the plan code, and returns only a checkout URL. After checkout, Bese26 verifies the reference server-side and Paystack sends a signed webhook. The webhook validates `x-paystack-signature` before updating the payment ledger and `seller_subscriptions`.
+A signed-in user chooses a plan. Bese26 sends the selected plan key to `/api/paystack/initialize`. The server validates the user, maps the plan to the fixed amount, creates a unique reference, and initializes a **one-time** Paystack transaction without a recurring plan code. Paystack returns a checkout URL with the enabled payment channels.
 
-No payment should be treated as successful from a browser callback alone. Access is granted only after server-side status, amount, currency, user metadata, and reference checks pass.
+After checkout, Bese26 verifies the reference server-side and Paystack sends a signed webhook. The webhook validates `x-paystack-signature` before marking the payment successful and activating the selected plan for one month.
+
+No payment is treated as successful from a browser callback alone. Access is granted only after server-side status, amount, currency, user metadata, and reference checks pass.
