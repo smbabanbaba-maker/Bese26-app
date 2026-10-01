@@ -8,12 +8,19 @@ function WelcomeSide({ isSignin }) {
     <div className="auth-welcome-shape auth-welcome-shape-one" />
     <div className="auth-welcome-shape auth-welcome-shape-two" />
     <div className="auth-welcome-content">
-      <span className="auth-welcome-kicker">BESE26 MARKETPLACE</span>
+      <span className="auth-welcome-kicker">Bese26 · BUY · SELL · CONNECT</span>
       <span className="auth-welcome-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></span>
-      <h2>{isSignin ? 'WELCOME\nBACK!' : 'JOIN THE\nMARKETPLACE'}</h2>
-      <p>{isSignin ? 'Save listings, post items, and chat with sellers securely.' : 'Create your profile and start buying or selling with confidence.'}</p>
+      <h2>{isSignin ? <>Welcome <em>back</em></> : <>Create your <em>account</em></>}</h2>
+      <p>{isSignin ? 'Sign in to continue to Bese26 and discover trusted opportunities across Nigeria.' : 'Join Bese26 and start buying, selling and connecting across Nigeria.'}</p>
       <span className="auth-welcome-note"><span /> Secure access for every device</span>
     </div>
+    <div className="auth-welcome-collage" aria-hidden="true">
+      <div className="auth-collage-card auth-collage-phone"><img src="/images/iphone-13-pro.jpg" alt="" /></div>
+      <div className="auth-collage-card auth-collage-car"><img src="/images/toyota-camry.jpg" alt="" /></div>
+      <div className="auth-collage-card auth-collage-home"><img src="/images/category-property.webp" alt="" /></div>
+      <div className="auth-collage-card auth-collage-fashion"><img src="/images/category-fashion.webp" alt="" /></div>
+    </div>
+    <div className="auth-welcome-swoosh" />
   </div>;
 }
 
@@ -81,20 +88,20 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const isSignin = mode === 'signin';
   const renderSignin = () => <div className="auth-form-panel auth-form-face-content">
     <div className="auth-panel-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></div>
-    <div className="eyebrow">SAFE MARKETPLACE ACCESS</div><h2 id="auth-title">Login</h2>
+    <div className="eyebrow">WELCOME BACK</div><h2 id="auth-title">Sign in</h2>
     <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
     {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
     <form onSubmit={submit} className="auth-form">
       <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
       <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="current-password" required /></label>
-      <button type="submit" className="primary-button auth-submit" disabled={loading || resetting}>{loading ? 'Signing in…' : 'Login'}</button><button type="button" className="auth-forgot" onClick={resetPassword} disabled={loading || resetting}>{resetting ? 'Sending reset link…' : 'Forgot password?'}</button>
+      <button type="submit" className="primary-button auth-submit" disabled={loading || resetting}>{loading ? 'Signing in…' : 'Sign in'}</button><button type="button" className="auth-forgot" onClick={resetPassword} disabled={loading || resetting}>{resetting ? 'Sending reset link…' : 'Forgot password?'}</button>
     </form>
     <button type="button" className="auth-switch" onClick={() => switchMode('signup')}>Don’t have an account? <strong>Sign up</strong></button>
   </div>;
   const renderSignup = () => <div className="auth-form-panel auth-form-face-content">
     <div className="auth-panel-mark"><img src="/images/bese26-official-logo.png" alt="Bese26" /></div>
-    <div className="eyebrow">JOIN BESE26</div><h2 id="auth-title">Create account</h2>
+    <div className="eyebrow">JOIN BESE26</div><h2 id="auth-title">Create your account</h2>
     <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
     {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
