@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, LockKeyhole, LoaderCircle, Mail, UserRound, X } from 'lucide-react';
-import { isSupabaseConfigured } from '../lib/supabase';
-import { requestPasswordReset, resendSignupConfirmation, signIn, signInWithGoogle, signUp } from '../lib/marketplace';
+import { requestPasswordReset, resendSignupConfirmation, signIn, signUp } from '../lib/marketplace';
 
 function WelcomeSide({ isSignin }) {
   return <div className="auth-welcome-panel">
@@ -28,13 +27,6 @@ function AuthLoading({ label }) {
   return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>;
 }
 
-function GoogleButton({ onClick, disabled }) {
-  return <button type="button" className="google-auth-button" onClick={onClick} disabled={disabled}>
-    <img className="google-logo" src="/images/google-logo.jpg" alt="Google" />
-    <span>Continue with Google</span>
-    <span className="google-button-arrow" aria-hidden="true">↗</span>
-  </button>;
-}
 
 export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   const [mode, setMode] = useState('signin');
@@ -78,12 +70,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the confirmation email.' }); }
     finally { setResendingConfirmation(false); }
   };
-  const continueWithGoogle = async () => {
-    setStatus({ type: '', message: '' });
-    setLoading(true); setLoadingLabel('Connecting to Google…');
-    try { await signInWithGoogle(); }
-    catch (error) { setStatus({ type: 'error', message: error.message || 'Google sign-in is unavailable right now. Please try again later.' }); setLoading(false); }
-  };
+
 
   const isSignin = mode === 'signin';
   const renderSignin = () => <div className="auth-form-panel auth-form-face-content">
@@ -91,7 +78,6 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <div className="eyebrow">WELCOME BACK</div><h2 id="auth-title">Sign in</h2>
     <p className="auth-panel-copy">{reason || 'Welcome back to your marketplace.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
-    {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
     <form onSubmit={submit} className="auth-form">
       <label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label>
       <label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="current-password" required /></label>
@@ -104,7 +90,6 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
     <div className="eyebrow">JOIN BESE26</div><h2 id="auth-title">Create your account</h2>
     <p className="auth-panel-copy">{reason || 'Set up your secure marketplace account.'}</p>
     {status.message && <div className={`auth-status ${status.type}`}><CheckCircle2 size={15} /><span>{status.message}</span></div>}
-    {isSupabaseConfigured && <><GoogleButton onClick={continueWithGoogle} disabled={loading} /><div className="auth-divider"><span>or use email</span></div></>}
     {registrationSent ? <div className="auth-confirmation-card"><div className="auth-confirmation-icon"><Mail size={22} /></div><h3>Check your email</h3><p>We sent a confirmation link to <strong>{form.email}</strong>. Open it and tap the link to return to Bese26 and enter the app automatically.</p><button type="button" className="primary-button auth-submit" onClick={() => { window.location.href = 'mailto:'; }}>Go to check email</button><button type="button" className="auth-resend-button" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend email'}</button><button type="button" className="auth-forgot" onClick={() => { setRegistrationSent(false); setStatus({ type: '', message: '' }); }}>Change email or try again</button></div> : <form onSubmit={submit} className="auth-form auth-signup-form">
       <div className="auth-field-row"><label><span><UserRound size={14} /> Display name</span><input value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Your name" autoComplete="name" required /></label><label><span><UserRound size={14} /> Username</span><input value={form.username} onChange={(event) => update('username', event.target.value.replace(/\s+/g, '').toLowerCase())} placeholder="e.g. sayyeed" autoComplete="username" /></label></div>
       <div className="auth-field-row"><label><span><Mail size={14} /> Email</span><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@example.com" autoComplete="email" required /></label><label><span><LockKeyhole size={14} /> Password</span><input type="password" minLength={6} value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="At least 6 characters" autoComplete="new-password" required /></label></div>
@@ -115,9 +100,8 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '' }) {
   return <div className="auth-backdrop" onClick={onClose}><section className="auth-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
     <button type="button" className="modal-close icon-button" onClick={onClose} aria-label="Close authentication"><X size={18} /></button>
     {loading && <AuthLoading label={loadingLabel} />}
-    <div className={`auth-form-flip-shell ${isSignin ? '' : 'is-flipped'}`}><div className="auth-form-flip-card">
-      <div className="auth-form-face auth-form-front">{renderSignin()}<WelcomeSide isSignin /></div>
-      <div className="auth-form-face auth-form-back">{renderSignup()}<WelcomeSide isSignin={false} /></div>
-    </div></div>
+    <div className={`auth-single-screen ${isSignin ? 'auth-single-signin' : 'auth-single-signup'}`}>
+      <div className="auth-form-face auth-form-front">{isSignin ? renderSignin() : renderSignup()}<WelcomeSide isSignin={isSignin} /></div>
+    </div>
   </section></div>;
 }
