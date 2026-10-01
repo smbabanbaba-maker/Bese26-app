@@ -7,7 +7,7 @@ function BrandHeader() {
 }
 function Field({ icon: Icon, children, className = '' }) { return <div className={`auth-reference-field ${className}`}><span className="auth-reference-field-icon"><Icon size={18} /></span>{children}</div>; }
 function PasswordField({ id, value, onChange, placeholder, visible, onToggle, validationState = '' }) {
-  return <Field icon={LockKeyhole} className={validationState ? `auth-reference-field-${validationState}` : ''}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required />{validationState && <span className="auth-reference-password-status" aria-label={validationState === 'valid' ? 'Password is valid' : 'Passwords do not match'}>{validationState === 'valid' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}</span>}<button type="button" className="auth-reference-eye" onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
+  return <Field icon={LockKeyhole} className={validationState ? `auth-reference-field-${validationState}` : ''}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required />{validationState && <span className="auth-reference-password-status" aria-label={validationState === 'valid' ? 'Password is valid' : 'Passwords do not match'}>{validationState === 'valid' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}</span>}<button type="button" className={`auth-reference-eye ${visible ? 'is-visible' : ''}`} onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
 }
 function AuthLoading({ label }) { return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>; }
 function MarketArt({ register = false }) {
@@ -66,7 +66,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
           <button type="button" className="auth-reference-forgot" onClick={() => switchMode('reset')}>Forgot password?</button>
           <button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Signing in…' : 'Sign In'}</span><ArrowRight size={23} /></button>
         </form>
-        <div className="auth-reference-switch">New to Bese26? <button type="button" onClick={() => switchMode('signup')}>Create Account</button></div>
+        <div className="auth-reference-switch">New to Bese26? <button type="button" onClick={() => switchMode('signup')}>Create Account</button></div><div className="auth-reference-trust"><ShieldCheck size={14} /> Secure authentication for your Bese26 account</div>
         <MarketArt />
       </>}
       {mode === 'signup' && <>
@@ -79,7 +79,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
           <label className="auth-reference-terms"><input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>I agree to the <b>Terms of Service</b> and <b>Privacy Policy.</b></span></label>
           <button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Please wait…' : 'Create Account'}</span><ArrowRight size={23} /></button>
         </form>}
-        <div className="auth-reference-switch">Already have an account? <button type="button" onClick={() => switchMode('signin')}>Sign In</button></div><MarketArt register />
+        <div className="auth-reference-switch">Already have an account? <button type="button" onClick={() => switchMode('signin')}>Sign In</button></div><div className="auth-reference-trust"><ShieldCheck size={14} /> Your information is protected with secure authentication</div><MarketArt register />
       </>}
       {mode === 'reset' && <>
         <div className="auth-reference-reset-art"><LockKeyhole size={53} /><span>••••</span></div>
