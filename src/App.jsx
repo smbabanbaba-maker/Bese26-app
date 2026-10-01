@@ -925,6 +925,7 @@ function PublicProfileHeader({ profile, business: suppliedBusiness, listings, sh
     setHeroFollow((current) => ({ ...current, busy: false }));
   };
   return <section className="miniweb-hero-v2"><div className="miniweb-hero-v2-top"><div className={`miniweb-hero-v2-logo ${avatarUrl ? 'has-business-logo' : ''}`}>{avatarUrl ? <img src={avatarUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="miniweb-hero-v2-heading"><div className="miniweb-hero-v2-eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1><div className={`miniweb-hero-v2-verification ${idVerified || cacVerified ? 'is-verified' : ''}`}><BadgeCheck size={16} /><span><strong>{idVerified || cacVerified ? 'Verified profile' : 'Public profile'}</strong><small>{idVerified || cacVerified ? 'Verified by Bese26' : 'Public profile on Bese26'}</small><VerificationBadges idVerified={idVerified} cacVerified={cacVerified} compact /></span></div></div></div><div className="miniweb-hero-v2-meta"><span><MapPin size={13} /> {location || 'Nigeria'}</span>{(business?.category || business?.business_type) && <span className="miniweb-hero-v2-category">{business.category || business.business_type}</span>}</div>{safeDescription && <p className="miniweb-hero-v2-description">{safeDescription}</p>}<div className="miniweb-hero-v2-bottom"><div className="miniweb-hero-v2-stats"><span><strong>{listings.length}</strong><small>Listings</small></span><span><strong>{heroFollow.followers}</strong><small>Followers</small></span><span><strong>{heroFollow.following}</strong><small>Following</small></span><span><strong>{profileViews}</strong><small>Views</small></span><button type="button" className={`miniweb-hero-v2-follow ${heroFollow.isFollowing ? 'following' : ''}`} onClick={handleHeroFollow} disabled={heroFollow.busy || !targetId}><UserPlus size={13} /> <span>{heroFollow.isFollowing ? 'Following' : 'Follow'}</span></button></div><div className="miniweb-hero-v2-actions"><button type="button" className="miniweb-hero-v2-listings" onClick={scrollToListings}>View listings <ArrowRight size={14} /></button></div></div></section>;
+
 }
 function PublicListingSection({ title, listings }) {
   return <section id="listings" className="public-business-listings storefront-listings-clean"><div className="section-heading"><div><div className="eyebrow">AVAILABLE NOW</div><h2>{title}</h2></div><span>{listings.length} listing{listings.length === 1 ? '' : 's'}</span></div>{listings.length ? <div className="product-grid">{listings.map((listing, index) => <PublicListingCard key={listing.id} listing={listing} featured={index === 0} />)}</div> : <div className="empty-state"><Package size={26} /><h3>No active listings yet</h3><p>Listings from this profile will appear here automatically.</p></div>}</section>;
@@ -954,7 +955,7 @@ function PublicPersonalPage({ data }) {
   const identity = getPublicIdentity(profile);
   const business = profile.business || null;
   const share = async () => { const url = `https://bese26.shop/@${profile.username}`; if (navigator.share) await navigator.share({ title: identity.name, text: business?.description || profile.bio || identity.name, url }); else await navigator.clipboard?.writeText(url); };
-  return <MiniwebPublicDashboard business={business} profile={profile} listings={listings} share={share} />;
+  return <PublicStorefrontLayout title={identity.name} share={share}><div className="storefront-shell-intro"><span className="storefront-live-dot" /> <span>PUBLIC MINIWEB</span></div><PublicProfileHeader profile={profile} business={business} listings={listings} share={share} />{business && <PublicBusinessAbout business={business} />}<PublicListingSection title={`Listings from ${identity.name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 const SEO_SITE_URL = SITE_URL;
 const SEO_DEFAULT_IMAGE = `${SEO_SITE_URL}/images/bese26-official-logo.png`;
@@ -1036,7 +1037,7 @@ const seoData = state.data;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
   const share = async () => { const url = `https://bese26.shop/@${business.business_handle}`; if (navigator.share) await navigator.share({ title: business.business_name, text: business.description || business.business_name, url }); else await navigator.clipboard?.writeText(url); };
-  return <MiniwebPublicDashboard business={business} profile={ownerProfile} listings={listings} share={share} />;
+  return <PublicStorefrontLayout title={business.business_name} share={share}><div className="storefront-shell-intro"><span className="storefront-live-dot" /> <span>PUBLIC BUSINESS</span></div><PublicProfileHeader profile={ownerProfile} business={business} listings={listings} share={share} /><PublicBusinessAbout business={business} /><PublicListingSection title={`Listings from ${business.business_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 function PublicListingRoute({ listingId }) {
   const [listing, setListing] = useState(null);
