@@ -2044,3 +2044,11 @@
   .miniweb-hero-v2-logo { flex-basis: 62px !important; width: 62px !important; height: 62px !important; }
   .miniweb-hero-v2-heading h1 { font-size: 27px !important; }
 }
+
+
+/* Tight top-edge spacing: hero starts immediately below the Miniweb brand bar. */
+.public-business-main { padding-top: 6px !important; }
+.public-business-main .miniweb-hero-v2 { margin-top: 0 !important; }
+@media (max-width: 600px) {
+  .public-business-main { padding-top: 2px !important; }
+}
