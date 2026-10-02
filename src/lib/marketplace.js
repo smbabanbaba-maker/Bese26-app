@@ -1031,7 +1031,18 @@ export async function fetchPublicSellerViews(userId) {
   if (error) throw error;
   return (data || []).reduce((total, row) => total + Number(row.views_count || 0), 0);
 }
-
+export async function recordPublicProfileView(profileId, visitorKey) {
+  if (!supabase || !profileId || !visitorKey) return { total_visits: 0, unique_visitors: 0, last_visited_at: null };
+  const { data, error } = await supabase.rpc('record_public_profile_view', { p_profile_id: profileId, p_visitor_key: visitorKey });
+  if (error) throw error;
+  return data || { total_visits: 0, unique_visitors: 0, last_visited_at: null };
+}
+export async function fetchPublicProfileViewSummary(profileId) {
+  if (!supabase || !profileId) return { total_visits: 0, unique_visitors: 0, last_visited_at: null };
+  const { data, error } = await supabase.rpc('get_public_profile_view_summary', { p_profile_id: profileId });
+  if (error) throw error;
+  return data || { total_visits: 0, unique_visitors: 0, last_visited_at: null };
+}
 export async function fetchPublicProfile(username) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();

@@ -89,7 +89,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -899,6 +899,7 @@ function PublicProfileHeader({ profile, business: suppliedBusiness, listings, sh
   const cacVerified = Boolean(business?.is_verified);
   const targetId = profile?.id;
   const [profileViews, setProfileViews] = useState(() => listings.reduce((total, item) => total + Number(item.views_count || 0), 0));
+  const [visitorSummary, setVisitorSummary] = useState({ total_visits: 0, unique_visitors: 0, last_visited_at: null });
   const [heroFollow, setHeroFollow] = useState({ followers: 0, following: 0, isFollowing: false, busy: false });
   useEffect(() => {
     let mounted = true;
@@ -913,7 +914,26 @@ function PublicProfileHeader({ profile, business: suppliedBusiness, listings, sh
     })();
     return () => { mounted = false; };
   }, [targetId]);
-  useEffect(() => { let mounted = true; if (!targetId || !isSupabaseConfigured || !supabase) return undefined; fetchPublicSellerViews(targetId).then((views) => mounted && setProfileViews(Number(views || 0))).catch(() => {}); return () => { mounted = false; }; }, [targetId]);
+  useEffect(() => {
+    let mounted = true;
+    if (!targetId || !isSupabaseConfigured || !supabase) return undefined;
+    const day = new Date().toISOString().slice(0, 10);
+    const storageKey = `bese26:public-profile-visitor:${targetId}`;
+    let visitorKey = '';
+    try {
+      visitorKey = window.localStorage.getItem('bese26:visitor-key') || (crypto.randomUUID ? crypto.randomUUID() : `visitor-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      window.localStorage.setItem('bese26:visitor-key', visitorKey);
+    } catch { visitorKey = `visitor-${Date.now()}-${Math.random().toString(36).slice(2)}`; }
+    const alreadyRecordedToday = (() => { try { return window.localStorage.getItem(storageKey) === day; } catch { return false; } })();
+    const load = alreadyRecordedToday ? fetchPublicProfileViewSummary(targetId) : recordPublicProfileView(targetId, visitorKey);
+    Promise.all([fetchPublicSellerViews(targetId), load]).then(([views, summary]) => {
+      if (!mounted) return;
+      setProfileViews(Number(views || 0));
+      setVisitorSummary({ total_visits: Number(summary?.total_visits || 0), unique_visitors: Number(summary?.unique_visitors || 0), last_visited_at: summary?.last_visited_at || null });
+      if (!alreadyRecordedToday) { try { window.localStorage.setItem(storageKey, day); } catch {} }
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, [targetId]);
   const handleHeroFollow = async () => {
     if (!supabase || !targetId) return;
     const { data } = await supabase.auth.getSession();
@@ -925,7 +945,7 @@ function PublicProfileHeader({ profile, business: suppliedBusiness, listings, sh
     try { await toggleFollow(currentUser.id, targetId, next); } catch { setHeroFollow((current) => ({ ...current, isFollowing: !next, followers: Math.max(0, current.followers + (next ? -1 : 1)), busy: false })); window.alert('Could not update follow status. Try again.'); return; }
     setHeroFollow((current) => ({ ...current, busy: false }));
   };
-  return <section className="miniweb-hero-v2"><div className="miniweb-hero-v2-top"><div className={`miniweb-hero-v2-logo ${avatarUrl ? 'has-business-logo' : ''}`}>{avatarUrl ? <img src={avatarUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="miniweb-hero-v2-heading"><div className="miniweb-hero-v2-eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1><div className={`miniweb-hero-v2-verification ${idVerified || cacVerified ? 'is-verified' : ''}`}><BadgeCheck size={16} /><span><strong>{idVerified || cacVerified ? 'Verified profile' : 'Public profile'}</strong><small>{idVerified || cacVerified ? 'Verified by Bese26' : 'Public profile on Bese26'}</small><VerificationBadges idVerified={idVerified} cacVerified={cacVerified} compact /></span></div></div></div><div className="miniweb-hero-v2-meta"><span><MapPin size={13} /> {location || 'Nigeria'}</span>{(business?.category || business?.business_type) && <span className="miniweb-hero-v2-category">{business.category || business.business_type}</span>}</div>{safeDescription && <p className="miniweb-hero-v2-description">{safeDescription}</p>}<div className="miniweb-hero-v2-bottom"><div className="miniweb-hero-v2-stats"><span><strong>{listings.length}</strong><small>Listings</small></span><span><strong>{heroFollow.followers}</strong><small>Followers</small></span><span><strong>{heroFollow.following}</strong><small>Following</small></span><span><strong>{profileViews}</strong><small>Views</small></span><button type="button" className={`miniweb-hero-v2-follow ${heroFollow.isFollowing ? 'following' : ''}`} onClick={handleHeroFollow} disabled={heroFollow.busy || !targetId}><UserPlus size={13} /> <span>{heroFollow.isFollowing ? 'Following' : 'Follow'}</span></button></div><div className="miniweb-hero-v2-actions"><button type="button" className="miniweb-hero-v2-listings" onClick={scrollToListings}>View listings <ArrowRight size={14} /></button></div></div></section>;
+  return <section className="miniweb-hero-v2"><div className="miniweb-hero-v2-top"><div className={`miniweb-hero-v2-logo ${avatarUrl ? 'has-business-logo' : ''}`}>{avatarUrl ? <img src={avatarUrl} alt={`${name} logo`} onLoad={handleBusinessLogoLoad} /> : <span>{name.slice(0, 1).toUpperCase()}</span>}</div><div className="miniweb-hero-v2-heading"><div className="miniweb-hero-v2-eyebrow">{isBusiness ? 'PUBLIC BUSINESS' : 'PUBLIC SELLER PROFILE'}</div><h1>{name}</h1><div className={`miniweb-hero-v2-verification ${idVerified || cacVerified ? 'is-verified' : ''}`}><BadgeCheck size={16} /><span><strong>{idVerified || cacVerified ? 'Verified profile' : 'Public profile'}</strong><small>{idVerified || cacVerified ? 'Verified by Bese26' : 'Public profile on Bese26'}</small><VerificationBadges idVerified={idVerified} cacVerified={cacVerified} compact /></span></div></div></div><div className="miniweb-hero-v2-meta"><span><MapPin size={13} /> {location || 'Nigeria'}</span>{(business?.category || business?.business_type) && <span className="miniweb-hero-v2-category">{business.category || business.business_type}</span>}</div>{safeDescription && <p className="miniweb-hero-v2-description">{safeDescription}</p>}<div className="miniweb-hero-v2-bottom"><div className="miniweb-hero-v2-stats"><span><strong>{listings.length}</strong><small>Listings</small></span><span><strong>{heroFollow.followers}</strong><small>Followers</small></span><span><strong>{heroFollow.following}</strong><small>Following</small></span><span><strong>{visitorSummary.unique_visitors || profileViews}</strong><small>Visitors</small></span><button type="button" className={`miniweb-hero-v2-follow ${heroFollow.isFollowing ? 'following' : ''}`} onClick={handleHeroFollow} disabled={heroFollow.busy || !targetId}><UserPlus size={13} /> <span>{heroFollow.isFollowing ? 'Following' : 'Follow'}</span></button></div><div className="miniweb-hero-v2-actions"><button type="button" className="miniweb-hero-v2-listings" onClick={scrollToListings}>View listings <ArrowRight size={14} /></button></div></div>{visitorSummary.last_visited_at && <div className="miniweb-visitor-note">{visitorSummary.total_visits.toLocaleString('en-NG')} visits · Last visit {new Date(visitorSummary.last_visited_at).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' })}</div>}</section>;
 
 }
 function PublicListingSection({ title, listings }) {
