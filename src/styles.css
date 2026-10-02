@@ -9804,3 +9804,102 @@ img.avatar.is-business-logo {
   .business-dashboard-page .business-status-card { min-height: 78px; align-items: center; padding: 13px; }
   .business-dashboard-page .business-status-copy strong { font-size: 15px; }
 }
+
+/* Seller Center premium workspace refresh. */
+.listing-management-center {
+  --seller-navy: #101b2d;
+  --seller-navy-2: #1d3150;
+  --seller-red: #d71920;
+  --seller-ink: #182231;
+  --seller-muted: #697688;
+  --seller-line: #e3e8ef;
+  --seller-soft: #f5f7fa;
+  max-width: 1240px !important;
+  padding: 20px 24px 88px !important;
+  background: #f5f7fa !important;
+}
+.listing-management-center .profile-subpage-header { margin-bottom: 20px !important; }
+.listing-management-center .profile-subpage-header h1 { color: var(--seller-ink) !important; font-size: clamp(27px, 4vw, 42px) !important; font-weight: 850 !important; letter-spacing: -.065em !important; }
+.listing-management-center .profile-subpage-header .eyebrow { color: var(--seller-red) !important; font-weight: 850 !important; }
+.listing-management-center .listing-management-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 190px;
+  padding: 29px !important;
+  border: 0 !important;
+  border-radius: 26px !important;
+  background: radial-gradient(circle at 95% 5%, rgba(215,25,32,.36), transparent 28%), linear-gradient(125deg, var(--seller-navy) 0%, var(--seller-navy-2) 72%, #263d60 100%) !important;
+  box-shadow: 0 22px 55px rgba(16,27,45,.18) !important;
+}
+.listing-management-center .listing-management-hero::after { content: ""; position: absolute; z-index: -1; right: -120px; bottom: -180px; width: 420px; height: 420px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 26px rgba(255,255,255,.035), 0 0 0 54px rgba(255,255,255,.025); }
+.listing-management-center .listing-management-hero > div { max-width: 650px; }
+.listing-management-center .listing-management-hero .eyebrow { color: #ffb7b8 !important; letter-spacing: .18em; }
+.listing-management-center .listing-management-hero h2 { margin: 7px 0 9px !important; color: #fff !important; font-size: clamp(28px, 5vw, 48px) !important; line-height: .98; letter-spacing: -.07em !important; }
+.listing-management-center .listing-management-hero p { max-width: 540px; color: #dbe5f2 !important; font-size: 12px !important; line-height: 1.6; }
+.listing-management-center .listing-management-hero .primary-button { min-height: 45px; border-radius: 13px; color: #fff !important; background: var(--seller-red) !important; border-color: var(--seller-red) !important; box-shadow: 0 11px 24px rgba(215,25,32,.3); }
+.listing-management-center .listing-management-hero .primary-button:hover { background: #ef3036 !important; }
+.listing-management-center .listing-summary-grid { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 11px !important; margin: 18px 0 !important; }
+.listing-management-center .listing-summary-grid > div { position: relative; min-height: 92px; gap: 7px; padding: 15px !important; border: 1px solid var(--seller-line) !important; border-radius: 16px !important; background: #fff !important; box-shadow: 0 10px 25px rgba(27,43,69,.045); }
+.listing-management-center .listing-summary-grid > div:nth-child(-n+5) { border-top: 3px solid var(--seller-red) !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(2) { border-top-color: #18845b !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(3) { border-top-color: #c3912e !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(4) { border-top-color: #2d73d5 !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(5) { border-top-color: #7b55bd !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(n+6) { min-height: 78px; background: #fbfcfe !important; }
+.listing-management-center .listing-summary-grid strong { color: var(--seller-ink) !important; font-size: 27px !important; letter-spacing: -.065em; }
+.listing-management-center .listing-summary-grid span { color: var(--seller-muted) !important; font-size: 10px !important; font-weight: 750; }
+.listing-management-center .listing-summary-grid > div:nth-child(n+6) strong { color: #526173 !important; font-size: 17px !important; }
+.listing-management-center .listing-management-toolbar { display: flex; align-items: center; gap: 10px; margin: 18px 0 11px !important; padding: 12px; border: 1px solid var(--seller-line); border-radius: 16px; background: #fff; box-shadow: 0 8px 22px rgba(27,43,69,.035); }
+.listing-management-center .listing-management-toolbar .search-box { min-height: 44px; border-color: #dfe5ec !important; box-shadow: none !important; background: #fbfcfe !important; }
+.listing-management-center .listing-management-toolbar .secondary-button { min-height: 44px; border-radius: 11px; color: var(--seller-ink); border-color: #dfe5ec; background: #fff; }
+.listing-management-center .listing-management-tabs { display: flex; gap: 7px; margin-bottom: 16px !important; padding: 5px; border: 1px solid var(--seller-line); border-radius: 14px; background: #fff !important; overflow-x: auto; scrollbar-width: none; }
+.listing-management-center .listing-management-tabs::-webkit-scrollbar { display: none; }
+.listing-management-center .listing-management-tabs button { flex: 0 0 auto; min-height: 38px; padding: 0 12px; border: 1px solid transparent; border-radius: 9px; color: var(--seller-muted) !important; background: transparent !important; font-size: 11px; font-weight: 750; }
+.listing-management-center .listing-management-tabs button:hover { color: var(--seller-red) !important; background: #fff6f6 !important; }
+.listing-management-center .listing-management-tabs button.active { color: #fff !important; border-color: var(--seller-red) !important; background: var(--seller-red) !important; box-shadow: 0 5px 12px rgba(215,25,32,.2); }
+.listing-management-center .listing-management-tabs button b { margin-left: 5px; color: inherit !important; font-size: 10px; }
+.listing-management-center .listing-management-grid { gap: 12px !important; }
+.listing-management-center .management-card { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 14px !important; border: 1px solid var(--seller-line) !important; border-radius: 18px !important; background: #fff !important; box-shadow: 0 10px 26px rgba(27,43,69,.045); }
+.listing-management-center .management-card > img, .listing-management-center .management-card > .managed-listing-placeholder { width: 120px; height: 120px; border-radius: 14px; }
+.listing-management-center .managed-listing-placeholder { display: grid; place-items: center; color: var(--seller-red); background: #fff1f1 !important; }
+.listing-management-center .managed-listing-copy { gap: 7px; min-width: 0; }
+.listing-management-center .managed-listing-copy > strong { color: var(--seller-ink) !important; font-size: 15px !important; }
+.listing-management-center .managed-listing-copy > b { color: var(--seller-red) !important; font-size: 14px; }
+.listing-management-center .managed-listing-top { justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+.listing-management-center .managed-listing-category { padding: 5px 8px; border-radius: 999px; color: var(--seller-muted); background: #f1f4f7; font-size: 9px; font-weight: 750; }
+.listing-management-center .managed-listing-copy > span:not(.status-pill), .listing-management-center .managed-meta, .listing-management-center .management-published-as { color: var(--seller-muted) !important; font-size: 10px; }
+.listing-management-center .managed-meta { display: flex; flex-wrap: wrap; gap: 12px; }
+.listing-management-center .management-card-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+.listing-management-center .management-card-actions .primary-button, .listing-management-center .management-card-actions .secondary-button { min-height: 36px; border-radius: 9px; font-size: 10px; }
+.listing-management-center .management-card-actions .primary-button { color: #fff !important; background: var(--seller-red) !important; }
+.listing-management-center .management-card-actions .icon-button { width: 36px; height: 36px; border: 1px solid var(--seller-line); border-radius: 9px; color: var(--seller-muted); }
+.listing-management-center .listing-action-menu, .listing-management-center .listing-price-editor { border: 1px solid var(--seller-line); border-radius: 12px; background: #fff; box-shadow: 0 14px 30px rgba(27,43,69,.12); }
+.listing-management-center .listing-management-center-empty, .listing-management-center .empty-state { border: 1px solid var(--seller-line); border-radius: 20px; background: #fff; box-shadow: 0 12px 30px rgba(27,43,69,.045); }
+.listing-management-center .listing-analytics-panel { border: 1px solid var(--seller-line); border-radius: 18px; box-shadow: 0 20px 50px rgba(16,27,45,.16); }
+@media (max-width: 900px) {
+  .listing-management-center .listing-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 760px) {
+  .listing-management-center { max-width: none !important; padding: 12px 12px 72px !important; }
+  .listing-management-center .profile-subpage-header { margin-bottom: 14px !important; }
+  .listing-management-center .listing-management-hero { min-height: 0; padding: 21px !important; border-radius: 20px !important; }
+  .listing-management-center .listing-management-hero h2 { font-size: clamp(29px, 9vw, 42px) !important; }
+  .listing-management-center .listing-management-hero .primary-button { width: 100%; margin-top: 17px; justify-content: center; }
+  .listing-management-center .listing-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; margin: 12px 0 !important; }
+  .listing-management-center .listing-summary-grid > div, .listing-management-center .listing-summary-grid > div:nth-child(n+6) { min-height: 80px; padding: 12px !important; }
+  .listing-management-center .listing-summary-grid strong { font-size: 24px !important; }
+  .listing-management-center .listing-management-toolbar { align-items: stretch; flex-direction: column; margin-top: 12px !important; padding: 9px; }
+  .listing-management-center .listing-management-toolbar .secondary-button { width: 100%; justify-content: center; }
+  .listing-management-center .listing-management-tabs { margin-inline: 0; }
+  .listing-management-center .management-card { grid-template-columns: 78px minmax(0, 1fr); gap: 11px; padding: 11px !important; border-radius: 15px !important; }
+  .listing-management-center .management-card > img, .listing-management-center .management-card > .managed-listing-placeholder { width: 78px; height: 78px; border-radius: 11px; }
+  .listing-management-center .managed-listing-copy > strong { font-size: 13px !important; }
+  .listing-management-center .management-card-actions .primary-button { flex: 1 1 100%; }
+}
+@media (max-width: 390px) {
+  .listing-management-center { padding-inline: 8px !important; }
+  .listing-management-center .listing-management-hero { padding: 17px !important; }
+  .listing-management-center .listing-summary-grid { grid-template-columns: 1fr 1fr !important; }
+  .listing-management-center .managed-listing-copy > strong { font-size: 12px !important; }
+}
