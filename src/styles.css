@@ -8740,19 +8740,25 @@ img.avatar.is-business-logo {
     border-left:0 !important;
     border-right:0 !important;
     overflow:visible !important;
+    display:block !important;
   }
   .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only,
   .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
     width:100% !important;
     height:auto !important;
+    min-height:0 !important;
     max-width:100% !important;
     max-height:none !important;
+    aspect-ratio:auto !important;
     object-fit:contain !important;
+    object-position:center !important;
   }
   .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+    display:block !important;
     border:0 !important;
     padding:0 !important;
     background:transparent !important;
+    overflow:visible !important;
   }
 }
 
