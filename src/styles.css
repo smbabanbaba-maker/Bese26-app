@@ -8724,10 +8724,14 @@ img.avatar.is-business-logo {
 
 /* Home sponsor artwork: full-bleed on phones, preserving the complete uploaded banner. */
 @media (max-width:700px) {
-  .main-container:has(.home-page) { padding-left:0 !important; padding-right:0 !important; }
-  .home-page { width:100vw !important; max-width:none !important; margin-left:calc(50% - 50vw) !important; margin-right:calc(50% - 50vw) !important; }
+  .main-container:has(.home-page) { padding-left:13px !important; padding-right:13px !important; overflow-x:clip !important; }
+  .home-page { width:auto !important; max-width:100% !important; margin-left:0 !important; margin-right:0 !important; }
   .home-page .home-ad-banner:has(.home-ad-image-only) {
-    width:100vw !important;
+    width:calc(100% + 26px) !important;
+    max-width:calc(100% + 26px) !important;
+    margin-left:-13px !important;
+    margin-right:-13px !important;
+    box-sizing:border-box !important;
     height:auto !important;
     min-height:0 !important;
     max-height:none !important;
@@ -8739,9 +8743,9 @@ img.avatar.is-business-logo {
   }
   .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only,
   .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
-    width:100vw !important;
+    width:100% !important;
     height:auto !important;
-    max-width:none !important;
+    max-width:100% !important;
     max-height:none !important;
     object-fit:contain !important;
   }
