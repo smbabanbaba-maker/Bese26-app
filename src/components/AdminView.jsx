@@ -152,6 +152,28 @@ function VerificationCenter({ verificationItems, identityItems, onReviewBusiness
   return <section className="admin-verification-center"><div className="admin-intro"><div><strong><ShieldCheck size={16} /> Verification Center</strong><p>Review complete applicant details and private documents securely. Badges appear only after approval.</p></div><span className="status-pill pending">{allItems.length} open</span></div>{error && <div className="auth-status error">{error}</div>}<div className="admin-verification-summary">{[['pending', 'Pending'], ['under_review', 'Under review'], ['requires_more_information', 'Needs info'], ['verified', 'Verified'], ['rejected', 'Rejected']].map(([key, label]) => <button type="button" key={key} onClick={() => setTab('all')}><strong>{counts[key]}</strong><span>{label}</span></button>)}</div><div className="admin-verification-toolbar"><div className="admin-verification-tabs"><button type="button" className={tab === 'all' ? 'active' : ''} onClick={() => setTab('all')}>All</button><button type="button" className={tab === 'identity' ? 'active' : ''} onClick={() => setTab('identity')}>Identity KYC</button><button type="button" className={tab === 'business' ? 'active' : ''} onClick={() => setTab('business')}>Business KYC</button></div><label className="admin-verification-search"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search applicant, username or business" /></label></div>{visible.length ? <div className="admin-verification-queue">{visible.map(renderItem)}</div> : <div className="empty-state compact-empty"><CheckCircle2 size={24} /><h3>No matching verification applications</h3><p>New identity and business requests will appear here.</p></div>}</section>;
 }
 
+function AuditLogsPanel() {
+  const [logs, setLogs] = useState([]);
+  const [query, setQuery] = useState('');
+  const [actionFilter, setActionFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const load = async () => { setLoading(true); setError(''); try { setLogs(await fetchAdminAuditLogs(300)); } catch (reason) { setError(reason.message || 'Could not load audit logs.'); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, []);
+  const actionOptions = [...new Set(logs.map((item) => item.action).filter(Boolean))];
+  const visible = logs.filter((item) => {
+    const haystack = [item.actor_name, item.actor_username, item.actor_email, item.action, item.target_type, item.note, item.target_id].filter(Boolean).join(' ').toLowerCase();
+    return (actionFilter === 'all' || item.action === actionFilter) && haystack.includes(query.trim().toLowerCase());
+  });
+  const label = (value) => String(value || 'admin action').replace(/^admin_/, '').replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return <section className="admin-operation-card admin-audit-logs" aria-label="Admin Audit Logs">
+    <div className="admin-section-title"><div><strong><Clock3 size={16} /> Audit Logs</strong><p>Track who changed what, where, and when across the Bese26 control room.</p></div><button type="button" className="secondary-button" onClick={load} disabled={loading}><RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh</button></div>
+    <div className="admin-audit-toolbar"><label className="admin-audit-search"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search admin, action, target or note" aria-label="Search audit logs" /></label><select value={actionFilter} onChange={(event) => setActionFilter(event.target.value)} aria-label="Filter audit log action"><option value="all">All actions</option>{actionOptions.map((action) => <option key={action} value={action}>{label(action)}</option>)}</select><span className="admin-section-count">{visible.length} shown</span></div>
+    {error && <div className="auth-status error">{error}</div>}
+    {loading ? <div className="empty-state compact-empty">Loading audit activity…</div> : visible.length ? <div className="admin-audit-list">{visible.map((item) => <article className="admin-audit-row" key={item.id}><div className="admin-audit-icon"><ShieldCheck size={16} /></div><div className="admin-audit-main"><div className="admin-audit-topline"><strong>{label(item.action)}</strong><time>{formatDate(item.created_at)}</time></div><p>{item.note || `Updated ${String(item.target_type || 'control').replaceAll('_', ' ')}`}</p><div className="admin-audit-meta"><span><b>Admin:</b> {item.actor_name || item.actor_username || item.actor_email || 'Bese26 admin'}{item.actor_email ? ` · ${item.actor_email}` : ''}</span>{item.target_type && <span><b>Target:</b> {String(item.target_type).replaceAll('_', ' ')}{item.target_id ? ` · ${item.target_id.slice(0, 8)}…` : ''}</span>}</div></div></article>)}</div> : <div className="empty-state compact-empty"><ShieldCheck size={24} /><h3>No matching audit activity</h3><p>Admin actions will appear here automatically after a control-room change.</p></div>}
+  </section>;
+}
+
 export default function AdminView({ user, onBack, onNotice, onCreateListing, adminPermissions = [], isOwnerAdmin = false }) {
   const [items, setItems] = useState([]);
   const [history, setHistory] = useState([]);
@@ -256,6 +278,7 @@ export default function AdminView({ user, onBack, onNotice, onCreateListing, adm
     <AdminTeamPanel onNotice={onNotice} />
     <AdminPlatformControls onNotice={onNotice} />
     <AdminControlPanel onNotice={onNotice} />
+    <AuditLogsPanel />
     <AdminOperationsPanel onNotice={onNotice} />
     <AdCampaignManager user={user} onNotice={onNotice} />
     <div className="admin-status-tabs" role="tablist" aria-label="Moderation status"><button className={activeTab === 'pending' ? 'active' : ''} onClick={() => setActiveTab('pending')} role="tab" aria-selected={activeTab === 'pending'}><Clock3 size={15} /> Pending <b>{counts.pending}</b></button><button className={activeTab === 'approved' ? 'active' : ''} onClick={() => setActiveTab('approved')} role="tab" aria-selected={activeTab === 'approved'}><CheckCircle2 size={15} /> Approved <b>{counts.approved}</b></button><button className={activeTab === 'rejected' ? 'active' : ''} onClick={() => setActiveTab('rejected')} role="tab" aria-selected={activeTab === 'rejected'}><X size={15} /> Rejected <b>{counts.rejected}</b></button></div>

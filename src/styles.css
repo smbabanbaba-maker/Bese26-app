@@ -9414,3 +9414,30 @@ img.avatar.is-business-logo {
 .admin-full-access-note span { display: grid; gap: 3px; }
 .admin-full-access-note strong { font-size: 11px; }
 .admin-full-access-note small { color: #58738b; font-size: 10px; line-height: 1.45; }
+
+/* Admin Audit Logs: high-signal activity timeline with compact mobile filters. */
+.admin-audit-logs { overflow: hidden; }
+.admin-audit-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 180px auto; align-items: center; gap: 9px; margin-top: 14px; }
+.admin-audit-search { display: flex; align-items: center; gap: 8px; min-height: 39px; padding: 0 11px; border: 1px solid #e3e6ea; border-radius: 10px; color: #818994; background: #fbfcfd; }
+.admin-audit-search:focus-within { border-color: rgba(217,33,42,.42); box-shadow: 0 0 0 3px rgba(217,33,42,.08); background: #fff; }
+.admin-audit-search input { width: 100%; min-width: 0; border: 0; outline: 0; color: #252a30; background: transparent; font-size: 11px; }
+.admin-audit-toolbar select { min-height: 39px; padding: 0 10px; border: 1px solid #e3e6ea; border-radius: 10px; color: #464d55; background: #fff; font-size: 11px; }
+.admin-audit-list { display: grid; gap: 7px; margin-top: 12px; }
+.admin-audit-row { display: flex; gap: 10px; padding: 11px 12px; border: 1px solid #eceef1; border-radius: 12px; background: linear-gradient(135deg, #fff, #fcfcfd); transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.admin-audit-row:hover { border-color: rgba(217,33,42,.25); box-shadow: 0 7px 18px rgba(26,31,38,.06); transform: translateY(-1px); }
+.admin-audit-icon { display: grid; flex: 0 0 30px; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: #c51e29; background: #fff0f1; }
+.admin-audit-main { min-width: 0; flex: 1; }
+.admin-audit-topline { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.admin-audit-topline strong { color: #252a30; font-size: 12px; }
+.admin-audit-topline time { flex: none; color: #8b929a; font-size: 9px; }
+.admin-audit-main p { margin: 3px 0 7px; color: #616a73; font-size: 10px; }
+.admin-audit-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: #8a929a; font-size: 9px; }
+.admin-audit-meta b { color: #59626c; font-weight: 700; }
+@media (max-width: 699px) {
+  .admin-audit-toolbar { grid-template-columns: 1fr auto; }
+  .admin-audit-search { grid-column: 1 / -1; }
+  .admin-audit-toolbar select { width: 100%; }
+  .admin-audit-topline { display: grid; gap: 3px; }
+  .admin-audit-topline time { font-size: 8px; }
+  .admin-audit-row { padding: 10px; }
+}
