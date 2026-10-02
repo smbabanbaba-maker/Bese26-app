@@ -1004,6 +1004,15 @@ export async function fetchPublicBusiness(handle) {
   let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle();
   if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle());
   if (businessError) throw businessError;
+  // A public company can be discovered by its real name, not only by its
+  // handle. This keeps /business/sylution and /@sylution useful when a buyer
+  // searches for “SYLUTION” without knowing the Bese26 handle first.
+  if (!business) {
+    let nameLookup = await supabase.from('business_profiles').select(businessFields).ilike('business_name', String(handle || '').trim()).eq('is_active', true).maybeSingle();
+    if (nameLookup.error && /contact_preference|column/i.test(nameLookup.error.message || '')) nameLookup = await supabase.from('business_profiles').select(legacyBusinessFields).ilike('business_name', String(handle || '').trim()).eq('is_active', true).maybeSingle();
+    if (nameLookup.error) throw nameLookup.error;
+    business = nameLookup.data;
+  }
   if (!business) return null;
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
