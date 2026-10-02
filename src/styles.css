@@ -4859,10 +4859,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 /* Dashboard hero final composition: full viewport width, clear mobile actions, larger animated mark. */
 .home-ad-dashboard {
-  width: 100vw !important;
-  max-width: none !important;
-  margin-left: 50% !important;
-  transform: translateX(-50%) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
   box-sizing: border-box !important;
   min-height: 190px !important;
   padding: 22px 34px !important;
