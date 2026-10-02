@@ -9174,3 +9174,31 @@ img.avatar.is-business-logo {
 .chat-image-viewer img { max-width: min(920px, 100%); max-height: calc(100dvh - 90px); object-fit: contain; border-radius: 10px; box-shadow: 0 20px 70px rgba(0,0,0,.4); }
 .chat-image-viewer-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; color: #fff; background: rgba(255,255,255,.12); }
 .chat-image-viewer-close:hover { color: #fff; background: #d9212a; }
+
+/* Final Bese26 image-viewer finish: branded charcoal canvas with restrained red controls. */
+.chat-image-viewer {
+  background: radial-gradient(circle at 50% 18%, rgba(217,33,42,.18), transparent 38%), linear-gradient(145deg, rgba(17,19,22,.98), rgba(45,18,22,.97));
+}
+.chat-image-viewer::before {
+  content: 'BESE26  ·  CHAT IMAGE';
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  left: 18px;
+  color: rgba(255,255,255,.68);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+.chat-image-viewer img {
+  border: 5px solid rgba(255,255,255,.96);
+  box-shadow: 0 0 0 1px rgba(217,33,42,.45), 0 24px 80px rgba(0,0,0,.52);
+}
+.chat-image-viewer-close {
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  border: 0;
+  color: #fff;
+  background: #d9212a;
+  box-shadow: 0 8px 20px rgba(217,33,42,.32);
+}
+.chat-image-viewer-close:hover { background: #a9151d; transform: scale(1.04); }
