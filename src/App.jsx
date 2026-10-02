@@ -780,7 +780,19 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
   };
   const updateOffer = async (offer, status) => { try { const updated = await updateChatOffer(offer.id, status); setDeals((current) => ({ ...current, offers: current.offers.map((item) => item.id === offer.id ? updated : item) })); onDemoAction(`Offer ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the offer.'); } };
   const updateMeeting = async (meeting, status) => { try { const updated = await updateChatMeeting(meeting.id, status); setDeals((current) => ({ ...current, meetings: current.meetings.map((item) => item.id === meeting.id ? updated : item) })); onDemoAction(`Meeting ${status}.`); } catch (error) { onDemoAction(error.message || 'Could not update the meeting.'); } };
-  const viewListing = () => { setChatMenuOpen(false); if (liveListing) onOpenListing?.(liveListing); else onDemoAction?.('The listing details are no longer available.'); };
+  const viewListing = async () => {
+    setChatMenuOpen(false);
+    if (liveListing) { onOpenListing?.(liveListing); return; }
+    if (!selectedConversation?.listing_id) { onDemoAction?.('The listing details are no longer available.'); return; }
+    setBusy(true);
+    try {
+      const listing = await fetchListingDetails(selectedConversation.listing_id);
+      if (listing) onOpenListing?.(listing);
+      else onDemoAction?.('The listing details are no longer available.');
+    } catch (error) {
+      onDemoAction?.(error.message || 'Could not open the listing details.');
+    } finally { setBusy(false); }
+  };
   const muteConversation = () => { if (!selectedConversation) return; try { window.localStorage.setItem(`bese26:muted-conversation:${selectedConversation.id}`, '1'); } catch { onDemoAction?.('Mute is unavailable in this browser session.'); return; } setChatMenuOpen(false); onDemoAction?.('Conversation muted on this device.'); };
   const reportConversation = async () => { if (!selectedConversation?.listing_id || !window.confirm('Report this conversation and its listing?')) return; setBusy(true); try { await reportListing({ listingId: selectedConversation.listing_id, reporterId: user.id, reason: 'harassment', details: 'Reported from a private conversation.' }); setChatMenuOpen(false); onDemoAction?.('Report submitted securely.'); } catch (error) { onDemoAction?.(error.message || 'Could not submit the report.'); } finally { setBusy(false); } };
   const blockConversation = async () => {
