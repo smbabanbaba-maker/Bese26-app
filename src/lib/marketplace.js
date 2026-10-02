@@ -1043,6 +1043,12 @@ export async function fetchPublicProfileViewSummary(profileId) {
   if (error) throw error;
   return data || { total_visits: 0, unique_visitors: 0, last_visited_at: null };
 }
+export async function fetchPublicProfileViewHistory(profileId, days = 14) {
+  if (!supabase || !profileId) return [];
+  const { data, error } = await supabase.rpc('get_public_profile_view_history', { p_profile_id: profileId, p_days: days });
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
 export async function fetchPublicProfile(username) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();

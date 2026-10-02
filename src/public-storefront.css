@@ -2195,3 +2195,35 @@
 @media (max-width: 480px) {
   .miniweb-visitor-note { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; }
 }
+
+/* Public visitor history graph: aggregate-only, no visitor identity is exposed. */
+.public-visitor-history {
+  margin-top: 16px;
+  padding: 18px 20px 15px;
+  border: 1px solid #e4e8ee;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  box-shadow: 0 10px 25px rgba(35,39,46,.045);
+}
+.public-visitor-history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.public-visitor-history-heading .eyebrow { margin-bottom: 5px; color: #b23a46; }
+.public-visitor-history-heading h2 { color: #181b21; font-size: 18px; }
+.public-visitor-history-heading p { margin-top: 5px; color: #77808c; font-size: 10px; }
+.public-visitor-history-heading > strong { display: grid; justify-items: end; color: #1d222a; font: 800 25px Manrope, sans-serif; letter-spacing: -.06em; }
+.public-visitor-history-heading > strong small { color: #7d8792; font: 700 9px 'DM Sans', sans-serif; letter-spacing: 0; }
+.public-visitor-chart { display: flex; align-items: flex-end; gap: 8px; height: 142px; margin-top: 20px; padding: 12px 8px 0; border-bottom: 1px solid #e2e6eb; overflow-x: auto; scrollbar-width: thin; }
+.public-visitor-day { display: grid; grid-template-rows: 1fr auto auto; flex: 1 0 27px; align-items: end; min-width: 27px; height: 100%; text-align: center; }
+.public-visitor-bar { position: relative; display: block; width: 100%; min-height: 3px; border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, #f04a59, #c51f35); box-shadow: 0 5px 12px rgba(214,42,59,.18); transition: filter .18s ease, transform .18s ease; }
+.public-visitor-day:hover .public-visitor-bar { filter: saturate(1.15); transform: translateY(-2px); }
+.public-visitor-bar b { position: absolute; top: -15px; left: 50%; color: #b52a3c; font-size: 8px; transform: translateX(-50%); }
+.public-visitor-day small { margin-top: 7px; color: #8b949e; font-size: 8px; font-weight: 750; text-transform: uppercase; }
+.public-visitor-day em { margin-top: 2px; color: #4f5965; font-size: 9px; font-style: normal; font-weight: 800; }
+.public-visitor-history-loading { min-height: 105px; display: grid; place-items: center; color: #87909b; font-size: 10px; }
+@media (max-width: 640px) {
+  .public-visitor-history { margin-top: 12px; padding: 14px 13px 12px; border-radius: 16px; }
+  .public-visitor-history-heading h2 { font-size: 16px; }
+  .public-visitor-history-heading p { max-width: 200px; line-height: 1.35; }
+  .public-visitor-history-heading > strong { font-size: 21px; }
+  .public-visitor-chart { gap: 6px; height: 126px; margin-top: 16px; padding-inline: 4px; }
+  .public-visitor-day { flex-basis: 23px; min-width: 23px; }
+}
