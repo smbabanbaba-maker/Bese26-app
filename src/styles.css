@@ -9440,6 +9440,8 @@ img.avatar.is-business-logo {
   .admin-audit-topline { display: grid; gap: 3px; }
   .admin-audit-topline time { font-size: 8px; }
   .admin-audit-row { padding: 10px; }
+}
+
 /* Profile reference parity on phones: keep the dashboard wide, compact and scannable. */
 @media (max-width:700px) {
   .premium-profile {
