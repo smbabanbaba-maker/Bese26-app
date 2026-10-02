@@ -1048,7 +1048,7 @@ export async function fetchPublicProfile(username) {
     is_verified: verificationIsCurrent(businessRow),
     logo_url: getBusinessLogoDisplayUrl(businessRow, businessRow.logo_path ? getAvatarUrl(businessRow.logo_path) : ''),
   } : null;
-  let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(60);
+  let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(1000);
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(1000));
   if (listingsError) throw listingsError;
   return { profile: { ...profile, is_verified: verificationIsCurrent(profile), business }, listings: await hydrateListingRows(rows || [], { firstMediaOnly: true }) };
