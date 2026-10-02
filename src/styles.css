@@ -8684,9 +8684,10 @@ img.avatar.is-business-logo {
 
 /* Sponsored banner fit: keep artwork inside the allocated hero slot on every device. */
 .home-page .home-ad-banner:has(.home-ad-image-only) {
-  width:100dvw !important;
-  max-width:100dvw !important;
-  margin-left:calc(50% - 50dvw) !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
   height:auto !important;
   min-height:0 !important;
   max-height:none !important;
@@ -8717,9 +8718,10 @@ img.avatar.is-business-logo {
 }
 /* Some older campaign rows render the same full artwork through home-ad-art. */
 .home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) {
-  width:100dvw !important;
-  max-width:100dvw !important;
-  margin-left:calc(50% - 50dvw) !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
   height:auto !important;
   min-height:0 !important;
   max-height:none !important;
@@ -8782,9 +8784,9 @@ img.avatar.is-business-logo {
   .main-container:has(.home-page) { padding-left:13px !important; padding-right:13px !important; overflow-x:clip !important; }
   .home-page { width:auto !important; max-width:100% !important; margin-left:0 !important; margin-right:0 !important; }
   .home-page .home-ad-banner:has(.home-ad-image-only) {
-    width:100dvw !important;
-    max-width:100dvw !important;
-    margin-left:calc(50% - 50dvw) !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:0 !important;
     margin-right:0 !important;
     box-sizing:border-box !important;
     height:auto !important;
@@ -8816,9 +8818,9 @@ img.avatar.is-business-logo {
     overflow:visible !important;
   }
   .home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) {
-    width:100dvw !important;
-    max-width:100dvw !important;
-    margin-left:calc(50% - 50dvw) !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:0 !important;
     margin-right:0 !important;
     box-sizing:border-box !important;
     border-radius:0 !important;
