@@ -9781,3 +9781,26 @@ img.avatar.is-business-logo {
   .business-dashboard-page .business-admin-tools, .business-dashboard-page .business-analytics-panel, .business-dashboard-page .business-onboarding-card, .business-dashboard-page .verification-readiness-card, .business-dashboard-page .business-edit-summary, .business-dashboard-page > form.profile-form-card { padding: 14px !important; }
 }
 @media (prefers-reduced-motion: reduce) { .business-dashboard-page .business-admin-tool-grid > button { transition: none; } }
+
+/* Business Center clarity pass — status information must read at a glance. */
+.business-dashboard-page .business-status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin: 0 0 4px; }
+.business-dashboard-page .business-status-card { display: flex; align-items: flex-start; gap: 11px; min-width: 0; min-height: 106px; padding: 15px; border: 1px solid rgba(255,255,255,.14); border-radius: 16px; background: rgba(255,255,255,.095); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+.business-dashboard-page .business-status-icon { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 11px; color: #fff; background: rgba(215,25,32,.9); }
+.business-dashboard-page .business-status-copy { display: grid; gap: 4px; min-width: 0; }
+.business-dashboard-page .business-status-copy small { color: #c5d1e0; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.business-dashboard-page .business-status-copy strong { overflow-wrap: anywhere; color: #fff; font-size: 16px; line-height: 1.05; letter-spacing: -.025em; }
+.business-dashboard-page .business-status-copy em { color: #dbe5f2; font-size: 10px; font-style: normal; line-height: 1.35; }
+.business-dashboard-page .business-status-listings .business-status-icon { background: #2d73d5; }
+.business-dashboard-page .business-status-public .business-status-icon { background: #b98022; }
+.business-dashboard-page .business-status-public.is-ready .business-status-icon { background: #18845b; }
+.business-dashboard-page .business-status-verification .business-status-icon { background: #a80f16; }
+.business-dashboard-page .business-status-verification.is-verified .business-status-icon { background: #18845b; }
+.business-dashboard-page .business-center-summary .business-status-grid + .publish-success-actions { margin-top: 20px; }
+@media (max-width: 900px) {
+  .business-dashboard-page .business-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .business-dashboard-page .business-status-grid { grid-template-columns: 1fr; gap: 8px; }
+  .business-dashboard-page .business-status-card { min-height: 78px; align-items: center; padding: 13px; }
+  .business-dashboard-page .business-status-copy strong { font-size: 15px; }
+}
