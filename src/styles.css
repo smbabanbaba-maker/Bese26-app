@@ -9166,3 +9166,11 @@ img.avatar.is-business-logo {
   .messages-selected-page .send-button { width: 36px; height: 36px; }
 }
 @media (prefers-reduced-motion: reduce) { .messages-selected-page .send-button, .messages-selected-page .chat-back-button, .messages-selected-page .chat-header-icon { transition: none; } }
+
+/* In-app chat image viewer: never send members to a raw signed storage URL. */
+.message-image-button { display: block; max-width: min(240px, 100%); padding: 0; border: 0; border-radius: 9px; background: transparent; cursor: zoom-in; }
+.message-image-button .message-image { display: block; width: 100%; max-width: 240px; }
+.chat-image-viewer { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 54px 18px 28px; background: rgba(9, 12, 15, .93); backdrop-filter: blur(8px); }
+.chat-image-viewer img { max-width: min(920px, 100%); max-height: calc(100dvh - 90px); object-fit: contain; border-radius: 10px; box-shadow: 0 20px 70px rgba(0,0,0,.4); }
+.chat-image-viewer-close { position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; color: #fff; background: rgba(255,255,255,.12); }
+.chat-image-viewer-close:hover { color: #fff; background: #d9212a; }
