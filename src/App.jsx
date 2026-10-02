@@ -999,6 +999,64 @@ function seoListingSchema(listing) {
   schema.offers.seller = sellerUrl ? { '@type': 'Organization', name: sellerName, url: sellerUrl } : { '@type': 'Person', name: sellerName };
   return schema;
 }
+function seoCatalogProduct(item, index) {
+  const rawPrice = Number(item?.raw?.price);
+  const images = item?.gallery?.filter(Boolean).slice(0, 8) || [];
+  const product = {
+    '@type': 'Product',
+    name: seoText(item?.title, 'Bese26 marketplace listing'),
+    description: seoText(item?.description, `${item?.title || 'Product'} available in Nigeria on Bese26.`),
+    image: images.length ? images : [item?.image || SEO_DEFAULT_IMAGE],
+    url: `${SEO_SITE_URL}/listing/${encodeURIComponent(item.id)}`,
+    category: seoText(item?.category),
+    offers: {
+      '@type': 'Offer',
+      url: `${SEO_SITE_URL}/listing/${encodeURIComponent(item.id)}`,
+      priceCurrency: 'NGN',
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/UsedCondition',
+    },
+  };
+  if (Number.isFinite(rawPrice) && rawPrice > 0) product.offers.price = rawPrice;
+  return { '@type': 'ListItem', position: index + 1, url: product.url, item: product };
+}
+function seoSocialLinks(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter((item) => typeof item === 'string' && /^https?:\/\//i.test(item));
+  if (typeof value === 'object') return Object.values(value).filter((item) => typeof item === 'string' && /^https?:\/\//i.test(item));
+  return String(value).split(/[,\s]+/).filter((item) => /^https?:\/\//i.test(item));
+}
+function seoPublicProfileSchema({ business, profile, listings, name, description, canonical, image }) {
+  const location = business || profile || {};
+  const entity = {
+    '@context': 'https://schema.org',
+    '@type': business ? 'Store' : 'Person',
+    '@id': `${canonical}#profile`,
+    name,
+    url: canonical,
+    description,
+    image,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: location.city || '',
+      addressRegion: location.state || '',
+      addressCountry: 'NG',
+    },
+    knowsLanguage: ['en', 'ha'],
+  };
+  if (business?.phone || business?.public_contact) entity.telephone = business.phone || business.public_contact;
+  if (business?.email) entity.email = business.email;
+  const social = seoSocialLinks(business?.social_links);
+  if (social.length) entity.sameAs = social;
+  if (business?.is_verified || profile?.is_verified) entity.additionalType = 'https://schema.org/TrustedContributor';
+  entity.hasOfferCatalog = {
+    '@type': 'OfferCatalog',
+    name: `Products and services from ${name}`,
+    itemListElement: listings.slice(0, 120).map(seoCatalogProduct),
+  };
+  entity.mainEntityOfPage = { '@type': 'WebPage', '@id': canonical };
+  return entity;
+}
 function usePublicSeo({ title, description, canonical, image = SEO_DEFAULT_IMAGE, schema }) {
   useEffect(() => {
     const previousTitle = document.title;
@@ -1032,7 +1090,7 @@ const seoData = state.data;
   const seoDescription = seoText(seoBusiness?.description || seoProfile?.bio, `${seoName} on Bese26 — discover listings, products and services in Nigeria.`);
   const seoCanonical = `${SEO_SITE_URL}/@${String(seoBusiness?.business_handle || seoProfile?.username || handle).toLowerCase()}`;
   const seoBusinessImage = getBusinessLogoDisplayUrl(seoBusiness, getAvatarUrl(seoBusiness?.logo_path)) || SEO_DEFAULT_IMAGE;
-  usePublicSeo({ title: `${seoName} | Bese26 Miniweb`, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage, schema: seoData ? { '@context': 'https://schema.org', '@type': seoBusiness ? 'Store' : 'Person', name: seoName, url: seoCanonical, description: seoDescription, image: seoBusinessImage, address: { '@type': 'PostalAddress', addressLocality: seoBusiness?.city || seoProfile?.city || '', addressRegion: seoBusiness?.state || seoProfile?.state || '', addressCountry: 'NG' }, hasOfferCatalog: { '@type': 'OfferCatalog', name: `Listings from ${seoName}`, itemListElement: seoListings.slice(0, 60).map((item, index) => ({ '@type': 'Offer', position: index + 1, url: `${SEO_SITE_URL}/listing/${encodeURIComponent(item.id)}`, itemOffered: { '@type': 'Product', name: seoText(item.title), image: item.image || SEO_DEFAULT_IMAGE, offers: { '@type': 'Offer', priceCurrency: 'NGN', availability: 'https://schema.org/InStock' } } })) } } : null });
+  usePublicSeo({ title: `${seoName} | Bese26 Miniweb`, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage, schema: seoData ? seoPublicProfileSchema({ business: seoBusiness, profile: seoProfile, listings: seoListings, name: seoName, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage }) : null });
   if (state.loading) return <MiniwebDashboardShell />;
   if (state.error || !state.data) return <div className="public-business-shell"><section className="public-business-not-found"><div className="brand-mark">B</div><div className="eyebrow">BESE26 SHOP</div><h1>Shop not found</h1><p>This public shop does not exist, is inactive, or has no public profile.</p><a className="primary-button" href="https://bese26.shop/">Back to Bese26 <ArrowRight size={16} /></a></section></div>;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }

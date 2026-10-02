@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /?admin=
+Disallow: /?chat_listing=
+Disallow: /?listing_id=
+
+Sitemap: https://bese26.shop/sitemap.xml
