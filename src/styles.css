@@ -8752,6 +8752,22 @@ img.avatar.is-business-logo {
   transform:none !important;
   box-shadow:none !important;
 }
+/* Search and Business sponsored placements: use the uploaded creative's natural ratio. */
+.sponsored-placement-art {
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:auto !important;
+  background:transparent !important;
+}
+.sponsored-placement-art img {
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  display:block !important;
+  object-fit:fill !important;
+  object-position:center !important;
+}
 @media (max-width:700px) {
   .home-page .home-ad-banner:has(.home-ad-image-only) {
     height:auto !important;
