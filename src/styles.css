@@ -10246,9 +10246,23 @@ body:has(.chat-image-viewer) {
 }
 .app-shell:has(.chat-image-viewer) .bottom-nav,
 .app-shell:has(.chat-image-viewer) .topbar {
-  visibility: hidden !important;
+  display: none !important;
   pointer-events: none !important;
 }
+.chat-image-viewer::before { content: none !important; display: none !important; }
+.chat-image-viewer-close {
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: auto !important;
+  left: max(14px, env(safe-area-inset-left)) !important;
+  width: 44px !important;
+  height: 44px !important;
+  border: 0 !important;
+  border-radius: 50%;
+  color: #fff !important;
+  background: rgba(0,0,0,.38) !important;
+  box-shadow: none !important;
+}
+.chat-image-viewer-close:hover { background: #d9212a !important; transform: none !important; }
 @media (max-width: 700px) {
   .chat-image-viewer {
     padding: max(58px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
