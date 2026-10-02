@@ -10226,3 +10226,38 @@ img.avatar.is-business-logo {
 .messages-selected-page .chat-safety-note-top svg { flex:none; color:#ef3340; }
 .messages-selected-page .chat-bottom-tools .chat-quick-actions .offer-quick-action { border-color:#ef3340; color:#ef3340; }
 @media (max-width:699px) { .messages-selected-page .chat-safety-note-top { margin:7px 8px 1px; } }
+
+/* Chat images open above every app surface, including the fixed mobile navigation. */
+.chat-image-viewer {
+  z-index: 6000 !important;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: pinch-zoom;
+}
+.chat-image-viewer img {
+  max-width: min(96vw, 1100px);
+  max-height: calc(100dvh - 40px);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+body:has(.chat-image-viewer) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+.app-shell:has(.chat-image-viewer) .bottom-nav,
+.app-shell:has(.chat-image-viewer) .topbar {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+@media (max-width: 700px) {
+  .chat-image-viewer {
+    padding: max(58px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+  .chat-image-viewer img {
+    max-width: 100vw;
+    max-height: calc(100dvh - 78px);
+    border-width: 3px;
+    border-radius: 6px;
+  }
+  .chat-image-viewer-close { z-index: 2; width: 46px; height: 46px; }
+}
