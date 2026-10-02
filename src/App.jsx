@@ -1278,7 +1278,7 @@ function AppContent() {
   const [platformSettings, setPlatformSettings] = useState({ maintenance_mode: false });
   const startupReadyRef = useRef(!isSupabaseConfigured);
   const ownerAdminEmail = 'smbabanbaba@gmail.com';
-  const canAccessAdmin = Boolean(isAdmin || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
+  const canAccessAdmin = Boolean(isAdmin || adminPermissions.length > 0 || sessionUser?.email?.toLowerCase() === ownerAdminEmail);
   const privateAdminEntry = new URLSearchParams(window.location.search).get('admin') === 'login';
   useEffect(() => { if (!isSupabaseConfigured) return undefined; let mounted = true; fetchPlatformSettings().then((value) => mounted && setPlatformSettings(value || { maintenance_mode: false })).catch(() => {}); return () => { mounted = false; }; }, []);
 
@@ -1415,14 +1415,14 @@ function AppContent() {
       }
       if (session?.user) {
         try {
-          const [remoteSaved, access] = await Promise.all([fetchSavedIds(session.user.id), fetchAdminAccess()]);
-          if (mounted) { setSavedIds(remoteSaved || []); setIsAdmin(Boolean(access?.isAdmin)); setAdminPermissions(access?.permissions || []); setIsOwnerAdmin(Boolean(access?.isOwner)); }
-        } catch (error) {
-          if (mounted) { setSavedIds([]); setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); }
+          const remoteSaved = await fetchSavedIds(session.user.id);
+          if (mounted) setSavedIds(remoteSaved || []);
+        } catch {
+          if (mounted) setSavedIds([]);
         }
       } else if (mounted) {
         setSavedIds([]);
-        setIsAdmin(false);
+        setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false);
       }
       if (mounted && initial && !startupReadyRef.current) {
         setStartupError('');
@@ -1455,12 +1455,32 @@ function AppContent() {
       if (event === 'SIGNED_IN' && session?.user) {
         loadBackend();
         fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
-        fetchAdminAccess().then((access) => { setIsAdmin(Boolean(access?.isAdmin)); setAdminPermissions(access?.permissions || []); setIsOwnerAdmin(Boolean(access?.isOwner)); }).catch(() => { setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); });
       }
       if (event === 'SIGNED_OUT') { setSavedIds([]); setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); setSelectedListing(null); setChatListing(null); setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); setChatDraft(''); setEditingListing(null); setSearch(''); setActiveNav('home'); loadBackend(); }
     });
     return () => { mounted = false; window.clearTimeout(startupTimeout); window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', refreshWhenVisible); window.removeEventListener('focus', refreshWhenFocused); subscription.unsubscribe(); };
   }, []);
+  useEffect(() => {
+    if (!sessionUser?.id || !isSupabaseConfigured) {
+      setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false);
+      return undefined;
+    }
+    let mounted = true;
+    const refreshAccess = () => fetchAdminAccess().then((access) => {
+      if (!mounted) return;
+      setIsAdmin(Boolean(access?.isAdmin));
+      setAdminPermissions(access?.permissions || []);
+      setIsOwnerAdmin(Boolean(access?.isOwner));
+    }).catch(() => {
+      if (mounted) { setIsAdmin(false); setAdminPermissions([]); setIsOwnerAdmin(false); }
+    });
+    refreshAccess();
+    const refreshOnVisibility = () => { if (document.visibilityState === 'visible') refreshAccess(); };
+    window.addEventListener('focus', refreshAccess);
+    document.addEventListener('visibilitychange', refreshOnVisibility);
+    const timer = window.setInterval(refreshAccess, 60 * 1000);
+    return () => { mounted = false; window.removeEventListener('focus', refreshAccess); document.removeEventListener('visibilitychange', refreshOnVisibility); window.clearInterval(timer); };
+  }, [sessionUser?.id]);
   useEffect(() => {
     if (!sessionUser || !isSupabaseConfigured) return undefined;
     const params = new URLSearchParams(window.location.search);
