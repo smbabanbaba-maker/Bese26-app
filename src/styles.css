@@ -8722,6 +8722,36 @@ img.avatar.is-business-logo {
   }
 }
 
+/* Home sponsor artwork: full-bleed on phones, preserving the complete uploaded banner. */
+@media (max-width:700px) {
+  .main-container:has(.home-page) { padding-left:0 !important; padding-right:0 !important; }
+  .home-page { width:100vw !important; max-width:none !important; margin-left:calc(50% - 50vw) !important; margin-right:calc(50% - 50vw) !important; }
+  .home-page .home-ad-banner:has(.home-ad-image-only) {
+    width:100vw !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    border-radius:0 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    overflow:visible !important;
+  }
+  .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only,
+  .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+    width:100vw !important;
+    height:auto !important;
+    max-width:none !important;
+    max-height:none !important;
+    object-fit:contain !important;
+  }
+  .home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+    border:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+  }
+}
+
 /* Internal Business Admin Dashboard: product workspace, not public Miniweb. */
 .business-dashboard-page {
   --bd-ink:#17212b;
