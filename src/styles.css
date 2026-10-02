@@ -8684,7 +8684,9 @@ img.avatar.is-business-logo {
 
 /* Sponsored banner fit: keep artwork inside the allocated hero slot on every device. */
 .home-page .home-ad-banner:has(.home-ad-image-only) {
-  width:100% !important;
+  width:100dvw !important;
+  max-width:100dvw !important;
+  margin-left:calc(50% - 50dvw) !important;
   height:auto !important;
   min-height:0 !important;
   max-height:none !important;
@@ -8713,6 +8715,43 @@ img.avatar.is-business-logo {
   object-fit:fill !important;
   object-position:center !important;
 }
+/* Some older campaign rows render the same full artwork through home-ad-art. */
+.home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) {
+  width:100dvw !important;
+  max-width:100dvw !important;
+  margin-left:calc(50% - 50dvw) !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  padding:0 !important;
+  background:transparent !important;
+  overflow:hidden !important;
+}
+.home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) .home-ad-art,
+.home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) .home-ad-art img {
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:none !important;
+  display:block !important;
+  object-fit:fill !important;
+  background:transparent !important;
+}
+.home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) .home-ad-art {
+  position:static !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  transform:none !important;
+  place-items:initial !important;
+}
+.home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) .home-ad-art img {
+  aspect-ratio:auto !important;
+  border-radius:0 !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
 @media (max-width:700px) {
   .home-page .home-ad-banner:has(.home-ad-image-only) {
     height:auto !important;
@@ -8727,10 +8766,10 @@ img.avatar.is-business-logo {
   .main-container:has(.home-page) { padding-left:13px !important; padding-right:13px !important; overflow-x:clip !important; }
   .home-page { width:auto !important; max-width:100% !important; margin-left:0 !important; margin-right:0 !important; }
   .home-page .home-ad-banner:has(.home-ad-image-only) {
-    width:calc(100% + 26px) !important;
-    max-width:calc(100% + 26px) !important;
-    margin-left:-13px !important;
-    margin-right:-13px !important;
+    width:100dvw !important;
+    max-width:100dvw !important;
+    margin-left:calc(50% - 50dvw) !important;
+    margin-right:0 !important;
     box-sizing:border-box !important;
     height:auto !important;
     min-height:0 !important;
@@ -8759,6 +8798,14 @@ img.avatar.is-business-logo {
     padding:0 !important;
     background:transparent !important;
     overflow:visible !important;
+  }
+  .home-page .home-ad-banner:not(.home-ad-dashboard):not(:has(.home-ad-copy)):has(.home-ad-art) {
+    width:100dvw !important;
+    max-width:100dvw !important;
+    margin-left:calc(50% - 50dvw) !important;
+    margin-right:0 !important;
+    box-sizing:border-box !important;
+    border-radius:0 !important;
   }
 }
 
