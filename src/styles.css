@@ -9440,4 +9440,116 @@ img.avatar.is-business-logo {
   .admin-audit-topline { display: grid; gap: 3px; }
   .admin-audit-topline time { font-size: 8px; }
   .admin-audit-row { padding: 10px; }
+/* Profile reference parity on phones: keep the dashboard wide, compact and scannable. */
+@media (max-width:700px) {
+  .premium-profile {
+    width:100% !important;
+    max-width:none !important;
+    padding:0 10px 92px !important;
+    gap:12px !important;
+  }
+  .premium-profile .profile-cover {
+    min-height:184px !important;
+    padding:15px 14px 12px !important;
+    border-radius:16px !important;
+  }
+  .premium-profile .profile-heading {
+    left:14px !important;
+    right:14px !important;
+    bottom:18px !important;
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    gap:9px !important;
+  }
+  .premium-profile .profile-heading > .avatar,
+  .premium-profile .profile-heading > .profile-avatar-image {
+    width:50px !important;
+    height:50px !important;
+    min-width:50px !important;
+    min-height:50px !important;
+    flex:0 0 50px !important;
+  }
+  .premium-profile .profile-identity {
+    min-width:0 !important;
+    flex:1 1 auto !important;
+    gap:2px !important;
+  }
+  .premium-profile .profile-identity h1 {
+    max-width:100% !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:clamp(16px,5.5vw,24px) !important;
+    line-height:1.05 !important;
+  }
+  .premium-profile .profile-name-row { gap:4px !important; flex-wrap:nowrap !important; }
+  .premium-profile .profile-name-row .verification-badge-group { transform:scale(.82); transform-origin:left center; }
+  .premium-profile .profile-identity .profile-account-type,
+  .premium-profile .profile-identity .product-meta,
+  .premium-profile .profile-identity .seller-stats { font-size:8px !important; line-height:1.25 !important; }
+  .premium-profile .profile-heading .outline-button {
+    width:auto !important;
+    min-width:max-content !important;
+    min-height:30px !important;
+    margin-left:auto !important;
+    padding:6px 8px !important;
+    font-size:9px !important;
+  }
+  .premium-profile .profile-completion {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:6px 10px !important;
+    min-height:78px;
+    padding:12px 13px !important;
+    border-radius:13px !important;
+  }
+  .premium-profile .profile-completion > div:first-child > span { font-size:8px !important; }
+  .premium-profile .profile-completion strong { font-size:15px !important; }
+  .premium-profile .profile-completion .text-action {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    align-self:center !important;
+    font-size:9px !important;
+  }
+  .premium-profile .profile-completion .completion-track { height:6px !important; }
+  .premium-profile .profile-stats {
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    overflow:visible !important;
+    min-width:0 !important;
+    gap:0 !important;
+    margin-top:-5px !important;
+    padding:8px 2px !important;
+    border-radius:14px !important;
+  }
+  .premium-profile .profile-stats button {
+    min-width:0 !important;
+    min-height:52px !important;
+    padding:6px 2px !important;
+  }
+  .premium-profile .profile-stats strong { font-size:17px !important; }
+  .premium-profile .profile-stats span { font-size:8px !important; white-space:nowrap !important; }
+  .premium-profile .profile-quick-actions {
+    gap:9px !important;
+    padding:13px !important;
+    border-radius:14px !important;
+  }
+  .premium-profile .profile-quick-heading { align-items:flex-end !important; flex-direction:row !important; gap:7px !important; }
+  .premium-profile .profile-quick-heading h2 { font-size:16px !important; }
+  .premium-profile .profile-quick-heading > span { margin-left:auto; font-size:8px !important; white-space:nowrap; }
+  .premium-profile .profile-quick-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+  .premium-profile .profile-quick-grid button {
+    min-height:64px !important;
+    display:grid !important;
+    grid-template-columns:auto 1fr !important;
+    align-content:center;
+    gap:5px !important;
+    padding:9px 7px !important;
+  }
+  .premium-profile .profile-quick-grid button > svg:last-child { display:none; }
+  .premium-profile .profile-quick-grid button > span { gap:2px !important; }
+  .premium-profile .profile-quick-grid strong { font-size:9px !important; line-height:1.1 !important; }
+  .premium-profile .profile-quick-grid small { font-size:7px !important; line-height:1.2 !important; }
 }
