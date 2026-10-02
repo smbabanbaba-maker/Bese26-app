@@ -4,6 +4,6 @@ Allow: /
 Disallow: /api/
 Disallow: /?admin=login
 
-Sitemap: https://bese26.shop/sitemap.xml
+Sitemap: https://www.bese26.shop/sitemap.xml
 `);
 }
