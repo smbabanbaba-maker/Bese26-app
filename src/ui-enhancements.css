@@ -1915,3 +1915,97 @@ img.is-business-logo-previewable:focus-visible {
   .messages-selected-page.messages-premium .chat-header-icon { transition: none; }
   .chat-recording-pulse::after { animation: none; }
 }
+
+
+/* Modern voice notes: consistent player, clear record/preview actions, and narrow-screen support. */
+.voice-note-player {
+  --voice-accent: #a92530;
+  --voice-play-surface: #fff0f0;
+  --voice-bar-muted: #e7bfc2;
+  --voice-bar-active: #a92530;
+  --voice-time: #687181;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: min(300px, 68vw);
+  min-width: 190px;
+  padding: 2px 0;
+  color: #263044;
+}
+.voice-note-player.is-mine { --voice-accent: #92232d; --voice-play-surface: #f9dfe0; --voice-bar-muted: #e9b5b8; --voice-bar-active: #92232d; --voice-time: #76565a; }
+.voice-note-play {
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0 0 0 2px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--voice-accent);
+  box-shadow: 0 3px 8px rgba(137, 36, 46, .18);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.voice-note-play:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(137, 36, 46, .22); }
+.voice-note-play:active { transform: scale(.96); }
+.voice-note-play:focus-visible, .voice-note-seek:focus-visible { outline: 2px solid #bf3540; outline-offset: 3px; }
+.voice-note-track { position: relative; display: flex; flex: 1 1 auto; align-items: center; min-width: 82px; height: 28px; }
+.voice-note-waveform { display: flex; align-items: center; justify-content: space-between; gap: 1.5px; width: 100%; height: 24px; overflow: hidden; }
+.voice-note-waveform > span { display: block; flex: 1 1 0; min-width: 1px; max-width: 3px; border-radius: 999px; background: var(--voice-bar-muted); transition: background-color .12s linear; }
+.voice-note-waveform > span.is-played { background: var(--voice-bar-active); }
+.voice-note-seek { position: absolute; z-index: 2; inset: 0; width: 100%; height: 28px; margin: 0; appearance: none; background: transparent; cursor: pointer; }
+.voice-note-seek:disabled { cursor: default; }
+.voice-note-seek::-webkit-slider-runnable-track { height: 28px; background: transparent; }
+.voice-note-seek::-webkit-slider-thumb { width: 10px; height: 10px; margin-top: 9px; appearance: none; border: 2px solid #fff; border-radius: 50%; background: var(--voice-accent); box-shadow: 0 1px 4px rgba(28, 35, 48, .25); }
+.voice-note-seek::-moz-range-track { height: 28px; background: transparent; }
+.voice-note-seek::-moz-range-thumb { width: 8px; height: 8px; border: 2px solid #fff; border-radius: 50%; background: var(--voice-accent); box-shadow: 0 1px 4px rgba(28, 35, 48, .25); }
+.voice-note-time { flex: 0 0 34px; width: 34px; color: var(--voice-time); font-variant-numeric: tabular-nums; font-size: 10px; font-weight: 700; text-align: right; }
+.voice-note-audio { display: none; }
+.voice-note-error { flex: 0 0 100%; margin: -3px 0 0 43px; color: #a92530; font-size: 9px; }
+.messages-selected-page.messages-premium .message-bubble .voice-note-player { width: min(300px, 68vw); min-width: 190px; }
+.messages-selected-page.messages-premium .chat-attachment-preview.has-voice-preview { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px 10px; padding: 10px 12px; }
+.chat-voice-preview-copy { display: flex; grid-column: 1; align-items: center; gap: 8px; min-width: 0; color: #a92530; }
+.chat-voice-preview-copy > svg { flex: 0 0 16px; }
+.chat-voice-preview-copy > span { display: grid; gap: 2px; min-width: 0; }
+.chat-voice-preview-copy strong { color: #293246; font-size: 10px; font-weight: 800; }
+.chat-voice-preview-copy small { color: #8b94a3; font-size: 9px; }
+.messages-selected-page.messages-premium .chat-attachment-preview.has-voice-preview .voice-note-player { grid-column: 1; width: 100%; min-width: 0; max-width: 390px; }
+.messages-selected-page.messages-premium .chat-attachment-preview.has-voice-preview > button { grid-column: 2; grid-row: 1 / span 2; }
+.messages-selected-page.messages-premium .chat-composer .chat-record-button {
+  display: inline-flex;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 64px;
+  height: 38px;
+  padding: 0 7px;
+  border: 1px solid #f1d3d4;
+  border-radius: 12px;
+  color: #a92530 !important;
+  background: #fff8f8 !important;
+}
+.messages-selected-page.messages-premium .chat-composer .chat-record-button:hover:not(:disabled) { border-color: #e7b9bc; color: #92232d !important; background: #fff0f0 !important; }
+.messages-selected-page.messages-premium .chat-composer .chat-record-button:disabled { cursor: not-allowed; opacity: .55; }
+.chat-record-button-label { font-size: 10px; font-weight: 800; }
+.chat-voice-starting-spinner { width: 14px; height: 14px; border: 2px solid #e7c2c5; border-top-color: #a92530; border-radius: 50%; animation: chat-voice-spin .7s linear infinite; }
+@keyframes chat-voice-spin { to { transform: rotate(360deg); } }
+@media (max-width: 760px) {
+  .messages-selected-page.messages-premium .chat-composer .chat-record-button { flex-basis: 61px; width: 61px; height: 36px; padding-inline: 5px; gap: 4px; }
+  .messages-selected-page.messages-premium .message-bubble .voice-note-player { width: min(270px, 72vw); min-width: 180px; }
+  .messages-selected-page.messages-premium .chat-attachment-preview.has-voice-preview { margin-inline: 10px; }
+}
+@media (max-width: 390px) {
+  .messages-selected-page.messages-premium .chat-composer .chat-record-button { flex-basis: 54px; width: 54px; padding-inline: 3px; gap: 3px; }
+  .chat-record-button-label { font-size: 9px; }
+  .messages-selected-page.messages-premium .chat-composer .emoji-toggle { display: none; }
+  .messages-selected-page.messages-premium .message-bubble .voice-note-player { width: min(248px, 74vw); min-width: 170px; gap: 7px; }
+  .voice-note-play { flex-basis: 32px; width: 32px; height: 32px; }
+  .voice-note-time { flex-basis: 31px; width: 31px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-note-play, .voice-note-waveform > span { transition: none; }
+  .chat-voice-starting-spinner { animation: none; border-top-color: #a92530; }
+}
