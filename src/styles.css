@@ -9366,3 +9366,44 @@ img.avatar.is-business-logo {
 }
 @media (prefers-reduced-motion: reduce) { .message-inbox-row, .conversation-row, .message-bubble, .chat-action-menu, .send-button { animation: none; transition: none; } }
 
+/* Admin control room: high-signal overview before the deeper management panels. */
+.admin-control-room {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #1e2430;
+  border-radius: 20px;
+  color: #fff;
+  background: radial-gradient(circle at 92% 0%, rgba(239,76,86,.26), transparent 34%), linear-gradient(135deg, #111722, #202a3a 58%, #34222a);
+  box-shadow: 0 16px 34px rgba(17,23,34,.16);
+}
+.admin-control-room-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.admin-control-room-heading .eyebrow { color: #ffb9bd; font-size: 9px; letter-spacing: .16em; }
+.admin-control-room-heading h2 { margin: 4px 0 3px; color: #fff; font-size: clamp(20px, 3vw, 28px); letter-spacing: -.05em; }
+.admin-control-room-heading p { margin: 0; max-width: 430px; color: #cbd3df; font-size: 11px; line-height: 1.45; }
+.admin-live-indicator { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 9px; border: 1px solid rgba(142,231,198,.32); border-radius: 999px; color: #b9f1d8; background: rgba(142,231,198,.1); font-size: 9px; font-weight: 800; }
+.admin-live-indicator i { width: 6px; height: 6px; border-radius: 50%; background: #76e4b4; box-shadow: 0 0 0 4px rgba(118,228,180,.13); }
+.admin-control-room-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.admin-control-metric { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; min-width: 0; padding: 11px; border: 1px solid rgba(255,255,255,.14); border-radius: 13px; color: #fff; background: rgba(255,255,255,.08); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.admin-control-metric:hover, .admin-control-metric:focus-visible { transform: translateY(-2px); border-color: rgba(255,185,189,.7); background: rgba(255,255,255,.14); outline: none; }
+.admin-control-metric.is-priority { border-color: rgba(255,185,189,.55); background: rgba(255,92,102,.16); }
+.admin-control-metric-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; color: #ffb9bd; background: rgba(255,255,255,.12); }
+.admin-control-metric span:not(.admin-control-metric-icon) { display: grid; min-width: 0; gap: 2px; }
+.admin-control-metric strong { overflow: hidden; color: #fff; font-size: 18px; letter-spacing: -.03em; text-overflow: ellipsis; white-space: nowrap; }
+.admin-control-metric small { overflow: hidden; color: #cbd3df; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-control-metric b { grid-column: 2; color: #ffced1; font-size: 8px; }
+.admin-control-shortcuts { display: flex; flex-wrap: wrap; gap: 7px; }
+.admin-control-shortcuts button { display: inline-flex; align-items: center; gap: 6px; min-height: 31px; padding: 6px 9px; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; color: #e7edf7; background: rgba(255,255,255,.06); font: inherit; font-size: 9px; font-weight: 800; cursor: pointer; transition: background .18s ease, transform .18s ease; }
+.admin-control-shortcuts button:hover { transform: translateY(-1px); color: #fff; background: rgba(255,255,255,.14); }
+@media (max-width: 820px) { .admin-control-room-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  .admin-control-room { padding: 14px; border-radius: 16px; }
+  .admin-control-room-heading { flex-direction: column; gap: 8px; }
+  .admin-live-indicator { align-self: flex-start; }
+  .admin-control-room-metrics { gap: 7px; }
+  .admin-control-metric { padding: 9px; }
+  .admin-control-metric strong { font-size: 16px; }
+  .admin-control-shortcuts { display: grid; grid-template-columns: 1fr 1fr; }
+  .admin-control-shortcuts button { justify-content: flex-start; min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .admin-control-metric, .admin-control-shortcuts button { transition: none; } }
