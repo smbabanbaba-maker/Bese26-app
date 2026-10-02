@@ -10219,3 +10219,10 @@ img.avatar.is-business-logo {
   .messages-selected-page .chat-composer:has(input:not(.chat-file-input):not(:placeholder-shown)) .chat-record-button { display:none !important; }
   .messages-selected-page .chat-attachment-preview { margin:5px 9px 0 !important; }
 }
+
+
+/* Final reference alignment: safety card above the real chat stream and compact red offer action. */
+.messages-selected-page .chat-safety-note-top { display:flex; flex:0 0 auto; align-items:center; gap:7px; margin:9px 13px 1px; padding:8px 10px; border:1px solid #ededed; border-left:3px solid #ef3340; border-radius:8px; color:#707070; background:#fff; font-size:10.5px; line-height:1.4; }
+.messages-selected-page .chat-safety-note-top svg { flex:none; color:#ef3340; }
+.messages-selected-page .chat-bottom-tools .chat-quick-actions .offer-quick-action { border-color:#ef3340; color:#ef3340; }
+@media (max-width:699px) { .messages-selected-page .chat-safety-note-top { margin:7px 8px 1px; } }
