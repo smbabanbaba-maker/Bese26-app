@@ -11013,3 +11013,10 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 .dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-copy { animation: miniwebCtaCopyIn .6s ease both; }
 @keyframes miniwebCtaCopyIn { from { opacity: .35; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-copy { animation: none; } }
+/* Hausa attention cue for the Shop CTA. */
+.dashboard-profile-snapshot .dashboard-miniweb-button { gap: 7px; }
+.dashboard-profile-snapshot .dashboard-miniweb-button > span { white-space: nowrap; }
+.dashboard-profile-snapshot .dashboard-miniweb-hint { display: inline-block; margin-left: -2px; color: rgba(255,255,255,.78); font-size: 7px; font-weight: 700; letter-spacing: .02em; animation: hausaHintBlink 1.8s ease-in-out infinite; }
+@keyframes hausaHintBlink { 0%, 100% { opacity: .38; transform: translateX(0); } 50% { opacity: 1; transform: translateX(2px); } }
+@media (max-width: 640px) { .dashboard-profile-snapshot .dashboard-miniweb-hint { display: none; } }
+@media (prefers-reduced-motion: reduce) { .dashboard-profile-snapshot .dashboard-miniweb-hint { animation: none; } }

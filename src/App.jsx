@@ -427,8 +427,8 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy"><small>{showingPlan ? 'YOUR SHOP IS READY FOR GROWTH' : hasMiniweb ? 'SHOP CREATED SUCCESSFULLY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{showingPlan ? 'Choose a plan for your Shop' : hasMiniweb ? 'Your Shop is ready' : 'Create your Shop'}</strong><p>{showingPlan ? 'Unlock more business tools, verification access and growth features.' : hasMiniweb ? 'Next step: choose a plan to unlock your shop tools.' : 'Build your professional shop and let buyers find your business.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}>{showingPlan ? 'Choose a plan' : hasMiniweb ? 'Next step' : 'Create Shop'} <ArrowRight size={16} /></button>
+      <div className="dashboard-miniweb-copy"><small>{showingPlan ? 'MATAKI NA GABA' : hasMiniweb ? 'AN ƘIRƘIRI SHOP ƊINKA' : 'FARA KASUWANCINKA A BESE26'}</small><strong>{showingPlan ? 'Zaɓi Plan ɗinka' : hasMiniweb ? 'Shop ɗinka ya shirya' : 'Ƙirƙiri Shop ɗinka'}</strong><p>{showingPlan ? 'Zaɓi plan yanzu domin ka buɗe cikakken damar amfani da kayan Shop ɗinka.' : hasMiniweb ? 'Mataki na gaba shi ne zaɓar plan domin ka samu ƙarin kayan kasuwanci.' : 'Buɗe shafin kasuwancinka yanzu domin masu saye su same ka cikin sauƙi.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}><span>{showingPlan ? 'Zaɓi Plan' : hasMiniweb ? 'Mataki na gaba' : 'Ƙirƙiri Shop'}</span><small className="dashboard-miniweb-hint">Danna nan</small><ArrowRight size={16} /></button>
     </div>}
   </section>;
 }
