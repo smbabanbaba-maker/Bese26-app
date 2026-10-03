@@ -10676,3 +10676,26 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
   object-fit: fill !important;
   object-position: center !important;
 }
+
+/* Shared campaign standard for every sponsored placement in the app. */
+.sponsored-placement-art {
+  width: 100% !important;
+  aspect-ratio: 1600 / 500 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  background: #f8f9fb !important;
+}
+.sponsored-placement-art img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  object-fit: fill !important;
+  object-position: center !important;
+}
+@media (max-width: 700px) {
+  .sponsored-placement-art { aspect-ratio: 1600 / 500 !important; min-height: 0 !important; }
+}

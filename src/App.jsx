@@ -391,7 +391,7 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   if (!campaign) return null;
   const linked = Boolean(campaign.cta_target?.trim());
   const open = () => linked && window.location.assign(campaign.cta_target);
-  const image = <img src={getOptimizedPublicImageUrl(campaign.image_url, { width: 960 })} alt={campaign.title || 'Sponsored promotion'} loading="lazy" decoding="async" />;
+  const image = <img src={getOptimizedPublicImageUrl(campaign.image_url, { width: 1600 })} alt={campaign.title || 'Sponsored promotion'} loading="lazy" decoding="async" />;
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
 
