@@ -392,11 +392,16 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const [profile, setProfile] = useState(null);
   const [contacts, setContacts] = useState(null);
   const [business, setBusiness] = useState(null);
+  const [entitlement, setEntitlement] = useState(null);
   const [loading, setLoading] = useState(Boolean(user));
+  const [planLoading, setPlanLoading] = useState(Boolean(user));
+  const [ctaMode, setCtaMode] = useState('shop');
   useEffect(() => {
     let mounted = true;
-    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setLoading(false); return undefined; }
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
     setLoading(true);
+    setPlanLoading(true);
+    fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
     Promise.all([getProfile(user.id), getProfileContacts(user.id), getBusinessProfile(user.id)])
       .then(([nextProfile, nextContacts, nextBusiness]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); setBusiness(nextBusiness); } })
       .catch(() => { if (mounted) { setProfile(null); setContacts(null); setBusiness(null); } })
@@ -408,12 +413,22 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const username = profile?.username ? `@${profile.username}` : '@member';
   const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
   const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
+  const hasActivePlan = Boolean(hasMiniweb && entitlement?.is_paid);
+  useEffect(() => {
+    setCtaMode('shop');
+    if (!hasMiniweb || hasActivePlan) return undefined;
+    const timer = window.setTimeout(() => setCtaMode('plan'), 6000);
+    return () => window.clearTimeout(timer);
+  }, [hasMiniweb, hasActivePlan]);
   const openMiniweb = () => onOpenProfilePage?.('business');
+  const openPlan = () => setCtaMode('plan');
+  if (!loading && !planLoading && hasActivePlan) return null;
+  const showingPlan = hasMiniweb && ctaMode === 'plan';
   return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR MINIWEB IS READY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{hasMiniweb ? 'Choose a plan for your Shop' : 'Create your Shop'}</strong><p>{hasMiniweb ? 'Unlock more business tools, verification access and growth features.' : 'Build your professional shop and let buyers find your business.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={hasMiniweb ? () => onNavigate('subscription') : openMiniweb}>{hasMiniweb ? 'Choose a plan' : 'Create Shop'} <ArrowRight size={16} /></button>
+      <div className="dashboard-miniweb-copy"><small>{showingPlan ? 'YOUR SHOP IS READY FOR GROWTH' : hasMiniweb ? 'SHOP CREATED SUCCESSFULLY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{showingPlan ? 'Choose a plan for your Shop' : hasMiniweb ? 'Your Shop is ready' : 'Create your Shop'}</strong><p>{showingPlan ? 'Unlock more business tools, verification access and growth features.' : hasMiniweb ? 'Next step: choose a plan to unlock your shop tools.' : 'Build your professional shop and let buyers find your business.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}>{showingPlan ? 'Choose a plan' : hasMiniweb ? 'Next step' : 'Create Shop'} <ArrowRight size={16} /></button>
     </div>}
   </section>;
 }

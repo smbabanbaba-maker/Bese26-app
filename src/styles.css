@@ -11007,3 +11007,9 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @media (prefers-reduced-motion: reduce) {
   .dashboard-profile-snapshot .dashboard-miniweb-button, .dashboard-profile-snapshot .dashboard-miniweb-button::before, .dashboard-profile-snapshot .dashboard-miniweb-icon { animation: none; }
 }
+/* Smooth state change from Shop ready to the plan prompt. */
+.dashboard-profile-snapshot .dashboard-miniweb-action { transition: background .65s ease, border-color .65s ease, box-shadow .65s ease; }
+.dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-button { transition: background .4s ease, transform .2s ease, filter .4s ease; }
+.dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-copy { animation: miniwebCtaCopyIn .6s ease both; }
+@keyframes miniwebCtaCopyIn { from { opacity: .35; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-copy { animation: none; } }
