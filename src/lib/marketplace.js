@@ -409,7 +409,13 @@ export async function getProfileContacts(userId) {
 
 export async function updateProfileContacts(userId, values) {
   failIfUnavailable();
-  const { data, error } = await supabase.from('profile_contacts').upsert({ profile_id: userId, ...values }, { onConflict: 'profile_id' }).select().single();
+  const payload = { profile_id: userId, ...values };
+  if (payload.phone) {
+    const { data: phoneUsed, error: phoneCheckError } = await supabase.rpc('phone_is_registered', { p_phone: payload.phone, p_exclude_profile_id: userId });
+    if (phoneCheckError) throw phoneCheckError;
+    if (phoneUsed) throw new Error('PHONE_ALREADY_REGISTERED');
+  }
+  const { data, error } = await supabase.from('profile_contacts').upsert(payload, { onConflict: 'profile_id' }).select().single();
   if (error) throw error;
   return data;
 }
