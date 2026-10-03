@@ -412,8 +412,8 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR MINIWEB IS READY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{hasMiniweb ? 'Choose a plan for your Miniweb' : 'Create your Miniweb'}</strong><p>{hasMiniweb ? 'Unlock more business tools, verification access and growth features.' : 'Build your professional storefront and let buyers find your business.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={hasMiniweb ? () => onNavigate('subscription') : openMiniweb}>{hasMiniweb ? 'Choose a plan' : 'Create Miniweb'} <ArrowRight size={16} /></button>
+      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR MINIWEB IS READY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{hasMiniweb ? 'Choose a plan for your Shop' : 'Create your Shop'}</strong><p>{hasMiniweb ? 'Unlock more business tools, verification access and growth features.' : 'Build your professional shop and let buyers find your business.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={hasMiniweb ? () => onNavigate('subscription') : openMiniweb}>{hasMiniweb ? 'Choose a plan' : 'Create Shop'} <ArrowRight size={16} /></button>
     </div>}
   </section>;
 }
