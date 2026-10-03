@@ -24,6 +24,7 @@ function friendlyAuthError(error) {
   if (message.includes('already') || message.includes('registered') || message.includes('user already')) return 'This email already has an account. Please sign in or use Forgot password.';
   if (message.includes('invalid login') || message.includes('invalid credentials') || message.includes('email or password')) return 'Email or password is not correct. Please try again.';
   if (message.includes('phone_already_registered')) return 'This phone number is already linked to a Bese26 account. Please sign in with it or use another number.';
+  if (message.includes('new password should be different') || message.includes('same password') || message.includes('password should be different')) return 'Sabon password ɗin dole ya bambanta da tsohon password. Zaɓi wani password daban.';
   if (message.includes('rate limit') || message.includes('too many')) return 'Too many attempts. Please wait a little and try again.';
   if (message.includes('confirm')) return 'Please confirm your email before signing in.';
   return error?.message || 'Authentication failed. Please try again.';
