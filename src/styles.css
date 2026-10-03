@@ -10627,3 +10627,36 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
   object-fit: initial !important;
   object-position: center !important;
 }
+
+/* Absolute final campaign frame: every home advert is exactly the hero's 1600:500 footprint. */
+.home-page .home-ad-banner:has(.home-ad-image-only) {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1600 / 500 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
