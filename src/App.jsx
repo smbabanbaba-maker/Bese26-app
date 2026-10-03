@@ -545,6 +545,10 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
   const [chatMenuOpen, setChatMenuOpen] = useState(false);
   const [messageReactions, setMessageReactions] = useState({});
   const [imageViewerUrl, setImageViewerUrl] = useState('');
+  useEffect(() => {
+    document.body.classList.toggle('chat-image-viewer-open', Boolean(imageViewerUrl));
+    return () => document.body.classList.remove('chat-image-viewer-open');
+  }, [imageViewerUrl]);
   const mediaRecorderRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const recordingTimerRef = useRef(null);

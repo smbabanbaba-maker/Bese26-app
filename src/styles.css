@@ -10437,3 +10437,17 @@ body:has(.chat-image-viewer) {
   .chat-image-viewer img { width: 100vw !important; height: 100dvh !important; object-fit: cover !important; }
   .chat-image-viewer-close { top: max(10px, env(safe-area-inset-top)) !important; left: max(10px, env(safe-area-inset-left)) !important; }
 }
+
+
+/* React-controlled image viewer state: remove every app navigation layer behind the photo. */
+body.chat-image-viewer-open .bottom-nav,
+body.chat-image-viewer-open .topbar,
+body.chat-image-viewer-open .site-footer {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+body.chat-image-viewer-open {
+  overflow: hidden !important;
+  background: #000 !important;
+}
