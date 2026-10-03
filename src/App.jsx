@@ -91,7 +91,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, submitUserReport, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -292,7 +292,7 @@ function NotificationsView({ user, onAuthRequired, onBack, onNotice, onNavigate,
   const [items, setItems] = useState([]); const [loading, setLoading] = useState(Boolean(user)); const [expanded, setExpanded] = useState({});
   useEffect(() => { let mounted = true; if (!user) { setLoading(false); return undefined; } fetchNotifications(user.id).then((rows) => { if (mounted) setItems(rows || []); }).catch((error) => mounted && onNotice?.(error.message || 'Could not load notifications.')).finally(() => mounted && setLoading(false)); const unsubscribe = subscribeToNotifications(user.id, (payload) => { if (!mounted || !payload?.new) return; fetchNotifications(user.id).then((rows) => mounted && setItems(rows || [])).catch(() => {}); }); return () => { mounted = false; unsubscribe?.(); }; }, [user, onNotice]);
   const unreadCount = items.filter((item) => !item.read_at).length;
-  const markAllAsRead = async () => { const unread = items.filter((item) => !item.read_at); await Promise.all(unread.map((item) => markNotificationRead(item.id, user.id).catch(() => null))); setItems((current) => current.map((item) => item.read_at ? item : { ...item, read_at: new Date().toISOString() })); };
+  const markAllAsRead = async () => { const unread = items.filter((item) => !item.read_at); const results = await Promise.allSettled(unread.map((item) => markNotificationRead(item.id, user.id))); const updatedIds = new Set(unread.filter((_, index) => results[index].status === 'fulfilled').map((item) => item.id)); if (updatedIds.size) setItems((current) => current.map((item) => updatedIds.has(item.id) ? { ...item, read_at: new Date().toISOString() } : item)); if (updatedIds.size < unread.length) onNotice?.('Some notifications could not be marked as read. Please try again.'); };
   const open = async (item) => {
     if (!item.read_at) {
       try {
@@ -864,7 +864,7 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
     } finally { setBusy(false); }
   };
   const muteConversation = () => { if (!selectedConversation) return; try { window.localStorage.setItem(`bese26:muted-conversation:${selectedConversation.id}`, '1'); } catch { onDemoAction?.('Mute is unavailable in this browser session.'); return; } setChatMenuOpen(false); onDemoAction?.('Conversation muted on this device.'); };
-  const reportConversation = async () => { if (!selectedConversation?.listing_id || !window.confirm('Report this conversation and its listing?')) return; setBusy(true); try { await reportListing({ listingId: selectedConversation.listing_id, reporterId: user.id, reason: 'harassment', details: 'Reported from a private conversation.' }); setChatMenuOpen(false); onDemoAction?.('Report submitted securely.'); } catch (error) { onDemoAction?.(error.message || 'Could not submit the report.'); } finally { setBusy(false); } };
+  const reportConversation = async () => { const reportedUserId = selectedConversation?.buyer_id === user?.id ? selectedConversation?.seller_id : selectedConversation?.buyer_id; if (!selectedConversation?.id || !reportedUserId || reportedUserId === user?.id || !window.confirm(`Report ${personName} for harassment or unsafe conduct? Bese26 will receive the conversation and listing references.`)) return; setBusy(true); try { await submitUserReport(user.id, { target_type: 'user', target_id: reportedUserId, reason: 'harassment', description: `Reported from private conversation ${selectedConversation.id}; listing ${selectedConversation.listing_id || 'not linked'}.` }); setChatMenuOpen(false); onDemoAction?.('User report submitted securely to Bese26 moderation.'); } catch (error) { onDemoAction?.(error.message || 'Could not submit the report.'); } finally { setBusy(false); } };
   const blockConversation = async () => {
     const blockedId = selectedConversation?.buyer_id === user?.id ? selectedConversation?.seller_id : selectedConversation?.buyer_id;
     if (!blockedId || blockedId === user?.id || !window.confirm(`Block ${personName} on Bese26? They will no longer be able to message you.`)) return;
@@ -1305,13 +1305,13 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
       </form>
     </section>
     <SponsoredBanner campaigns={adCampaigns} placement="business_directory" className="business-sponsored-slot" />
-    {error && <div className="auth-status error"><AlertCircle size={15} /> {error}</div>}
+    {error && <div className="auth-status error" role="alert"><AlertCircle size={15} /> {error} <button type="button" className="text-action" onClick={() => loadBusinesses(query)}>Retry</button></div>}
     <section className="directory-results" aria-labelledby="directory-results-title">
       <div className="directory-results-heading">
         <div><span className="directory-section-kicker">CURATED FOR YOU</span><h2 id="directory-results-title">Miniwebs to explore</h2><p>Meet businesses and stores from around your community.</p></div>
         {!loading && <span className="directory-results-count"><strong>{businesses.length}</strong> {businesses.length === 1 ? 'business' : 'businesses'}</span>}
       </div>
-      {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : businesses.length ? <div className="directory-business-grid">{businesses.map((business) => {
+      {loading ? <BrandLoader message="Loading public miniwebs…" compact /> : error ? null : businesses.length ? <div className="directory-business-grid">{businesses.map((business) => {
         const name = business.business_name || 'Bese26 business';
         const handle = business.business_handle;
         const logoUrl = getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path));
@@ -1439,11 +1439,10 @@ function AppContent() {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
-    const unsubscribeNotifications = subscribeToNotifications(sessionUser.id, (payload) => { if (mounted && payload?.new && !payload.new.read_at) setUnreadNotifications((count) => count + 1); });
     if (isSupabaseConfigured) getBusinessProfile(sessionUser.id).then((profile) => mounted && setBusinessOwnerProfile(profile)).catch(() => mounted && setBusinessOwnerProfile(null));
     const unsubscribe = subscribeToNotifications(sessionUser.id, (payload) => {
       if (!mounted || !payload?.new) return;
-      setUnreadNotifications((count) => count + 1);
+      if (!payload.new.read_at) setUnreadNotifications((count) => count + 1);
       const title = payload.new.title || 'New Bese26 notification';
       showToast(title);
     });

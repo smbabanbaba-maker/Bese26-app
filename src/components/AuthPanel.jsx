@@ -82,7 +82,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
     <main className="auth-reference-screen">
       <BrandHeader />
       <section className="auth-reference-heading"><h1 id="auth-title">{title}</h1><p>{mode === 'signin' ? 'Sign in to continue to Bese26.' : mode === 'signup' ? <>Join Bese26 and start buying, selling<br />and connecting across Nigeria.</> : <>Enter your email to receive a secure<br />password reset link.</>}</p></section>
-      {status.message && <div className={`auth-reference-status ${status.type}`}><span>{status.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}</span>{status.message}</div>}
+      {status.message && <div className={`auth-reference-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}><span>{status.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}</span>{status.message}</div>}
       {mode === 'signin' && <>
         <form className="auth-reference-form" onSubmit={submit}>
           <Field icon={UserRound}><input type="text" inputMode="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Phone number or Email" autoComplete="username" required /></Field>
@@ -94,7 +94,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
         <MarketArt />
       </>}
       {mode === 'signup' && <>
-        {registrationSent ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><Mail size={25} /></div><h2>Check your email</h2><p>We sent a confirmation link to <strong>{form.email}</strong>.</p><button type="button" className="auth-reference-primary" onClick={() => { window.location.href = 'mailto:'; }}><span>Go to email</span><ArrowRight size={23} /></button><button type="button" className="auth-reference-forgot" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend email'}</button></div> : <form className="auth-reference-form auth-reference-signup-form" onSubmit={submit}>
+        {registrationSent ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><Mail size={25} /></div><h2>Check your email</h2><p>We sent a confirmation link to <strong>{form.email}</strong>.</p><p>Open your email app and check your inbox or spam folder for the confirmation link.</p><button type="button" className="auth-reference-forgot" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend email'}</button></div> : <form className="auth-reference-form auth-reference-signup-form" onSubmit={submit}>
           <Field icon={UserRound}><input type="text" value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Full Name" autoComplete="name" required /></Field>
           <Field icon={Phone}><input type="tel" value={form.phone} onChange={(event) => update('phone', event.target.value)} placeholder="Phone Number" autoComplete="tel" required /><span className="auth-reference-prefix">🇳🇬 +234</span></Field>
           <Field icon={Mail}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Email Address" autoComplete="email" required /></Field>
@@ -107,7 +107,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
       </>}
       {mode === 'reset' && <>
         <div className="auth-reference-reset-art"><LockKeyhole size={53} /><span>••••</span></div>
-        <form className="auth-reference-form" onSubmit={resetPassword}><Field icon={UserRound}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Phone number or Email" autoComplete="email" required /></Field><button type="submit" className="auth-reference-primary" disabled={resetting}><span>{resetting ? 'Sending…' : 'Send Reset Link'}</span><ArrowRight size={23} /></button></form>
+        <form className="auth-reference-form" onSubmit={resetPassword}><Field icon={UserRound}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Email address" autoComplete="email" required /></Field><button type="submit" className="auth-reference-primary" disabled={resetting}><span>{resetting ? 'Sending…' : 'Send Reset Link'}</span><ArrowRight size={23} /></button></form>
         <div className="auth-reference-security"><ShieldCheck size={22} /><div><strong>Secure password recovery</strong><p>We'll send a secure link to reset your password.</p></div></div><div className="auth-reference-switch">Remember your password? <button type="button" onClick={() => switchMode('signin')}>Sign In</button></div>
       </>}
     </main>

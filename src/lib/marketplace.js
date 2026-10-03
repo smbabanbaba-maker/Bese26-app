@@ -1115,7 +1115,7 @@ export async function fetchBusinessDirectory(search = '') {
     verifiedProfiles = new Set((profiles || []).filter((profile) => verificationIsCurrent(profile)).map((profile) => profile.id));
   }
   return businesses.map((business) => {
-    const cacVerified = verificationIsCurrent(business) || String(business.verification_status || '').toLowerCase() === 'verified';
+    const cacVerified = verificationIsCurrent(business);
     const idVerified = verifiedProfiles.has(business.profile_id);
     return {
       ...business,
