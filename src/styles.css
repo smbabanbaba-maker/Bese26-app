@@ -11077,3 +11077,7 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 .profile-skeleton-line.narrow { width: min(38%, 140px); }
 @keyframes profileLoadingSweep { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .profile-loading-note::after, .profile-skeleton-state, .profile-skeleton-orb { animation: none; } }
+
+.inline-loading-pulse { display: inline-block; width: 34px; height: 7px; vertical-align: middle; border-radius: 999px; background: linear-gradient(90deg, rgba(255,44,44,.12), rgba(255,44,44,.46), rgba(255,44,44,.12)); background-size: 220% 100%; animation: profileLoadingSweep 1.25s ease-in-out infinite; }
+.listing-review-comments-state, .listing-new-no-reviews, .listing-comments-empty { display: grid; place-items: center; min-height: 42px; }
+@media (prefers-reduced-motion: reduce) { .inline-loading-pulse { animation: none; } }
