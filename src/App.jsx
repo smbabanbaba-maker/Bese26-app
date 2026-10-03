@@ -410,19 +410,11 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
   const openMiniweb = () => onOpenProfilePage?.('business');
   return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
-    <div className="dashboard-profile-identity">
-      <div className="dashboard-profile-avatar">{profile?.avatar_path ? <img src={getAvatarUrl(profile.avatar_path)} alt="" /> : <span>{name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</span>}</div>
-      <div className="dashboard-profile-main">
-        <div className="eyebrow">YOUR PROFILE</div>
-        {loading ? <div className="dashboard-profile-loading"><span /> Loading your saved details…</div> : <><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={15} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span></div></>}
-      </div>
-    </div>
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
       <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR MINIWEB IS READY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{hasMiniweb ? 'Choose a plan for your Miniweb' : 'Create your Miniweb'}</strong><p>{hasMiniweb ? 'Unlock more business tools, verification access and growth features.' : 'Build your professional storefront and let buyers find your business.'}</p></div>
       <button type="button" className="dashboard-miniweb-button" onClick={hasMiniweb ? () => onNavigate('subscription') : openMiniweb}>{hasMiniweb ? 'Choose a plan' : 'Create Miniweb'} <ArrowRight size={16} /></button>
     </div>}
-    <button type="button" className="dashboard-profile-action" onClick={() => onNavigate('profile')}>View profile <ArrowRight size={15} /></button>
   </section>;
 }
 function MailIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">@</span>; }
