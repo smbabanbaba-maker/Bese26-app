@@ -66,7 +66,13 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
       if (form.password !== form.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match.' }); return; }
       setLoading(true); setLoadingLabel('Updating your password…');
       try { await updatePassword(form.password); setPasswordUpdated(true); setStatus({ type: 'success', message: 'Your password has been updated securely.' }); setForm((current) => ({ ...current, password: '', confirmPassword: '' })); }
-      catch (error) { setStatus({ type: 'error', message: friendlyAuthError(error) }); }
+      catch (error) {
+        const message = String(error?.message || '').toLowerCase();
+        if (message.includes('new password should be different') || message.includes('same password') || message.includes('password should be different')) {
+          setPasswordUpdated(true);
+          setStatus({ type: 'success', message: 'Wannan shi ne password ɗinka na yanzu. Za ka iya ci gaba da shiga da shi.' });
+        } else setStatus({ type: 'error', message: friendlyAuthError(error) });
+      }
       finally { setLoading(false); }
       return;
     }
@@ -122,7 +128,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
         <div className="auth-reference-security"><ShieldCheck size={22} /><div><strong>Secure password recovery</strong><p>We'll send a secure link to reset your password.</p></div></div><div className="auth-reference-switch">Remember your password? <button type="button" onClick={() => switchMode('signin')}>Sign In</button></div>
       </>}
       {mode === 'recovery' && <>
-        {passwordUpdated ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><CheckCircle2 size={25} /></div><h2>Password updated</h2><p>Your new password is ready. You can now sign in securely.</p><button type="button" className="auth-reference-primary" onClick={() => switchMode('signin')}><span>Continue to Sign In</span><ArrowRight size={23} /></button></div> : <form className="auth-reference-form" onSubmit={submit}><PasswordField id="recoveryPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="New password" visible={visiblePasswords.register} validationState={passwordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, register: !v.register }))} /><PasswordField id="recoveryConfirmPassword" value={form.confirmPassword} onChange={(event) => update('confirmPassword', event.target.value)} placeholder="Confirm new password" visible={visiblePasswords.confirm} validationState={confirmPasswordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, confirm: !v.confirm }))} /><button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Updating…' : 'Update password'}</span><ArrowRight size={23} /></button></form>}
+        {passwordUpdated ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><CheckCircle2 size={25} /></div><h2>Password ready</h2><p>{status.message || 'Your password is ready. You can continue to Bese26.'}</p><button type="button" className="auth-reference-primary" onClick={onClose}><span>Continue to Bese26</span><ArrowRight size={23} /></button></div> : <form className="auth-reference-form" onSubmit={submit}><PasswordField id="recoveryPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="New password" visible={visiblePasswords.register} validationState={passwordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, register: !v.register }))} /><PasswordField id="recoveryConfirmPassword" value={form.confirmPassword} onChange={(event) => update('confirmPassword', event.target.value)} placeholder="Confirm new password" visible={visiblePasswords.confirm} validationState={confirmPasswordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, confirm: !v.confirm }))} /><button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Updating…' : 'Update password'}</span><ArrowRight size={23} /></button></form>}
         <div className="auth-reference-security"><ShieldCheck size={22} /><div><strong>Secure password recovery</strong><p>Use at least 6 characters and do not share your password.</p></div></div>
       </>}
     </main>
