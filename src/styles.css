@@ -10570,3 +10570,33 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
     object-fit:initial !important;
   }
 }
+
+/* Final home advertiser frame: match the home hero footprint without cropping artwork. */
+.home-ad-banner:has(.home-ad-image-only) {
+  aspect-ratio: 1600 / 500 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.home-ad-banner:has(.home-ad-image-only) .home-ad-image-only,
+.home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center !important;
+}
+.home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+}
+.home-ad-banner:has(.home-ad-image-only) .home-ad-dots { z-index: 3 !important; }
+@media (max-width: 700px) {
+  .home-ad-banner:has(.home-ad-image-only) { aspect-ratio: 1600 / 500 !important; min-height: 0 !important; }
+}
