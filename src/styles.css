@@ -11066,3 +11066,14 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @keyframes adminLoadingSpin { to { transform: rotate(360deg); } }
 @keyframes adminLoadingSweep { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .admin-loading-state, .admin-loading-orb { animation: none; } }
+
+/* Profile and subpage loading: animation only, with accessible status labels for screen readers. */
+.profile-loading-note { justify-content: center; min-height: 44px; font-size: 0; }
+.profile-loading-note::after { content: ''; width: 92px; height: 7px; border-radius: 999px; background: linear-gradient(90deg, rgba(255,44,44,.12), rgba(255,44,44,.42), rgba(255,44,44,.12)); background-size: 220% 100%; animation: profileLoadingSweep 1.35s ease-in-out infinite; }
+.profile-skeleton-state { display: grid; justify-items: center; gap: 11px; min-height: 128px; padding: 24px 18px; border: 1px solid var(--line, #e7e4df); border-radius: 16px; background: linear-gradient(110deg, #fbfaf9, #fff, #fbfaf9); background-size: 220% 100%; animation: profileLoadingSweep 1.5s ease-in-out infinite; }
+.profile-skeleton-orb { width: 25px; height: 25px; border: 3px solid rgba(255,44,44,.16); border-top-color: var(--red, #ff2c2c); border-radius: 50%; animation: bese26LoaderSpin .85s linear infinite; }
+.profile-skeleton-line { height: 8px; border-radius: 999px; background: rgba(152,162,179,.2); }
+.profile-skeleton-line.wide { width: min(72%, 260px); }
+.profile-skeleton-line.narrow { width: min(38%, 140px); }
+@keyframes profileLoadingSweep { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .profile-loading-note::after, .profile-skeleton-state, .profile-skeleton-orb { animation: none; } }
