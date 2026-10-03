@@ -10600,3 +10600,30 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
 @media (max-width: 700px) {
   .home-ad-banner:has(.home-ad-image-only) { aspect-ratio: 1600 / 500 !important; min-height: 0 !important; }
 }
+
+/* Render the campaign artwork in normal flow: this prevents an empty zero-height frame. */
+.home-page .home-ad-banner:has(.home-ad-image-only) {
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  object-fit: initial !important;
+  object-position: center !important;
+}
