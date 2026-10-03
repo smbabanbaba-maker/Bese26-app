@@ -1555,6 +1555,11 @@ function AppContent() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setSessionUser(session?.user || null);
+      if (event === 'PASSWORD_RECOVERY') {
+        setAuthInitialMode('recovery');
+        setAuthReason('Choose a new password for your Bese26 account.');
+        setShowAuth(true);
+      }
       if (event === 'SIGNED_IN' && session?.user) {
         loadBackend();
         fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});

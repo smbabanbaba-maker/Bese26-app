@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff, LockKeyhole, LoaderCircle, Mail, Phone, ShieldCheck, UserRound, X } from 'lucide-react';
-import { requestPasswordReset, resendSignupConfirmation, signIn, signUp } from '../lib/marketplace';
+import { requestPasswordReset, resendSignupConfirmation, signIn, signUp, updatePassword } from '../lib/marketplace';
 
 function BrandHeader() {
   return <div className="auth-reference-brand"><div className="auth-reference-logo"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div><div className="auth-reference-name">Bese<span>26</span></div><div className="auth-reference-tagline">BUY · SELL · CONNECT</div></div>;
@@ -40,7 +40,7 @@ function MarketArt({ register = false }) {
 }
 
 export default function AuthPanel({ onClose, onAuthenticated, reason = '', initialMode = 'signin' }) {
-  const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'signin');
+  const [mode, setMode] = useState(['signup', 'recovery'].includes(initialMode) ? initialMode : 'signin');
   const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', displayName: '', username: '', phone: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(false);
@@ -52,13 +52,23 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState(0);
   const [visiblePasswords, setVisiblePasswords] = useState({ login: false, register: false, confirm: false });
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-  const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setRegistrationSent(false); };
+  const switchMode = (nextMode) => { setMode(nextMode); setStatus({ type: '', message: '' }); setRegistrationSent(false); setPasswordUpdated(false); };
   const passwordValidation = form.password ? (form.password.length >= 6 ? 'valid' : 'invalid') : '';
   const confirmPasswordValidation = form.confirmPassword ? (form.confirmPassword === form.password && form.password.length >= 6 ? 'valid' : 'invalid') : '';
   const submit = async (event) => {
     event.preventDefault(); setStatus({ type: '', message: '' });
     if (mode === 'reset') return;
+    if (mode === 'recovery') {
+      if (form.password.length < 6) { setStatus({ type: 'error', message: 'Use a password with at least 6 characters.' }); return; }
+      if (form.password !== form.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match.' }); return; }
+      setLoading(true); setLoadingLabel('Updating your password…');
+      try { await updatePassword(form.password); setPasswordUpdated(true); setStatus({ type: 'success', message: 'Your password has been updated securely.' }); setForm((current) => ({ ...current, password: '', confirmPassword: '' })); }
+      catch (error) { setStatus({ type: 'error', message: friendlyAuthError(error) }); }
+      finally { setLoading(false); }
+      return;
+    }
     if (mode === 'signin' && lockedUntil > Date.now()) { setStatus({ type: 'error', message: 'Too many attempts. Please wait 30 seconds and try again.' }); return; }
     if (mode === 'signin' && !isEmail(form.email) && !isNigerianPhone(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address or Nigerian phone number.' }); return; }
     if (mode !== 'signin' && !isEmail(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address.' }); return; }
@@ -74,14 +84,14 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   };
   const resetPassword = async (event) => { event?.preventDefault(); setStatus({ type: '', message: '' }); if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email first.' }); return; } setResetting(true); try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset instructions sent. Check your email.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send reset instructions.' }); } finally { setResetting(false); } };
   const resendConfirmation = async () => { setStatus({ type: '', message: '' }); setResendingConfirmation(true); try { await resendSignupConfirmation(form.email); setStatus({ type: 'success', message: 'Confirmation email sent again. Check your inbox.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the confirmation email.' }); } finally { setResendingConfirmation(false); } };
-  const title = mode === 'signin' ? <>Welcome <em>back</em></> : mode === 'signup' ? <>Create your <em>account</em></> : <>Reset your <em>password</em></>;
+  const title = mode === 'signin' ? <>Welcome <em>back</em></> : mode === 'signup' ? <>Create your <em>account</em></> : mode === 'recovery' ? <>Choose a new <em>password</em></> : <>Reset your <em>password</em></>;
   return <div className="auth-reference-backdrop" onClick={onClose}><section className={`auth-reference-app auth-reference-${mode}`} onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
     <button type="button" className="auth-reference-close" onClick={onClose} aria-label="Close authentication"><X size={20} /></button>
     {mode !== 'signin' && <button type="button" className="auth-reference-back" onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signin')} aria-label="Back to sign in"><ArrowLeft size={23} /></button>}
     {loading && <AuthLoading label={loadingLabel} />}
     <main className="auth-reference-screen">
       <BrandHeader />
-      <section className="auth-reference-heading"><h1 id="auth-title">{title}</h1><p>{mode === 'signin' ? 'Sign in to continue to Bese26.' : mode === 'signup' ? <>Join Bese26 and start buying, selling<br />and connecting across Nigeria.</> : <>Enter your email to receive a secure<br />password reset link.</>}</p></section>
+      <section className="auth-reference-heading"><h1 id="auth-title">{title}</h1><p>{mode === 'signin' ? 'Sign in to continue to Bese26.' : mode === 'signup' ? <>Join Bese26 and start buying, selling<br />and connecting across Nigeria.</> : mode === 'recovery' ? 'Create a new password for your Bese26 account.' : <>Enter your email to receive a secure<br />password reset link.</>}</p></section>
       {status.message && <div className={`auth-reference-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}><span>{status.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}</span>{status.message}</div>}
       {mode === 'signin' && <>
         <form className="auth-reference-form" onSubmit={submit}>
@@ -109,6 +119,10 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
         <div className="auth-reference-reset-art"><LockKeyhole size={53} /><span>••••</span></div>
         <form className="auth-reference-form" onSubmit={resetPassword}><Field icon={UserRound}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Email address" autoComplete="email" required /></Field><button type="submit" className="auth-reference-primary" disabled={resetting}><span>{resetting ? 'Sending…' : 'Send Reset Link'}</span><ArrowRight size={23} /></button></form>
         <div className="auth-reference-security"><ShieldCheck size={22} /><div><strong>Secure password recovery</strong><p>We'll send a secure link to reset your password.</p></div></div><div className="auth-reference-switch">Remember your password? <button type="button" onClick={() => switchMode('signin')}>Sign In</button></div>
+      </>}
+      {mode === 'recovery' && <>
+        {passwordUpdated ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><CheckCircle2 size={25} /></div><h2>Password updated</h2><p>Your new password is ready. You can now sign in securely.</p><button type="button" className="auth-reference-primary" onClick={() => switchMode('signin')}><span>Continue to Sign In</span><ArrowRight size={23} /></button></div> : <form className="auth-reference-form" onSubmit={submit}><PasswordField id="recoveryPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="New password" visible={visiblePasswords.register} validationState={passwordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, register: !v.register }))} /><PasswordField id="recoveryConfirmPassword" value={form.confirmPassword} onChange={(event) => update('confirmPassword', event.target.value)} placeholder="Confirm new password" visible={visiblePasswords.confirm} validationState={confirmPasswordValidation} onToggle={() => setVisiblePasswords((v) => ({ ...v, confirm: !v.confirm }))} /><button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Updating…' : 'Update password'}</span><ArrowRight size={23} /></button></form>}
+        <div className="auth-reference-security"><ShieldCheck size={22} /><div><strong>Secure password recovery</strong><p>Use at least 6 characters and do not share your password.</p></div></div>
       </>}
     </main>
   </section></div>;
