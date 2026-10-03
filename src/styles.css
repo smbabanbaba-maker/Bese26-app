@@ -11043,3 +11043,26 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
   .admin-more-button { min-height: 42px; }
 }
 .admin-user-list-rows { display: grid; gap: 10px; }
+
+/* Premium dashboard loading state: motion communicates progress without a plain text placeholder. */
+.admin-loading-state {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 92px;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  border-radius: 16px;
+  background: linear-gradient(110deg, rgba(248,250,252,.92), rgba(255,255,255,.98), rgba(248,250,252,.92));
+  background-size: 220% 100%;
+  animation: adminLoadingSweep 1.6s ease-in-out infinite;
+}
+.admin-loading-orb { width: 24px; height: 24px; flex: none; border: 3px solid rgba(180,35,47,.18); border-top-color: #b4232f; border-right-color: #e15461; border-radius: 50%; animation: adminLoadingSpin .8s linear infinite; }
+.admin-loading-copy { display: grid; gap: 8px; min-width: 0; flex: 1; }
+.admin-loading-copy strong { color: #344054; font-size: 13px; }
+.admin-loading-line { display: block; height: 8px; border-radius: 999px; background: rgba(152,162,179,.2); }
+.admin-loading-line.long { width: min(78%, 320px); }
+.admin-loading-line.short { width: min(42%, 170px); }
+@keyframes adminLoadingSpin { to { transform: rotate(360deg); } }
+@keyframes adminLoadingSweep { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .admin-loading-state, .admin-loading-orb { animation: none; } }
