@@ -10451,3 +10451,70 @@ body.chat-image-viewer-open {
   overflow: hidden !important;
   background: #000 !important;
 }
+
+
+/* Jiji-style chat photo viewer: no app chrome, no white panel, one clean image canvas. */
+.chat-image-viewer {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+.chat-image-viewer > img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100vw !important;
+  max-height: 100dvh !important;
+  object-fit: contain !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.chat-image-viewer-close {
+  top: max(14px, env(safe-area-inset-top)) !important;
+  left: max(14px, env(safe-area-inset-left)) !important;
+  right: auto !important;
+  width: 42px !important;
+  height: 42px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.chat-image-viewer-count {
+  position: absolute !important;
+  z-index: 2 !important;
+  top: max(19px, env(safe-area-inset-top)) !important;
+  left: 90px !important;
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  line-height: 32px !important;
+}
+.chat-image-viewer-thumb {
+  position: absolute !important;
+  z-index: 2 !important;
+  left: 10px !important;
+  bottom: max(18px, env(safe-area-inset-bottom)) !important;
+  width: 74px !important;
+  height: 74px !important;
+  padding: 2px !important;
+  border: 2px solid #fff !important;
+  border-radius: 2px !important;
+  background: #111 !important;
+  overflow: hidden !important;
+}
+.chat-image-viewer-thumb img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+body.chat-image-viewer-open .bottom-nav,
+body.chat-image-viewer-open .topbar,
+body.chat-image-viewer-open .site-footer { display: none !important; }
