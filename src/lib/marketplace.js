@@ -162,7 +162,7 @@ export async function requestPasswordReset(email) {
   failIfUnavailable();
   const value = String(email || '').trim();
   if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: getAuthRedirectUrl() });
+  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: SITE_URL });
   if (error) throw error;
 }
 export async function signInWithGoogle() {
