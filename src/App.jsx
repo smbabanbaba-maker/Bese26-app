@@ -89,7 +89,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, updateChatMeeting, updateChatOffer, updateListing, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -386,6 +386,35 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
+function DashboardProfileSnapshot({ user, onNavigate }) {
+  const [profile, setProfile] = useState(null);
+  const [contacts, setContacts] = useState(null);
+  const [loading, setLoading] = useState(Boolean(user));
+  useEffect(() => {
+    let mounted = true;
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setLoading(false); return undefined; }
+    setLoading(true);
+    Promise.all([getProfile(user.id), getProfileContacts(user.id)])
+      .then(([nextProfile, nextContacts]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); } })
+      .catch(() => { if (mounted) { setProfile(null); setContacts(null); } })
+      .finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, [user?.id]);
+  if (!user) return null;
+  const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
+  const username = profile?.username ? `@${profile.username}` : '@member';
+  const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
+  return <section className="dashboard-profile-snapshot" aria-label="Your profile details">
+    <div className="dashboard-profile-avatar">{profile?.avatar_path ? <img src={getAvatarUrl(profile.avatar_path)} alt="" /> : <span>{name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</span>}</div>
+    <div className="dashboard-profile-main">
+      <div className="eyebrow">YOUR PROFILE</div>
+      {loading ? <div className="dashboard-profile-loading"><span /> Loading your saved details…</div> : <><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={15} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span></div></>}
+    </div>
+    <button type="button" className="dashboard-profile-action" onClick={() => onNavigate('profile')}>View profile <ArrowRight size={15} /></button>
+  </section>;
+}
+function MailIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">@</span>; }
+function PhoneIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">+234</span>; }
 function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   const campaign = campaigns.find((item) => item.placement === placement && item.image_url);
   if (!campaign) return null;
@@ -431,6 +460,7 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
         <div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.key || `${slide.eyebrow}-${index}`} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div>
       </section>}
 
+      {user && <DashboardProfileSnapshot user={user} onNavigate={onNavigate} />}
       <section className="search-section">
         <div className="search-box home-search" role="search">
           <Search size={18} />
