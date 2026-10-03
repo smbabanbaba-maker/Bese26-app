@@ -23,6 +23,7 @@ function friendlyAuthError(error) {
   const message = String(error?.message || '').toLowerCase();
   if (message.includes('already') || message.includes('registered') || message.includes('user already')) return 'This email already has an account. Please sign in or use Forgot password.';
   if (message.includes('invalid login') || message.includes('invalid credentials') || message.includes('email or password')) return 'Email or password is not correct. Please try again.';
+  if (message.includes('phone_already_registered')) return 'This phone number is already linked to a Bese26 account. Please sign in with it or use another number.';
   if (message.includes('rate limit') || message.includes('too many')) return 'Too many attempts. Please wait a little and try again.';
   if (message.includes('confirm')) return 'Please confirm your email before signing in.';
   return error?.message || 'Authentication failed. Please try again.';
@@ -59,14 +60,15 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
     event.preventDefault(); setStatus({ type: '', message: '' });
     if (mode === 'reset') return;
     if (mode === 'signin' && lockedUntil > Date.now()) { setStatus({ type: 'error', message: 'Too many attempts. Please wait 30 seconds and try again.' }); return; }
-    if (!isEmail(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address.' }); return; }
+    if (mode === 'signin' && !isEmail(form.email) && !isNigerianPhone(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address or Nigerian phone number.' }); return; }
+    if (mode !== 'signin' && !isEmail(form.email)) { setStatus({ type: 'error', message: 'Enter a valid email address.' }); return; }
     if (form.password.length < 6) { setStatus({ type: 'error', message: 'Use a password with at least 6 characters.' }); return; }
     if (mode === 'signup' && !isNigerianPhone(form.phone)) { setStatus({ type: 'error', message: 'Enter a valid Nigerian phone number, for example 08012345678.' }); return; }
     if (mode === 'signup' && form.password !== form.confirmPassword) { setStatus({ type: 'error', message: 'Passwords do not match.' }); return; }
     if (mode === 'signup' && !termsAccepted) { setStatus({ type: 'error', message: 'Please agree to the Terms of Service and Privacy Policy.' }); return; }
     setLoading(true); setLoadingLabel(mode === 'signin' ? 'Signing you in…' : 'Creating your account…');
     try {
-      const data = mode === 'signin' ? await signIn({ email: form.email.trim().toLowerCase(), password: form.password }) : await signUp({ email: form.email.trim().toLowerCase(), password: form.password, displayName: form.displayName, username: form.username, phone: normalizeNigerianPhone(form.phone) });
+      const data = mode === 'signin' ? await signIn({ identifier: form.email.trim(), password: form.password }) : await signUp({ email: form.email.trim().toLowerCase(), password: form.password, displayName: form.displayName, username: form.username, phone: normalizeNigerianPhone(form.phone) });
       if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
     } catch (error) { if (mode === 'signin') { const nextAttempts = loginAttempts + 1; setLoginAttempts(nextAttempts); if (nextAttempts >= 5) setLockedUntil(Date.now() + 30000); } setStatus({ type: 'error', message: friendlyAuthError(error) }); } finally { setLoading(false); }
   };
@@ -83,7 +85,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
       {status.message && <div className={`auth-reference-status ${status.type}`}><span>{status.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}</span>{status.message}</div>}
       {mode === 'signin' && <>
         <form className="auth-reference-form" onSubmit={submit}>
-          <Field icon={UserRound}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Phone number or Email" autoComplete="email" required /></Field>
+          <Field icon={UserRound}><input type="text" inputMode="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Phone number or Email" autoComplete="username" required /></Field>
           <PasswordField id="loginPassword" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="Password" visible={visiblePasswords.login} onToggle={() => setVisiblePasswords((v) => ({ ...v, login: !v.login }))} />
           <button type="button" className="auth-reference-forgot" onClick={() => switchMode('reset')}>Forgot password?</button>
           <button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Signing in…' : 'Sign In'}</span><ArrowRight size={23} /></button>

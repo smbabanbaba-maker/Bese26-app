@@ -114,9 +114,18 @@ export async function resendSignupConfirmation(email) {
   if (error) throw error;
 }
 
-export async function signIn({ email, password }) {
+export async function signIn({ identifier, email, password }) {
   failIfUnavailable();
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const value = String(identifier ?? email ?? '').trim();
+  if (!value) throw new Error('Enter your email or phone number.');
+  let loginEmail = value.toLowerCase();
+  if (!loginEmail.includes('@')) {
+    const { data: resolvedEmail, error: resolveError } = await supabase.rpc('resolve_login_email', { p_identifier: value });
+    if (resolveError) throw resolveError;
+    if (!resolvedEmail) throw new Error('Invalid login credentials.');
+    loginEmail = String(resolvedEmail).toLowerCase();
+  }
+  const { data, error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
   if (error) throw error;
   return data;
 }
