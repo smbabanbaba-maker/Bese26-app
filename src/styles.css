@@ -10518,3 +10518,34 @@ body.chat-image-viewer-open {
 body.chat-image-viewer-open .bottom-nav,
 body.chat-image-viewer-open .topbar,
 body.chat-image-viewer-open .site-footer { display: none !important; }
+/* Responsive sponsored artwork: preserve the uploaded banner's complete composition. */
+.home-page .home-ad-banner:has(.home-ad-image-only) {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  display: block !important;
+  overflow: visible !important;
+}
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: initial !important;
+  object-position: center !important;
+}
+@media (max-width: 700px) {
+  .home-page .home-ad-banner:has(.home-ad-image-only) { border-radius: 16px !important; }
+}
