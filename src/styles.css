@@ -11042,3 +11042,4 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @media (max-width: 640px) {
   .admin-more-button { min-height: 42px; }
 }
+.admin-user-list-rows { display: grid; gap: 10px; }
