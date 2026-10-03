@@ -94,6 +94,11 @@ export async function getCurrentSession() {
 
 export async function signUp({ email, password, displayName, username, phone }) {
   failIfUnavailable();
+  if (phone) {
+    const { data: phoneUsed, error: phoneCheckError } = await supabase.rpc('phone_is_registered', { p_phone: phone });
+    if (phoneCheckError) throw phoneCheckError;
+    if (phoneUsed) throw new Error('PHONE_ALREADY_REGISTERED');
+  }
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
