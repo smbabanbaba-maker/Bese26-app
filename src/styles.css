@@ -11020,3 +11020,25 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @keyframes hausaHintBlink { 0%, 100% { opacity: .38; transform: translateX(0); } 50% { opacity: 1; transform: translateX(2px); } }
 @media (max-width: 640px) { .dashboard-profile-snapshot .dashboard-miniweb-hint { display: none; } }
 @media (prefers-reduced-motion: reduce) { .dashboard-profile-snapshot .dashboard-miniweb-hint { animation: none; } }
+
+/* Keep long admin histories compact until the owner asks to see the rest. */
+.admin-more-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(15, 23, 42, .12);
+  border-radius: 12px;
+  background: rgba(248, 250, 252, .92);
+  color: #b4232f;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-more-button:hover { background: #fff1f2; }
+.admin-team-list { display: grid; gap: 10px; }
+@media (max-width: 640px) {
+  .admin-more-button { min-height: 42px; }
+}
