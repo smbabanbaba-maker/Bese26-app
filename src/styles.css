@@ -10660,3 +10660,11 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
   object-fit: contain !important;
   object-position: center !important;
 }
+
+/* Fill the locked hero frame edge-to-edge; never increase its height. */
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
