@@ -10981,3 +10981,19 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
   .dashboard-profile-snapshot .dashboard-miniweb-copy p { line-height: 1.3; }
   .dashboard-profile-snapshot .dashboard-miniweb-button { min-height: 34px; margin-top: 3px; }
 }
+/* Premium attention motion for the compact Miniweb CTA. */
+.dashboard-profile-snapshot .dashboard-miniweb-action { position: relative; overflow: hidden; animation: miniwebCardLift 5s ease-in-out infinite; }
+.dashboard-profile-snapshot .dashboard-miniweb-action::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 32%, rgba(255,255,255,.62) 48%, transparent 64%); transform: translateX(-115%); animation: miniwebCardShimmer 6s ease-in-out infinite; }
+.dashboard-profile-snapshot .dashboard-miniweb-icon { position: relative; z-index: 1; animation: miniwebIconPulse 2.8s ease-in-out infinite; }
+.dashboard-profile-snapshot .dashboard-miniweb-button { position: relative; z-index: 1; animation: miniwebButtonNudge 3.8s ease-in-out infinite; }
+@keyframes miniwebCardLift { 0%, 100% { transform: translateY(0); box-shadow: 0 8px 20px rgba(215,25,32,.06); } 50% { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(215,25,32,.12); } }
+@keyframes miniwebCardShimmer { 0%, 55%, 100% { transform: translateX(-115%); } 72% { transform: translateX(115%); } }
+@keyframes miniwebIconPulse { 0%, 100% { transform: scale(1); box-shadow: 0 7px 15px rgba(215,25,32,.12); } 50% { transform: scale(1.06); box-shadow: 0 9px 20px rgba(215,25,32,.24); } }
+@keyframes miniwebButtonNudge { 0%, 72%, 100% { transform: translateX(0); } 78% { transform: translateX(3px); } 84% { transform: translateX(0); } }
+.dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-action { animation-name: miniwebCardLiftGreen; }
+.dashboard-profile-snapshot.has-miniweb .dashboard-miniweb-icon { animation-name: miniwebIconPulseGreen; }
+@keyframes miniwebCardLiftGreen { 0%, 100% { transform: translateY(0); box-shadow: 0 8px 20px rgba(15,138,91,.06); } 50% { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,138,91,.14); } }
+@keyframes miniwebIconPulseGreen { 0%, 100% { transform: scale(1); box-shadow: 0 7px 15px rgba(15,138,91,.12); } 50% { transform: scale(1.06); box-shadow: 0 9px 20px rgba(15,138,91,.24); } }
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-profile-snapshot .dashboard-miniweb-action, .dashboard-profile-snapshot .dashboard-miniweb-action::after, .dashboard-profile-snapshot .dashboard-miniweb-icon, .dashboard-profile-snapshot .dashboard-miniweb-button { animation: none; }
+}
