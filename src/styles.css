@@ -10275,3 +10275,37 @@ body:has(.chat-image-viewer) {
   }
   .chat-image-viewer-close { z-index: 2; width: 46px; height: 46px; }
 }
+
+/* Final mobile navigation layout: five primary actions on row one, Shop/Profile on row two. */
+@media (max-width: 640px) {
+  .app-shell { padding-bottom: 154px !important; }
+  .bottom-nav {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(54px, auto)) !important;
+    align-items: start !important;
+    justify-content: initial !important;
+    min-height: 132px !important;
+    padding: 9px 8px calc(12px + env(safe-area-inset-bottom)) !important;
+    gap: 2px 3px !important;
+  }
+  .bottom-nav button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 54px !important;
+    padding: 3px 1px 0 !important;
+    gap: 4px !important;
+    font-size: 9px !important;
+  }
+  .bottom-nav button:nth-child(6) { grid-column: 1; grid-row: 2; }
+  .bottom-nav button:nth-child(7) { grid-column: 2; grid-row: 2; }
+  .bottom-nav .nav-icon { width: 30px !important; height: 29px !important; }
+  .bottom-nav .nav-icon svg { width: 23px !important; height: 23px !important; }
+  .bottom-nav .sell-nav .nav-icon { width: 38px !important; height: 38px !important; margin-top: -2px !important; }
+  .bottom-nav button span:last-child { display: block !important; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px !important; letter-spacing: -.02em !important; }
+}
+@media (max-width: 380px) {
+  .app-shell { padding-bottom: 148px !important; }
+  .bottom-nav { min-height: 128px !important; padding-inline: 5px !important; }
+  .bottom-nav button span:last-child { font-size: 8px !important; }
+}
