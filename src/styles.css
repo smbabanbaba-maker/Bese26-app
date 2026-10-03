@@ -10668,3 +10668,11 @@ body.chat-image-viewer-open .site-footer { display: none !important; }
   object-fit: cover !important;
   object-position: center center !important;
 }
+
+/* Show the complete uploaded campaign artwork edge-to-edge inside the fixed frame. */
+.home-page .home-ad-banner:has(.home-ad-image-only) .home-ad-image-only img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important;
+  object-position: center !important;
+}
