@@ -10346,3 +10346,51 @@ body:has(.chat-image-viewer) {
   .bottom-nav button span:last-child { font-size: 7px !important; }
   .bottom-nav .nav-icon svg { width: 21px !important; height: 21px !important; }
 }
+
+
+/* Equal-width mobile navigation: every one of the seven actions gets identical space. */
+@media (max-width: 640px) {
+  .bottom-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: stretch !important;
+    flex-wrap: nowrap !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    min-height: 92px !important;
+    padding: 10px 4px calc(21px + env(safe-area-inset-bottom)) !important;
+    gap: 0 !important;
+  }
+  .bottom-nav > button,
+  .bottom-nav > button:nth-child(6),
+  .bottom-nav > button:nth-child(7) {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    height: 61px !important;
+    margin: 0 !important;
+    padding: 3px 0 0 !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+  }
+  .bottom-nav > button span:last-child {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    font-size: 8px !important;
+    letter-spacing: -.04em !important;
+  }
+  .bottom-nav > button .nav-icon { flex: 0 0 29px !important; width: 29px !important; height: 27px !important; }
+  .bottom-nav > button .nav-icon svg { width: 22px !important; height: 22px !important; }
+  .bottom-nav > button.sell-nav .nav-icon { flex-basis: 36px !important; width: 36px !important; height: 36px !important; }
+}
+@media (max-width: 380px) {
+  .bottom-nav { padding-inline: 2px !important; }
+  .bottom-nav > button span:last-child { font-size: 7px !important; }
+}
