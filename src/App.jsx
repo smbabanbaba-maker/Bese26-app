@@ -388,17 +388,18 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
-function DashboardProfileSnapshot({ user, onNavigate }) {
+function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const [profile, setProfile] = useState(null);
   const [contacts, setContacts] = useState(null);
+  const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(Boolean(user));
   useEffect(() => {
     let mounted = true;
-    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setLoading(false); return undefined; }
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setLoading(false); return undefined; }
     setLoading(true);
-    Promise.all([getProfile(user.id), getProfileContacts(user.id)])
-      .then(([nextProfile, nextContacts]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); } })
-      .catch(() => { if (mounted) { setProfile(null); setContacts(null); } })
+    Promise.all([getProfile(user.id), getProfileContacts(user.id), getBusinessProfile(user.id)])
+      .then(([nextProfile, nextContacts, nextBusiness]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); setBusiness(nextBusiness); } })
+      .catch(() => { if (mounted) { setProfile(null); setContacts(null); setBusiness(null); } })
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
   }, [user?.id]);
@@ -406,12 +407,21 @@ function DashboardProfileSnapshot({ user, onNavigate }) {
   const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
   const username = profile?.username ? `@${profile.username}` : '@member';
   const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
-  return <section className="dashboard-profile-snapshot" aria-label="Your profile details">
-    <div className="dashboard-profile-avatar">{profile?.avatar_path ? <img src={getAvatarUrl(profile.avatar_path)} alt="" /> : <span>{name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</span>}</div>
-    <div className="dashboard-profile-main">
-      <div className="eyebrow">YOUR PROFILE</div>
-      {loading ? <div className="dashboard-profile-loading"><span /> Loading your saved details…</div> : <><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={15} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span></div></>}
+  const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
+  const openMiniweb = () => onOpenProfilePage?.('business');
+  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
+    <div className="dashboard-profile-identity">
+      <div className="dashboard-profile-avatar">{profile?.avatar_path ? <img src={getAvatarUrl(profile.avatar_path)} alt="" /> : <span>{name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</span>}</div>
+      <div className="dashboard-profile-main">
+        <div className="eyebrow">YOUR PROFILE</div>
+        {loading ? <div className="dashboard-profile-loading"><span /> Loading your saved details…</div> : <><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={15} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span></div></>}
+      </div>
     </div>
+    {!loading && <div className="dashboard-miniweb-action">
+      <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
+      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR MINIWEB IS READY' : 'START YOUR BUSINESS JOURNEY'}</small><strong>{hasMiniweb ? 'Choose a plan for your Miniweb' : 'Create your Miniweb'}</strong><p>{hasMiniweb ? 'Unlock more business tools, verification access and growth features.' : 'Build your professional storefront and let buyers find your business.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={hasMiniweb ? () => onNavigate('subscription') : openMiniweb}>{hasMiniweb ? 'Choose a plan' : 'Create Miniweb'} <ArrowRight size={16} /></button>
+    </div>}
     <button type="button" className="dashboard-profile-action" onClick={() => onNavigate('profile')}>View profile <ArrowRight size={15} /></button>
   </section>;
 }
@@ -426,7 +436,7 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
 
-function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onShowNotifications }) {
+function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onOpenProfilePage, onShowNotifications }) {
   const [geo, setGeo] = useState(null);
   const [selectedState, setSelectedState] = useState('');
   const [selectedLga, setSelectedLga] = useState('');
@@ -462,7 +472,7 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
         <div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.key || `${slide.eyebrow}-${index}`} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div>
       </section>}
 
-      {user && <DashboardProfileSnapshot user={user} onNavigate={onNavigate} />}
+      {user && <DashboardProfileSnapshot user={user} onNavigate={onNavigate} onOpenProfilePage={onOpenProfilePage} />}
       <section className="search-section">
         <div className="search-box home-search" role="search">
           <Search size={18} />
@@ -1728,7 +1738,7 @@ function AppContent() {
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={goBack} />;
-    if (activeNav === 'home') return <HomeView user={sessionUser} marketLoading={marketLoading} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} />;
+    if (activeNav === 'home') return <HomeView user={sessionUser} marketLoading={marketLoading} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} onOpenProfilePage={openNotificationProfilePage} />;
     if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketLoading={marketLoading} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={goBack} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={goBack} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} onOpenConversation={openNotificationConversation} onOpenPublicProfile={openNotificationPublicProfile} onOpenProfilePage={openNotificationProfilePage} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
