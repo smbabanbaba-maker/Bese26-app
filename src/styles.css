@@ -10793,3 +10793,44 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 .chat-image-viewer-close,
 .chat-image-viewer-count,
 .chat-image-viewer-thumb { display: none !important; }
+
+
+/* Keep the back action in its own top row, above (never over) the photo. */
+.chat-image-viewer {
+  display: grid !important;
+  grid-template-rows: calc(56px + env(safe-area-inset-top, 0px)) minmax(0, 1fr) !important;
+}
+.chat-image-viewer-back {
+  position: relative !important;
+  z-index: 2 !important;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: calc(env(safe-area-inset-top, 0px) + 6px) 0 0 max(12px, env(safe-area-inset-left, 0px));
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 50%;
+  color: #fff;
+  background: #c82d3a !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.chat-image-viewer-back:hover { background: #a91f2d !important; transform: translateY(-1px); }
+.chat-image-viewer-back:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.chat-image-viewer-back svg { width: 22px; height: 22px; flex: none; }
+.chat-image-viewer > img {
+  position: relative !important;
+  inset: auto !important;
+  grid-row: 2;
+  justify-self: stretch;
+  align-self: stretch;
+  width: 100% !important;
+  height: 100% !important;
+}
