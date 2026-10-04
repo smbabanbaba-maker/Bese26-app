@@ -21,6 +21,7 @@ import {
   Dumbbell,
   Heart,
   House,
+  Globe,
   Image as ImageIcon,
   Laptop,
   Mic,
@@ -455,14 +456,9 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
     return (geo || []).find((item) => item.state === selectedState)?.lgas.map((name) => ({ name })) || [];
   }, [selectedState, geo]);
   const findByLocation = () => onSearch([selectedLga, states.find((state) => state.isoCode === selectedState)?.name, 'Nigeria'].filter(Boolean).join(' '));
-  const advertisingSlides = adCampaigns.filter((campaign) => campaign.placement === 'home_banner').map((campaign) => ({ type: 'ad', image_only: true, creative_width: 1600, creative_height: 500, eyebrow: 'SPONSORED', title: campaign.title, body: campaign.body, action: campaign.cta_label || 'Learn more', cta_target: campaign.cta_target || '', image_url: campaign.image_url?.includes('89ae6fec-edf9-4222-bc04-2ccaf5a91f5d') ? '/images/bese26-campaign-banner.png' : getOptimizedPublicImageUrl(campaign.image_url, { width: 1024 }), onAction: () => { if (campaign.cta_target?.startsWith('http')) window.location.assign(campaign.cta_target); else onNavigate(campaign.cta_target === '/business' ? 'business' : campaign.cta_target === '/sell' ? 'sell' : 'profile'); } }));
-  const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
-  const promoSlides = [{ type: 'dashboard', key: 'dashboard' }, ...advertisingSlides];
-  const [promoIndex, setPromoIndex] = useState(0);
+  const [language, setLanguage] = useState(() => { try { return localStorage.getItem('bese26:language') || 'en'; } catch { return 'en'; } });
+  const selectLanguage = (event) => { const value = event.target.value; setLanguage(value); try { localStorage.setItem('bese26:language', value); } catch {} };
   const [homeSearch, setHomeSearch] = useState('');
-  useEffect(() => { setPromoIndex(0); }, [user?.id, adCampaigns.length]);
-  useEffect(() => { if (promoSlides.length < 2) return undefined; const timer = window.setInterval(() => setPromoIndex((current) => (current + 1) % promoSlides.length), 6000); return () => window.clearInterval(timer); }, [promoSlides.length]);
-  const promo = promoSlides[promoIndex];
   const featuredListings = useMemo(() => {
     const seen = new Set();
     return marketListings.filter((listing) => {
@@ -474,10 +470,10 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
   }, [marketListings]);
   return (
     <div className="page-stack home-page">
-      {promo && <section className={`home-ad-banner ${promo.type === 'dashboard' ? 'home-ad-dashboard dashboard-welcome-card' : `home-ad-slide-${promoIndex}`}`} aria-label={promo.type === 'dashboard' ? 'Your Bese26 dashboard' : 'Sponsored promotion'}>
-        {promo.type === 'dashboard' ? <><div className="dashboard-welcome-copy"><div className="eyebrow">{user ? 'YOUR BESE26 DASHBOARD' : 'WELCOME TO BESE26'}</div><h1>{user ? <>Good to see you, <span>{displayName}</span>.</> : <>Buy and sell with confidence.</>}</h1><p>{user ? 'Pick up where you left off and keep your marketplace moving.' : 'Browse trusted listings or start selling in a few simple steps.'}</p><div className="dashboard-actions"><button type="button" className="dashboard-primary-action" onClick={() => onNavigate(user ? 'sell' : 'search')}><Plus size={15} /> {user ? 'List an item' : 'Browse listings'}</button><button type="button" className="dashboard-secondary-action" onClick={() => onNavigate(user ? 'profile' : 'sell')}>{user ? 'View profile' : 'Start selling'} <ArrowRight size={15} /></button></div></div><div className="dashboard-orbit-art" aria-hidden="true"><span className="dashboard-orbit dashboard-orbit-one" /><span className="dashboard-orbit dashboard-orbit-two" /><img src="/images/bese26-logo-icon.webp" alt="" /></div></> : promo.image_only ? promo.cta_target?.trim() ? <button type="button" className="home-ad-image-only" onClick={promo.onAction} aria-label={promo.title}><img src={promo.image_url} alt={promo.title} /></button> : <div className="home-ad-image-only" aria-label={promo.title}><img src={promo.image_url} alt={promo.title} /></div> : <><div className="home-ad-copy"><div className="eyebrow light">{promo.eyebrow} <span className="home-ad-sponsored">Sponsored space</span></div><h2>{promo.title}</h2><p>{promo.body}</p><button type="button" className="home-ad-cta" onClick={promo.onAction}>{promo.action} <ArrowRight size={15} /></button></div><div className={`home-ad-art ${promo.type === 'ad' ? 'home-ad-art-clickable' : ''}`} aria-hidden={promo.type !== 'ad'} onClick={promo.type === 'ad' ? promo.onAction : undefined} role={promo.type === 'ad' ? 'link' : undefined} tabIndex={promo.type === 'ad' ? 0 : undefined} onKeyDown={promo.type === 'ad' ? (event) => { if (event.key === 'Enter' || event.key === ' ') promo.onAction(); } : undefined}><img src={promo.image_url || "/images/bese26-official-logo.png"} alt={promo.type === 'ad' ? `${promo.title} advertisement` : ''} /></div></>}
-        <div className="home-ad-dots" aria-label="Promotion slides">{promoSlides.map((slide, index) => <button type="button" key={slide.key || `${slide.eyebrow}-${index}`} className={index === promoIndex ? 'active' : ''} onClick={() => setPromoIndex(index)} aria-label={`Show promotion ${index + 1}`} />)}</div>
-      </section>}
+      <section className="home-ad-banner home-ad-dashboard dashboard-welcome-card premium-dashboard-hero" aria-label="Bese26 dashboard">
+        <div className="premium-hero-toolbar"><span className="premium-hero-kicker"><span className="premium-live-dot" /> BESE26 MARKETPLACE</span><label className="language-switcher" title="Choose language"><Globe size={15} /><select value={language} onChange={selectLanguage} aria-label="Choose language"><option value="en">English</option><option value="ha">Hausa</option><option value="yo">Yorùbá</option><option value="ig">Igbo</option></select><ChevronDown size={13} /></label></div>
+        <div className="dashboard-welcome-copy"><div className="eyebrow">YOUR MARKETPLACE, SIMPLIFIED</div><h1>Buy, sell, and grow <span>with Bese26.</span></h1><p>Discover trusted listings, connect with sellers, and grow your business in one place.</p><div className="dashboard-actions"><button type="button" className="dashboard-primary-action" onClick={() => onNavigate('sell')}><Plus size={15} /> List an item</button><button type="button" className="dashboard-secondary-action" onClick={() => onNavigate('business')}>Explore shops <ArrowRight size={15} /></button></div></div><div className="dashboard-orbit-art" aria-hidden="true"><span className="dashboard-orbit dashboard-orbit-one" /><span className="dashboard-orbit dashboard-orbit-two" /><img src="/images/bese26-logo-icon.webp" alt="" /></div>
+      </section>
 
       {user && <DashboardProfileSnapshot user={user} onNavigate={onNavigate} onOpenProfilePage={onOpenProfilePage} />}
       <section className="search-section">
