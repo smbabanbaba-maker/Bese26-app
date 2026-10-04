@@ -11191,3 +11191,47 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
   .marketplace-quick-actions button { min-height: 32px; padding: 6px 9px; font-size: 9px; }
   .marketplace-location-picker { grid-template-columns: 1fr; margin-top: -5px; }
 }
+
+/* Premium motion polish: restrained, fast, and comfortable on mobile. */
+.marketplace-search-hero {
+  min-height: 268px;
+  background-size: 180% 180% !important;
+  animation: marketplaceHeroGradient 12s ease-in-out infinite;
+}
+.marketplace-search-hero::before { animation: marketplaceHeroGlow 7s ease-in-out infinite; }
+.marketplace-hero-brand { animation: marketplaceBrandIn .55s cubic-bezier(.23,1,.32,1) both; }
+.marketplace-brand-mark { animation: marketplaceMarkPulse 3.6s ease-in-out infinite; }
+.marketplace-language { animation: marketplaceLanguageIn .65s .08s cubic-bezier(.23,1,.32,1) both; }
+.marketplace-hero-content { animation: marketplaceContentIn .65s .12s cubic-bezier(.23,1,.32,1) both; }
+.marketplace-hero-search-row { animation: marketplaceSearchIn .65s .2s cubic-bezier(.23,1,.32,1) both; }
+.marketplace-search-input { transition: transform .22s ease, box-shadow .22s ease; }
+.marketplace-search-input:focus-within { transform: translateY(-2px); box-shadow: 0 13px 26px rgba(0,0,0,.19); }
+.marketplace-country-button { transition: transform .22s ease, box-shadow .22s ease; }
+.marketplace-country-button:hover { transform: translateY(-2px); box-shadow: 0 13px 26px rgba(0,0,0,.18); }
+.marketplace-quick-actions button { animation: marketplaceChipIn .5s cubic-bezier(.23,1,.32,1) both; }
+.marketplace-quick-actions button:nth-child(1) { animation-delay: .28s; }
+.marketplace-quick-actions button:nth-child(2) { animation-delay: .35s; }
+.marketplace-quick-actions button:nth-child(3) { animation-delay: .42s; }
+.marketplace-quick-actions button:nth-child(4) { animation-delay: .49s; }
+@keyframes marketplaceHeroGradient { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes marketplaceHeroGlow { 0%,100% { opacity: .42; transform: translate3d(0,0,0) scale(1); } 50% { opacity: .75; transform: translate3d(-3%,2%,0) scale(1.08); } }
+@keyframes marketplaceBrandIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes marketplaceLanguageIn { from { opacity: 0; transform: translateY(-8px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes marketplaceContentIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes marketplaceSearchIn { from { opacity: 0; transform: translateY(15px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes marketplaceChipIn { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes marketplaceMarkPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,44,44,0); } 50% { box-shadow: 0 0 0 6px rgba(255,44,44,.14); } }
+@media (max-width:700px) {
+  .marketplace-search-hero { min-height: 276px; gap: 12px; padding-top: 14px; padding-bottom: 17px; }
+  .marketplace-hero-content { margin-top: 8px; }
+  .marketplace-hero-content h1 { font-size: 25px; }
+  .marketplace-hero-content p { display: none; }
+  .marketplace-hero-search-row { margin-top: 1px; }
+  .marketplace-country-button, .marketplace-search-input { min-height: 48px; }
+  .marketplace-search-input button { width: 35px; height: 35px; }
+  .marketplace-quick-actions { gap: 5px; }
+  .marketplace-quick-actions button { min-height: 29px; padding: 5px 8px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-search-hero, .marketplace-search-hero::before, .marketplace-hero-brand, .marketplace-brand-mark, .marketplace-language, .marketplace-hero-content, .marketplace-hero-search-row, .marketplace-quick-actions button { animation: none !important; }
+}
