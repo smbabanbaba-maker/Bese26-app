@@ -11235,3 +11235,160 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @media (prefers-reduced-motion: reduce) {
   .marketplace-search-hero, .marketplace-search-hero::before, .marketplace-hero-brand, .marketplace-brand-mark, .marketplace-language, .marketplace-hero-content, .marketplace-hero-search-row, .marketplace-quick-actions button { animation: none !important; }
 }
+/* Final coffee brand theme: replace the old red action system with the Home hero coffee palette. */
+:root {
+  --red:#8a5a3b;
+  --dark-red:#5b3826;
+  --brand-gradient:linear-gradient(135deg,#a8754f 0%,#6b432d 100%);
+  --blue:#8a5a3b;
+  --purple:#8a5a3b;
+  --blue-soft:#f4ebe4;
+  --blue-line:#cda98d;
+  --danger-soft:#f7eee8;
+}
+.brand-mark,
+.primary-button,
+.publish-button,
+.send-button,
+.search-submit,
+.home-search .search-submit,
+.home-ad-cta,
+.dashboard-primary-action,
+.business-setup-mark,
+.company-save-button,
+.upload-tile-icon,
+.sell-upload-tile > span {
+  background:var(--brand-gradient) !important;
+  border-color:#6b432d !important;
+  color:#fff !important;
+}
+.primary-button:hover,
+.publish-button:hover,
+.send-button:hover,
+.search-submit:hover,
+.home-search .search-submit:hover,
+.home-ad-cta:hover,
+.dashboard-primary-action:hover,
+.company-save-button:hover { background:var(--dark-red) !important; }
+.dashboard-welcome-card,
+.dashboard-welcome,
+.hero-panel,
+.discovery-banner,
+.home-ad-dashboard,
+.home-ad-banner:not(.home-ad-image-only),
+.miniweb-cover-banner,
+.public-info-hero,
+.public-business-hero.storefront-hero-clean {
+  background:linear-gradient(135deg,#4e3326 0%,#7a5035 58%,#a8754f 100%) !important;
+  background-image:linear-gradient(135deg,#4e3326 0%,#7a5035 58%,#a8754f 100%) !important;
+  color:#fff !important;
+}
+.dashboard-welcome-card *,
+.dashboard-welcome *,
+.hero-panel *,
+.discovery-banner *,
+.home-ad-dashboard *,
+.home-ad-banner:not(.home-ad-image-only) *,
+.miniweb-cover-banner *,
+.public-info-hero *,
+.public-business-hero.storefront-hero-clean * { color:#fff; }
+.dashboard-welcome-card h1 span,
+.dashboard-welcome-card .eyebrow,
+.dashboard-welcome-copy .eyebrow,
+.hero-panel h1 span,
+.discovery-copy h1 span,
+.home-ad-banner h1 span,
+.home-ad-banner h2 span,
+.dashboard-welcome-card .dashboard-welcome-copy h1 span { color:#f0c29d !important; }
+.dashboard-welcome-card .eyebrow,
+.dashboard-welcome-copy .eyebrow,
+.hero-panel .eyebrow,
+.discovery-banner .eyebrow { color:#e7bb98 !important; }
+.dashboard-welcome-card .dashboard-secondary-action,
+.dashboard-secondary-action,
+.hero-cta,
+.discovery-cta { color:#5b3826 !important; background:#fff !important; border-color:#fff !important; }
+.dashboard-secondary-action:hover,
+.hero-cta:hover,
+.discovery-cta:hover { color:#8a5a3b !important; border-color:#f0d6c0 !important; }
+.text-button,
+.inline-link,
+.text-action,
+.product-price,
+.modal-price,
+.listing-detail-price,
+.results-count,
+.location-detect-button,
+.field-label svg,
+.profile-tabs button.active,
+.profile-tabs button b,
+.managed-listing-copy > b,
+.analytics-stats svg,
+.analytics-total,
+.notification-row-icon,
+.notification-empty svg,
+.unavailable-icon,
+.about-card > svg,
+.public-about-link,
+.public-business-nav a:hover,
+.public-brand strong span,
+.public-business-footer strong span,
+.company-preview-link,
+.business-logo-upload span,
+.preview-badge,
+.verification-center-card-icon,
+.message-filter-tabs button.active,
+.message-inbox-copy small { color:#8a5a3b !important; }
+.profile-tabs button.active:after,
+.message-filter-tabs button.active::after,
+.home-ad-dashboard::before,
+.public-business-nav a::after { background:#8a5a3b !important; }
+.category-tile .category-icon,
+.popular-category > span,
+.quick-action .quick-action-icon,
+.notification-icon,
+.profile-menu-card-icon,
+.dashboard-orbit-art img,
+.orb-one,
+.orb-two,
+.hero-orb,
+.discovery-accent {
+  color:#8a5a3b !important;
+  background:#f4ebe4 !important;
+}
+.category-tile:hover,
+.product-card:hover,
+.profile-menu-card:hover,
+.quick-action:hover,
+.product-card:hover,
+.topbar-search:hover,
+.save-button:hover,
+.save-button.saved,
+.filter-chip.active,
+.filter-button:hover,
+.verification-choice button.selected,
+.sell-publish-identity-switch > button.active {
+  border-color:#8a5a3b !important;
+  color:#8a5a3b !important;
+}
+.notification-badge,
+.message-count,
+.nav-badge,
+.bottom-nav button.active,
+.bottom-nav button:nth-child(n).active { background:#8a5a3b !important; color:#fff !important; }
+.bottom-nav button.active,
+.bottom-nav button:nth-child(n).active { background:transparent !important; color:#8a5a3b !important; }
+.bottom-nav { border-color:#8a5a3b !important; }
+input:focus,
+textarea:focus,
+select:focus,
+.home-search:focus-within,
+.topbar-search:focus-within { border-color:#b98763 !important; box-shadow:0 0 0 4px rgba(138,90,59,.14) !important; }
+.status-pill.pending,
+.status-pill.sold,
+.status-pill.rejected,
+.danger-outline-button,
+.danger-button { border-color:#b98763 !important; color:#6b432d !important; }
+.messages-selected-page .send-button { background:#8a5a3b !important; }
+.chat-image-viewer-close:hover { background:#8a5a3b !important; }
+@media (prefers-reduced-motion: reduce) { .dashboard-welcome-card *, .category-tile *, .product-card * { animation:none !important; transition:none !important; } }
