@@ -11235,191 +11235,83 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @media (prefers-reduced-motion: reduce) {
   .marketplace-search-hero, .marketplace-search-hero::before, .marketplace-hero-brand, .marketplace-brand-mark, .marketplace-language, .marketplace-hero-content, .marketplace-hero-search-row, .marketplace-quick-actions button { animation: none !important; }
 }
-/* Final coffee brand theme: replace the old red action system with the Home hero coffee palette. */
-:root {
-  --red:#8a5a3b;
-  --dark-red:#5b3826;
-  --brand-gradient:linear-gradient(135deg,#a8754f 0%,#6b432d 100%);
-  --blue:#8a5a3b;
-  --purple:#8a5a3b;
-  --blue-soft:#f4ebe4;
-  --blue-line:#cda98d;
-  --danger-soft:#f7eee8;
-}
-.brand-mark,
-.primary-button,
-.publish-button,
-.send-button,
-.search-submit,
-.home-search .search-submit,
-.home-ad-cta,
-.dashboard-primary-action,
-.business-setup-mark,
-.company-save-button,
-.upload-tile-icon,
-.sell-upload-tile > span {
-  background:var(--brand-gradient) !important;
-  border-color:#6b432d !important;
-  color:#fff !important;
-}
-.primary-button:hover,
-.publish-button:hover,
-.send-button:hover,
-.search-submit:hover,
-.home-search .search-submit:hover,
-.home-ad-cta:hover,
-.dashboard-primary-action:hover,
-.company-save-button:hover { background:var(--dark-red) !important; }
-.dashboard-welcome-card,
-.dashboard-welcome,
-.hero-panel,
-.discovery-banner,
-.home-ad-dashboard,
-.home-ad-banner:not(.home-ad-image-only),
-.miniweb-cover-banner,
-.public-info-hero,
-.public-business-hero.storefront-hero-clean {
-  background:linear-gradient(135deg,#4e3326 0%,#7a5035 58%,#a8754f 100%) !important;
-  background-image:linear-gradient(135deg,#4e3326 0%,#7a5035 58%,#a8754f 100%) !important;
-  color:#fff !important;
-}
-.dashboard-welcome-card *,
-.dashboard-welcome *,
-.hero-panel *,
-.discovery-banner *,
-.home-ad-dashboard *,
-.home-ad-banner:not(.home-ad-image-only) *,
-.miniweb-cover-banner *,
-.public-info-hero *,
-.public-business-hero.storefront-hero-clean * { color:#fff; }
-.dashboard-welcome-card h1 span,
-.dashboard-welcome-card .eyebrow,
-.dashboard-welcome-copy .eyebrow,
-.hero-panel h1 span,
-.discovery-copy h1 span,
-.home-ad-banner h1 span,
-.home-ad-banner h2 span,
-.dashboard-welcome-card .dashboard-welcome-copy h1 span { color:#f0c29d !important; }
-.dashboard-welcome-card .eyebrow,
-.dashboard-welcome-copy .eyebrow,
-.hero-panel .eyebrow,
-.discovery-banner .eyebrow { color:#e7bb98 !important; }
-.dashboard-welcome-card .dashboard-secondary-action,
-.dashboard-secondary-action,
-.hero-cta,
-.discovery-cta { color:#5b3826 !important; background:#fff !important; border-color:#fff !important; }
-.dashboard-secondary-action:hover,
-.hero-cta:hover,
-.discovery-cta:hover { color:#8a5a3b !important; border-color:#f0d6c0 !important; }
-.text-button,
-.inline-link,
-.text-action,
-.product-price,
-.modal-price,
-.listing-detail-price,
-.results-count,
-.location-detect-button,
-.field-label svg,
-.profile-tabs button.active,
-.profile-tabs button b,
-.managed-listing-copy > b,
-.analytics-stats svg,
-.analytics-total,
-.notification-row-icon,
-.notification-empty svg,
-.unavailable-icon,
-.about-card > svg,
-.public-about-link,
-.public-business-nav a:hover,
-.public-brand strong span,
-.public-business-footer strong span,
-.company-preview-link,
-.business-logo-upload span,
-.preview-badge,
-.verification-center-card-icon,
-.message-filter-tabs button.active,
-.message-inbox-copy small { color:#8a5a3b !important; }
-.profile-tabs button.active:after,
-.message-filter-tabs button.active::after,
-.home-ad-dashboard::before,
-.public-business-nav a::after { background:#8a5a3b !important; }
-.category-tile .category-icon,
-.popular-category > span,
-.quick-action .quick-action-icon,
-.notification-icon,
-.profile-menu-card-icon,
-.dashboard-orbit-art img,
-.orb-one,
-.orb-two,
-.hero-orb,
-.discovery-accent {
-  color:#8a5a3b !important;
-  background:#f4ebe4 !important;
-}
-.category-tile:hover,
-.product-card:hover,
-.profile-menu-card:hover,
-.quick-action:hover,
-.product-card:hover,
-.topbar-search:hover,
-.save-button:hover,
-.save-button.saved,
-.filter-chip.active,
-.filter-button:hover,
-.verification-choice button.selected,
-.sell-publish-identity-switch > button.active {
-  border-color:#8a5a3b !important;
-  color:#8a5a3b !important;
-}
-.notification-badge,
-.message-count,
-.nav-badge,
-.bottom-nav button.active,
-.bottom-nav button:nth-child(n).active { background:#8a5a3b !important; color:#fff !important; }
-.bottom-nav button.active,
-.bottom-nav button:nth-child(n).active { background:transparent !important; color:#8a5a3b !important; }
-.bottom-nav { border-color:#8a5a3b !important; }
-input:focus,
-textarea:focus,
-select:focus,
-.home-search:focus-within,
-.topbar-search:focus-within { border-color:#b98763 !important; box-shadow:0 0 0 4px rgba(138,90,59,.14) !important; }
-.status-pill.pending,
-.status-pill.sold,
-.status-pill.rejected,
-.danger-outline-button,
-.danger-button { border-color:#b98763 !important; color:#6b432d !important; }
-.messages-selected-page .send-button { background:#8a5a3b !important; }
-.chat-image-viewer-close:hover { background:#8a5a3b !important; }
-@media (prefers-reduced-motion: reduce) { .dashboard-welcome-card *, .category-tile *, .product-card * { animation:none !important; transition:none !important; } }
 
-/* Messages final reference lock: this comes after every premium/coffee override. */
-@media (max-width:760px) {
-  .messages-premium.messages-selected-page .chat-panel,
-  .messages-premium.messages-selected-page .message-layout { background:#eaf2f9 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
-  .messages-premium.messages-selected-page .chat-header { min-height:64px !important; height:64px !important; flex:0 0 64px !important; padding:7px 10px !important; background:#fff !important; color:#263238 !important; border-bottom:1px solid #d7e0e7 !important; box-shadow:none !important; }
-  .messages-premium.messages-selected-page .chat-back-button,
-  .messages-premium.messages-selected-page .chat-header-icon { color:#263238 !important; background:transparent !important; border:0 !important; }
-  .messages-premium.messages-selected-page .chat-person strong { color:#263238 !important; }
-  .messages-premium.messages-selected-page .chat-person > div > span { color:#78909c !important; }
-  .messages-premium.messages-selected-page .chat-context { min-height:60px !important; height:60px !important; flex:0 0 60px !important; margin:0 !important; padding:7px 13px !important; border:0 !important; border-bottom:1px solid #d7e0e7 !important; border-radius:0 !important; background:#fff !important; box-shadow:none !important; }
-  .messages-premium.messages-selected-page .chat-context > div:last-child span { color:#78909c !important; text-transform:none !important; letter-spacing:0 !important; }
-  .messages-premium.messages-selected-page .chat-context > div:last-child strong,
-  .messages-premium.messages-selected-page .chat-context-price { color:#263238 !important; }
-  .messages-premium.messages-selected-page .chat-messages { min-height:0 !important; padding:14px !important; background:#eaf2f9 !important; background-image:none !important; }
-  .messages-premium.messages-selected-page .message-bubble { max-width:82% !important; padding:9px 11px 6px !important; border:0 !important; border-radius:11px 11px 11px 3px !important; color:#263238 !important; background:#fff !important; box-shadow:0 1px 2px rgba(39,55,67,.14) !important; font-size:13px !important; }
-  .messages-premium.messages-selected-page .message-bubble.mine { border-radius:11px 11px 3px 11px !important; color:#263238 !important; background:#c8edcb !important; border:0 !important; box-shadow:0 1px 2px rgba(45,105,58,.14) !important; }
-  .messages-premium.messages-selected-page .message-bubble small,
-  .messages-premium.messages-selected-page .message-bubble.mine small { color:#78909c !important; }
-  .messages-premium.messages-selected-page .chat-bottom-tools { padding:7px 10px 5px !important; background:#fff !important; border-top:1px solid #d7e0e7 !important; }
-  .messages-premium.messages-selected-page .chat-bottom-tools .chat-safety-note { display:none !important; }
-  .messages-premium.messages-selected-page .chat-bottom-tools .chat-quick-actions { margin:0 !important; padding:0 !important; gap:6px !important; overflow-x:auto !important; }
-  .messages-premium.messages-selected-page .chat-bottom-tools .chat-quick-actions button { min-height:31px !important; padding:5px 11px !important; border:2px solid #197a26 !important; border-radius:9px !important; color:#176d21 !important; background:#fff !important; font-size:10px !important; }
-  .messages-premium.messages-selected-page .chat-composer { min-height:63px !important; height:63px !important; flex:0 0 63px !important; padding:7px 9px max(9px,env(safe-area-inset-bottom)) !important; background:#fff !important; border-top:0 !important; }
-  .messages-premium.messages-selected-page .chat-composer input:not(.chat-file-input) { min-width:0 !important; height:42px !important; min-height:42px !important; border:1px solid #cfd8dc !important; border-radius:20px !important; background:#fff !important; color:#263238 !important; }
-  .messages-premium.messages-selected-page .chat-composer .icon-button { width:31px !important; height:31px !important; border:0 !important; border-radius:50% !important; color:#78909c !important; background:transparent !important; }
-  .messages-premium.messages-selected-page .chat-composer .chat-record-button-label { display:none !important; }
-  .messages-premium.messages-selected-page .chat-composer .send-button { width:34px !important; height:34px !important; border-radius:50% !important; background:#8a5a3b !important; box-shadow:none !important; }
-  .messages-premium.messages-selected-page .chat-composer .send-button:disabled { display:none !important; }
-  .messages-premium.messages-selected-page .chat-composer:has(input:not(.chat-file-input):not(:placeholder-shown)) .chat-record-button { display:none !important; }
+/* Bese26 signature hero: editorial, asymmetric, and intentionally different from other marketplaces. */
+.marketplace-search-hero {
+  isolation: isolate;
+  min-height: 258px;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 14px;
+  padding: 17px 28px 20px;
+  border-radius: 0 0 30px 30px;
+  background: #070707 !important;
+  box-shadow: 0 18px 36px rgba(0,0,0,.2);
+  animation: beseSignatureIn .7s cubic-bezier(.23,1,.32,1) both;
+}
+.marketplace-search-hero::before {
+  inset: auto -65px -130px auto;
+  width: 310px;
+  height: 310px;
+  border-radius: 42% 58% 52% 48%;
+  opacity: 1;
+  background: linear-gradient(145deg, #ff2c2c 0%, #990000 72%, #4d0000 100%);
+  transform: rotate(18deg);
+  animation: beseSignatureShape 9s ease-in-out infinite;
+}
+.marketplace-search-hero::after {
+  content: '26';
+  position: absolute;
+  z-index: 0;
+  right: 48px;
+  bottom: 70px;
+  color: rgba(255,255,255,.08);
+  font: 900 150px/1 Manrope, sans-serif;
+  letter-spacing: -.14em;
+  pointer-events: none;
+  transform: rotate(-10deg);
+  animation: beseSignatureNumber 7s ease-in-out infinite;
+}
+.marketplace-hero-top { align-items: center; }
+.marketplace-hero-brand { position: relative; z-index: 3; letter-spacing: -.05em; }
+.marketplace-brand-mark { width: 30px; height: 30px; border: 0; border-radius: 10px; background: #ff2c2c; box-shadow: 5px 5px 0 #fff; }
+.marketplace-language { position: relative; z-index: 3; border-color: rgba(255,255,255,.2); background: #141414; }
+.marketplace-hero-content { position: relative; z-index: 2; justify-items: start; align-content: center; max-width: 430px; margin: 5px 0 0; text-align: left; }
+.marketplace-hero-content::before { content: ''; width: 34px; height: 3px; margin-bottom: 5px; border-radius: 99px; background: #ff2c2c; }
+.marketplace-hero-content .eyebrow { margin-bottom: 1px; color: #ff7777 !important; font-size: 8px; letter-spacing: .2em; }
+.marketplace-hero-content h1 { max-width: 430px; font-size: clamp(26px, 4.8vw, 40px); letter-spacing: -.065em; }
+.marketplace-hero-content p { max-width: 340px; color: rgba(255,255,255,.6) !important; font-size: 10px; line-height: 1.4; }
+.marketplace-hero-search-row { z-index: 4; max-width: none; margin: 0; padding: 7px; border: 1px solid rgba(255,255,255,.13); border-radius: 17px; background: rgba(255,255,255,.08); box-shadow: 0 15px 30px rgba(0,0,0,.2); backdrop-filter: blur(12px); }
+.marketplace-country-button, .marketplace-search-input { min-height: 48px; border-radius: 11px; box-shadow: none; }
+.marketplace-country-button { background: #171717; color: #fff; border: 1px solid rgba(255,255,255,.1); }
+.marketplace-country-button svg:first-child { color: #ff5555; }
+.marketplace-search-input { background: #fff; }
+.marketplace-search-input button { width: 37px; height: 37px; border-radius: 9px; }
+.marketplace-quick-actions { z-index: 3; justify-content: flex-start; max-width: none; margin: 0; gap: 6px; }
+.marketplace-quick-actions button { min-height: 28px; padding: 5px 9px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: transparent; font-size: 8px; }
+.marketplace-quick-actions button:first-child { border-color: #ff2c2c; background: #ff2c2c; color: #fff; }
+.marketplace-quick-actions button svg { color: #ff7777; }
+.marketplace-quick-actions button:first-child svg { color: #fff; }
+@keyframes beseSignatureIn { from { opacity: 0; clip-path: inset(0 0 8% 0); } to { opacity: 1; clip-path: inset(0); } }
+@keyframes beseSignatureShape { 0%,100% { transform: rotate(18deg) translate3d(0,0,0); } 50% { transform: rotate(23deg) translate3d(-10px,-8px,0); } }
+@keyframes beseSignatureNumber { 0%,100% { opacity: .8; transform: rotate(-10deg) translateY(0); } 50% { opacity: 1; transform: rotate(-7deg) translateY(-7px); } }
+@media (max-width:700px) {
+  .marketplace-search-hero { min-height: 248px; grid-template-rows: auto 1fr auto auto; gap: 10px; margin: -20px -16px 0; padding: 14px 16px 15px; border-radius: 0 0 24px 24px; }
+  .marketplace-search-hero::before { right: -105px; bottom: -110px; width: 255px; height: 255px; }
+  .marketplace-search-hero::after { right: 8px; bottom: 74px; font-size: 106px; }
+  .marketplace-brand-mark { width: 26px; height: 26px; box-shadow: 4px 4px 0 #fff; }
+  .marketplace-hero-content { margin: 2px 0 0; }
+  .marketplace-hero-content::before { width: 27px; height: 2px; margin-bottom: 3px; }
+  .marketplace-hero-content h1 { max-width: 280px; font-size: 27px; }
+  .marketplace-hero-content p { display: block; max-width: 245px; font-size: 9px; }
+  .marketplace-hero-search-row { grid-template-columns: 99px minmax(0,1fr); gap: 6px; padding: 5px; }
+  .marketplace-country-button, .marketplace-search-input { min-height: 43px; }
+  .marketplace-country-button { padding: 0 8px; font-size: 10px; }
+  .marketplace-search-input { padding-left: 10px; }
+  .marketplace-search-input input { font-size: 10px; }
+  .marketplace-search-input button { width: 33px; height: 33px; }
+  .marketplace-quick-actions { gap: 5px; }
+  .marketplace-quick-actions button { min-height: 26px; padding: 4px 7px; font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-search-hero, .marketplace-search-hero::before, .marketplace-search-hero::after { animation: none !important; }
 }
