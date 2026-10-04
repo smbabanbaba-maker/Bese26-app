@@ -11560,3 +11560,18 @@ select:focus,
   .marketplace-language select { width: 50px; font-size: 9px; }
 }
 @media (prefers-reduced-motion: reduce) { .marketplace-language svg:first-child { animation: none !important; } }
+
+/* Exact requested lockup: one official logo, then the Bese26.shop wordmark. */
+.marketplace-hero-brand-lockup { gap: 0; }
+.marketplace-hero-brand { display: inline-flex; align-items: center; gap: 8px; }
+.marketplace-official-logo-main { display: block; width: 32px; height: 32px; border-radius: 9px; object-fit: cover; box-shadow: 0 0 0 3px rgba(255,44,44,.16), 0 7px 16px rgba(0,0,0,.22); animation: officialLogoFloat 3.8s ease-in-out infinite; }
+.marketplace-hero-brand strong { font-size: 17px; }
+.marketplace-official-logo, .marketplace-brand-backmark, .marketplace-brand-mark { display: none !important; }
+.marketplace-language { min-width: 116px; background: #111 !important; }
+.language-icon-wrap { background: #ff2c2c; }
+@media (max-width:700px) {
+  .marketplace-hero-brand { gap: 7px; }
+  .marketplace-official-logo-main { width: 27px; height: 27px; border-radius: 8px; }
+  .marketplace-hero-brand strong { font-size: 14px; }
+  .marketplace-language { min-width: 96px; }
+}
