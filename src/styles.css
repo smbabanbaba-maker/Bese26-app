@@ -11575,3 +11575,33 @@ select:focus,
   .marketplace-hero-brand strong { font-size: 14px; }
   .marketplace-language { min-width: 96px; }
 }
+
+/* Premium logo + wordmark motion: subtle, polished, never distracting. */
+.marketplace-official-logo-main {
+  animation: beseLogoLift 3.8s ease-in-out infinite, beseLogoReveal .7s cubic-bezier(.23,1,.32,1) both;
+}
+.marketplace-hero-brand strong {
+  position: relative;
+  display: inline-block;
+  animation: beseWordmarkReveal .7s .1s cubic-bezier(.23,1,.32,1) both;
+}
+.marketplace-hero-brand strong::after {
+  content: '';
+  position: absolute;
+  inset: 0 -8px;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.72) 50%, transparent 65%);
+  background-size: 220% 100%;
+  mix-blend-mode: screen;
+  animation: beseWordmarkShine 5.5s 1.2s ease-in-out infinite;
+}
+@keyframes beseLogoLift {
+  0%,100% { transform: translateY(0) rotate(0deg); box-shadow: 0 0 0 3px rgba(255,44,44,.16), 0 7px 16px rgba(0,0,0,.22); }
+  50% { transform: translateY(-4px) rotate(2deg); box-shadow: 0 0 0 5px rgba(255,44,44,.24), 0 12px 22px rgba(255,44,44,.22); }
+}
+@keyframes beseLogoReveal { from { opacity: 0; transform: scale(.78) rotate(-8deg); } to { opacity: 1; } }
+@keyframes beseWordmarkReveal { from { opacity: 0; transform: translateX(-9px); letter-spacing: .02em; } to { opacity: 1; transform: translateX(0); } }
+@keyframes beseWordmarkShine { 0%,72%,100% { background-position: 220% 0; } 84% { background-position: -20% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-official-logo-main, .marketplace-hero-brand strong, .marketplace-hero-brand strong::after { animation: none !important; }
+}
