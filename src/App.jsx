@@ -416,14 +416,14 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const hasActivePlan = Boolean(hasMiniweb && entitlement?.is_paid);
   useEffect(() => {
     setCtaMode('shop');
-    if (!hasMiniweb || hasActivePlan) return undefined;
+    if (hasActivePlan) return undefined;
     const timer = window.setTimeout(() => setCtaMode('plan'), 3000);
     return () => window.clearTimeout(timer);
   }, [hasMiniweb, hasActivePlan]);
   const openMiniweb = () => onOpenProfilePage?.('business');
   const openPlan = () => setCtaMode('plan');
   if (!loading && !planLoading && hasActivePlan) return null;
-  const showingPlan = hasMiniweb && ctaMode === 'plan';
+  const showingPlan = ctaMode === 'plan';
   return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'} ${showingPlan ? 'is-plan' : 'is-shop'}`} aria-label="Your profile and Miniweb setup">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
