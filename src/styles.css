@@ -11081,26 +11081,3 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 .inline-loading-pulse { display: inline-block; width: 34px; height: 7px; vertical-align: middle; border-radius: 999px; background: linear-gradient(90deg, rgba(255,44,44,.12), rgba(255,44,44,.46), rgba(255,44,44,.12)); background-size: 220% 100%; animation: profileLoadingSweep 1.25s ease-in-out infinite; }
 .listing-review-comments-state, .listing-new-no-reviews, .listing-comments-empty { display: grid; place-items: center; min-height: 42px; }
 @media (prefers-reduced-motion: reduce) { .inline-loading-pulse { animation: none; } }
-/* Shop creation belongs to the existing Home hero, not a second banner. */
-.dashboard-shop-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 38px;
-  padding: 9px 13px;
-  border: 1px solid rgba(255,255,255,.34);
-  border-radius: 9px;
-  color: #fff;
-  background: rgba(255,255,255,.08);
-  font-size: 11px;
-  font-weight: 800;
-  transition: transform .2s ease, background .2s ease, border-color .2s ease;
-}
-.dashboard-shop-action:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,.7);
-  background: rgba(255,255,255,.16);
-}
-@media (max-width:700px) {
-  .dashboard-shop-action { justify-content: center; min-height: 38px; padding-inline: 10px; font-size: 10px; }
-}
