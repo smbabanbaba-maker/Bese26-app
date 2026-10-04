@@ -11535,3 +11535,28 @@ select:focus,
 @media (prefers-reduced-motion: reduce) {
   .marketplace-official-logo img, .marketplace-language svg:first-child { animation: none !important; }
 }
+
+/* Final brand cleanup: no duplicate B before the name; official logo follows the wordmark. */
+.marketplace-hero-brand-lockup { gap: 10px; }
+.marketplace-brand-backmark, .marketplace-brand-mark { display: none !important; }
+.marketplace-hero-brand { display: inline-flex; align-items: center; }
+.marketplace-hero-brand strong { color: #fff; font-size: 17px; letter-spacing: -.065em; }
+.marketplace-hero-brand strong span { color: #ff7777; }
+.marketplace-official-logo { margin-left: 0; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.24); }
+.marketplace-official-logo img { width: 31px; height: 31px; border-radius: 9px; }
+.marketplace-language { display: inline-flex; align-items: center; gap: 6px; min-width: 110px; min-height: 38px; padding: 5px 8px 5px 6px; border: 1px solid rgba(255,255,255,.26); border-radius: 14px; background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.04)); box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 9px 18px rgba(0,0,0,.18); }
+.language-icon-wrap { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 9px; color: #fff; background: #ff2c2c; box-shadow: 0 5px 12px rgba(255,44,44,.3); }
+.marketplace-language svg:first-child { color: #fff; animation: languageGlobeSpin 5s ease-in-out infinite; }
+.marketplace-language select { width: 62px; color: #fff; background: transparent; font-size: 10px; }
+.marketplace-language > svg:last-child { color: rgba(255,255,255,.7); }
+@keyframes languageGlobeSpin { 0%,100% { transform: rotate(0) scale(1); } 45% { transform: rotate(8deg) scale(1.08); } 65% { transform: rotate(-5deg) scale(1); } }
+@media (max-width:700px) {
+  .marketplace-hero-brand-lockup { gap: 7px; }
+  .marketplace-hero-brand strong { font-size: 14px; }
+  .marketplace-official-logo { padding-left: 7px; }
+  .marketplace-official-logo img { width: 25px; height: 25px; border-radius: 7px; }
+  .marketplace-language { min-width: 93px; min-height: 32px; gap: 5px; padding: 4px 6px 4px 4px; border-radius: 11px; }
+  .language-icon-wrap { width: 23px; height: 23px; border-radius: 7px; }
+  .marketplace-language select { width: 50px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .marketplace-language svg:first-child { animation: none !important; } }
