@@ -417,18 +417,18 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   useEffect(() => {
     setCtaMode('shop');
     if (!hasMiniweb || hasActivePlan) return undefined;
-    const timer = window.setTimeout(() => setCtaMode('plan'), 6000);
+    const timer = window.setTimeout(() => setCtaMode('plan'), 3000);
     return () => window.clearTimeout(timer);
   }, [hasMiniweb, hasActivePlan]);
   const openMiniweb = () => onOpenProfilePage?.('business');
   const openPlan = () => setCtaMode('plan');
   if (!loading && !planLoading && hasActivePlan) return null;
   const showingPlan = hasMiniweb && ctaMode === 'plan';
-  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'}`} aria-label="Your profile and Miniweb setup">
+  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'} ${showingPlan ? 'is-plan' : 'is-shop'}`} aria-label="Your profile and Miniweb setup">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy"><small>{showingPlan ? 'MATAKI NA GABA' : hasMiniweb ? 'AN ƘIRƘIRI SHOP ƊINKA' : 'FARA KASUWANCINKA A BESE26'}</small><strong>{showingPlan ? 'Zaɓi Plan ɗinka' : hasMiniweb ? 'Shop ɗinka ya shirya' : 'Ƙirƙiri Shop ɗinka'}</strong><p>{showingPlan ? 'Zaɓi plan yanzu domin ka buɗe cikakken damar amfani da kayan Shop ɗinka.' : hasMiniweb ? 'Mataki na gaba shi ne zaɓar plan domin ka samu ƙarin kayan kasuwanci.' : 'Buɗe shafin kasuwancinka yanzu domin masu saye su same ka cikin sauƙi.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}><span>{showingPlan ? 'Zaɓi Plan' : hasMiniweb ? 'Mataki na gaba' : 'Ƙirƙiri Shop'}</span><small className="dashboard-miniweb-hint">Danna nan</small><ArrowRight size={16} /></button>
+      <div className="dashboard-miniweb-copy" key={showingPlan ? 'subscription' : 'shop'}><small>{showingPlan ? 'NEXT STEP' : hasMiniweb ? 'YOUR SHOP IS READY' : 'START SELLING ON BESE26'}</small><strong>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'Your shop is ready' : 'Create your shop'}</strong><p>{showingPlan ? 'Choose a plan to unlock more selling capacity and business tools.' : hasMiniweb ? 'Choose a subscription to unlock more tools for your business.' : 'Set up your business page so buyers can discover you more easily.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}><span>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'View shop' : 'Create shop'}</span><small className="dashboard-miniweb-hint">Open</small><ArrowRight size={16} /></button>
     </div>}
   </section>;
 }
