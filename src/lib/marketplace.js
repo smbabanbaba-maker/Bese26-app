@@ -47,7 +47,7 @@ export function mapListing(row) {
   const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
   const seller = row.profiles || {};
   const business = row.business_profile || {};
-  const sellerName = business.business_name || seller.display_name || 'bese26 seller';
+  const sellerName = seller.cac_verified_name || seller.display_name || business.business_name || 'bese26 seller';
   const category = row.category || row.categories || {};
   const subcategory = row.subcategory || {};
   const location = normalizeLocation(row.city, row.state, row.country);
@@ -66,17 +66,17 @@ export function mapListing(row) {
     subcategory: subcategory.name || '',
     seller: sellerName,
     sellerDisplayName: sellerName,
-    sellerBusinessName: business.business_name || '',
+    sellerBusinessName: seller.cac_verified_name || seller.display_name || '',
     sellerBusinessHandle: business.business_handle || '',
     publishedAsType: row.published_as_type || 'personal',
     sellerId: row.seller_id,
     sellerAvatar: getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path || seller.avatar_path)),
     sellerAvatarIsBusinessLogo: Boolean(business.logo_path || isOfficialBese26Business(business)),
-    sellerInitials: initials(business.business_name || seller.display_name),
+    sellerInitials: initials(seller.cac_verified_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
     idVerified: verificationIsCurrent(seller),
-    cacVerified: verificationIsCurrent(business) && String(business.verification_status || 'verified').toLowerCase() === 'verified',
-    verified: verificationIsCurrent(seller) || verificationIsCurrent(business),
+    cacVerified: Boolean(seller.cac_verified_name),
+    verified: verificationIsCurrent(seller) || Boolean(seller.cac_verified_name),
     promoted: false,
     description: row.description || '',
     attributes: row.attributes || {},
@@ -309,11 +309,9 @@ export async function reviewVerificationApplication({ id, userId, status, verifi
   }
   const { data, error } = await supabase.from('verification_applications').update(updateValues).eq('id', id).select().single();
   if (error) throw error;
-  if (status === 'approved') {
-    if (verificationType === 'business') {
-      const { error: businessError } = await supabase.from('business_profiles').update({ is_verified: true }).eq('profile_id', userId);
-      if (businessError) throw businessError;
-    }
+  if (status === 'approved' && verificationType === 'business') {
+    const { error: profileError } = await supabase.from('profiles').update({ cac_verified_name: data.cac_registered_name || data.business_name || null, cac_verified_at: new Date().toISOString() }).eq('id', userId);
+    if (profileError) throw profileError;
   }
   return data;
 }
@@ -376,7 +374,7 @@ export async function getProfile(userId) {
   failIfUnavailable();
   const fullQuery = supabase
     .from('profiles')
-    .select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
+    .select('id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,account_type,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
     .eq('id', userId)
     .maybeSingle();
   const { data, error } = await fullQuery;
@@ -386,7 +384,7 @@ export async function getProfile(userId) {
   if (!/account_type|column .* does not exist|schema cache/i.test(error.message || '')) throw error;
   const { data: fallback, error: fallbackError } = await supabase
     .from('profiles')
-    .select('id,username,display_name,avatar_path,bio,city,state,country,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
+    .select('id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,is_verified,seller_rating,seller_rating_count,created_at,updated_at')
     .eq('id', userId)
     .maybeSingle();
   if (fallbackError) throw fallbackError;
@@ -419,8 +417,9 @@ export async function ensureAccountDashboard(userId, { displayName = '', email =
     if (!availability.available) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
     profile = await updateProfile(userId, { username: handle });
   }
-  // Personal accounts do not receive an automatic business profile. CAC
-  // verification is stored against the profile's verification application.
+
+  // Profile is the user's shop identity. Never recreate legacy business_profiles
+  // rows during login; existing listings continue to belong to seller_id. dd03619 (Make verification profile-first for every user)
   return { profile, business: null, handle, url: siteUrl(`/@${handle}`) };
 }
 
@@ -702,7 +701,7 @@ export async function fetchSavedIds(userId) {
 // Keep reads compatible with the existing Supabase schema until the ownership
 // migration is applied. New ownership fields are hydrated automatically once
 // the migration is live.
-const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,username,display_name,avatar_path,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
+const listingSelect = 'id,seller_id,category_id,subcategory_id,title,description,price,currency,pricing_type,condition,quantity,unit,country,state,city,delivery_options,contact_preference,attributes,status,moderation_status,rejection_reason,created_at,updated_at,views_count,profiles:profiles!listings_seller_id_fkey(id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at),category:categories!listings_category_id_fkey(name),subcategory:categories!listings_subcategory_id_fkey(name),listing_media(id,storage_path,media_type,sort_order)';
 const listingSelectWithOwnership = `${listingSelect},business_profile_id,published_as_type`;
 
 async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
@@ -1097,7 +1096,7 @@ export async function fetchPublicProfile(username) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();
   if (!normalized) return null;
-  const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
+  const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
   if (profileError) throw profileError;
   if (!profile) return null;
   let { data: businessRow, error: businessError } = await supabase.from('business_profiles')
