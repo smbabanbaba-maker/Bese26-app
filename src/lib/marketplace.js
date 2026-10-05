@@ -1483,6 +1483,27 @@ export async function getBusinessProfile(userId) {
   return data;
 }
 
+export async function ensureBusinessProfile(user) {
+  failIfUnavailable();
+  if (!user?.id) return null;
+  const existing = await getBusinessProfile(user.id);
+  if (existing?.business_handle) return existing;
+  const metadata = user.user_metadata || {};
+  const displayName = String(metadata.display_name || metadata.full_name || user.email?.split('@')[0] || 'Bese26 seller').trim();
+  const baseHandle = String(metadata.username || displayName || 'shop').toLowerCase().replace(/^@/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 20) || 'shop';
+  const handle = `${baseHandle}-${String(user.id).replace(/-/g, '').slice(0, 8)}`.slice(0, 30).replace(/-$/, '');
+  return saveBusinessProfile(user.id, {
+    ...(existing || {}),
+    business_name: existing?.business_name || displayName,
+    business_handle: handle,
+    business_type: existing?.business_type || 'Individual',
+    category: existing?.category || 'Marketplace',
+    description: existing?.description || `Welcome to ${displayName}'s Bese26 shop.`,
+    email: existing?.email || user.email || '',
+    country: 'Nigeria',
+  });
+}
+
 export async function saveBusinessProfile(userId, values) {
   failIfUnavailable();
   const payload = {
