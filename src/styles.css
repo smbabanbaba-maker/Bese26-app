@@ -10997,7 +10997,7 @@ body.chat-image-viewer-open { overflow: hidden !important; background: #000 !imp
 @media (prefers-reduced-motion: reduce) {
   .dashboard-profile-snapshot .dashboard-miniweb-action, .dashboard-profile-snapshot .dashboard-miniweb-action::after, .dashboard-profile-snapshot .dashboard-miniweb-icon, .dashboard-profile-snapshot .dashboard-miniweb-button { animation: none; }
 }
-/* Extra CTA motion: make the Create Shop action unmistakable. */
+/* Extra CTA motion for the Miniweb dashboard action. */
 .dashboard-profile-snapshot .dashboard-miniweb-button { overflow: hidden; isolation: isolate; animation: miniwebButtonNudge 3.8s ease-in-out infinite, miniwebButtonGlow 2.8s ease-in-out infinite; }
 .dashboard-profile-snapshot .dashboard-miniweb-button::before { content: ''; position: absolute; z-index: -1; top: -35%; bottom: -35%; left: -55%; width: 34%; transform: skewX(-18deg); background: rgba(255,255,255,.5); animation: miniwebButtonShine 3.8s ease-in-out infinite; }
 .dashboard-profile-snapshot .dashboard-miniweb-icon { animation: miniwebIconPulse 2.8s ease-in-out infinite, miniwebIconFloat 3.6s ease-in-out infinite; }
