@@ -11690,3 +11690,53 @@ select:focus,
 .profile-dashboard-link-actions button { min-height: 36px; padding: 8px 12px; border-radius: 11px; font-size: .78rem; }
 @media (max-width: 620px) { .profile-dashboard-link-card { align-items: flex-start; flex-wrap: wrap; border-radius: 16px; } .profile-dashboard-link-actions { width: 100%; margin-left: 54px; justify-content: flex-start; } }
 
+
+/* Premium Appearance theme studio */
+.appearance-page { max-width: 820px; margin: 0 auto; gap: 16px; }
+.appearance-hero { position: relative; display: flex; align-items: center; gap: 15px; min-height: 142px; padding: 24px; overflow: hidden; color: #fff; border: 1px solid rgba(255,255,255,.1); border-radius: 22px; background: radial-gradient(circle at 92% 8%, rgba(255,78,78,.55), transparent 31%), linear-gradient(135deg, #17191e 0%, #2a1c28 53%, #861f2b 145%); box-shadow: 0 18px 34px rgba(32, 16, 26, .18); }
+.appearance-hero::after { content: ''; position: absolute; width: 180px; height: 180px; right: -44px; bottom: -88px; border: 1px solid rgba(255,255,255,.15); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,255,255,.04), 0 0 0 38px rgba(255,255,255,.03); }
+.appearance-hero-orb { display: grid; place-items: center; position: relative; width: 58px; height: 58px; flex: none; color: #fff; border: 1px solid rgba(255,255,255,.23); border-radius: 18px; background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.04)); box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 10px 22px rgba(0,0,0,.2); }
+.appearance-hero-orb svg:last-child { position: absolute; right: 7px; bottom: 7px; padding: 3px; color: #ffd3d3; border-radius: 50%; background: #8e2531; }
+.appearance-hero h2 { margin: 5px 0 4px; color: #fff; font-size: clamp(20px, 3vw, 28px); letter-spacing: -.8px; }
+.appearance-hero p { max-width: 470px; margin: 0; color: rgba(255,255,255,.72); font-size: 11px; line-height: 1.55; }
+.appearance-live-pill { z-index: 1; display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-left: auto; padding: 6px 9px; color: #ffd8d8; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(0,0,0,.18); font-size: 9px; font-weight: 800; }
+.appearance-live-pill i { width: 6px; height: 6px; border-radius: 50%; background: #71e0ad; box-shadow: 0 0 0 4px rgba(113,224,173,.14); }
+.appearance-panel { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: 0 10px 24px rgba(28, 15, 18, .04); }
+.appearance-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.appearance-panel-heading h3 { margin-top: 4px; font-size: 17px; letter-spacing: -.3px; }
+.appearance-current { padding: 7px 10px; color: var(--red); border: 1px solid rgba(255,44,44,.18); border-radius: 999px; background: var(--danger-soft); font-size: 9px; font-weight: 800; text-transform: capitalize; }
+.appearance-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 0; overflow: visible; border: 0; background: transparent; }
+.appearance-options .appearance-option { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; min-height: 150px; padding: 15px; text-align: left; border: 1px solid var(--line); border-radius: 15px; background: var(--soft); transition: transform .18s var(--ease), border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+.appearance-options .appearance-option:hover { transform: translateY(-2px); border-color: #f0a5a5; box-shadow: 0 10px 20px rgba(173, 38, 38, .08); }
+.appearance-options .appearance-option:focus-visible { outline: 3px solid rgba(255,44,44,.22); outline-offset: 2px; }
+.appearance-options .appearance-option.selected { border-color: var(--red); background: linear-gradient(145deg, var(--card), var(--danger-soft)); box-shadow: 0 0 0 2px rgba(255,44,44,.1), 0 12px 22px rgba(173,38,38,.09); }
+.appearance-option-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; }
+.appearance-option.sun .appearance-option-icon { color: #a86a00; background: #fff1c7; }
+.appearance-option.moon .appearance-option-icon { color: #7663bf; background: #ebe8ff; }
+.appearance-option.system .appearance-option-icon { color: #287a73; background: #dff5ef; }
+.appearance-option-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.appearance-option-copy strong { color: var(--ink); font-size: 13px; }
+.appearance-option-copy small { color: var(--muted); font-size: 9px; line-height: 1.4; }
+.appearance-option-check { position: absolute; top: 13px; right: 13px; display: grid; place-items: center; width: 23px; height: 23px; color: #fff; border-radius: 50%; background: var(--red); }
+.appearance-footnote { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 15px 0 0; color: var(--muted); font-size: 9px; }
+.appearance-footnote svg { color: var(--red); flex: none; }
+.theme-dark .appearance-panel { box-shadow: 0 12px 28px rgba(0,0,0,.2); }
+.theme-dark .appearance-options .appearance-option { background: rgba(255,255,255,.035); }
+.theme-dark .appearance-options .appearance-option.selected { background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(130,25,35,.25)); }
+@media (max-width: 640px) {
+  .appearance-page { gap: 12px; }
+  .appearance-hero { align-items: flex-start; min-height: 166px; padding: 18px; }
+  .appearance-hero-orb { width: 48px; height: 48px; border-radius: 14px; }
+  .appearance-hero h2 { font-size: 21px; }
+  .appearance-hero p { max-width: 235px; font-size: 10px; }
+  .appearance-live-pill { position: absolute; right: 16px; bottom: 16px; }
+  .appearance-panel { padding: 14px; }
+  .appearance-panel-heading { align-items: center; }
+  .appearance-panel-heading h3 { font-size: 15px; }
+  .appearance-current { font-size: 8px; }
+  .appearance-options { grid-template-columns: 1fr; gap: 8px; }
+  .appearance-options .appearance-option { flex-direction: row; align-items: center; min-height: 0; padding: 12px; gap: 11px; }
+  .appearance-option-icon { width: 38px; height: 38px; border-radius: 11px; }
+  .appearance-option-check { top: 20px; right: 13px; }
+  .appearance-footnote { align-items: flex-start; text-align: center; line-height: 1.4; }
+}
