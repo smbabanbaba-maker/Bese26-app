@@ -576,7 +576,8 @@ function IdentityVerificationForm({ user, profile, onBack, onNotice, onSubmitted
 
 function VerificationPage({ user, profile, onBack, onNotice, onOpenSubscription }) {
   const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [business, setBusiness] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showBusinessForm, setShowBusinessForm] = useState(false);
   const [showIdentityForm, setShowIdentityForm] = useState(false);
@@ -585,7 +586,7 @@ function VerificationPage({ user, profile, onBack, onNotice, onOpenSubscription 
   const [entitlement, setEntitlement] = useState(null);
   const [form, setForm] = useState({ business_name: '', cac_registered_name: '', business_address: '', registration_number: '', business_registration_type: 'registered', phone: '', notes: '' });
   useEffect(() => { let mounted = true; fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)); return () => { mounted = false; }; }, [user.id]);
-  useEffect(() => { let mounted = true; fetchVerificationApplications(user.id).then((applications) => mounted && setItems(applications)).catch((requestError) => mounted && setError(requestError.message || 'Could not load verification status.')).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
+  useEffect(() => { let mounted = true; Promise.allSettled([fetchVerificationApplications(user.id), getBusinessProfile(user.id)]).then(([applicationsResult, businessResult]) => { if (!mounted) return; if (applicationsResult.status === 'fulfilled') setItems(applicationsResult.value); if (businessResult.status === 'fulfilled') { setBusiness(businessResult.value); if (businessResult.value) setForm((current) => ({ ...current, business_name: businessResult.value.business_name || '', business_address: businessResult.value.address || '', registration_number: businessResult.value.registration_number || '', cac_registered_name: businessResult.value.business_name || '', phone: businessResult.value.phone || '' })); } const failed = [applicationsResult, businessResult].find((result) => result.status === 'rejected'); if (failed && applicationsResult.status === 'rejected') setError(failed.reason?.message || 'Could not load verification status.'); }).finally(() => mounted && setLoading(false)); return () => { mounted = false; }; }, [user.id]);
   const canVerify = entitlement?.verification_eligible === true;
   const canBusinessVerify = canVerify;
   const openIdentity = () => { if (identityApplication?.status === 'approved' || identityApplication?.status === 'verified') return onNotice('Your identity verification is already approved and locked. Contact Admin if a legal correction is required.'); if (!canVerify) return onOpenSubscription?.(); setShowIdentityForm(true); };
