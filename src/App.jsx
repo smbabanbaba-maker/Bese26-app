@@ -413,23 +413,13 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
   const username = profile?.username ? `@${profile.username}` : '@member';
   const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
-  const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
-  const hasActivePlan = Boolean(hasMiniweb && entitlement?.is_paid);
-  useEffect(() => {
-    setCtaMode('shop');
-    if (hasActivePlan) return undefined;
-    const timer = window.setTimeout(() => setCtaMode('plan'), 3000);
-    return () => window.clearTimeout(timer);
-  }, [hasMiniweb, hasActivePlan]);
-  const openMiniweb = () => onOpenProfilePage?.('business');
-  const openPlan = () => setCtaMode('plan');
-  if (!loading && !planLoading && hasActivePlan) return null;
-  const showingPlan = ctaMode === 'plan';
-  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'} ${showingPlan ? 'is-plan' : 'is-shop'}`} aria-label="Your profile and Miniweb setup">
+  const hasProfile = Boolean(profile?.id || user?.id);
+  const openProfile = () => onOpenProfilePage?.('main');
+  return <section className={`dashboard-profile-snapshot ${hasProfile ? 'has-profile' : 'needs-profile'}`} aria-label="Your profile">
     {!loading && <div className="dashboard-miniweb-action">
-      <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy" key={showingPlan ? 'subscription' : 'shop'}><small>{showingPlan ? 'NEXT STEP' : hasMiniweb ? 'YOUR MINIWEB IS READY' : 'YOUR MINIWEB DASHBOARD'}</small><strong>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'Your dashboard is ready' : 'Open your dashboard'}</strong><p>{showingPlan ? 'Choose a plan to unlock more selling capacity and business tools.' : hasMiniweb ? 'Choose a subscription to unlock more tools for your business.' : 'Your personal Miniweb dashboard is being prepared for you.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : hasMiniweb ? openPlan : openMiniweb}><span>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'View dashboard' : 'Open dashboard'}</span><small className="dashboard-miniweb-hint">Open</small><ArrowRight size={16} /></button>
+      <span className="dashboard-miniweb-icon" aria-hidden="true"><UserRound size={22} /></span>
+      <div className="dashboard-miniweb-copy"><small>YOUR BESE26 PROFILE</small><strong>{name}</strong><p>Your profile is your shop. Manage your details, listings, messages and public profile from one place.</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={openProfile}><span>Open profile</span><small className="dashboard-miniweb-hint">View</small><ArrowRight size={16} /></button>
     </div>}
   </section>;
 }
