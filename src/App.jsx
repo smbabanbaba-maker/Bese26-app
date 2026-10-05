@@ -388,42 +388,6 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
-function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
-  const [profile, setProfile] = useState(null);
-  const [contacts, setContacts] = useState(null);
-  const [entitlement, setEntitlement] = useState(null);
-  const [loading, setLoading] = useState(Boolean(user));
-  const [planLoading, setPlanLoading] = useState(Boolean(user));
-  const [ctaMode, setCtaMode] = useState('shop');
-  useEffect(() => {
-    let mounted = true;
-    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
-    setLoading(true);
-    setPlanLoading(true);
-    fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
-    Promise.allSettled([getProfile(user.id), getProfileContacts(user.id)])
-      .then(([profileResult, contactsResult]) => { if (mounted) { setProfile(profileResult.status === 'fulfilled' ? profileResult.value : null); setContacts(contactsResult.status === 'fulfilled' ? contactsResult.value : null); } })
-      .finally(() => mounted && setLoading(false));
-    return () => { mounted = false; };
-  }, [user?.id]);
-  if (!user) return null;
-  const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
-  const username = profile?.username ? `@${profile.username}` : '@member';
-  const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
-  const hasProfile = Boolean(profile?.id || user?.id);
-  const planName = entitlement ? String(entitlement.plan_key || 'free').replace(/^./, (value) => value.toUpperCase()) : '';
-  const hasMiniweb = Boolean(profile?.username);
-  const openProfile = () => onOpenProfilePage?.('main');
-  return <section className={`dashboard-profile-snapshot ${hasProfile ? 'has-profile' : 'needs-profile'} ${hasMiniweb ? 'has-miniweb' : ''}`} aria-label="Your profile is your Bese26 shop">
-    {!loading && <div className="dashboard-miniweb-action">
-      <span className="dashboard-miniweb-icon" aria-hidden="true"><UserRound size={22} /></span>
-      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR BESE26 SHOP PROFILE' : 'YOUR BESE26 PROFILE'}</small><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={14} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span><span><span className="dashboard-profile-detail-icon" aria-hidden="true">PLAN</span>{planLoading ? 'Checking plan…' : entitlement ? `${planName} plan` : 'Plan unavailable'}</span></div><p>Your Bese26 profile is your shop. Manage your details, listings, messages and public profile from one place.</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={openProfile}><span>Open profile</span><small className="dashboard-miniweb-hint">View</small><ArrowRight size={16} /></button>
-    </div>}
-  </section>;
-}
-function MailIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">@</span>; }
-function PhoneIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">+234</span>; }
 function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   const campaign = campaigns.find((item) => item.placement === placement && item.image_url);
   if (!campaign) return null;
@@ -467,7 +431,7 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
         <div className="marketplace-quick-actions"><button type="button" onClick={() => onNavigate('sell')}><Plus size={15} /> How to sell</button><button type="button" onClick={() => onSearch('')}><Search size={15} /> How to buy</button><button type="button" onClick={() => onNavigate('business')}><Store size={15} /> Explore shops</button><button type="button" onClick={() => onNavigate('sell')}><Sparkles size={15} /> List an item</button></div>
       </section>
 
-      {user && <DashboardProfileSnapshot user={user} onNavigate={onNavigate} onOpenProfilePage={onOpenProfilePage} />}
+
       <section className="popular-categories"><SectionHeading eyebrow="CHOOSE A CATEGORY" title="What are you looking for?" action="View all" onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`Browse ${label}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{label}</strong></button>)}</div></section>
       {featuredListings.length > 0 && <section className="trending-deals-section" aria-label="Trending deals"><div className="trending-deals-heading"><div><div className="eyebrow">HOT OFFERS</div><h2>Trending deals</h2><p>Popular picks buyers are checking out now.</p></div><button type="button" className="trending-deals-view-all" onClick={() => onNavigate('search')}>View all <ArrowRight size={15} /></button></div><div className="trending-deals-rail">{featuredListings.slice(0, 4).map((listing) => <button type="button" className="trending-deal-card" key={listing.id} onClick={() => onOpenListing(listing)}><span className="trending-deal-image">{listing.image ? <img src={listing.image} alt="" loading="lazy" /> : <Package size={24} />}</span><span className="trending-deal-copy"><strong>{listing.title}</strong><b>{listing.price}</b><small><MapPin size={11} /> {listing.location}</small></span><span className="trending-deal-arrow"><ArrowUpRight size={15} /></span></button>)}</div></section>}
 
