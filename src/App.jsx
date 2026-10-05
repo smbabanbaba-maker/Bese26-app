@@ -391,19 +391,18 @@ function FirstVisitCard({ user, onNavigate }) {
 function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const [profile, setProfile] = useState(null);
   const [contacts, setContacts] = useState(null);
-  const [business, setBusiness] = useState(null);
   const [entitlement, setEntitlement] = useState(null);
   const [loading, setLoading] = useState(Boolean(user));
   const [planLoading, setPlanLoading] = useState(Boolean(user));
   const [ctaMode, setCtaMode] = useState('shop');
   useEffect(() => {
     let mounted = true;
-    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
     setLoading(true);
     setPlanLoading(true);
     fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
-    Promise.allSettled([getProfile(user.id), getProfileContacts(user.id), getBusinessProfile(user.id)])
-      .then(([profileResult, contactsResult, businessResult]) => { if (mounted) { setProfile(profileResult.status === 'fulfilled' ? profileResult.value : null); setContacts(contactsResult.status === 'fulfilled' ? contactsResult.value : null); setBusiness(businessResult.status === 'fulfilled' ? businessResult.value : null); } })
+    Promise.allSettled([getProfile(user.id), getProfileContacts(user.id)])
+      .then(([profileResult, contactsResult]) => { if (mounted) { setProfile(profileResult.status === 'fulfilled' ? profileResult.value : null); setContacts(contactsResult.status === 'fulfilled' ? contactsResult.value : null); } })
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
   }, [user?.id]);
@@ -412,13 +411,13 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const username = profile?.username ? `@${profile.username}` : '@member';
   const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
   const hasProfile = Boolean(profile?.id || user?.id);
-  const businessName = business?.business_name || '';
   const planName = entitlement ? String(entitlement.plan_key || 'free').replace(/^./, (value) => value.toUpperCase()) : '';
+  const hasMiniweb = Boolean(profile?.username);
   const openProfile = () => onOpenProfilePage?.('main');
-  return <section className={`dashboard-profile-snapshot ${hasProfile ? 'has-profile' : 'needs-profile'} ${businessName ? 'has-miniweb' : ''}`} aria-label="Your profile">
+  return <section className={`dashboard-profile-snapshot ${hasProfile ? 'has-profile' : 'needs-profile'} ${hasMiniweb ? 'has-miniweb' : ''}`} aria-label="Your profile is your Bese26 shop">
     {!loading && <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true"><UserRound size={22} /></span>
-      <div className="dashboard-miniweb-copy"><small>{businessName ? 'YOUR BUSINESS PROFILE' : 'YOUR BESE26 PROFILE'}</small><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={14} />}</div><div className="dashboard-profile-handle">{username}{businessName ? ` · ${businessName}` : ''}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span><span><span className="dashboard-profile-detail-icon" aria-hidden="true">PLAN</span>{planLoading ? 'Checking plan…' : entitlement ? `${planName} plan` : 'Plan unavailable'}</span></div><p>Your profile is your shop. Manage your details, listings, messages and public profile from one place.</p></div>
+      <div className="dashboard-miniweb-copy"><small>{hasMiniweb ? 'YOUR BESE26 SHOP PROFILE' : 'YOUR BESE26 PROFILE'}</small><div className="dashboard-profile-name"><strong>{name}</strong>{profile?.is_verified && <BadgeCheck size={14} />}</div><div className="dashboard-profile-handle">{username}</div><div className="dashboard-profile-details"><span><MailIcon />{user.email || 'Email not available'}</span><span><PhoneIcon />{phone}</span><span><span className="dashboard-profile-detail-icon" aria-hidden="true">PLAN</span>{planLoading ? 'Checking plan…' : entitlement ? `${planName} plan` : 'Plan unavailable'}</span></div><p>Your Bese26 profile is your shop. Manage your details, listings, messages and public profile from one place.</p></div>
       <button type="button" className="dashboard-miniweb-button" onClick={openProfile}><span>Open profile</span><small className="dashboard-miniweb-hint">View</small><ArrowRight size={16} /></button>
     </div>}
   </section>;
