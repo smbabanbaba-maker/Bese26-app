@@ -2009,3 +2009,53 @@ img.is-business-logo-previewable:focus-visible {
   .voice-note-play, .voice-note-waveform > span { transition: none; }
   .chat-voice-starting-spinner { animation: none; border-top-color: #a92530; }
 }
+
+
+/* Multiline chat writing: expand with text and preserve paragraphs in sent bubbles. */
+.messages-selected-page.messages-premium .chat-composer textarea.chat-message-composer-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 45px;
+  min-height: 45px;
+  max-height: 120px;
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 10px 14px;
+  border: 1px solid #e4e7ed !important;
+  border-radius: 15px !important;
+  color: #20283a !important;
+  background: #f8f9fb !important;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.messages-selected-page.messages-premium .chat-composer textarea.chat-message-composer-input:focus {
+  outline: none;
+  border-color: #d98286 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(201, 47, 58, 0.09) !important;
+}
+.messages-selected-page.messages-premium .chat-composer textarea.chat-message-composer-input::placeholder {
+  color: #929baa;
+  opacity: 1;
+}
+.messages-selected-page.messages-premium .chat-composer textarea.chat-message-composer-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+.messages-selected-page.messages-premium .message-bubble > span {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .messages-selected-page.messages-premium .chat-composer textarea.chat-message-composer-input {
+    min-height: 42px;
+    padding: 9px 12px;
+    border-radius: 13px !important;
+    font-size: 12px;
+  }
+}
