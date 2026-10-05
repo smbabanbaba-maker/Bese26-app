@@ -11605,3 +11605,21 @@ select:focus,
 @media (prefers-reduced-motion: reduce) {
   .marketplace-official-logo-main, .marketplace-hero-brand strong, .marketplace-hero-brand strong::after { animation: none !important; }
 }
+
+/* Photo-led category discovery, inspired by real marketplace browsing. */
+.home-category-section { display: grid; gap: 14px; }
+.home-category-rail { display: grid; grid-template-columns: repeat(6, minmax(104px,1fr)); gap: 10px; overflow-x: auto; padding: 1px 2px 7px; scrollbar-width: thin; scrollbar-color: #ffb0b0 transparent; }
+.home-category-rail::-webkit-scrollbar { height: 5px; }
+.home-category-rail::-webkit-scrollbar-thumb { border-radius: 99px; background: #ffb0b0; }
+.home-photo-category { display: grid !important; grid-template-rows: 92px auto; align-items: start !important; gap: 8px !important; min-width: 104px; padding: 0 !important; overflow: hidden; border: 1px solid #eadfe0 !important; border-radius: 16px !important; background: #fff !important; color: #202124 !important; box-shadow: 0 5px 14px rgba(28,20,20,.04); text-align: left !important; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease !important; }
+.home-photo-category:hover { transform: translateY(-4px); border-color: #ff9c9c !important; box-shadow: 0 13px 25px rgba(255,44,44,.12); }
+.home-category-image { display: block; width: 100%; height: 92px; overflow: hidden; background: #f8eeee; }
+.home-category-image img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .35s ease; }
+.home-photo-category:hover .home-category-image img { transform: scale(1.08); }
+.home-photo-category strong { display: block; min-height: 30px; padding: 0 10px 10px; color: #25272a !important; font-size: 10px; line-height: 1.25; }
+@media (min-width:1000px) { .home-category-rail { overflow-x: visible; } }
+@media (max-width:700px) {
+  .home-category-rail { grid-template-columns: repeat(6, 104px); margin-right: -16px; padding-right: 18px; }
+  .home-photo-category { grid-template-rows: 82px auto; }
+  .home-category-image { height: 82px; }
+}
