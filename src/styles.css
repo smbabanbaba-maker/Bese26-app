@@ -11782,3 +11782,9 @@ select:focus,
   .preferences-hub-card { padding: 12px; }
   .preferences-group-heading h3 { font-size: 15px; }
 }
+
+.preferences-auth-gate { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 42px 22px; text-align: center; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: 0 12px 24px rgba(35,15,18,.05); }
+.preferences-auth-gate .preferences-hub-icon { color: var(--red); border-color: rgba(255,44,44,.15); background: var(--danger-soft); }
+.preferences-auth-gate h2 { font-size: 20px; letter-spacing: -.4px; }
+.preferences-auth-gate p { max-width: 360px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.preferences-auth-gate .primary-button { display: inline-flex; align-items: center; gap: 7px; margin-top: 5px; }
