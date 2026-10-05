@@ -3,13 +3,13 @@ import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff, LockKeyh
 import { requestPasswordReset, resendSignupConfirmation, signIn, signUp, updatePassword } from '../lib/marketplace';
 
 function BrandHeader() {
-  return <div className="auth-reference-brand"><div className="auth-reference-logo"><img src="/images/bese26-logo-icon.png" alt="Bese26" /></div><div className="auth-reference-name">Bese<span>26</span></div><div className="auth-reference-tagline">BUY · SELL · CONNECT</div></div>;
+  return <div className="auth-reference-brand"><div className="auth-reference-logo"><img src="/images/bese26-logo-icon.webp" alt="Bese26" /></div></div>;
 }
 function Field({ icon: Icon, children, className = '' }) { return <div className={`auth-reference-field ${className}`}><span className="auth-reference-field-icon"><Icon size={18} /></span>{children}</div>; }
 function PasswordField({ id, value, onChange, placeholder, visible, onToggle, validationState = '' }) {
   return <Field icon={LockKeyhole} className={validationState ? `auth-reference-field-${validationState}` : ''}><input id={id} type={visible ? 'text' : 'password'} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id === 'loginPassword' ? 'current-password' : 'new-password'} required />{validationState && <span className="auth-reference-password-status" aria-label={validationState === 'valid' ? 'Password is valid' : 'Passwords do not match'}>{validationState === 'valid' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}</span>}<button type="button" className={`auth-reference-eye ${visible ? 'is-visible' : ''}`} onClick={onToggle} aria-label={visible ? 'Hide password' : 'Show password'}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></Field>;
 }
-function AuthLoading({ label }) { return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.png" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>; }
+function AuthLoading({ label }) { return <div className="auth-loading-overlay" role="status" aria-live="polite"><div className="auth-loading-orbit"><span /><span /><span /><img src="/images/bese26-logo-icon.webp" alt="" /></div><strong>{label}</strong><small>Keeping your account secure</small><LoaderCircle size={16} className="auth-loading-spinner" /></div>; }
 function normalizeNigerianPhone(value) {
   const digits = String(value || '').replace(/[\s()-]/g, '');
   if (digits.startsWith('+234')) return `+234${digits.slice(4)}`;
