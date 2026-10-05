@@ -932,7 +932,7 @@ export default function ListingDetailsView({
               setTouchStart(null);
             }}>
               {primaryImage
-                ? <button type="button" className="listing-new-image-button" onClick={(event) => { imageTriggerRef.current = event.currentTarget; setZoomed(true); }} aria-label={`Open photo ${activeImage + 1} of ${validImages.length} full screen`}><img src={primaryImage} alt={`${listing.title} image ${activeImage + 1}`} onError={() => setFailedImageUrls((current) => new Set([...current, primaryImage]))} /></button>
+                ? <button type="button" className="listing-new-image-button" onClick={(event) => { imageTriggerRef.current = event.currentTarget; setZoomed(true); }} aria-label={`Open photo ${activeImage + 1} of ${validImages.length} full screen`}><img key={primaryImage} src={primaryImage} alt={`${listing.title} image ${activeImage + 1}`} onError={() => setFailedImageUrls((current) => new Set([...current, primaryImage]))} /></button>
                 : <div className="listing-new-no-image"><ImageIcon size={30} /><span>No listing photo</span></div>}
               {validImages.length > 1 && <>
                 <button type="button" className="listing-new-gallery-arrow prev" onClick={previousImage} aria-label="Previous photo"><ArrowLeft size={17} /></button>

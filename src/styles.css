@@ -11645,3 +11645,36 @@ select:focus,
 .trending-deal-arrow { position: absolute; right: 7px; bottom: 7px; display: grid; place-items: center; width: 21px; height: 21px; border-radius: 7px; color: #b00000; background: #fff0f0; }
 @media (max-width:800px) { .trending-deals-rail { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 3px; scrollbar-width: thin; scrollbar-color: #ffb0b0 transparent; } .trending-deal-card { flex: 0 0 218px; } }
 @media (max-width:700px) { .trending-deals-section { gap: 12px; padding: 14px; border-radius: 17px; } .trending-deals-heading h2 { font-size: 19px; } .trending-deals-heading p { font-size: 9px; } .trending-deal-card { flex-basis: 205px; } }
+
+/* Product Details gallery: cinematic motion and premium image browsing. */
+.listing-details-view .listing-new-image-section { position: relative; }
+.listing-details-view .listing-new-image-frame { isolation: isolate; overflow: hidden; border: 1px solid rgba(255,255,255,.14); background: #090909; box-shadow: 0 18px 42px rgba(0,0,0,.2); }
+.listing-details-view .listing-new-image-frame::before { content: ''; position: absolute; z-index: 2; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 25%, rgba(255,255,255,.18) 48%, transparent 64%); background-size: 220% 100%; animation: listingGallerySweep 6s 1s ease-in-out infinite; }
+.listing-details-view .listing-new-image-frame::after { content: ''; position: absolute; z-index: 1; inset: auto 0 0; height: 30%; pointer-events: none; background: linear-gradient(transparent, rgba(0,0,0,.32)); }
+.listing-details-view .listing-new-image-button { position: relative; z-index: 0; overflow: hidden; background: radial-gradient(circle at 50% 30%, #fff, #edf0f4 72%); }
+.listing-details-view .listing-new-image-button img { animation: listingImageReveal .72s cubic-bezier(.23,1,.32,1) both, listingKenBurns 7s ease-out .65s both; transform-origin: center center; will-change: transform, opacity; }
+.listing-details-view .listing-new-gallery-arrow { z-index: 4; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.4); border-radius: 50%; color: #fff; background: rgba(0,0,0,.48); box-shadow: 0 8px 18px rgba(0,0,0,.22); backdrop-filter: blur(8px); transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+.listing-details-view .listing-new-gallery-arrow:hover { transform: scale(1.1); border-color: #ff7777; background: #ff2c2c; }
+.listing-details-view .listing-new-counter { z-index: 4; right: 14px; bottom: 14px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; color: #fff; background: rgba(0,0,0,.52); box-shadow: 0 6px 14px rgba(0,0,0,.2); backdrop-filter: blur(8px); font-weight: 800; }
+.listing-details-view .listing-new-thumbs { gap: 9px; padding: 12px 2px 3px; }
+.listing-details-view .listing-new-thumbs button { position: relative; overflow: hidden; border: 2px solid transparent; border-radius: 12px; opacity: .62; transform: translateY(0); transition: opacity .2s ease, transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.listing-details-view .listing-new-thumbs button:hover { opacity: .9; transform: translateY(-3px); }
+.listing-details-view .listing-new-thumbs button.active { border-color: #ff2c2c; opacity: 1; box-shadow: 0 0 0 3px rgba(255,44,44,.16), 0 8px 16px rgba(255,44,44,.13); transform: translateY(-3px); }
+.listing-details-view .listing-new-thumbs button.active::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.52) 50%, transparent 76%); background-size: 220% 100%; animation: listingThumbSweep 3.8s ease-in-out infinite; }
+.listing-details-view .listing-new-summary { animation: listingDetailsRise .55s .12s cubic-bezier(.23,1,.32,1) both; }
+.listing-details-view .listing-new-price { text-shadow: 0 3px 16px rgba(255,44,44,.13); }
+@keyframes listingImageReveal { from { opacity: 0; transform: scale(1.04) translateX(12px); } to { opacity: 1; transform: scale(1) translateX(0); } }
+@keyframes listingKenBurns { from { transform: scale(1); } to { transform: scale(1.045); } }
+@keyframes listingGallerySweep { 0%,70%,100% { background-position: 220% 0; opacity: 0; } 82% { background-position: -20% 0; opacity: 1; } }
+@keyframes listingThumbSweep { 0%,70%,100% { background-position: 220% 0; opacity: 0; } 82% { background-position: -20% 0; opacity: 1; } }
+@keyframes listingDetailsRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width:700px) {
+  .listing-details-view .listing-new-image-frame { border-radius: 0 0 20px 20px; }
+  .listing-details-view .listing-new-gallery-arrow { width: 36px; height: 36px; }
+  .listing-details-view .listing-new-counter { right: 11px; bottom: 11px; }
+  .listing-details-view .listing-new-thumbs { gap: 7px; padding-top: 10px; }
+  .listing-details-view .listing-new-thumbs button { border-radius: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .listing-details-view .listing-new-image-frame::before, .listing-details-view .listing-new-image-button img, .listing-details-view .listing-new-thumbs button.active::after, .listing-details-view .listing-new-summary { animation: none !important; }
+}
