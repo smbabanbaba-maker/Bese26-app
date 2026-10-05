@@ -11678,3 +11678,15 @@ select:focus,
 @media (prefers-reduced-motion: reduce) {
   .listing-details-view .listing-new-image-frame::before, .listing-details-view .listing-new-image-button img, .listing-details-view .listing-new-thumbs button.active::after, .listing-details-view .listing-new-summary { animation: none !important; }
 }
+
+/* Direct dashboard link card: the account's public Miniweb is created automatically. */
+.profile-dashboard-link-card { display: flex; align-items: center; gap: 14px; margin: 18px 0 6px; padding: 16px; border: 1px solid rgba(17,17,17,.12); border-radius: 20px; background: linear-gradient(135deg,#fff 0%,#fff7f7 100%); box-shadow: 0 12px 28px rgba(17,17,17,.06); }
+.profile-dashboard-link-icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 13px; color: #d71920; background: #fff; border: 1px solid rgba(215,25,32,.18); }
+.profile-dashboard-link-card > div:nth-child(2) { min-width: 0; flex: 1; }
+.profile-dashboard-link-card strong, .profile-dashboard-link-card small { display: block; }
+.profile-dashboard-link-card strong { margin-top: 3px; overflow: hidden; color: #111; font-size: .96rem; text-overflow: ellipsis; white-space: nowrap; }
+.profile-dashboard-link-card small { margin-top: 4px; color: #6b6b6b; line-height: 1.4; }
+.profile-dashboard-link-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.profile-dashboard-link-actions button { min-height: 36px; padding: 8px 12px; border-radius: 11px; font-size: .78rem; }
+@media (max-width: 620px) { .profile-dashboard-link-card { align-items: flex-start; flex-wrap: wrap; border-radius: 16px; } .profile-dashboard-link-actions { width: 100%; margin-left: 54px; justify-content: flex-start; } }
+

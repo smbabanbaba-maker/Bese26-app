@@ -1,4 +1,4 @@
-import { SITE_URL } from './site';
+import { SITE_URL, siteUrl } from './site';
 import { getAvatarUrl, getListingMediaUrls, getStoragePublicUrl, supabase } from './supabase';
 import { getBusinessLogoDisplayUrl, isOfficialBese26Business } from './businessLogoFit';
 
@@ -398,6 +398,34 @@ export async function updateProfile(userId, values) {
   const { data, error } = await supabase.from('profiles').update({ ...values, country: NIGERIA_COUNTRY }).eq('id', userId).select().single();
   if (error) throw error;
   return data;
+}
+
+function publicHandleSlug(value, fallback = 'member') {
+  const slug = String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30).replace(/-+$/, '');
+  if (slug.length >= 3) return slug;
+  const safeFallback = String(fallback || 'member').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 24);
+  return `${safeFallback || 'member'}-user`;
+}
+
+export async function ensureAccountDashboard(userId, { displayName = '', email = '' } = {}) {
+  failIfUnavailable();
+  if (!userId) return null;
+  let profile = await getProfile(userId);
+  const name = String(profile?.display_name || displayName || email.split('@')[0] || 'Bese26 user').trim() || 'Bese26 user';
+  let handle = String(profile?.username || '').replace(/^@/, '').trim().toLowerCase();
+  if (!handle) {
+    handle = publicHandleSlug(name, userId.replace(/-/g, '').slice(0, 8));
+    const availability = await checkBusinessHandleAvailability(handle, userId);
+    if (!availability.available) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
+    profile = await updateProfile(userId, { username: handle });
+  }
+  let business = await getBusinessProfile(userId);
+  if (!business) {
+    business = await saveBusinessProfile(userId, { business_name: name, business_handle: handle, email, country: NIGERIA_COUNTRY });
+  } else if (!business.business_handle) {
+    business = await saveBusinessProfile(userId, { ...business, business_name: business.business_name || name, business_handle: handle, email: business.email || email, country: NIGERIA_COUNTRY });
+  }
+  return { profile, business, handle, url: siteUrl(`/@${handle}`) };
 }
 
 export async function getProfileContacts(userId) {
