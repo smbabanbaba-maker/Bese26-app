@@ -402,9 +402,8 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
     setLoading(true);
     setPlanLoading(true);
     fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
-    Promise.all([getProfile(user.id), getProfileContacts(user.id), getBusinessProfile(user.id)])
-      .then(([nextProfile, nextContacts, nextBusiness]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); setBusiness(nextBusiness); } })
-      .catch(() => { if (mounted) { setProfile(null); setContacts(null); setBusiness(null); } })
+    Promise.allSettled([getProfile(user.id), getProfileContacts(user.id), getBusinessProfile(user.id)])
+      .then(([profileResult, contactsResult, businessResult]) => { if (mounted) { setProfile(profileResult.status === 'fulfilled' ? profileResult.value : null); setContacts(contactsResult.status === 'fulfilled' ? contactsResult.value : null); setBusiness(businessResult.status === 'fulfilled' ? businessResult.value : null); } })
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
   }, [user?.id]);
