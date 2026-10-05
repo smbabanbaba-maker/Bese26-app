@@ -419,13 +419,9 @@ export async function ensureAccountDashboard(userId, { displayName = '', email =
     if (!availability.available) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
     profile = await updateProfile(userId, { username: handle });
   }
-  let business = await getBusinessProfile(userId);
-  if (!business) {
-    business = await saveBusinessProfile(userId, { business_name: name, business_handle: handle, email, country: NIGERIA_COUNTRY });
-  } else if (!business.business_handle) {
-    business = await saveBusinessProfile(userId, { ...business, business_name: business.business_name || name, business_handle: handle, email: business.email || email, country: NIGERIA_COUNTRY });
-  }
-  return { profile, business, handle, url: siteUrl(`/@${handle}`) };
+  // Personal accounts do not receive an automatic business profile. CAC
+  // verification is stored against the profile's verification application.
+  return { profile, business: null, handle, url: siteUrl(`/@${handle}`) };
 }
 
 export async function getProfileContacts(userId) {
