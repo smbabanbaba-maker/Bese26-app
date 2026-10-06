@@ -785,7 +785,7 @@ async function attachBusinessIdentities(comments = []) {
   return comments.map((comment) => {
     const business = businesses[comment.user_id] || null;
     const idVerified = verificationIsCurrent(comment.user);
-    const cacVerified = Boolean(business && verificationIsCurrent(business));
+    const cacVerified = Boolean(comment.user?.cac_verified_name) || Boolean(business && verificationIsCurrent(business));
     return { ...comment, user: comment.user ? { ...comment.user, business, id_verified: idVerified, cac_verified: cacVerified } : comment.user, business, id_verified: idVerified, cac_verified: cacVerified };
   });
 }
@@ -795,17 +795,21 @@ async function attachBusinessIdentitiesToReviews(reviews = []) {
   if (!profileIds.length) return reviews;
   const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200);
   const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
-  return reviews.map((review) => ({
-    ...review,
-    reviewer: review.reviewer ? { ...review.reviewer, business: businesses[review.reviewer_id] || null } : review.reviewer,
-    reviewee: review.reviewee ? { ...review.reviewee, business: businesses[review.reviewee_id] || null } : review.reviewee,
-  }));
+  return reviews.map((review) => {
+    const reviewerBusiness = businesses[review.reviewer_id] || null;
+    const revieweeBusiness = businesses[review.reviewee_id] || null;
+    return {
+      ...review,
+      reviewer: review.reviewer ? { ...review.reviewer, business: reviewerBusiness, id_verified: verificationIsCurrent(review.reviewer), cac_verified: Boolean(review.reviewer.cac_verified_name) || Boolean(reviewerBusiness && verificationIsCurrent(reviewerBusiness)) } : review.reviewer,
+      reviewee: review.reviewee ? { ...review.reviewee, business: revieweeBusiness, id_verified: verificationIsCurrent(review.reviewee), cac_verified: Boolean(review.reviewee.cac_verified_name) || Boolean(revieweeBusiness && verificationIsCurrent(revieweeBusiness)) } : review.reviewee,
+    };
+  });
 }
 
 export async function fetchListingComments(listingId) {
   failIfUnavailable();
   if (!listingId) return [];
-  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
   return attachBusinessIdentities(data || []);
 }
@@ -821,7 +825,7 @@ export async function submitListingComment({ listingId, userId, body, parentComm
   const { error } = await supabase.from('listing_comments').insert(comment);
   if (error) throw error;
   try {
-    const { data: hydratedRow } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)').eq('id', id).maybeSingle();
+    const { data: hydratedRow } = await supabase.from('listing_comments').select('id,listing_id,user_id,parent_comment_id,body,status,created_at,user:profiles!listing_comments_user_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)').eq('id', id).maybeSingle();
     const [hydrated] = await attachBusinessIdentities([hydratedRow || comment]);
     return hydrated || comment;
   } catch {
@@ -876,7 +880,7 @@ export async function toggleListingCommentReaction({ commentId, userId, reaction
 export async function fetchListingReviews(listingId, userId = null) {
   failIfUnavailable();
   if (!listingId) return [];
-  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(20);
+  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)').eq('listing_id', listingId).order('created_at', { ascending: false }).limit(20);
   query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
   const { data, error } = await query;
   if (error) throw error;
@@ -886,7 +890,7 @@ export async function fetchListingReviews(listingId, userId = null) {
 export async function fetchSellerReviews(sellerId, userId = null) {
   failIfUnavailable();
   if (!sellerId) return [];
-  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path),listing:listings!reviews_listing_id_fkey(title)').eq('reviewee_id', sellerId).order('created_at', { ascending: false }).limit(50);
+  let query = supabase.from('reviews').select('id,listing_id,reviewer_id,rating,body,status,created_at,reviewer:profiles!reviews_reviewer_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at),listing:listings!reviews_listing_id_fkey(title)').eq('reviewee_id', sellerId).order('created_at', { ascending: false }).limit(50);
   query = userId ? query.or(`status.eq.published,reviewer_id.eq.${userId}`) : query.eq('status', 'published');
   const { data, error } = await query;
   if (error) throw error;
@@ -920,7 +924,7 @@ export async function fetchReviewComments(reviewId, userId = null) {
   failIfUnavailable();
   if (!reviewId) return [];
   let query = supabase.from('review_comments')
-    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)')
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)')
     .eq('review_id', reviewId)
     .order('created_at', { ascending: true })
     .limit(50);
@@ -961,7 +965,7 @@ export async function submitReviewComment({ reviewId, userId, body, parentCommen
   if (!reviewId || !userId || !text) throw new Error('Sign in and write a comment before posting.');
   if (text.length > 1000) throw new Error('Review comments must be 1,000 characters or fewer.');
   const { data, error } = await supabase.from('review_comments').insert({ review_id: reviewId, user_id: userId, parent_comment_id: parentCommentId || null, body: text })
-    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,is_verified,verification_expires_at)')
+    .select('id,review_id,user_id,parent_comment_id,body,status,created_at,user:profiles!review_comments_user_id_fkey(display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)')
     .single();
   if (error) throw error;
   const [hydrated] = await attachBusinessIdentities([data]);
@@ -1106,7 +1110,7 @@ export async function fetchPublicBusiness(handle) {
     if (!profileByName.error && profileByName.data?.id) return fetchPublicProfile('', profileByName.data.id);
     return fetchPublicProfile(normalized);
   }
-  const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
+  const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
   // The public storefront is the seller's searchable catalog. Keep the feed
   // broad so approved active products are not silently hidden after 60 rows.
@@ -1180,14 +1184,15 @@ export async function fetchBusinessDirectory(search = '') {
   if (error) throw error;
   const businesses = data || [];
   const profileIds = businesses.map((business) => business.profile_id).filter(Boolean);
-  let verifiedProfiles = new Set();
+  const profileById = {};
   if (profileIds.length) {
-    const { data: profiles } = await supabase.from('profiles').select('id,is_verified,verification_expires_at').in('id', profileIds);
-    verifiedProfiles = new Set((profiles || []).filter((profile) => verificationIsCurrent(profile)).map((profile) => profile.id));
+    const { data: profiles } = await supabase.from('profiles').select('id,cac_verified_name,cac_verified_at,is_verified,verification_expires_at').in('id', profileIds);
+    (profiles || []).forEach((profile) => { profileById[profile.id] = profile; });
   }
   return businesses.map((business) => {
-    const cacVerified = verificationIsCurrent(business);
-    const idVerified = verifiedProfiles.has(business.profile_id);
+    const profile = profileById[business.profile_id] || {};
+    const cacVerified = Boolean(profile.cac_verified_name) || verificationIsCurrent(business);
+    const idVerified = verificationIsCurrent(profile);
     return {
       ...business,
       id_verified: idVerified,
@@ -1322,7 +1327,7 @@ export async function fetchNotifications(userId) {
   const businessIds = [...new Set(rows.map((row) => row.data?.business_profile_id).filter(Boolean))];
   const businessOwnerIds = [...new Set([...actorIds, ...businessIds])];
   const [{ data: profiles, error: profilesError }, { data: businesses, error: businessesError }, { data: listings, error: listingsError }] = await Promise.all([
-    actorIds.length ? supabase.from('profiles').select('id,display_name,username,avatar_path,is_verified,verification_expires_at,app_role').in('id', actorIds) : Promise.resolve({ data: [], error: null }),
+    actorIds.length ? supabase.from('profiles').select('id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at,app_role').in('id', actorIds) : Promise.resolve({ data: [], error: null }),
     businessOwnerIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,verification_expires_at,is_active').in('profile_id', businessOwnerIds).eq('is_active', true) : Promise.resolve({ data: [], error: null }),
     listingIds.length ? supabase.from('listings').select('id,title,listing_media(storage_path,media_type,sort_order)').in('id', listingIds) : Promise.resolve({ data: [], error: null }),
   ]);
@@ -1474,7 +1479,7 @@ export async function fetchProfileReviews(userId, mode = 'about') {
   const column = mode === 'mine' ? 'reviewer_id' : 'reviewee_id';
   const { data, error } = await supabase
     .from('reviews')
-    .select('id,listing_id,reviewer_id,reviewee_id,rating,body,status,created_at,listing:listings!listing_id(id,title),reviewer:profiles!reviews_reviewer_id_fkey(id,display_name,avatar_path),reviewee:profiles!reviews_reviewee_id_fkey(id,display_name,avatar_path)')
+    .select('id,listing_id,reviewer_id,reviewee_id,rating,body,status,created_at,listing:listings!listing_id(id,title),reviewer:profiles!reviews_reviewer_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at),reviewee:profiles!reviews_reviewee_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at)')
     .eq(column, userId)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -1666,7 +1671,7 @@ export async function fetchProfileRelations(userId, mode = 'followers') {
   if (!userId) return [];
   const isFollowers = mode === 'followers';
   const column = isFollowers ? 'following_id' : 'follower_id';
-  const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,is_verified)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,is_verified)';
+  const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified)';
   const { data, error } = await supabase.from('profile_follows').select(`follower_id,following_id,created_at,${relation}`).eq(column, userId).order('created_at', { ascending: false }).limit(200);
   if (error) throw error;
   const rows = data || [];
@@ -1891,7 +1896,7 @@ export async function fetchConversations(userId) {
   const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
   const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }, { data: messageRows, error: messageError }, { data: unreadRows, error: unreadError }] = await Promise.all([
     listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
-    profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
+    profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200) : Promise.resolve({ data: [], error: null }),
     conversationIds.length ? supabase.from('messages').select('conversation_id,sender_id,body,attachment_path,attachment_mime_type,created_at,read_at').in('conversation_id', conversationIds).order('created_at', { ascending: false }).limit(300) : Promise.resolve({ data: [], error: null }),
     conversationIds.length ? supabase.from('messages').select('conversation_id').in('conversation_id', conversationIds).neq('sender_id', userId).is('read_at', null).limit(500) : Promise.resolve({ data: [], error: null }),
