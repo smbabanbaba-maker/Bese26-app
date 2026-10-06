@@ -1038,6 +1038,25 @@ export async function setListingStatus(listingId, ownerId, status) {
   return updateListing(listingId, ownerId, { status, updated_at: new Date().toISOString() });
 }
 
+function mergeProfileIntoPublicBusiness(profile, business) {
+  if (!business) return null;
+  const merged = {
+    ...business,
+    // Personal Profile is the single source of truth for public identity.
+    business_name: profile?.display_name ?? business.business_name,
+    business_handle: profile?.username ?? business.business_handle,
+    logo_path: profile?.avatar_path ?? business.logo_path,
+    description: profile?.bio ?? business.description,
+    country: profile?.country ?? business.country,
+    state: profile?.state ?? business.state,
+    city: profile?.city ?? business.city,
+  };
+  return {
+    ...merged,
+    logo_url: getBusinessLogoDisplayUrl(merged, merged.logo_path ? getAvatarUrl(merged.logo_path) : ''),
+  };
+}
+
 export async function fetchPublicBusiness(handle) {
   failIfUnavailable();
   const normalized = String(handle || '').replace(/^@/, '').trim().toLowerCase();
@@ -1095,7 +1114,8 @@ export async function fetchPublicBusiness(handle) {
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', business.profile_id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(1000));
   if (listingsError) throw listingsError;
   const listings = await hydrateListingRows(rows || [], { firstMediaOnly: true });
-  return { business: { ...business, is_verified: verificationIsCurrent(business) }, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
+  const publicBusiness = mergeProfileIntoPublicBusiness(ownerProfile, { ...business, is_verified: verificationIsCurrent(business) });
+  return { business: publicBusiness, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
 }
 
 export async function fetchPublicSellerViews(userId) {
@@ -1141,11 +1161,10 @@ export async function fetchPublicProfile(username, profileId = null) {
       .maybeSingle());
   }
   if (businessError) throw businessError;
-  const business = businessRow ? {
+  const business = mergeProfileIntoPublicBusiness(profile, businessRow ? {
     ...businessRow,
     is_verified: verificationIsCurrent(businessRow),
-    logo_url: getBusinessLogoDisplayUrl(businessRow, businessRow.logo_path ? getAvatarUrl(businessRow.logo_path) : ''),
-  } : null;
+  } : null);
   let { data: rows, error: listingsError } = await supabase.from('listings').select(listingSelectWithOwnership).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(1000);
   if (listingsError && /business_profile_id|published_as_type|column/i.test(listingsError.message || '')) ({ data: rows, error: listingsError } = await supabase.from('listings').select(listingSelect).eq('seller_id', profile.id).eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(1000));
   if (listingsError) throw listingsError;
