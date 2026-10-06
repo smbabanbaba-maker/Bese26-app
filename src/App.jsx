@@ -388,6 +388,52 @@ function FirstVisitCard({ user, onNavigate }) {
   if (!user) return null;
   return null;
 }
+function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
+  const [profile, setProfile] = useState(null);
+  const [contacts, setContacts] = useState(null);
+  const [business, setBusiness] = useState(null);
+  const [entitlement, setEntitlement] = useState(null);
+  const [loading, setLoading] = useState(Boolean(user));
+  const [planLoading, setPlanLoading] = useState(Boolean(user));
+  const [ctaMode, setCtaMode] = useState('shop');
+  useEffect(() => {
+    let mounted = true;
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
+    setLoading(true);
+    setPlanLoading(true);
+    fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
+    Promise.all([ensureAccountDashboard(user.id, { displayName: user.user_metadata?.display_name, email: user.email || '' }), getProfileContacts(user.id)])
+      .then(([dashboard, nextContacts]) => { if (mounted) { setProfile(dashboard?.profile || null); setContacts(nextContacts); setBusiness(dashboard?.business || null); } })
+      .catch(() => { if (mounted) { setProfile(null); setContacts(null); setBusiness(null); } })
+      .finally(() => mounted && setLoading(false));
+    return () => { mounted = false; };
+  }, [user?.id]);
+  if (!user) return null;
+  const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
+  const username = profile?.username ? `@${profile.username}` : '@member';
+  const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
+  const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
+  const hasActivePlan = Boolean(hasMiniweb && entitlement?.is_paid);
+  useEffect(() => {
+    setCtaMode('shop');
+    if (hasActivePlan) return undefined;
+    const timer = window.setTimeout(() => setCtaMode('plan'), 3000);
+    return () => window.clearTimeout(timer);
+  }, [hasMiniweb, hasActivePlan]);
+  const openMiniweb = () => { const handle = String(business?.business_handle || profile?.username || '').replace(/^@/, '').trim().toLowerCase(); if (handle) window.location.assign(`/@${handle}`); else onOpenProfilePage?.('business'); };
+  const openPlan = () => setCtaMode('plan');
+  if (!loading && !planLoading && hasActivePlan) return null;
+  const showingPlan = ctaMode === 'plan';
+  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'} ${showingPlan ? 'is-plan' : 'is-shop'}`} aria-label="Your profile and Miniweb setup">
+    {!loading && <div className="dashboard-miniweb-action">
+      <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
+      <div className="dashboard-miniweb-copy" key={showingPlan ? 'subscription' : 'shop'}><small>{showingPlan ? 'NEXT STEP' : hasMiniweb ? 'YOUR MINIWEB IS READY' : 'YOUR MINIWEB DASHBOARD'}</small><strong>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'Your dashboard is ready' : 'Open your dashboard'}</strong><p>{showingPlan ? 'Choose a plan to unlock more selling capacity and business tools.' : hasMiniweb ? 'Choose a subscription to unlock more tools for your business.' : 'Your personal Miniweb dashboard is being prepared for you.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : openMiniweb}><span>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'View dashboard' : 'Open dashboard'}</span><small className="dashboard-miniweb-hint">Open</small><ArrowRight size={16} /></button>
+    </div>}
+  </section>;
+}
+function MailIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">@</span>; }
+function PhoneIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">+234</span>; }
 function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   const campaign = campaigns.find((item) => item.placement === placement && item.image_url);
   if (!campaign) return null;
