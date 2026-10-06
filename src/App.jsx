@@ -1214,9 +1214,9 @@ function usePublicSeo({ title, description, canonical, image = SEO_DEFAULT_IMAGE
   }, [title, description, canonical, image, schema]);
 }
 
-function PublicBusinessPage({ handle }) {
+function PublicBusinessPage({ handle, profileId = null }) {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
-  useEffect(() => { let mounted = true; fetchPublicBusiness(handle).then((data) => data || fetchPublicProfile(handle)).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load this public profile.' })); return () => { mounted = false; }; }, [handle]);
+  useEffect(() => { let mounted = true; const request = profileId ? fetchPublicProfile('', profileId) : fetchPublicBusiness(handle).then((data) => data || fetchPublicProfile(handle)); request.then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load this public profile.' })); return () => { mounted = false; }; }, [handle, profileId]);
 const seoData = state.data;
   const seoBusiness = seoData?.business || seoData?.profile?.business;
   const seoProfile = seoData?.profile || seoData?.ownerProfile;
@@ -1332,9 +1332,11 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
 
 function AppContent() {
   const { t } = useI18n();
+  const publicSellerId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?seller\/([0-9a-f-]{20,})\/?$/i)?.[1] : null;
   const publicHandle = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || window.location.pathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
   const publicListingId = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?listing\/([^/]+)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('listing') || new URLSearchParams(window.location.search).get('listing_id')) : null;
   if (publicListingId) return <PublicListingRoute listingId={publicListingId} />;
+  if (publicSellerId) return <PublicBusinessPage profileId={publicSellerId} handle={publicSellerId} />;
   if (publicHandle) return <PublicBusinessPage handle={publicHandle} />;
   const [activeNav, setActiveNav] = useState('home');
   const navigationReadyRef = useRef(false);

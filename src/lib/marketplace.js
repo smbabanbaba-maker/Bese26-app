@@ -1113,11 +1113,12 @@ export async function fetchPublicProfileViewHistory(profileId, days = 14) {
   if (error) throw error;
   return Array.isArray(data) ? data : [];
 }
-export async function fetchPublicProfile(username) {
+export async function fetchPublicProfile(username, profileId = null) {
   failIfUnavailable();
   const normalized = String(username || '').replace(/^@/, '').trim().toLowerCase();
-  if (!normalized) return null;
-  const { data: profile, error: profileError } = await supabase.from('profiles').select('id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at').eq('username', normalized).maybeSingle();
+  if (!normalized && !profileId) return null;
+  const profileSelect = supabase.from('profiles').select('id,username,display_name,cac_verified_name,cac_verified_at,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count,created_at');
+  const { data: profile, error: profileError } = await (profileId ? profileSelect.eq('id', profileId) : profileSelect.eq('username', normalized)).maybeSingle();
   if (profileError) throw profileError;
   if (!profile) return null;
   let { data: businessRow, error: businessError } = await supabase.from('business_profiles')
