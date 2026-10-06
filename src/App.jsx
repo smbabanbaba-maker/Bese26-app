@@ -1223,14 +1223,15 @@ const seoData = state.data;
   const seoListings = seoData?.listings || [];
   const seoName = seoBusiness?.business_name || seoProfile?.display_name || handle;
   const seoDescription = seoText(seoBusiness?.description || seoProfile?.bio, `${seoName} on Bese26 — discover listings, products and services in Nigeria.`);
-  const seoCanonical = `${SEO_SITE_URL}/@${String(seoBusiness?.business_handle || seoProfile?.username || handle).toLowerCase()}`;
+  const publicPath = seoBusiness?.business_handle || seoProfile?.username ? `/@${String(seoBusiness?.business_handle || seoProfile?.username).toLowerCase()}` : profileId ? `/seller/${encodeURIComponent(profileId)}` : `/@${String(handle || '').toLowerCase()}`;
+  const seoCanonical = `${SEO_SITE_URL}${publicPath}`;
   const seoBusinessImage = getBusinessLogoDisplayUrl(seoBusiness, getAvatarUrl(seoBusiness?.logo_path)) || SEO_DEFAULT_IMAGE;
   usePublicSeo({ title: seoBusiness ? `${seoName} | Official company profile` : `${seoName} | Bese26 profile`, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage, schema: seoData ? seoPublicProfileSchema({ business: seoBusiness, profile: seoProfile, listings: seoListings, name: seoName, description: seoDescription, canonical: seoCanonical, image: seoBusinessImage }) : null });
   if (state.loading) return <MiniwebDashboardShell />;
   if (state.error || !state.data) return <div className="public-business-shell"><section className="public-business-not-found"><div className="brand-mark">B</div><div className="eyebrow">BESE26 SHOP</div><h1>Shop not found</h1><p>This public shop does not exist, is inactive, or has no public profile.</p><a className="primary-button" href="https://bese26.shop/">Back to Bese26 <ArrowRight size={16} /></a></section></div>;
   if (state.data.profile) { const { profile, listings } = state.data; return <PublicPersonalPage data={{ profile, listings }} />; }
   const { business, ownerProfile, listings } = state.data;
-  const share = async () => { const url = `https://bese26.shop/@${business.business_handle}`; if (navigator.share) await navigator.share({ title: business.business_name, text: business.description || business.business_name, url }); else await navigator.clipboard?.writeText(url); };
+  const share = async () => { const url = `https://bese26.shop${publicPath}`; if (navigator.share) await navigator.share({ title: business?.business_name || seoName, text: business?.description || seoName, url }); else await navigator.clipboard?.writeText(url); };
   return <PublicStorefrontLayout title={business.business_name} share={share}><div className="storefront-shell-intro"><span className="storefront-live-dot" /> <span>PUBLIC BUSINESS</span></div><PublicProfileHeader profile={ownerProfile} business={business} listings={listings} share={share} /><PublicBusinessAbout business={business} /><PublicListingSection title={`Listings from ${business.business_name}`} listings={listings} /></PublicStorefrontLayout>;
 }
 function PublicListingRoute({ listingId }) {
