@@ -1065,7 +1065,16 @@ export async function fetchPublicBusiness(handle) {
     if (legacyLookup.error) throw legacyLookup.error;
     business = legacyLookup.data;
   }
-  if (!business) return null;
+  if (!business) {
+    let legacyNameLookup = await supabase.from('business_profiles').select(businessFields).ilike('business_name', String(handle || '').trim()).maybeSingle();
+    if (legacyNameLookup.error && /contact_preference|column/i.test(legacyNameLookup.error.message || '')) legacyNameLookup = await supabase.from('business_profiles').select(legacyBusinessFields).ilike('business_name', String(handle || '').trim()).maybeSingle();
+    if (legacyNameLookup.error) throw legacyNameLookup.error;
+    business = legacyNameLookup.data;
+  }
+  // Every registered account has a public profile, even when it has never
+  // completed the optional business setup. Return that profile as the same
+  // Miniweb dashboard instead of treating the route as a missing shop.
+  if (!business) return fetchPublicProfile(normalized);
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
   // The public storefront is the seller's searchable catalog. Keep the feed
