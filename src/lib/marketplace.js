@@ -1077,7 +1077,16 @@ export async function fetchPublicBusiness(handle) {
   // Every registered account has a public profile, even when it has never
   // completed the optional business setup. Return that profile as the same
   // Miniweb dashboard instead of treating the route as a missing shop.
-  if (!business) return fetchPublicProfile(normalized);
+  if (!business) {
+    // Handles are not always the same as the visible profile/business name.
+    // Resolve the friendly URL to the account first, then load its public
+    // miniweb by immutable profile id.
+    const profileByUsername = await supabase.from('profiles').select('id').ilike('username', normalized).maybeSingle();
+    if (!profileByUsername.error && profileByUsername.data?.id) return fetchPublicProfile('', profileByUsername.data.id);
+    const profileByName = await supabase.from('profiles').select('id').ilike('display_name', String(handle || '').trim()).maybeSingle();
+    if (!profileByName.error && profileByName.data?.id) return fetchPublicProfile('', profileByName.data.id);
+    return fetchPublicProfile(normalized);
+  }
   const { data: ownerProfile, error: ownerError } = await supabase.from('profiles').select('id,display_name,username,avatar_path,bio,city,state,country,account_type,is_verified,verification_expires_at,seller_rating,seller_rating_count').eq('id', business.profile_id).maybeSingle();
   if (ownerError) throw ownerError;
   // The public storefront is the seller's searchable catalog. Keep the feed
