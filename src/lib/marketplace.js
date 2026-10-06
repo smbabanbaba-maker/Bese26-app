@@ -1044,15 +1044,18 @@ export async function fetchPublicBusiness(handle) {
   if (!normalized) return null;
   const businessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,contact_preference,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,verification_status,verification_expires_at,is_active,created_at';
   const legacyBusinessFields = 'profile_id,business_name,business_handle,business_type,logo_path,category,description,phone,whatsapp,email,country,state,city,area,address,business_hours,website,social_links,delivery_available,pickup_available,years_in_business,public_contact,location_visibility,is_verified,is_active,created_at';
-  let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle();
-  if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).eq('is_active', true).maybeSingle());
+  // Direct public links must remain resolvable even when a shop is no longer
+  // shown in the directory. Directory visibility and a shared storefront URL
+  // are separate concerns; the owner can still be found through /@handle.
+  let { data: business, error: businessError } = await supabase.from('business_profiles').select(businessFields).eq('business_handle', normalized).maybeSingle();
+  if (businessError && /contact_preference|column/i.test(businessError.message || '')) ({ data: business, error: businessError } = await supabase.from('business_profiles').select(legacyBusinessFields).eq('business_handle', normalized).maybeSingle());
   if (businessError) throw businessError;
   // A public company can be discovered by its real name, not only by its
   // handle. This keeps /business/sylution and /@sylution useful when a buyer
   // searches for “SYLUTION” without knowing the Bese26 handle first.
   if (!business) {
-    let nameLookup = await supabase.from('business_profiles').select(businessFields).ilike('business_name', String(handle || '').trim()).eq('is_active', true).maybeSingle();
-    if (nameLookup.error && /contact_preference|column/i.test(nameLookup.error.message || '')) nameLookup = await supabase.from('business_profiles').select(legacyBusinessFields).ilike('business_name', String(handle || '').trim()).eq('is_active', true).maybeSingle();
+    let nameLookup = await supabase.from('business_profiles').select(businessFields).ilike('business_name', String(handle || '').trim()).maybeSingle();
+    if (nameLookup.error && /contact_preference|column/i.test(nameLookup.error.message || '')) nameLookup = await supabase.from('business_profiles').select(legacyBusinessFields).ilike('business_name', String(handle || '').trim()).maybeSingle();
     if (nameLookup.error) throw nameLookup.error;
     business = nameLookup.data;
   }
@@ -1120,13 +1123,11 @@ export async function fetchPublicProfile(username) {
   let { data: businessRow, error: businessError } = await supabase.from('business_profiles')
     .select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,is_verified,verification_expires_at,is_active')
     .eq('profile_id', profile.id)
-    .eq('is_active', true)
     .maybeSingle();
   if (businessError && /verification_expires_at|column/i.test(businessError.message || '')) {
     ({ data: businessRow, error: businessError } = await supabase.from('business_profiles')
       .select('profile_id,business_name,business_handle,business_type,logo_path,category,description,country,state,city,is_verified,is_active')
       .eq('profile_id', profile.id)
-      .eq('is_active', true)
       .maybeSingle());
   }
   if (businessError) throw businessError;
