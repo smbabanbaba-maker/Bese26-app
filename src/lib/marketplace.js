@@ -157,7 +157,7 @@ export async function verifyEmailOtp({ email, token }) {
   const value = String(email || '').trim().toLowerCase();
   const code = String(token || '').trim();
   if (!value || !code) throw new Error('Enter the email and 6-digit code.');
-  const { data, error } = await supabase.auth.verifyOtp({ email: value, token: code, type: 'email' });
+  const { data, error } = await supabase.auth.verifyOtp({ email: value, token: code, type: 'signup' });
   if (error) throw error;
   return data;
 }
