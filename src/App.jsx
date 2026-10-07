@@ -1103,7 +1103,20 @@ function OwnerMiniwebDashboard({ user, onBack, onNavigate, onOpenSubscription, o
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   useEffect(() => {
     let mounted = true;
-    fetchPublicProfile('', user?.id).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load your Miniweb.' }));
+    const load = async () => {
+      try {
+        if (!user?.id) throw new Error('An tabbatar da account session ɗinka sannan ka sake gwadawa.');
+        const savedProfile = await getProfile(user.id);
+        const publicData = savedProfile?.username
+          ? await fetchPublicProfile(savedProfile.username)
+          : await fetchPublicProfile('', user.id);
+        if (!publicData) throw new Error('Ba a sami profile ɗinka ba. Ka buɗe Gyara profile ka ajiye bayananka sannan ka sake gwadawa.');
+        if (mounted) setState({ loading: false, data: publicData, error: '' });
+      } catch (error) {
+        if (mounted) setState({ loading: false, data: null, error: error.message || 'Ba a iya loda Miniweb ɗinka ba.' });
+      }
+    };
+    load();
     return () => { mounted = false; };
   }, [user?.id]);
   const data = state.data;
