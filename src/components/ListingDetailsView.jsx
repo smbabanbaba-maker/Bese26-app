@@ -279,6 +279,7 @@ function ReviewFeedbackCard({
           {reviewerAvatar ? <img src={reviewerAvatar} alt="" loading="lazy" onLoad={reviewerIdentity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : reviewer.slice(0, 1).toUpperCase()}
         </div>
         <strong>{reviewer}</strong>
+        <VerificationBadges idVerified={Boolean(review.reviewer?.id_verified)} cacVerified={Boolean(review.reviewer?.cac_verified)} compact />
         <time dateTime={review.created_at || undefined}>{formatFeedbackDate(review.created_at)}</time>
         {review.status === 'pending' && review.reviewer_id === user?.id && <span className="listing-review-pending">Pending review</span>}
         <button type="button" className="listing-review-more" aria-label="Review options" aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>

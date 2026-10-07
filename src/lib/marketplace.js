@@ -42,6 +42,21 @@ function verificationIsCurrent(record = {}) {
   return (verified || statusVerified) && (!expiresAt || expiresAt > Date.now());
 }
 
+async function queryActiveBusinessProfiles(profileIds = [], limit = 100) {
+  const ids = [...new Set(profileIds.filter(Boolean))];
+  if (!ids.length) return { data: [], error: null };
+  const query = (includeExpiry) => supabase.from('business_profiles')
+    .select(`profile_id,business_name,business_handle,logo_path,is_verified,verification_status,${includeExpiry ? 'verification_expires_at,' : ''}is_active`)
+    .in('profile_id', ids)
+    .eq('is_active', true)
+    .limit(limit);
+  let result = await query(true);
+  if (result.error && /verification_expires_at|column|schema cache/i.test(result.error.message || '')) {
+    result = await query(false);
+  }
+  return result;
+}
+
 export function mapListing(row) {
   const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
   const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
@@ -802,7 +817,7 @@ export async function submitListingReview({ listingId, reviewerId, revieweeId, r
 async function attachBusinessIdentities(comments = []) {
   const profileIds = [...new Set(comments.map((comment) => comment.user_id).filter(Boolean))];
   if (!profileIds.length) return comments;
-  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(100);
+  const { data } = await queryActiveBusinessProfiles(profileIds, 100);
   const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
   return comments.map((comment) => {
     const business = businesses[comment.user_id] || null;
@@ -815,7 +830,7 @@ async function attachBusinessIdentities(comments = []) {
 async function attachBusinessIdentitiesToReviews(reviews = []) {
   const profileIds = [...new Set(reviews.flatMap((review) => [review.reviewer_id, review.reviewee_id]).filter(Boolean))];
   if (!profileIds.length) return reviews;
-  const { data } = await supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200);
+  const { data } = await queryActiveBusinessProfiles(profileIds, 200);
   const businesses = Object.fromEntries((data || []).map((business) => [business.profile_id, { ...business, logo_url: getBusinessLogoDisplayUrl(business, business.logo_path ? getAvatarUrl(business.logo_path) : '') }]));
   return reviews.map((review) => {
     const reviewerBusiness = businesses[review.reviewer_id] || null;
@@ -1571,7 +1586,7 @@ export async function fetchProfileReviews(userId, mode = 'about') {
   const column = mode === 'mine' ? 'reviewer_id' : 'reviewee_id';
   const { data, error } = await supabase
     .from('reviews')
-    .select('id,listing_id,reviewer_id,reviewee_id,rating,body,status,created_at,listing:listings!listing_id(id,title),reviewer:profiles!reviews_reviewer_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at),reviewee:profiles!reviews_reviewee_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at)')
+    .select('id,listing_id,reviewer_id,reviewee_id,rating,body,status,created_at,listing:listings!listing_id(id,title),reviewer:profiles!reviews_reviewer_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at),reviewee:profiles!reviews_reviewee_id_fkey(id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)')
     .eq(column, userId)
     .order('created_at', { ascending: false })
     .limit(100);
@@ -1697,9 +1712,20 @@ export async function uploadBusinessLogo({ userId, file, previousPath = null }) 
 export async function fetchBlockedUsers(userId) {
   failIfUnavailable();
   if (!userId) return [];
-  const { data, error } = await supabase.from('profile_blocks').select('blocked_id,created_at,blocked:profiles!profile_blocks_blocked_id_fkey(id,display_name,username,avatar_path)').eq('blocker_id', userId).order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await supabase.from('profile_blocks').select('blocked_id,created_at,blocked:profiles!profile_blocks_blocked_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)').eq('blocker_id', userId).order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
-  return data || [];
+  const rows = data || [];
+  const profileIds = [...new Set(rows.map((row) => row.blocked?.id).filter(Boolean))];
+  if (!profileIds.length) return rows;
+  const { data: businesses, error: businessError } = await queryActiveBusinessProfiles(profileIds, 100);
+  if (businessError) throw businessError;
+  const businessByProfile = Object.fromEntries((businesses || []).map((business) => [business.profile_id, business]));
+  return rows.map((row) => {
+    const profile = row.blocked;
+    if (!profile) return row;
+    const business = businessByProfile[profile.id] || null;
+    return { ...row, blocked: { ...profile, business, id_verified: verificationIsCurrent(profile), cac_verified: Boolean(profile.cac_verified_name) || Boolean(business && verificationIsCurrent(business)) } };
+  });
 }
 
 export async function blockUser(userId, blockedId) {
@@ -1763,24 +1789,30 @@ export async function fetchProfileRelations(userId, mode = 'followers') {
   if (!userId) return [];
   const isFollowers = mode === 'followers';
   const column = isFollowers ? 'following_id' : 'follower_id';
-  const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified)';
+  const relation = isFollowers ? 'follower:profiles!profile_follows_follower_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)' : 'following:profiles!profile_follows_following_id_fkey(id,display_name,username,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at)';
   const { data, error } = await supabase.from('profile_follows').select(`follower_id,following_id,created_at,${relation}`).eq(column, userId).order('created_at', { ascending: false }).limit(200);
   if (error) throw error;
   const rows = data || [];
   const relationKey = isFollowers ? 'follower' : 'following';
   const profileIds = [...new Set(rows.map((row) => row[relationKey]?.id).filter(Boolean))];
   if (!profileIds.length) return rows;
-  const { data: businesses, error: businessError } = await supabase.from('business_profiles')
-    .select('profile_id,business_name,business_handle,logo_path,is_active')
-    .in('profile_id', profileIds)
-    .eq('is_active', true)
-    .limit(200);
+  const { data: businesses, error: businessError } = await queryActiveBusinessProfiles(profileIds, 200);
   if (businessError) throw businessError;
   const businessByProfile = Object.fromEntries((businesses || []).map((business) => [business.profile_id, business]));
-  return rows.map((row) => ({
-    ...row,
-    [relationKey]: row[relationKey] ? { ...row[relationKey], business: businessByProfile[row[relationKey].id] || null } : row[relationKey],
-  }));
+  return rows.map((row) => {
+    const profile = row[relationKey];
+    if (!profile) return row;
+    const business = businessByProfile[profile.id] || null;
+    return {
+      ...row,
+      [relationKey]: {
+        ...profile,
+        business,
+        id_verified: verificationIsCurrent(profile),
+        cac_verified: Boolean(profile.cac_verified_name) || Boolean(business && verificationIsCurrent(business)),
+      },
+    };
+  });
 }
 
 export async function fetchFollowSummary(userId) {
@@ -1997,8 +2029,8 @@ export async function fetchConversations(userId) {
   const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
   const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }, { data: messageRows, error: messageError }, { data: unreadRows, error: unreadError }] = await Promise.all([
     listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
-    profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
-    profileIds.length ? supabase.from('business_profiles').select('profile_id,business_name,business_handle,logo_path,is_verified,verification_status,is_active').in('profile_id', profileIds).eq('is_active', true).limit(200) : Promise.resolve({ data: [], error: null }),
+    profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
+    profileIds.length ? queryActiveBusinessProfiles(profileIds, 200) : Promise.resolve({ data: [], error: null }),
     conversationIds.length ? supabase.from('messages').select('conversation_id,sender_id,body,attachment_path,attachment_mime_type,created_at,read_at').in('conversation_id', conversationIds).order('created_at', { ascending: false }).limit(300) : Promise.resolve({ data: [], error: null }),
     conversationIds.length ? supabase.from('messages').select('conversation_id').in('conversation_id', conversationIds).neq('sender_id', userId).is('read_at', null).limit(500) : Promise.resolve({ data: [], error: null }),
   ]);
@@ -2009,7 +2041,16 @@ export async function fetchConversations(userId) {
   if (unreadError) throw unreadError;
   const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
   const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getBusinessLogoDisplayUrl(row, getAvatarUrl(row.logo_path)) }]));
-  const profileMap = Object.fromEntries((profileRows || []).map((row) => [row.id, { ...row, avatar_url: getAvatarUrl(row.avatar_path), business: businessMap[row.id] || null }]));
+  const profileMap = Object.fromEntries((profileRows || []).map((row) => {
+    const business = businessMap[row.id] || null;
+    return [row.id, {
+      ...row,
+      avatar_url: getAvatarUrl(row.avatar_path),
+      business,
+      id_verified: verificationIsCurrent(row),
+      cac_verified: Boolean(row.cac_verified_name) || Boolean(business && verificationIsCurrent(business)),
+    }];
+  }));
   const latestMessageMap = {};
   for (const message of messageRows || []) if (!latestMessageMap[message.conversation_id]) latestMessageMap[message.conversation_id] = message;
   const unreadCountMap = {};
