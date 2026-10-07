@@ -2059,3 +2059,10 @@ img.is-business-logo-previewable:focus-visible {
     font-size: 12px;
   }
 }
+
+/* Device notification controls: compact and clear on small screens. */
+.notification-device-status { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; color: #7a5a5d; font-size: 11px; font-weight: 700; }
+.notification-device-status svg { color: #c3313a; }
+.notification-enable-device { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 12px; border: 1px solid #e7b7ba; border-radius: 11px; color: #a91f29; background: #fff4f4; font-size: 11px; font-weight: 800; cursor: pointer; transition: transform .18s ease, background .18s ease, box-shadow .18s ease; }
+.notification-enable-device:hover { transform: translateY(-1px); color: #fff; background: #d43840; box-shadow: 0 8px 16px rgba(212,56,64,.18); }
+@media (max-width: 560px) { .notifications-page.notification-center .notification-center-header { grid-template-columns: 1fr; gap: 14px; } .notifications-page.notification-center .notification-header-actions { align-items: stretch; flex-direction: row; flex-wrap: wrap; } .notification-enable-device, .notifications-page.notification-center .notification-mark-all { flex: 1 1 150px; } }
