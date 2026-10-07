@@ -104,25 +104,25 @@ export async function signUp({ email, password, displayName, username, phone }) 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' } },
+    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: getAuthRedirectUrl() },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
     throw new Error('This email has already been registered. Please log in or use Forgot password.');
   }
-  // Always send a numeric email OTP after registration. Verification is completed
-  // with verifyOtp, so the user never needs to open a confirmation link.
-  const { error: otpError } = await supabase.auth.signInWithOtp({
-    email: String(email).trim().toLowerCase(),
-    options: { shouldCreateUser: false },
-  });
-  if (otpError) throw otpError;
   return data;
 }
 
 export async function resendSignupConfirmation(email) {
-  // Kept as a compatibility helper, but signup resend is OTP-only now.
-  return sendEmailOtp(email);
+  failIfUnavailable();
+  const value = String(email || '').trim().toLowerCase();
+  if (!value) throw new Error('Enter your email first.');
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: value,
+    options: { emailRedirectTo: getAuthRedirectUrl() },
+  });
+  if (error) throw error;
 }
 
 export async function signIn({ identifier, email, password }) {
@@ -169,6 +169,13 @@ export async function sendPasswordResetOtp(email) {
   const value = String(email || '').trim().toLowerCase();
   if (!value) throw new Error('Enter your email first.');
   const { error } = await supabase.auth.signInWithOtp({ email: value, options: { shouldCreateUser: false } });
+  if (error) throw error;
+}
+export async function requestPasswordReset(email) {
+  failIfUnavailable();
+  const value = String(email || '').trim().toLowerCase();
+  if (!value) throw new Error('Enter your email first.');
+  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: `${getAuthRedirectUrl()}/?auth=recovery` });
   if (error) throw error;
 }
 export async function signInWithGoogle() {
