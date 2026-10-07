@@ -11868,3 +11868,10 @@ select:focus,
 .email-confirmation-card .primary-button { display:inline-flex; align-items:center; gap:8px; margin-top:16px; text-decoration:none; }
 .email-confirmation-loader { display:block; width:30px; height:30px; margin:24px auto 0; border:3px solid #ffd6d6; border-top-color:#ff2c2c; border-radius:50%; animation:bese26-confirm-spin .8s linear infinite; }
 @keyframes bese26-confirm-spin { to { transform:rotate(360deg); } }
+
+/* Install invitation shown to every browser visitor who has not installed Bese26. */
+.install-prompt { animation: bese26InstallPromptIn .32s ease both; }
+.install-prompt-copy strong { line-height: 1.2; }
+.install-prompt-action { white-space: nowrap; }
+@keyframes bese26InstallPromptIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 480px) { .install-prompt { align-items: flex-start; gap: 10px; padding: 13px 38px 13px 12px; border-radius: 16px; } .install-prompt-icon { width: 36px; height: 36px; flex-basis: 36px; } .install-prompt-copy strong { font-size: 13px; } .install-prompt-copy p { font-size: 11px; } .install-prompt-action { min-height: 34px; padding: 0 10px; font-size: 11px; } }
