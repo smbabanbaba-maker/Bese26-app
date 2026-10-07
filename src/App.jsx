@@ -92,7 +92,7 @@ import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Busi
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, ensureAccountDashboard, getBusinessProfile, ensureBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, submitUserReport, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, getProfilePreferences, updateChatMeeting, updateChatOffer, updateListing, updateProfilePreferences, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
+import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchTrendingListingScores, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, fetchPublicProfileViewHistory, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, ensureAccountDashboard, getBusinessProfile, ensureBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, submitUserReport, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, getProfilePreferences, updateChatMeeting, updateChatOffer, updateListing, updateProfilePreferences, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
 function BrandLoader({ message = 'Loading Bese26…', offline = false, compact = false }) {
   return <div className={`brand-loader ${compact ? 'brand-loader-compact' : ''}`} role="status" aria-live="polite">
@@ -247,7 +247,7 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
   return (
     <article className={`product-card ${compact ? 'product-card-compact' : ''}`} role="button" tabIndex={0} aria-label={`Open listing: ${listing.title}`} onClick={() => onOpen(listing)} onKeyDown={(event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); onOpen(listing); } }}>
       <ListingCardMedia listing={listing}>
-        <div className="listing-card-badges">{featured && <span className="featured-pill"><Star size={11} fill="currentColor" /> FEATURED</span>}{listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> BOOSTED</span>}{isNew && <span className="fresh-pill">NEW</span>}{isTopRated && <span className="trust-pill"><BadgeCheck size={11} /> TOP RATED</span>}</div>
+        <div className="listing-card-badges">{featured && <span className="featured-pill"><Star size={11} fill="currentColor" /> FEATURED</span>}{listing.promoted && <span className="promoted-pill"><Sparkles size={12} /> SPONSORED</span>}{isNew && <span className="fresh-pill">NEW</span>}{isTopRated && <span className="trust-pill"><BadgeCheck size={11} /> TOP RATED</span>}</div>
         <button className={`save-button ${isSaved ? 'saved' : ''}`} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} onClick={(event) => { event.stopPropagation(); onToggleSave(listing.id); }}>
           <Heart size={17} fill={isSaved ? 'currentColor' : 'none'} />
         </button>
@@ -260,6 +260,7 @@ const ProductCard = memo(function ProductCard({ listing, onOpen, isSaved, onTogg
         <div className="product-foot">
           <span>{listing.condition}</span>
           <span>{listing.posted}</span>
+          <span aria-label={`${Number(listing.viewsCount || listing.raw?.views_count || 0).toLocaleString('en-NG')} views`}>Views {Number(listing.viewsCount || listing.raw?.views_count || 0).toLocaleString('en-NG')}</span>
         </div>
       </div>
     </article>
@@ -443,7 +444,7 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
 
-function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onOpenProfilePage, onShowNotifications, onLanguageChange }) {
+function HomeView({ user, marketListings, trendingScores = [], marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onOpenProfilePage, onShowNotifications, onLanguageChange }) {
   const { locale, locales, t } = useI18n();
   const [geo, setGeo] = useState(null);
   const [selectedState, setSelectedState] = useState('');
@@ -459,14 +460,17 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
   const selectLanguage = (event) => onLanguageChange?.(event.target.value);
   const [homeSearch, setHomeSearch] = useState('');
   const featuredListings = useMemo(() => {
+    const scores = new Map((trendingScores || []).map((row, index) => [row.listing_id, { ...row, rank: index }]));
     const seen = new Set();
-    return marketListings.filter((listing) => {
+    return [...marketListings].filter((listing) => {
       const key = String(listing.title || listing.id || '').trim().toLowerCase().replace(/\s+/g, ' ');
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).slice(0, 50);
-  }, [marketListings]);
+    }).map((listing) => ({ ...listing, ...scores.get(listing.id), viewsCount: listing.viewsCount || Number(listing.raw?.views_count || 0) }))
+      .sort((a, b) => Number(b.trending_score || b.trendingScore || 0) - Number(a.trending_score || a.trendingScore || 0) || Number(b.viewsCount || 0) - Number(a.viewsCount || 0) || new Date(b.raw?.created_at || 0) - new Date(a.raw?.created_at || 0))
+      .slice(0, 50);
+  }, [marketListings, trendingScores]);
   return (
     <div className="page-stack home-page">
       <section className="marketplace-search-hero" aria-label="Find products and services">
@@ -479,7 +483,7 @@ function HomeView({ user, marketListings, marketLoading = false, adCampaigns = [
 
 
       <section className="popular-categories"><SectionHeading eyebrow={t('CHOOSE A CATEGORY')} title={t('What are you looking for?')} action={t('View all')} onAction={() => onSearch('')} /><div className="popular-category-rail">{[['Phones', Smartphone, 'tone-lavender'], ['Cars', CarFront, 'tone-blue'], ['Property', Building2, 'tone-sand'], ['Fashion', Shirt, 'tone-pink'], ['Agriculture', Wheat, 'tone-green'], ['Services', BriefcaseBusiness, 'tone-peach'], ['Food', UtensilsCrossed, 'tone-gold'], ['Businesses', Store, 'tone-coral']].map(([label, Icon, tone]) => <button type="button" className={`popular-category ${tone}`} key={label} onClick={() => onSearch(label)} aria-label={`${t('Browse listings')}: ${t(label)}`}><span><Icon size={20} strokeWidth={2.1} /></span><strong>{t(label)}</strong></button>)}</div></section>
-      {featuredListings.length > 0 && <section className="trending-deals-section" aria-label={t('Trending deals')}><div className="trending-deals-heading"><div><div className="eyebrow">{t('HOT OFFERS')}</div><h2>{t('Trending deals')}</h2><p>{t('Popular picks buyers are checking out now.')}</p></div><button type="button" className="trending-deals-view-all" onClick={() => onNavigate('search')}>{t('View all')} <ArrowRight size={15} /></button></div><div className="trending-deals-rail">{featuredListings.slice(0, 4).map((listing) => <button type="button" className="trending-deal-card" key={listing.id} onClick={() => onOpenListing(listing)}><span className="trending-deal-image">{listing.image ? <img src={listing.image} alt="" loading="lazy" /> : <Package size={24} />}</span><span className="trending-deal-copy"><strong>{listing.title}</strong><b>{listing.price}</b><small><MapPin size={11} /> {listing.location}</small></span><span className="trending-deal-arrow"><ArrowUpRight size={15} /></span></button>)}</div></section>}
+      {featuredListings.length > 0 && <section className="trending-deals-section" aria-label={t('Trending deals')}><div className="trending-deals-heading"><div><div className="eyebrow">{t('HOT OFFERS')}</div><h2>{t('Trending deals')}</h2><p>{t('Popular picks buyers are checking out now.')}</p></div><button type="button" className="trending-deals-view-all" onClick={() => onNavigate('search')}>{t('View all')} <ArrowRight size={15} /></button></div><div className="trending-deals-rail">{featuredListings.slice(0, 4).map((listing) => <button type="button" className="trending-deal-card" key={listing.id} onClick={() => onOpenListing(listing)}><span className="trending-deal-image">{listing.image ? <img src={listing.image} alt="" loading="lazy" /> : <Package size={24} />}</span><span className="trending-deal-copy"><strong>{listing.title}</strong><b>{listing.price}</b><small><MapPin size={11} /> {listing.location}</small><small className="trending-deal-views">Views {Number(listing.viewsCount || listing.raw?.views_count || 0).toLocaleString('en-NG')}{listing.promoted ? ' · Sponsored' : ''}</small></span><span className="trending-deal-arrow"><ArrowUpRight size={15} /></span></button>)}</div></section>}
 
       <section className="home-featured-section">
         <div className="home-featured-heading"><div><div className="eyebrow">{t('CURATED FOR YOU')}</div><h2>{t('Featured listings')}</h2></div><span>{featuredListings.length ? t('Fresh picks for you') : t('New picks appear here')}</span></div>
@@ -1378,6 +1382,7 @@ function AppContent() {
   const [marketListings, setMarketListings] = useState([]);
   const [marketLoading, setMarketLoading] = useState(isSupabaseConfigured);
   const [marketCategories, setMarketCategories] = useState([]);
+  const [trendingScores, setTrendingScores] = useState([]);
   const [adCampaigns, setAdCampaigns] = useState([]);
   const [userPlace, setUserPlace] = useState('');
   const [userCoordinates, setUserCoordinates] = useState(null);
@@ -1526,10 +1531,11 @@ function AppContent() {
         if (mounted && !initial) showToast(error.message || 'Could not restore your session.');
       }
       try {
-        const [remoteListings, remoteCategories] = await Promise.all([fetchActiveListings(), fetchCategories()]);
+        const [remoteListings, remoteCategories, remoteTrending] = await Promise.all([fetchActiveListings(), fetchCategories(), fetchTrendingListingScores(40).catch(() => [])]);
         if (mounted) {
           setMarketListings(remoteListings || []);
           setMarketCategories(remoteCategories || []);
+          setTrendingScores(remoteTrending || []);
           setMarketLoading(false);
         }
       } catch (error) {
@@ -1787,7 +1793,7 @@ function AppContent() {
 
   const renderView = () => {
     if (activeNav.startsWith('public-')) return <PublicInfoPage page={activeNav.slice(7)} onBack={goBack} />;
-    if (activeNav === 'home') return <HomeView user={sessionUser} marketLoading={marketLoading} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} onOpenProfilePage={openNotificationProfilePage} onLanguageChange={changeLocale} />;
+    if (activeNav === 'home') return <HomeView user={sessionUser} trendingScores={trendingScores} marketLoading={marketLoading} adCampaigns={adCampaigns} marketListings={nearbyListings} userPlace={userPlace} locationBusy={locationBusy} onUseLocation={useMyLocation} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onSearch={goSearch} onNavigate={navigate} onOpenProfilePage={openNotificationProfilePage} onLanguageChange={changeLocale} />;
     if (activeNav === 'search') return <SearchView adCampaigns={adCampaigns} marketLoading={marketLoading} marketListings={marketListings} categories={marketCategories} search={search} setSearch={setSearch} onOpenListing={openListing} savedIds={savedIds} onToggleSave={toggleSave} onBack={goBack} />;
     if (activeNav === 'notifications') return <NotificationsView user={sessionUser} onAuthRequired={() => requireAuth('Login to view notifications.')} onBack={goBack} onNotice={showToast} onNavigate={navigate} onOpenListing={openListing} onOpenConversation={openNotificationConversation} onOpenPublicProfile={openNotificationPublicProfile} onOpenProfilePage={openNotificationProfilePage} />;
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;

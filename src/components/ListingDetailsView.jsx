@@ -563,7 +563,7 @@ export default function ListingDetailsView({
     if (user?.id && listing.sellerId) {
       getFollowState(user.id, listing.sellerId).then((state) => current && setFollowingSeller(Boolean(state?.following))).catch(() => {});
     }
-    if (user?.id) recordListingView(listing.id).catch(() => {});
+    if (user?.id) recordListingView(listing.id, listing.promoted ? 'boost' : 'organic').catch(() => {});
     return () => { current = false; };
   }, [listing?.id, listing?.sellerId, listing?.raw?.contact_preference, user?.id]);
 

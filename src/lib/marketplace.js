@@ -77,7 +77,9 @@ export function mapListing(row) {
     idVerified: verificationIsCurrent(seller),
     cacVerified: Boolean(seller.cac_verified_name),
     verified: verificationIsCurrent(seller) || Boolean(seller.cac_verified_name),
-    promoted: false,
+    promoted: Boolean(row.promoted || row.active_boost || row.boost_active),
+    viewsCount: Number(row.views_count || 0),
+    trendingScore: Number(row.trending_score || 0),
     description: row.description || '',
     attributes: row.attributes || {},
     deliveryOptions: row.delivery_options || [],
@@ -726,12 +728,14 @@ async function hydrateListingRows(rows = [], { firstMediaOnly = false } = {}) {
       }
     });
   });
-  const [businessResult, signedUrls] = await Promise.all([businessProfilesRequest, getListingMediaUrls(signedEntries.map((entry) => entry.path))]);
+  const [businessResult, signedUrls, boostResult] = await Promise.all([businessProfilesRequest, getListingMediaUrls(signedEntries.map((entry) => entry.path)), supabase.from('active_listing_boosts').select('listing_id').in('listing_id', rows.map((row) => row.id)).limit(500)]);
   if (businessResult.error) throw businessResult.error;
   const businessById = Object.fromEntries((businessResult.data || []).map((business) => [business.profile_id, business]));
+  const boostedIds = new Set((boostResult.data || []).map((item) => item.listing_id));
   const signedByKey = Object.fromEntries(signedEntries.map((entry, index) => [entry.key, signedUrls[index] || '']));
   return mediaByRow.map(({ row, media }) => mapListing({
     ...row,
+    boost_active: boostedIds.has(row.id),
     business_profile: businessById[row.business_profile_id] || businessById[row.seller_id] || null,
     listing_media: (firstMediaOnly ? media.slice(0, 1) : media).map((item) => {
       const key = `${row.id}:${item.storage_path}`;
@@ -762,9 +766,9 @@ export async function fetchListingContact(listingId) {
   return { phone: data?.phone || '', whatsapp: data?.whatsapp || '' };
 }
 
-export async function recordListingView(listingId) {
+export async function recordListingView(listingId, viewSource = 'organic') {
   if (!supabase || !listingId) return null;
-  const { data, error } = await supabase.rpc('record_listing_view', { p_listing_id: listingId });
+  const { data, error } = await supabase.rpc('record_listing_view', { p_listing_id: listingId, p_view_source: viewSource });
   if (error && !error.message?.includes('record_listing_view')) throw error;
   return data;
 }
@@ -1122,6 +1126,12 @@ export async function fetchPublicBusiness(handle) {
   return { business: publicBusiness, ownerProfile: { ...ownerProfile, is_verified: verificationIsCurrent(ownerProfile) }, listings };
 }
 
+export async function fetchTrendingListingScores(limit = 40) {
+  if (!supabase) return [];
+  const { data, error } = await supabase.rpc('get_trending_listing_scores', { p_limit: limit });
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
 export async function fetchPublicSellerViews(userId) {
   if (!supabase || !userId) return 0;
   const { data, error } = await supabase.from('listings').select('views_count').eq('seller_id', userId).limit(1000);
@@ -1396,12 +1406,14 @@ export async function fetchSellerAnalytics({ userId, startDate, endDate } = {}) 
   if (!userId) return { listings: [], views: [], inquiries: [], summary: { views: 0, inquiries: 0, uploaded: 0, sold: 0, active: 0 } };
   const start = startDate ? new Date(startDate).toISOString() : null;
   const end = endDate ? new Date(endDate).toISOString() : null;
-  const [{ data: listingRows, error: listingError }, { data: conversationRows, error: conversationError }] = await Promise.all([
+  const [{ data: listingRows, error: listingError }, { data: conversationRows, error: conversationError }, { data: favoriteRows, error: favoriteError }] = await Promise.all([
     supabase.from('listings').select('id,title,description,price,currency,status,views_count,created_at,updated_at,category:categories!listings_category_id_fkey(name)').eq('seller_id', userId).order('created_at', { ascending: false }).limit(1000),
     supabase.from('conversations').select('id,listing_id,created_at,updated_at,last_message_at').eq('seller_id', userId).order('created_at', { ascending: false }).limit(5000),
+    supabase.from('listing_favorites').select('listing_id,created_at').in('listing_id', (await supabase.from('listings').select('id').eq('seller_id', userId).limit(1000)).data?.map((row) => row.id) || []).limit(20000),
   ]);
   if (listingError) throw listingError;
   if (conversationError) throw conversationError;
+  if (favoriteError) throw favoriteError;
   const allListings = listingRows || [];
   const listingIds = allListings.map((row) => row.id);
   let viewRows = [];
@@ -1414,17 +1426,20 @@ export async function fetchSellerAnalytics({ userId, startDate, endDate } = {}) 
     viewRows = result.data || [];
   }
   const inRange = (value) => { const time = new Date(value || 0).getTime(); return (!start || time >= new Date(start).getTime()) && (!end || time < new Date(end).getTime()); };
+  const savesByListing = new Map();
+  (favoriteRows || []).filter((row) => inRange(row.created_at)).forEach((row) => savesByListing.set(row.listing_id, (savesByListing.get(row.listing_id) || 0) + 1));
   const rangeListings = allListings.filter((row) => inRange(row.created_at));
   const rangeInquiries = (conversationRows || []).filter((row) => inRange(row.created_at));
   const viewsByListing = new Map();
   viewRows.forEach((row) => viewsByListing.set(row.listing_id, (viewsByListing.get(row.listing_id) || 0) + 1));
-  const listings = rangeListings.map((row) => ({ ...row, category_name: row.category?.name || 'Uncategorised', range_views: viewsByListing.get(row.id) || 0, range_inquiries: rangeInquiries.filter((item) => item.listing_id === row.id).length }));
+  const listings = rangeListings.map((row) => { const listingViews = viewRows.filter((item) => item.listing_id === row.id); return { ...row, category_name: row.category?.name || 'Uncategorised', range_views: viewsByListing.get(row.id) || 0, range_saves: savesByListing.get(row.id) || 0, range_inquiries: rangeInquiries.filter((item) => item.listing_id === row.id).length, organic_views: listingViews.filter((item) => item.view_source !== 'boost').length, boost_views: listingViews.filter((item) => item.view_source === 'boost').length }; });
   return {
     listings,
     views: viewRows,
     inquiries: rangeInquiries,
     summary: {
       views: viewRows.length,
+      saves: [...savesByListing.values()].reduce((total, count) => total + count, 0),
       inquiries: rangeInquiries.length,
       uploaded: rangeListings.length,
       sold: rangeListings.filter((row) => row.status === 'sold').length,
