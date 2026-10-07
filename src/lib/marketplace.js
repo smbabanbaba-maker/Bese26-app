@@ -104,7 +104,7 @@ export async function signUp({ email, password, displayName, username, phone }) 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: getAuthRedirectUrl() },
+    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: `${getAuthRedirectUrl()}/auth/confirm` },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -120,7 +120,7 @@ export async function resendSignupConfirmation(email) {
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email: value,
-    options: { emailRedirectTo: getAuthRedirectUrl() },
+    options: { emailRedirectTo: `${getAuthRedirectUrl()}/auth/confirm` },
   });
   if (error) throw error;
 }

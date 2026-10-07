@@ -26,12 +26,16 @@ function mountConfirmationPage() {
   const status = document.getElementById('confirmation-status');
   const params = new URLSearchParams(window.location.search);
   const tokenHash = params.get('token_hash');
+  const code = params.get('code');
   const type = params.get('type') || 'signup';
-  if (!supabase || !tokenHash) {
+  if (!supabase || (!tokenHash && !code)) {
     status.textContent = 'This confirmation link is missing or invalid. Please request a new email.';
     return;
   }
-  supabase.auth.verifyOtp({ token_hash: tokenHash, type }).then(({ error }) => {
+  const confirmation = code
+    ? supabase.auth.exchangeCodeForSession(code)
+    : supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+  confirmation.then(({ error }) => {
     if (error) throw error;
     status.textContent = 'Email confirmed. Opening Bese26…';
     window.history.replaceState({}, '', '/');
