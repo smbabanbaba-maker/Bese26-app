@@ -11885,3 +11885,15 @@ select:focus,
 @media (max-width: 760px) { .owner-miniweb-control-bar { align-items: stretch; flex-direction: column; padding: 16px; border-radius: 17px; } .owner-miniweb-control-bar h1 { font-size: 20px; } .owner-miniweb-control-actions { justify-content: stretch; } .owner-miniweb-control-actions button { flex: 1 1 calc(50% - 8px); } }
 .owner-miniweb-header { display: flex; align-items: center; gap: 10px; min-height: 42px; }
 .owner-miniweb-header strong { display: block; color: #1b1b21; font: 800 18px Manrope, sans-serif; }
+/* Quick listing control panel inside the owner Miniweb dashboard. */
+.owner-listing-tools { padding: 22px; border: 1px solid #e8e1e2; border-radius: 22px; background: #fff; box-shadow: 0 14px 34px rgba(55,20,20,.06); }
+.owner-listing-tools-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; color: #b51f2a; }
+.owner-listing-tools-heading h2 { margin: 5px 0 5px; color: #1b1b21; font: 850 20px Manrope, sans-serif; letter-spacing: -.04em; }
+.owner-listing-tools-heading p { color: #766b70; font-size: 12px; }
+.owner-listing-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 14px; }
+.owner-listing-stats > div { padding: 13px 14px; border: 1px solid #eee6e7; border-radius: 14px; background: #fffafa; }
+.owner-listing-stats strong { display: block; color: #1b1b21; font: 850 22px Manrope, sans-serif; letter-spacing: -.05em; }
+.owner-listing-stats span { color: #796e73; font-size: 10px; font-weight: 750; }
+.owner-listing-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.owner-listing-actions button { min-height: 40px; }
+@media (max-width: 600px) { .owner-listing-tools { padding: 16px; border-radius: 17px; } .owner-listing-stats { gap: 7px; } .owner-listing-stats > div { padding: 11px 10px; } .owner-listing-stats strong { font-size: 19px; } .owner-listing-actions { display: grid; grid-template-columns: 1fr; } .owner-listing-actions button { width: 100%; justify-content: center; } }
