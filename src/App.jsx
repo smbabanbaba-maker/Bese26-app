@@ -1420,9 +1420,10 @@ function AppContent() {
   const [isOwnerAdmin, setIsOwnerAdmin] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [browserNotificationPermission, setBrowserNotificationPermission] = useState(() => typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported');
-  const [showAuth, setShowAuth] = useState(false);
-  const [authReason, setAuthReason] = useState('');
-  const [authInitialMode, setAuthInitialMode] = useState('signin');
+  const recoveryLinkRequested = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('auth') === 'recovery' || new URLSearchParams(window.location.hash.replace(/^#/, '')).get('type') === 'recovery');
+  const [showAuth, setShowAuth] = useState(recoveryLinkRequested);
+  const [authReason, setAuthReason] = useState(recoveryLinkRequested ? 'Create a new password for your Bese26 account.' : '');
+  const [authInitialMode, setAuthInitialMode] = useState(recoveryLinkRequested ? 'recovery' : 'signin');
   const [authTarget, setAuthTarget] = useState('');
   const [chatListing, setChatListing] = useState(null);
   const [chatDealPanel, setChatDealPanel] = useState('');
@@ -1634,6 +1635,11 @@ function AppContent() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setSessionUser(session?.user || null);
+      if (event === 'PASSWORD_RECOVERY') {
+        setAuthInitialMode('recovery');
+        setAuthReason('Create a new password for your Bese26 account.');
+        setShowAuth(true);
+      }
       if (event === 'SIGNED_IN' && session?.user) {
         loadBackend();
         fetchSavedIds(session.user.id).then(setSavedIds).catch(() => {});
