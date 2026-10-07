@@ -1331,8 +1331,31 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
   </div>;
 }
 
+function EmailConfirmationRoute() {
+  const [state, setState] = useState({ loading: true, error: '' });
+  useEffect(() => {
+    let mounted = true;
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get('token_hash');
+    const type = params.get('type') || 'signup';
+    if (!tokenHash || !supabase || !['signup', 'email', 'invite', 'recovery'].includes(type)) {
+      setState({ loading: false, error: 'This confirmation link is missing or no longer valid.' });
+      return () => { mounted = false; };
+    }
+    supabase.auth.verifyOtp({ token_hash: tokenHash, type }).then(({ error }) => {
+      if (!mounted) return;
+      if (error) setState({ loading: false, error: error.message || 'We could not confirm this email.' });
+      else window.location.replace('/?email_confirmed=1');
+    }).catch((error) => mounted && setState({ loading: false, error: error.message || 'We could not confirm this email.' }));
+    return () => { mounted = false; };
+  }, []);
+  return <div className="email-confirmation-screen"><section className="email-confirmation-card"><img src="/images/bese26-logo-icon.webp" alt="Bese26" /><div className="eyebrow">BESE26 ACCOUNT</div>{state.loading ? <><h1>Confirming your email…</h1><p>Please wait while we secure your Bese26 account.</p><span className="email-confirmation-loader" aria-hidden="true" /></> : state.error ? <><h1>Confirmation link expired</h1><p>{state.error}</p><a className="primary-button" href="/">Return to Bese26 <ArrowRight size={16} /></a></> : null}</section></div>;
+}
+
 function AppContent() {
   const { locale, locales, setLocale, t } = useI18n();
+  const isEmailConfirmation = typeof window !== 'undefined' && /^\/auth\/confirm\/?$/i.test(window.location.pathname);
+  if (isEmailConfirmation) return <EmailConfirmationRoute />;
   const publicSellerId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?seller\/([0-9a-f-]{20,})\/?$/i)?.[1] : null;
   const publicHandle = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || window.location.pathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
   const publicListingId = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?listing\/([^/]+)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('listing') || new URLSearchParams(window.location.search).get('listing_id')) : null;
