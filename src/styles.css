@@ -11883,3 +11883,5 @@ select:focus,
 .owner-miniweb-control-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .owner-miniweb-control-actions button { white-space: nowrap; }
 @media (max-width: 760px) { .owner-miniweb-control-bar { align-items: stretch; flex-direction: column; padding: 16px; border-radius: 17px; } .owner-miniweb-control-bar h1 { font-size: 20px; } .owner-miniweb-control-actions { justify-content: stretch; } .owner-miniweb-control-actions button { flex: 1 1 calc(50% - 8px); } }
+.owner-miniweb-header { display: flex; align-items: center; gap: 10px; min-height: 42px; }
+.owner-miniweb-header strong { display: block; color: #1b1b21; font: 800 18px Manrope, sans-serif; }
