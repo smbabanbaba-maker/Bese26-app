@@ -1110,8 +1110,10 @@ function OwnerMiniwebDashboard({ user, onBack, onNavigate, onOpenSubscription, o
         const publicData = savedProfile?.username
           ? await fetchPublicProfile(savedProfile.username)
           : await fetchPublicProfile('', user.id);
-        if (!publicData) throw new Error('Ba a sami profile ɗinka ba. Ka buɗe Gyara profile ka ajiye bayananka sannan ka sake gwadawa.');
-        if (mounted) setState({ loading: false, data: publicData, error: '' });
+        const fallbackProfile = savedProfile || { id: user.id, username: user.user_metadata?.username || user.email?.split('@')[0] || '', display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user', country: 'Nigeria' };
+        const fallbackListings = publicData?.listings || await fetchMyListings({ sellerId: user.id, status: 'active' });
+        const resolvedData = publicData || { profile: fallbackProfile, listings: fallbackListings };
+        if (mounted) setState({ loading: false, data: resolvedData, error: '' });
       } catch (error) {
         if (mounted) setState({ loading: false, data: null, error: error.message || 'Ba a iya loda Miniweb ɗinka ba.' });
       }
