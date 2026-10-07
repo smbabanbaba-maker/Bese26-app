@@ -152,12 +152,12 @@ export async function sendEmailOtp(email) {
   if (error) throw error;
 }
 
-export async function verifyEmailOtp({ email, token }) {
+export async function verifyEmailOtp({ email, token, type = 'email' }) {
   failIfUnavailable();
   const value = String(email || '').trim().toLowerCase();
   const code = String(token || '').trim();
   if (!value || !code) throw new Error('Enter the email and 6-digit code.');
-  const { data, error } = await supabase.auth.verifyOtp({ email: value, token: code, type: 'signup' });
+  const { data, error } = await supabase.auth.verifyOtp({ email: value, token: code, type });
   if (error) throw error;
   return data;
 }
@@ -167,11 +167,11 @@ function getAuthRedirectUrl() {
   return SITE_URL;
 }
 
-export async function requestPasswordReset(email) {
+export async function sendPasswordResetOtp(email) {
   failIfUnavailable();
-  const value = String(email || '').trim();
+  const value = String(email || '').trim().toLowerCase();
   if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.resetPasswordForEmail(value, { redirectTo: SITE_URL });
+  const { error } = await supabase.auth.signInWithOtp({ email: value, options: { shouldCreateUser: false } });
   if (error) throw error;
 }
 export async function signInWithGoogle() {
