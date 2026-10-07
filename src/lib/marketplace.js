@@ -145,7 +145,7 @@ export async function sendEmailOtp(email) {
   failIfUnavailable();
   const value = String(email || '').trim().toLowerCase();
   if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.signInWithOtp({ email: value, options: { shouldCreateUser: false } });
+  const { error } = await supabase.auth.signInWithOtp({ email: value, options: { shouldCreateUser: true } });
   if (error) throw error;
 }
 
