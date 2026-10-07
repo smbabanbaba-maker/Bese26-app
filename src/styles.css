@@ -11875,3 +11875,11 @@ select:focus,
 .install-prompt-action { white-space: nowrap; }
 @keyframes bese26InstallPromptIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 480px) { .install-prompt { align-items: flex-start; gap: 10px; padding: 13px 38px 13px 12px; border-radius: 16px; } .install-prompt-icon { width: 36px; height: 36px; flex-basis: 36px; } .install-prompt-copy strong { font-size: 13px; } .install-prompt-copy p { font-size: 11px; } .install-prompt-action { min-height: 34px; padding: 0 10px; font-size: 11px; } }
+/* Owner-controlled Miniweb preview dashboard. */
+.owner-miniweb-shell { display: grid; gap: 16px; }
+.owner-miniweb-control-bar { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 22px; border: 1px solid #eadbdd; border-radius: 22px; background: linear-gradient(135deg, #fffafa, #fff); box-shadow: 0 14px 34px rgba(55,20,20,.07); }
+.owner-miniweb-control-bar h1 { margin: 4px 0 5px; color: #1b1b21; font: 850 25px Manrope, sans-serif; letter-spacing: -.04em; }
+.owner-miniweb-control-bar p { color: #766b70; font-size: 12px; }
+.owner-miniweb-control-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.owner-miniweb-control-actions button { white-space: nowrap; }
+@media (max-width: 760px) { .owner-miniweb-control-bar { align-items: stretch; flex-direction: column; padding: 16px; border-radius: 17px; } .owner-miniweb-control-bar h1 { font-size: 20px; } .owner-miniweb-control-actions { justify-content: stretch; } .owner-miniweb-control-actions button { flex: 1 1 calc(50% - 8px); } }

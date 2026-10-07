@@ -406,7 +406,7 @@ function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   if (!user) return null;
   const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
   const username = profile?.username ? `@${profile.username}` : '@member';
-  const openProfileMiniweb = () => onOpenProfilePage?.('main');
+  const openProfileMiniweb = () => onNavigate('business');
   return <section className="dashboard-profile-snapshot profile-miniweb-card" aria-label="Your Miniweb profile">
     <div className="dashboard-miniweb-action">
       <span className="dashboard-miniweb-icon" aria-hidden="true"><UserRound size={22} /></span>
@@ -1093,17 +1093,30 @@ function PublicStorefrontLayout({ title, share, children }) {
   useEffect(() => { import('./public-storefront.css'); document.title = `${title} | Bese26`; return () => { document.title = 'Bese26'; }; }, [title]);
   return <div className="public-business-shell"><header className="public-business-topbar"><a href="https://bese26.shop/" className="public-brand"><img className="public-brand-logo" src="/images/bese26-logo-icon.webp" alt="Bese26" /><strong>Bese26<span>.shop</span></strong></a><nav className="public-business-nav" aria-label="Public shop navigation"><a href="https://bese26.shop/">Marketplace</a><a href="#listings">Listings</a></nav><button type="button" className="public-topbar-share" onClick={share} aria-label="Share shop"><Share2 size={14} /> Share</button></header><main className="public-business-main">{children}</main><footer className="public-business-footer"><strong>Bese26<span>.shop</span></strong><span>Trusted local buying and selling</span></footer></div>;
 }
-function MiniwebPublicDashboard({ business, profile, listings, share }) {
+function MiniwebPublicDashboard({ business, profile, listings, share, chrome = true }) {
   const identity = getPublicIdentity(profile || {});
   const name = business?.business_name || identity.name || 'Bese26 store';
+  const content = <><div className="storefront-shell-intro"><span className="storefront-live-dot" /> <span>{chrome ? 'PUBLIC MINIWEB' : 'YOUR MINIWEB PREVIEW'}</span></div><PublicProfileHeader profile={profile} business={business} listings={listings} share={share} />{business && <PublicBusinessAbout business={business} />}<PublicListingSection title={business ? `Listings from ${name}` : `Listings by ${name}`} listings={listings} /></>;
+  return chrome ? <PublicStorefrontLayout title={name} share={share}>{content}</PublicStorefrontLayout> : content;
+}
+function OwnerMiniwebDashboard({ user, onBack, onNavigate, onOpenSubscription, onNotice }) {
+  const [state, setState] = useState({ loading: true, data: null, error: '' });
+  useEffect(() => {
+    let mounted = true;
+    fetchPublicProfile('', user?.id).then((data) => mounted && setState({ loading: false, data, error: '' })).catch((error) => mounted && setState({ loading: false, data: null, error: error.message || 'Unable to load your Miniweb.' }));
+    return () => { mounted = false; };
+  }, [user?.id]);
+  const data = state.data;
+  const profile = data?.profile || null;
+  const business = profile?.business || null;
+  const listings = data?.listings || [];
+  const name = business?.business_name || profile?.display_name || user?.email?.split('@')[0] || 'Your Miniweb';
   const handle = business?.business_handle || profile?.username || '';
-  const logoSource = business?.logo_path || profile?.avatar_path;
-  const logoUrl = getBusinessLogoDisplayUrl(business, logoSource ? getAvatarUrl(logoSource) : '');
-  const location = [business?.city || profile?.city, business?.state || profile?.state].filter(Boolean).filter((value, index, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === index).join(', ');
-  const description = business?.description || profile?.bio || 'A trusted Miniweb on Bese26.';
-  const services = [business?.delivery_available && 'Delivery available', business?.pickup_available && 'Pickup available'].filter(Boolean);
-  const views = listings.reduce((total, item) => total + Number(item.views_count || 0), 0);
-  return <PublicStorefrontLayout title={name} share={share}><PublicProfileHeader profile={profile} business={business} listings={listings} share={share} />{business && <PublicBusinessAbout business={business} />}<PublicListingSection title={business ? `Listings from ${name}` : `Listings by ${name}`} listings={listings} /></PublicStorefrontLayout>;
+  const publicUrl = handle ? `${SITE_URL}/@${handle}` : '';
+  const share = async () => { if (!publicUrl) return; try { if (navigator.share) await navigator.share({ title: name, text: `Duba Miniweb ɗina na Bese26: ${publicUrl}`, url: publicUrl }); else { await navigator.clipboard?.writeText(publicUrl); onNotice?.('An kwafi link ɗin Miniweb.'); } } catch {} };
+  if (state.loading) return <div className="owner-miniweb-shell"><SubpageHeader title="My Miniweb" eyebrow="YOUR MINIWEB" onBack={onBack} /><BrandLoader message="Ana buɗe Miniweb ɗinka…" compact /></div>;
+  if (state.error || !data) return <div className="owner-miniweb-shell"><SubpageHeader title="My Miniweb" eyebrow="YOUR MINIWEB" onBack={onBack} /><div className="empty-state"><Store size={26} /><h3>Ba a iya buɗe Miniweb ba</h3><p>{state.error || 'Ƙara bayanan profile ɗinka sannan ka sake gwadawa.'}</p><button type="button" className="primary-button" onClick={() => onNavigate('profile')}>Gyara profile</button></div></div>;
+  return <div className="owner-miniweb-shell"><SubpageHeader title="My Miniweb" eyebrow="OWNER DASHBOARD" onBack={onBack} /><section className="owner-miniweb-control-bar"><div><div className="eyebrow">KAKE SARAWA</div><h1>{name}</h1><p>Wannan shi ne yadda masu amfani za su ga Miniweb ɗinka.</p></div><div className="owner-miniweb-control-actions"><button type="button" className="primary-button" onClick={() => onNavigate('profile')}>Gyara profile <Pencil size={15} /></button><button type="button" className="secondary-button" onClick={() => onNavigate('sell')}>Saka kaya <Package size={15} /></button><button type="button" className="secondary-button" onClick={() => onNavigate('messages')}>Saƙonni <MessageCircle size={15} /></button><button type="button" className="secondary-button" onClick={() => onNavigate('analytics')}>Analytics <BarChart3 size={15} /></button>{publicUrl && <button type="button" className="secondary-button" onClick={share}>Share <Share2 size={15} /></button>}<button type="button" className="secondary-button" onClick={() => onOpenSubscription?.()}>Plans <Sparkles size={15} /></button></div></section><PublicStorefrontLayout title={name} share={share}><MiniwebPublicDashboard business={business} profile={profile} listings={listings} share={share} chrome={false} /></PublicStorefrontLayout></div>;
 }
 function PublicPersonalPage({ data }) {
   const { profile, listings } = data;
@@ -1798,7 +1811,7 @@ function AppContent() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={goBack} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={goBack} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'business') return <ProfileView key={`profile-miniweb-${profileReset}`} user={sessionUser} initialPage="main" onAuthRequired={() => requireAuth('Sign in to manage your Miniweb.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of Bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'business'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
+    if (activeNav === 'business') return <OwnerMiniwebDashboard user={sessionUser} onBack={goBack} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} onNotice={showToast} />;
     if (activeNav === 'sell') return <SellView key={`sell-${editingListing?.id || editingDraft?.id || copySourceListing?.id || 'new'}`} user={sessionUser} isAdmin={canAccessAdmin} initialListing={editingListing} initialDraft={editingDraft} copySource={copySourceListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onOpenListing={openListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialNotificationTarget={chatNotificationTarget} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); setChatNotificationTarget(null); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); }} />;
     if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} adminPermissions={adminPermissions} isOwnerAdmin={isOwnerAdmin} onBack={goBack} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); setCopySourceListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
