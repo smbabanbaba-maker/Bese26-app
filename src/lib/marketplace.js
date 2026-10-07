@@ -121,11 +121,8 @@ export async function signUp({ email, password, displayName, username, phone }) 
 }
 
 export async function resendSignupConfirmation(email) {
-  failIfUnavailable();
-  const value = String(email || '').trim().toLowerCase();
-  if (!value) throw new Error('Enter your email first.');
-  const { error } = await supabase.auth.resend({ type: 'signup', email: value, options: { emailRedirectTo: getAuthRedirectUrl() } });
-  if (error) throw error;
+  // Kept as a compatibility helper, but signup resend is OTP-only now.
+  return sendEmailOtp(email);
 }
 
 export async function signIn({ identifier, email, password }) {

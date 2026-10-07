@@ -104,7 +104,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
     {loading && <AuthLoading label={loadingLabel} />}
     <main className="auth-reference-screen">
       <BrandHeader />
-      <section className="auth-reference-heading"><h1 id="auth-title">{title}</h1><p>{mode === 'signin' ? 'Sign in to continue to Bese26.' : mode === 'signup' ? <>Join Bese26 and start buying, selling<br />and connecting across Nigeria.</> : mode === 'recovery' ? 'Create a new password for your Bese26 account.' : <>Enter your email to receive a secure<br />password reset link.</>}</p></section>
+      <section className="auth-reference-heading"><h1 id="auth-title">{title}</h1><p>{mode === 'signin' ? 'Sign in to continue to Bese26.' : mode === 'signup' ? <>Join Bese26 and start buying, selling<br />and connecting across Nigeria.</> : mode === 'recovery' ? 'Create a new password for your Bese26 account.' : <>Enter your email to receive a secure<br />6-digit reset code.</>}</p></section>
       {status.message && <div className={`auth-reference-status ${status.type}`} role={status.type === 'error' ? 'alert' : 'status'}><span>{status.type === 'error' ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}</span>{status.message}</div>}
       {mode === 'signin' && <>
         <form className="auth-reference-form" onSubmit={submit}>
