@@ -1852,14 +1852,23 @@ async function optimizeListingPhoto(file) {
 
 export async function uploadListingMedia({ userId, listingId, file, sortOrder = 0 }) {
   failIfUnavailable();
+  if (!userId || !listingId || !file) throw new Error('Choose a photo before uploading.');
   const uploadFile = await optimizeListingPhoto(file);
+  if (!uploadFile?.type?.startsWith('image/')) throw new Error('Only JPG, PNG, WEBP, or GIF photos can be uploaded.');
+  if (uploadFile.size > 10 * 1024 * 1024) throw new Error('This photo is larger than the 10 MB upload limit.');
   const safeName = uploadFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
-  const path = `${userId}/${listingId}/${crypto.randomUUID()}-${safeName}`;
+  const randomId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const path = `${userId}/${listingId}/${randomId}-${safeName}`;
   const { error: uploadError } = await supabase.storage.from('listing-media').upload(path, uploadFile, { cacheControl: '3600', upsert: false, contentType: uploadFile.type });
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    throw new Error(`Photo upload failed: ${uploadError.message || 'Storage rejected the file.'}`);
+  }
   const mediaType = uploadFile.type.startsWith('video/') ? 'video' : 'image';
   const { data, error } = await supabase.from('listing_media').insert({ listing_id: listingId, owner_id: userId, storage_path: path, media_type: mediaType, mime_type: uploadFile.type, file_size_bytes: uploadFile.size, sort_order: sortOrder }).select().single();
-  if (error) throw error;
+  if (error) {
+    await supabase.storage.from('listing-media').remove([path]).catch(() => {});
+    throw new Error(`Photo record could not be saved: ${error.message || 'Please try again.'}`);
+  }
   return data;
 }
 export async function updateListingMediaOrder({ listingId, mediaId, sortOrder }) {
