@@ -662,7 +662,10 @@ export async function fetchActiveListings({ search = '', category = '' } = {}) {
     .eq('status', 'active')
     .eq('moderation_status', 'approved')
     .order('created_at', { ascending: false })
-    .limit(50);
+    // Search and filters run client-side in SearchView. Load the complete
+    // active catalogue up to Supabase's safe page size so older listings are
+    // not silently absent from search results.
+    .limit(1000);
   if (search.trim()) query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%,city.ilike.%${search.trim()}%,state.ilike.%${search.trim()}%`);
   if (category && category !== 'All') query = query.eq('category.name', category);
   let { data, error } = await query;

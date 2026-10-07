@@ -510,13 +510,24 @@ function SearchView({ marketListings, categories, marketLoading = false, search,
   const clearFilters = () => { setSearch(''); setActiveCategory('All'); setVerifiedOnly(false); setSort('Recommended'); };
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let result = marketListings.filter((listing) => !term || `${listing.title} ${listing.description || ''} ${listing.location} ${listing.category} ${listing.sellerDisplayName || listing.seller}`.toLowerCase().includes(term));
-    if (activeCategory !== 'All') result = result.filter((listing) => listing.category === activeCategory);
+    const normalize = (value) => String(value || '').trim().toLocaleLowerCase();
+    let result = marketListings.filter((listing) => !term || [listing.title, listing.description, listing.location, listing.category, listing.sellerDisplayName, listing.seller].map(normalize).join(' ').includes(term));
+    if (activeCategory !== 'All') result = result.filter((listing) => normalize(listing.category) === normalize(activeCategory));
     if (verifiedOnly) result = result.filter((listing) => listing.verified === true);
     if (sort === 'Recommended') result = [...result].sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
     if (sort === 'Newest') result = [...result].sort((a, b) => new Date(b.raw?.created_at || b.created_at || 0) - new Date(a.raw?.created_at || a.created_at || 0));
-    if (sort === 'Price low → high') result = [...result].sort((a, b) => a.numericPrice - b.numericPrice);
-    if (sort === 'Price high → low') result = [...result].sort((a, b) => b.numericPrice - a.numericPrice);
+    if (sort === 'Price low → high') result = [...result].sort((a, b) => {
+      const aContact = a.raw?.price == null;
+      const bContact = b.raw?.price == null;
+      if (aContact !== bContact) return aContact ? 1 : -1;
+      return Number(a.numericPrice || 0) - Number(b.numericPrice || 0);
+    });
+    if (sort === 'Price high → low') result = [...result].sort((a, b) => {
+      const aContact = a.raw?.price == null;
+      const bContact = b.raw?.price == null;
+      if (aContact !== bContact) return aContact ? 1 : -1;
+      return Number(b.numericPrice || 0) - Number(a.numericPrice || 0);
+    });
     return result;
   }, [marketListings, search, activeCategory, sort, verifiedOnly]);
 
