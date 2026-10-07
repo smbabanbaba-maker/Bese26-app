@@ -998,9 +998,16 @@ export async function toggleReviewLike({ reviewId, userId, shouldLike }) {
   return Boolean(shouldLike);
 }
 
+function fairRotationHash(value) {
+  let hash = 2166136261;
+  for (const char of String(value || '')) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return hash >>> 0;
+}
+
 export async function fetchSimilarListings(listing) {
   if (!supabase || !listing?.id) return [];
-  let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', listing.raw?.category_id || null).order('created_at', { ascending: false }).limit(50);
+  const categoryId = listing.raw?.category_id || null;
+  let query = supabase.from('listings').select(listingSelect).eq('status', 'active').eq('moderation_status', 'approved').neq('id', listing.id).eq('category_id', categoryId).order('created_at', { ascending: false }).limit(100);
   const { data, error } = await query;
   if (error) return [];
   const listings = await hydrateListingRows(data || [], { firstMediaOnly: true });
@@ -1010,7 +1017,32 @@ export async function fetchSimilarListings(listing) {
     const { data: activeBoosts, error: boostError } = await supabase.from('active_listing_boosts').select('listing_id').in('listing_id', ids);
     if (boostError) return listings;
     const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
-    return listings.map((item) => ({ ...item, promoted: promoted.has(item.id) })).sort((a, b) => Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)));
+    const dayKey = new Date().toISOString().slice(0, 10);
+    const source = listings.map((item) => ({
+      ...item,
+      promoted: promoted.has(item.id),
+      rotationScore: fairRotationHash(`${dayKey}:${listing.id}:${item.id}`),
+    }));
+    // Rotate daily and use round-robin seller slots: one seller cannot occupy
+    // the whole Similar ads rail. Boost stays visible as a label, not a ranking override.
+    const groups = new Map();
+    source.sort((a, b) => b.rotationScore - a.rotationScore).forEach((item) => {
+      const sellerKey = item.sellerId || item.seller || item.id;
+      const group = groups.get(sellerKey) || [];
+      group.push(item);
+      groups.set(sellerKey, group);
+    });
+    const fair = [];
+    let depth = 0;
+    while (fair.length < source.length) {
+      let added = false;
+      for (const group of groups.values()) {
+        if (group[depth]) { fair.push(group[depth]); added = true; }
+      }
+      if (!added) break;
+      depth += 1;
+    }
+    return fair;
   } catch {
     return listings;
   }

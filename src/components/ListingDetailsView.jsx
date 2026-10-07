@@ -548,6 +548,7 @@ export default function ListingDetailsView({
     }).finally(() => {
       if (current) { setCommentsLoading(false); setCommentsResolved(true); }
     });
+    setSimilarVisibleCount(12);
     fetchSimilarListings(listing).then((rows) => current && setSimilar(rows || [])).catch(() => {});
     if (user?.id && !owner && (allowsPhone || allowsWhatsApp)) {
       fetchListingContact(listing.id).then((details) => {
@@ -1068,7 +1069,7 @@ function SimilarListingCard({ item, savedIds = [], onOpenListing, onToggleSave }
   return <article className="listing-new-card">
     <button type="button" className="listing-new-card-open" onClick={() => onOpenListing?.(item)}>
       <div className="listing-new-card-image">{item.image ? <img src={item.image} alt={item.title} loading="lazy" /> : <Package size={22} />}</div>
-      <strong>{item.title}</strong><b>{item.price}</b><small><MapPin size={11} /> {item.location}</small>
+      <strong>{item.title}</strong><b>{item.price}</b><small><MapPin size={11} /> {item.location}</small><small>Views {Number(item.viewsCount || item.raw?.views_count || 0).toLocaleString('en-NG')}{item.promoted ? ' · Sponsored' : ''}</small>
     </button>
     <button type="button" className="listing-new-card-save" onClick={() => onToggleSave?.(item.id)} aria-label={isSaved ? 'Remove from saved' : 'Save listing'} aria-pressed={isSaved}><Heart size={16} fill={isSaved ? 'currentColor' : 'none'} /></button>
   </article>;
