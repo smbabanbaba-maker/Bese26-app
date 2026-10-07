@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff, LockKeyhole, LoaderCircle, Mail, Phone, ShieldCheck, UserRound, X } from 'lucide-react';
-import { requestPasswordReset, resendSignupConfirmation, signIn, signUp, updatePassword } from '../lib/marketplace';
+import { requestPasswordReset, sendEmailOtp, signIn, signUp, updatePassword, verifyEmailOtp } from '../lib/marketplace';
 
 function BrandHeader() {
   return <div className="auth-reference-brand"><div className="auth-reference-logo"><img src="/images/bese26-logo-icon.webp" alt="Bese26" /></div></div>;
@@ -48,6 +48,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
   const [loadingLabel, setLoadingLabel] = useState('Signing you in…');
   const [resetting, setResetting] = useState(false);
   const [registrationSent, setRegistrationSent] = useState(false);
+  const [otp, setOtp] = useState('');
   const [resendingConfirmation, setResendingConfirmation] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
@@ -86,11 +87,12 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
     setLoading(true); setLoadingLabel(mode === 'signin' ? 'Signing you in…' : 'Creating your account…');
     try {
       const data = mode === 'signin' ? await signIn({ identifier: form.email.trim(), password: form.password }) : await signUp({ email: form.email.trim().toLowerCase(), password: form.password, displayName: form.displayName, username: form.username, phone: normalizeNigerianPhone(form.phone) });
-      if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation email to your inbox.' }); } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
+      if (mode === 'signup') { await sendEmailOtp(form.email.trim().toLowerCase()); setRegistrationSent(true); setStatus({ type: 'success', message: 'Mun aika lambar tabbatarwa mai digits 6 zuwa email ɗinka.' }); } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
     } catch (error) { if (mode === 'signin') { const nextAttempts = loginAttempts + 1; setLoginAttempts(nextAttempts); if (nextAttempts >= 5) setLockedUntil(Date.now() + 30000); } setStatus({ type: 'error', message: friendlyAuthError(error) }); } finally { setLoading(false); }
   };
   const resetPassword = async (event) => { event?.preventDefault(); setStatus({ type: '', message: '' }); if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email first.' }); return; } setResetting(true); try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset instructions sent. Check your email.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send reset instructions.' }); } finally { setResetting(false); } };
-  const resendConfirmation = async () => { setStatus({ type: '', message: '' }); setResendingConfirmation(true); try { await resendSignupConfirmation(form.email); setStatus({ type: 'success', message: 'Confirmation email sent again. Check your inbox.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the confirmation email.' }); } finally { setResendingConfirmation(false); } };
+  const resendConfirmation = async () => { setStatus({ type: '', message: '' }); setResendingConfirmation(true); try { await sendEmailOtp(form.email); setStatus({ type: 'success', message: 'Sabuwar lambar OTP ta tafi zuwa email ɗinka.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not resend the OTP.' }); } finally { setResendingConfirmation(false); } };
+  const confirmSignupOtp = async (event) => { event.preventDefault(); setStatus({ type: '', message: '' }); if (!/^\d{6}$/.test(otp.trim())) { setStatus({ type: 'error', message: 'Shigar da lambar OTP mai digits 6.' }); return; } setLoading(true); setLoadingLabel('Confirming your email…'); try { const data = await verifyEmailOtp({ email: form.email, token: otp }); setStatus({ type: 'success', message: 'An tabbatar da email ɗinka. Barka da zuwa Bese26.' }); onAuthenticated?.(data.user); onClose?.(); } catch (error) { setStatus({ type: 'error', message: friendlyAuthError(error) }); } finally { setLoading(false); } };
   const title = mode === 'signin' ? <>Welcome <em>back</em></> : mode === 'signup' ? <>Create your <em>account</em></> : mode === 'recovery' ? <>Choose a new <em>password</em></> : <>Reset your <em>password</em></>;
   return <div className="auth-reference-backdrop" onClick={onClose}><section className={`auth-reference-app auth-reference-${mode}`} onClick={(event) => event.stopPropagation()} aria-labelledby="auth-title">
     <button type="button" className="auth-reference-close" onClick={onClose} aria-label="Close authentication"><X size={20} /></button>
@@ -111,7 +113,7 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
         <MarketArt />
       </>}
       {mode === 'signup' && <>
-        {registrationSent ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><Mail size={25} /></div><h2>Check your email</h2><p>We sent a confirmation link to <strong>{form.email}</strong>.</p><p>Open your email app and check your inbox or spam folder for the confirmation link.</p><button type="button" className="auth-reference-forgot" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend email'}</button></div> : <form className="auth-reference-form auth-reference-signup-form" onSubmit={submit}>
+        {registrationSent ? <div className="auth-reference-confirm"><div className="auth-reference-confirm-icon"><Mail size={25} /></div><h2>Confirm your email</h2><p>Mun aika OTP mai digits 6 zuwa <strong>{form.email}</strong>.</p><form className="auth-otp-form" onSubmit={confirmSignupOtp}><Field icon={ShieldCheck}><input value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" placeholder="Enter 6-digit OTP" maxLength={6} required /></Field><button type="submit" className="auth-reference-primary" disabled={loading}><span>{loading ? 'Confirming…' : 'Confirm email'}</span><ArrowRight size={23} /></button></form><button type="button" className="auth-reference-forgot" onClick={resendConfirmation} disabled={resendingConfirmation}>{resendingConfirmation ? 'Sending again…' : 'Resend OTP'}</button></div> : <form className="auth-reference-form auth-reference-signup-form" onSubmit={submit}>
           <Field icon={UserRound}><input type="text" value={form.displayName} onChange={(event) => update('displayName', event.target.value)} placeholder="Full Name" autoComplete="name" required /></Field>
           <Field icon={Phone}><input type="tel" value={form.phone} onChange={(event) => update('phone', event.target.value)} placeholder="Phone Number" autoComplete="tel" required /><span className="auth-reference-prefix">🇳🇬 +234</span></Field>
           <Field icon={Mail}><input type="email" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Email Address" autoComplete="email" required /></Field>
