@@ -443,7 +443,11 @@ function SponsoredBanner({ campaigns = [], placement, className = '' }) {
   const image = <img src={getOptimizedPublicImageUrl(campaign.image_url, { width: 1600 })} alt={campaign.title || 'Sponsored promotion'} loading="lazy" decoding="async" />;
   return <section className={`sponsored-placement ${className}`} aria-label="Sponsored promotion"><div className="sponsored-placement-label"><span>SPONSORED</span><small>Advertisement</small></div>{linked ? <button type="button" className="sponsored-placement-art linked" onClick={open} aria-label={campaign.title || 'Open sponsored promotion'}>{image}</button> : <div className="sponsored-placement-art" aria-label="Sponsored promotion">{image}</div>}</section>;
 }
-
+function homeRotationHash(value) {
+  let hash = 2166136261;
+  for (const char of String(value || '')) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return hash >>> 0;
+}
 function HomeView({ user, marketListings, trendingScores = [], marketLoading = false, adCampaigns = [], userPlace = '', locationBusy = false, onUseLocation, onOpenListing, savedIds, onToggleSave, onSearch, onNavigate, onOpenProfilePage, onShowNotifications, onLanguageChange }) {
   const { locale, locales, t } = useI18n();
   const [geo, setGeo] = useState(null);
@@ -462,15 +466,36 @@ function HomeView({ user, marketListings, trendingScores = [], marketLoading = f
   const featuredListings = useMemo(() => {
     const scores = new Map((trendingScores || []).map((row, index) => [row.listing_id, { ...row, rank: index }]));
     const seen = new Set();
-    return [...marketListings].filter((listing) => {
+    const candidates = [...marketListings].filter((listing) => {
       const key = String(listing.title || listing.id || '').trim().toLowerCase().replace(/\s+/g, ' ');
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
     }).map((listing) => ({ ...listing, ...scores.get(listing.id), viewsCount: listing.viewsCount || Number(listing.raw?.views_count || 0) }))
-      .sort((a, b) => Number(b.trending_score || b.trendingScore || 0) - Number(a.trending_score || a.trendingScore || 0) || Number(b.viewsCount || 0) - Number(a.viewsCount || 0) || new Date(b.raw?.created_at || 0) - new Date(a.raw?.created_at || 0))
-      .slice(0, 50);
-  }, [marketListings, trendingScores]);
+      .sort((a, b) => Number(b.trending_score || b.trendingScore || 0) - Number(a.trending_score || a.trendingScore || 0) || Number(b.viewsCount || 0) - Number(a.viewsCount || 0) || new Date(b.raw?.created_at || 0) - new Date(a.raw?.created_at || 0));
+    if (!candidates.length) return [];
+    const dayKey = new Date().toISOString().slice(0, 10);
+    const offset = homeRotationHash(`${dayKey}:${userPlace || 'Nigeria'}`) % candidates.length;
+    const rotated = [...candidates.slice(offset), ...candidates.slice(0, offset)];
+    const sellerGroups = new Map();
+    rotated.forEach((item) => {
+      const sellerKey = item.sellerId || item.seller || item.id;
+      const group = sellerGroups.get(sellerKey) || [];
+      group.push(item);
+      sellerGroups.set(sellerKey, group);
+    });
+    const fair = [];
+    let depth = 0;
+    while (fair.length < rotated.length) {
+      let added = false;
+      for (const group of sellerGroups.values()) {
+        if (group[depth]) { fair.push(group[depth]); added = true; }
+      }
+      if (!added) break;
+      depth += 1;
+    }
+    return fair.slice(0, 50);
+  }, [marketListings, trendingScores, userPlace]);
   return (
     <div className="page-stack home-page">
       <section className="marketplace-search-hero" aria-label="Find products and services">
