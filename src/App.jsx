@@ -392,45 +392,27 @@ function FirstVisitCard({ user, onNavigate }) {
 function DashboardProfileSnapshot({ user, onNavigate, onOpenProfilePage }) {
   const [profile, setProfile] = useState(null);
   const [contacts, setContacts] = useState(null);
-  const [business, setBusiness] = useState(null);
-  const [entitlement, setEntitlement] = useState(null);
   const [loading, setLoading] = useState(Boolean(user));
-  const [planLoading, setPlanLoading] = useState(Boolean(user));
-  const [ctaMode, setCtaMode] = useState('shop');
   useEffect(() => {
     let mounted = true;
-    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setBusiness(null); setEntitlement(null); setLoading(false); setPlanLoading(false); return undefined; }
+    if (!user?.id || !isSupabaseConfigured) { setProfile(null); setContacts(null); setLoading(false); return undefined; }
     setLoading(true);
-    setPlanLoading(true);
-    fetchSellerEntitlement().then((value) => mounted && setEntitlement(value)).catch(() => mounted && setEntitlement(null)).finally(() => mounted && setPlanLoading(false));
-    Promise.all([ensureAccountDashboard(user.id, { displayName: user.user_metadata?.display_name, email: user.email || '' }), getProfileContacts(user.id)])
-      .then(([dashboard, nextContacts]) => { if (mounted) { setProfile(dashboard?.profile || null); setContacts(nextContacts); setBusiness(dashboard?.business || null); } })
-      .catch(() => { if (mounted) { setProfile(null); setContacts(null); setBusiness(null); } })
+    Promise.all([getProfile(user.id), getProfileContacts(user.id)])
+      .then(([nextProfile, nextContacts]) => { if (mounted) { setProfile(nextProfile); setContacts(nextContacts); } })
+      .catch(() => { if (mounted) { setProfile(null); setContacts(null); } })
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
   }, [user?.id]);
   if (!user) return null;
   const name = profile?.display_name || user.user_metadata?.display_name || user.email?.split('@')[0] || 'Bese26 user';
   const username = profile?.username ? `@${profile.username}` : '@member';
-  const phone = contacts?.phone || user.user_metadata?.phone || 'Phone not added';
-  const hasMiniweb = Boolean(business?.business_name || business?.business_handle);
-  const hasActivePlan = Boolean(hasMiniweb && entitlement?.is_paid);
-  useEffect(() => {
-    setCtaMode('shop');
-    if (hasActivePlan) return undefined;
-    const timer = window.setTimeout(() => setCtaMode('plan'), 3000);
-    return () => window.clearTimeout(timer);
-  }, [hasMiniweb, hasActivePlan]);
-  const openMiniweb = () => { const handle = String(business?.business_handle || profile?.username || '').replace(/^@/, '').trim().toLowerCase(); if (handle) window.location.assign(`/@${handle}`); else onOpenProfilePage?.('business'); };
-  const openPlan = () => setCtaMode('plan');
-  if (!loading && !planLoading && hasActivePlan) return null;
-  const showingPlan = ctaMode === 'plan';
-  return <section className={`dashboard-profile-snapshot ${hasMiniweb ? 'has-miniweb' : 'needs-miniweb'} ${showingPlan ? 'is-plan' : 'is-shop'}`} aria-label="Your profile and Miniweb setup">
-    {!loading && <div className="dashboard-miniweb-action">
-      <span className="dashboard-miniweb-icon" aria-hidden="true">{hasMiniweb ? <Store size={22} /> : <Sparkles size={22} />}</span>
-      <div className="dashboard-miniweb-copy" key={showingPlan ? 'subscription' : 'shop'}><small>{showingPlan ? 'NEXT STEP' : hasMiniweb ? 'YOUR MINIWEB IS READY' : 'YOUR MINIWEB DASHBOARD'}</small><strong>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'Your dashboard is ready' : 'Open your dashboard'}</strong><p>{showingPlan ? 'Choose a plan to unlock more selling capacity and business tools.' : hasMiniweb ? 'Choose a subscription to unlock more tools for your business.' : 'Your personal Miniweb dashboard is being prepared for you.'}</p></div>
-      <button type="button" className="dashboard-miniweb-button" onClick={showingPlan ? () => onNavigate('subscription') : openMiniweb}><span>{showingPlan ? 'Go to subscription' : hasMiniweb ? 'View dashboard' : 'Open dashboard'}</span><small className="dashboard-miniweb-hint">Open</small><ArrowRight size={16} /></button>
-    </div>}
+  const openProfileMiniweb = () => onOpenProfilePage?.('main');
+  return <section className="dashboard-profile-snapshot profile-miniweb-card" aria-label="Your Miniweb profile">
+    <div className="dashboard-miniweb-action">
+      <span className="dashboard-miniweb-icon" aria-hidden="true"><UserRound size={22} /></span>
+      <div className="dashboard-miniweb-copy"><small>{loading ? 'BESE26 MINIWEB PROFILE' : 'PROFILE ƊINKA SHINE MINIWEB ƊINKA'}</small><strong>{loading ? 'Loading profile…' : `Duba Miniweb ɗin ${name}`}</strong><p>{loading ? 'Ana ɗauko bayanan profile ɗinka.' : 'Sarrafa suna, hoto, bayaninka da abin da masu saye za su gani daga profile ɗinka.'}</p></div>
+      <button type="button" className="dashboard-miniweb-button" onClick={openProfileMiniweb}><span>Duba Miniweb</span><small className="dashboard-miniweb-hint">Danna nan</small><ArrowRight size={16} /></button>
+    </div>
   </section>;
 }
 function MailIcon() { return <span className="dashboard-profile-detail-icon" aria-hidden="true">@</span>; }
@@ -1816,7 +1798,7 @@ function AppContent() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={goBack} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={goBack} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
-    if (activeNav === 'business') return <ProfileView key={`business-dashboard-${profileReset}`} user={sessionUser} initialPage="business" onAuthRequired={() => requireAuth('Sign in to manage your Miniweb.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of Bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'business'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
+    if (activeNav === 'business') return <ProfileView key={`profile-miniweb-${profileReset}`} user={sessionUser} initialPage="main" onAuthRequired={() => requireAuth('Sign in to manage your Miniweb.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of Bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'business'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'sell') return <SellView key={`sell-${editingListing?.id || editingDraft?.id || copySourceListing?.id || 'new'}`} user={sessionUser} isAdmin={canAccessAdmin} initialListing={editingListing} initialDraft={editingDraft} copySource={copySourceListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onOpenListing={openListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialNotificationTarget={chatNotificationTarget} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); setChatNotificationTarget(null); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); }} />;
     if (activeNav === 'admin') return canAccessAdmin ? <AdminView user={sessionUser} adminPermissions={adminPermissions} isOwnerAdmin={isOwnerAdmin} onBack={goBack} onNotice={showToast} onCreateListing={() => { setEditingDraft(null); setEditingListing(null); setCopySourceListing(null); navigate('sell'); }} /> : <ProfileView key={profileReset} user={sessionUser} onAuthRequired={() => requireAuth('Sign in to manage your profile.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'profile'} isAdmin={false} onOpenAdmin={() => {}} onOpenSubscription={() => navigate('subscription')} />;
