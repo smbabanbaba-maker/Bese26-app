@@ -1021,30 +1021,57 @@ export async function fetchSimilarListings(listing) {
     if (boostError) return listings;
     const promoted = new Set((activeBoosts || []).map((item) => item.listing_id));
     const dayKey = new Date().toISOString().slice(0, 10);
+    const base = listing.raw || {};
+    const normalize = (value) => String(value || '').trim().toLowerCase();
+    const targetTitleWords = new Set(normalize(listing.title).split(/[^a-z0-9]+/).filter((word) => word.length > 2));
+    const targetPrice = Number(listing.numericPrice || base.price || 0);
     const source = listings.map((item) => ({
       ...item,
       promoted: promoted.has(item.id),
       rotationScore: fairRotationHash(`${dayKey}:${listing.id}:${item.id}`),
+      relevanceScore: (() => {
+        const row = item.raw || {};
+        const sameCity = normalize(row.city) && normalize(row.city) === normalize(base.city);
+        const sameState = normalize(row.state) && normalize(row.state) === normalize(base.state);
+        const itemPrice = Number(item.numericPrice || row.price || 0);
+        const priceGap = targetPrice > 0 && itemPrice > 0 ? Math.abs(Math.log(itemPrice / targetPrice)) : 99;
+        const titleOverlap = [...new Set(normalize(item.title).split(/[^a-z0-9]+/).filter((word) => word.length > 2))].filter((word) => targetTitleWords.has(word)).length;
+        return (row.subcategory_id && row.subcategory_id === base.subcategory_id ? 100 : 0)
+          + (sameCity ? 35 : 0)
+          + (sameState ? 20 : 0)
+          + (normalize(row.condition) && normalize(row.condition) === normalize(base.condition) ? 10 : 0)
+          + Math.max(0, 25 - Math.round(priceGap * 10))
+          + Math.min(30, titleOverlap * 10);
+      })(),
     }));
-    // Rotate daily and use round-robin seller slots: one seller cannot occupy
-    // the whole Similar ads rail. Boost stays visible as a label, not a ranking override.
-    const groups = new Map();
-    source.sort((a, b) => b.rotationScore - a.rotationScore).forEach((item) => {
-      const sellerKey = item.sellerId || item.seller || item.id;
-      const group = groups.get(sellerKey) || [];
-      group.push(item);
-      groups.set(sellerKey, group);
-    });
     const fair = [];
-    let depth = 0;
-    while (fair.length < source.length) {
-      let added = false;
-      for (const group of groups.values()) {
-        if (group[depth]) { fair.push(group[depth]); added = true; }
+    // Relevance tiers keep close matches first. Rotation happens inside each
+    // tier, and round-robin seller slots stop one seller filling the rail.
+    const tiers = new Map();
+    source.forEach((item) => {
+      const tier = Math.floor(item.relevanceScore / 25);
+      const group = tiers.get(tier) || [];
+      group.push(item);
+      tiers.set(tier, group);
+    });
+    [...tiers.keys()].sort((a, b) => b - a).forEach((tier) => {
+      const sellerGroups = new Map();
+      tiers.get(tier).sort((a, b) => b.rotationScore - a.rotationScore).forEach((item) => {
+        const sellerKey = item.sellerId || item.seller || item.id;
+        const group = sellerGroups.get(sellerKey) || [];
+        group.push(item);
+        sellerGroups.set(sellerKey, group);
+      });
+      let depth = 0;
+      while (true) {
+        let added = false;
+        for (const group of sellerGroups.values()) {
+          if (group[depth]) { fair.push(group[depth]); added = true; }
+        }
+        if (!added) break;
+        depth += 1;
       }
-      if (!added) break;
-      depth += 1;
-    }
+    });
     return fair;
   } catch {
     return listings;
