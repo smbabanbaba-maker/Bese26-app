@@ -104,12 +104,19 @@ export async function signUp({ email, password, displayName, username, phone }) 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: getAuthRedirectUrl() },
+    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' } },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
     throw new Error('This email has already been registered. Please log in or use Forgot password.');
   }
+  // Always send a numeric email OTP after registration. Verification is completed
+  // with verifyOtp, so the user never needs to open a confirmation link.
+  const { error: otpError } = await supabase.auth.signInWithOtp({
+    email: String(email).trim().toLowerCase(),
+    options: { shouldCreateUser: false },
+  });
+  if (otpError) throw otpError;
   return data;
 }
 
@@ -221,11 +228,15 @@ export async function submitBusinessVerification(values) {
     p_notes: values.notes?.trim() || null,
     p_document_path: values.document_path || null,
     p_cac_registered_name: values.cac_registered_name?.trim() || '',
+    p_authorized_representative_name: values.authorized_representative_name?.trim() || '',
+    p_applicant_role: values.applicant_role?.trim() || '',
+    p_owner_relationship: values.owner_relationship?.trim() || '',
+    p_ownership_declaration: Boolean(values.ownership_declaration),
   });
   if (error) throw error;
   return data;
 }
-const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,provider,provider_reference,provider_status,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
+const identityVerificationFields = 'id,user_id,verification_type,status,legal_first_name,legal_middle_name,legal_last_name,date_of_birth,gender,country,state,city,residential_address,document_type,document_number_reference,document_country,document_expiry,document_front_path,document_back_path,selfie_path,legal_name_matches_document,provider,provider_reference,provider_status,reviewer_note,liveness_status,accuracy_confirmed,submitted_at,reviewed_at,verified_at,created_at,updated_at';
 export async function fetchIdentityVerification(userId) {
   failIfUnavailable();
   const { data, error } = await supabase.from('verification_applications').select(identityVerificationFields).eq('user_id', userId).eq('verification_type', 'identity').order('created_at', { ascending: false }).limit(1).maybeSingle();
@@ -239,7 +250,7 @@ function maskDocumentNumber(value) {
 }
 export async function saveIdentityVerificationDraft(userId, values) {
   failIfUnavailable();
-  const payload = { user_id: userId, verification_type: 'identity', full_name: [values.legal_first_name, values.legal_middle_name, values.legal_last_name].filter(Boolean).join(' ').trim() || 'Identity verification applicant', status: 'draft', legal_first_name: values.legal_first_name?.trim() || null, legal_middle_name: values.legal_middle_name?.trim() || null, legal_last_name: values.legal_last_name?.trim() || null, date_of_birth: values.date_of_birth || null, gender: values.gender || null, country: NIGERIA_COUNTRY, state: values.state?.trim() || null, city: values.city?.trim() || null, residential_address: values.residential_address?.trim() || null, document_type: values.document_type || null, document_number_reference: maskDocumentNumber(values.document_number_reference), document_country: NIGERIA_COUNTRY, document_expiry: values.document_expiry || null, document_front_path: values.document_front_path || null, document_back_path: values.document_back_path || null, selfie_path: values.selfie_path || null, accuracy_confirmed: Boolean(values.accuracy_confirmed) };
+  const payload = { user_id: userId, verification_type: 'identity', full_name: [values.legal_first_name, values.legal_middle_name, values.legal_last_name].filter(Boolean).join(' ').trim() || 'Identity verification applicant', status: 'draft', legal_first_name: values.legal_first_name?.trim() || null, legal_middle_name: values.legal_middle_name?.trim() || null, legal_last_name: values.legal_last_name?.trim() || null, date_of_birth: values.date_of_birth || null, gender: values.gender || null, country: NIGERIA_COUNTRY, state: values.state?.trim() || null, city: values.city?.trim() || null, residential_address: values.residential_address?.trim() || null, document_type: values.document_type || null, document_number_reference: maskDocumentNumber(values.document_number_reference), document_country: NIGERIA_COUNTRY, document_expiry: values.document_expiry || null, document_front_path: values.document_front_path || null, document_back_path: values.document_back_path || null, selfie_path: values.selfie_path || null, legal_name_matches_document: Boolean(values.legal_name_matches_document), accuracy_confirmed: Boolean(values.accuracy_confirmed) };
   if (values.id) {
     const { data, error } = await supabase.from('verification_applications').update(payload).eq('id', values.id).eq('user_id', userId).eq('verification_type', 'identity').select(identityVerificationFields).single();
     if (error) throw error;
