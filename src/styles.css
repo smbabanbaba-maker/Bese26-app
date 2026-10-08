@@ -14216,3 +14216,22 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   body .notifications-page.notification-center .notification-search-shell,
   body .notifications-page.notification-center .notification-feed { margin-left: 9px !important; margin-right: 9px !important; }
 }
+
+/* Official/admin notifications use a blue social-style verification mark, not the brand red. */
+.notifications-page.notification-center .notification-admin-mark {
+  width: 19px !important;
+  height: 19px !important;
+  display: inline-grid !important;
+  flex: none !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  color: #fff !important;
+  background: #1877f2 !important;
+  box-shadow: 0 2px 5px rgba(24,119,242,.24) !important;
+}
+.notifications-page.notification-center .notification-admin-mark svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke-width: 3 !important;
+}
