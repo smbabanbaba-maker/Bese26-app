@@ -14102,3 +14102,48 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
 @media (max-width: 380px) {
   .notifications-page.notification-center .notification-search-shell { margin-inline: 9px; }
 }
+
+/* Notifications final alignment: left-anchored feed with search at the top. */
+.notifications-page.notification-center {
+  align-self: stretch !important;
+  justify-self: start !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.notifications-page.notification-center .notification-search-shell {
+  align-self: stretch;
+  width: auto;
+  margin-top: 0 !important;
+  margin-bottom: 14px !important;
+}
+.notifications-page.notification-center .notification-feed {
+  width: auto !important;
+  max-width: none !important;
+  justify-items: stretch !important;
+  align-items: stretch !important;
+}
+.notifications-page.notification-center .notification-feed-group,
+.notifications-page.notification-center .notification-feed-row { width: 100% !important; justify-self: stretch !important; }
+@media (max-width: 620px) {
+  .notifications-page.notification-center {
+    width: calc(100% + 26px) !important;
+    margin-left: -13px !important;
+    margin-right: -13px !important;
+  }
+  .notifications-page.notification-center .notification-search-shell {
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    margin-left: 13px !important;
+    margin-right: 13px !important;
+  }
+  .notifications-page.notification-center .notification-feed { padding-left: 13px !important; padding-right: 13px !important; }
+}
+@media (max-width: 380px) {
+  .notifications-page.notification-center { width: calc(100% + 18px) !important; margin-left: -9px !important; margin-right: -9px !important; }
+  .notifications-page.notification-center .notification-search-shell { margin-left: 9px !important; margin-right: 9px !important; }
+  .notifications-page.notification-center .notification-feed { padding-left: 9px !important; padding-right: 9px !important; }
+}
