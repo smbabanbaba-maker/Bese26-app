@@ -13414,3 +13414,26 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   flex:1 1 auto!important;min-width:0!important;
  }
 }
+/* Composer visibility fix: the real control is a textarea, not an input. Keep it inside the bottom row. */
+.chat-reference-mode .chat-panel,
+.messages-selected-page .chat-panel { display:flex !important; flex-direction:column !important; min-height:0 !important; overflow:hidden !important; }
+.chat-reference-mode .chat-messages,
+.messages-selected-page .chat-messages { flex:1 1 auto !important; min-height:0 !important; overflow-y:auto !important; }
+.chat-reference-mode .chat-bottom-tools,
+.messages-selected-page .chat-bottom-tools { flex:0 0 auto !important; position:relative !important; z-index:5 !important; }
+.chat-reference-mode .chat-composer,
+.messages-selected-page .chat-composer { display:flex !important; align-items:center !important; flex:0 0 auto !important; min-height:64px !important; height:auto !important; position:relative !important; z-index:6 !important; overflow:visible !important; }
+.chat-reference-mode .chat-composer .chat-message-composer-input,
+.messages-selected-page .chat-composer .chat-message-composer-input { display:block !important; order:3 !important; flex:1 1 auto !important; width:auto !important; min-width:0 !important; height:43px !important; min-height:43px !important; max-height:43px !important; margin:0 !important; padding:10px 15px !important; resize:none !important; overflow:hidden !important; border:1px solid #cfd8dc !important; border-radius:22px !important; color:#263238 !important; background:#fff !important; line-height:21px !important; }
+.chat-reference-mode .chat-composer .chat-attach-button,
+.messages-selected-page .chat-composer .chat-attach-button { order:2 !important; }
+.chat-reference-mode .chat-composer .chat-record-button,
+.messages-selected-page .chat-composer .chat-record-button { order:4 !important; }
+.chat-reference-mode .chat-composer .emoji-toggle,
+.messages-selected-page .chat-composer .emoji-toggle { order:1 !important; }
+.chat-reference-mode .chat-composer .send-button,
+.messages-selected-page .chat-composer .send-button { order:5 !important; flex:0 0 40px !important; display:grid !important; place-items:center !important; }
+@media (max-width:699px) {
+  .chat-reference-mode .chat-composer .chat-message-composer-input,
+  .messages-selected-page .chat-composer .chat-message-composer-input { height:42px !important; min-height:42px !important; max-height:42px !important; padding-inline:13px !important; }
+}
