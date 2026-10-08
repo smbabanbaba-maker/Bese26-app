@@ -170,7 +170,7 @@ const mobileNavItems = [
   { key: 'saved', label: 'Saved', icon: Bookmark },
   { key: 'sell', label: 'Sell', icon: Plus },
   { key: 'messages', label: 'Messages', icon: MessageCircle },
-  { key: 'business', label: 'Shop', icon: Store },
+  { key: 'analytics', label: 'Dashboard', icon: BarChart3 },
   { key: 'profile', label: 'Profile', icon: UserRound },
 ];
 
@@ -1758,7 +1758,7 @@ function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
   const navigate = (page) => {
-    const protectedPages = new Set(['notifications', 'saved', 'sell', 'messages', 'business', 'profile', 'subscription', 'admin']);
+    const protectedPages = new Set(['notifications', 'saved', 'sell', 'messages', 'analytics', 'business', 'profile', 'subscription', 'admin']);
     if (protectedPages.has(page) && !sessionUser) {
       requireAuth('Login or create a free Bese26 account to continue.', 'signin', page);
       return;
@@ -1887,6 +1887,7 @@ function AppContent() {
     if (activeNav === 'saved') return <SavedView marketListings={marketListings} savedIds={savedIds} onOpenListing={openListing} onToggleSave={toggleSave} />;
     if (activeNav === 'wallet') return <UnavailableView icon={WalletCards} eyebrow="WALLET" title="Wallet is coming soon" description="Wallet, payments, and transactions are not connected yet. No balance or transaction data is shown until the real service is ready." onBack={goBack} />;
     if (activeNav === 'subscription') return <SubscriptionView user={sessionUser} onBack={goBack} onAuthRequired={() => requireAuth('Sign in to view your seller plan.')} onDemoAction={showToast} />;
+    if (activeNav === 'analytics') return <ProfileView key={`analytics-${profileReset}`} user={sessionUser} initialPage="analytics" onInitialPageConsumed={() => {}} onAuthRequired={() => requireAuth('Sign in to view your dashboard.')} onSignOut={async () => { try { await signOut(); showToast('Signed out of bese26.'); } catch (error) { showToast(error.message || 'Could not sign out.'); } }} onDemoAction={showToast} isDark={isDark} onToggleTheme={() => { setIsDark(!isDark); showToast(isDark ? 'Light mode enabled' : 'Dark mode enabled'); }} onNavigate={navigate} onCreateListing={openSell} onContinueDraft={(draft) => { setEditingDraft(draft); setEditingListing(null); navigate('sell'); }} onEditListing={(listing) => { setEditingDraft(null); setEditingListing(listing); navigate('sell'); }} onOpenListing={openListing} onToggleSave={toggleSave} isActive={activeNav === 'analytics'} isAdmin={canAccessAdmin} onOpenAdmin={() => navigate('admin')} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'business') return <OwnerMiniwebDashboard user={sessionUser} onBack={goBack} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} onNotice={showToast} />;
     if (activeNav === 'sell') return <SellView key={`sell-${editingListing?.id || editingDraft?.id || copySourceListing?.id || 'new'}`} user={sessionUser} isAdmin={canAccessAdmin} initialListing={editingListing} initialDraft={editingDraft} copySource={copySourceListing} onAuthRequired={() => requireAuth('Sign in before posting a listing.')} onDemoAction={showToast} onNavigate={navigate} onOpenSubscription={() => navigate('subscription')} />;
     if (activeNav === 'messages') return <MessagesView user={sessionUser} liveListing={chatListing} onOpenListing={openListing} onDemoAction={showToast} onAuthRequired={(message) => requireAuth(message)} initialMessageId={chatTargetId} initialNotificationTarget={chatNotificationTarget} initialDealPanel={chatDealPanel} initialText={chatDraft} onSelectConversation={(conversation) => { setChatTargetId(conversation.id); setChatListing(null); setChatDealPanel(''); setChatNotificationTarget(null); }} onBackToInbox={() => { setChatTargetId(null); setChatDealPanel(''); setChatNotificationTarget(null); }} />;
@@ -1896,7 +1897,7 @@ function AppContent() {
 
   // Keep primary navigation on top-level destinations, not focused workflows.
   const showPrimaryBottomNav = !selectedListing && !showAuth && !chatTargetId &&
-    ['home', 'notifications', 'saved', 'messages', 'shop', 'profile'].includes(activeNav) &&
+    ['home', 'notifications', 'saved', 'messages', 'analytics', 'profile'].includes(activeNav) &&
     !(activeNav === 'profile' && profilePageTarget && profilePageTarget !== 'main');
 
   return <div className={`app-shell ${isDark ? 'theme-dark' : ''}`} data-release="comments-v2">
