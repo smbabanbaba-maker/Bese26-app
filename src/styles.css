@@ -13185,3 +13185,45 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   background:#fff!important;color:#171717!important;
  }
 }
+
+
+/* Mobile chat footer repair: override legacy fixed/inset layout and viewport offsets.
+   The message list is the only scrolling region; the input always remains visible. */
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+  position:fixed!important;inset:0 0 auto 0!important;
+  top:0!important;left:0!important;right:0!important;bottom:auto!important;
+  height:var(--bese26-chat-viewport-height,100dvh)!important;
+  max-height:var(--bese26-chat-viewport-height,100dvh)!important;
+  min-height:0!important;display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;box-sizing:border-box!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+  flex:1 1 0%!important;min-height:0!important;max-height:none!important;
+  overflow-y:auto!important;margin:0!important;
+  padding:12px!important;scroll-padding-bottom:12px!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+  position:static!important;inset:auto!important;transform:none!important;
+  flex-shrink:0!important;margin:0!important;width:100%!important;
+  box-sizing:border-box!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+  display:flex!important;min-height:66px!important;height:auto!important;
+  max-height:110px!important;overflow:visible!important;
+  padding:8px 10px!important;visibility:visible!important;
+  background:white!important;z-index:5!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+  max-height:65px!important;overflow:hidden!important;background:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-safety-note {
+  display:none!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-quick-actions {
+  overflow-x:auto!important;white-space:nowrap!important;
+  max-height:62px!important;
+ }
+}
