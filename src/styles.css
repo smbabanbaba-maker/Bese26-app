@@ -13547,3 +13547,77 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     min-width:0 !important;
   }
 }
+
+/* Definitive mobile chat footer fix: no quick-action tray, no reserved blank bottom layer. */
+@media (max-width:760px) {
+  html body .messages-page.chat-reference-mode.messages-selected-page {
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100dvh !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+    position:relative !important;
+    inset:auto !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+    display:none !important;
+    position:static !important;
+    width:0 !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+    flex:1 1 0% !important;
+    min-height:0 !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow-y:auto !important;
+    padding-bottom:12px !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+    position:relative !important;
+    inset:auto !important;
+    display:flex !important;
+    flex:0 0 70px !important;
+    width:100% !important;
+    height:70px !important;
+    min-height:70px !important;
+    max-height:70px !important;
+    margin:0 !important;
+    padding:8px 10px max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow:visible !important;
+    background:#fff !important;
+    z-index:30 !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-message-composer-input {
+    display:block !important;
+    position:relative !important;
+    flex:1 1 auto !important;
+    width:auto !important;
+    min-width:0 !important;
+    height:42px !important;
+    min-height:42px !important;
+    max-height:42px !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+}
