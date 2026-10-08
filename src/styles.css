@@ -12565,3 +12565,36 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    overflow-y:auto !important;
  }
 }
+
+
+/* Photo attachment preview: no generated filename; remove photo directly on thumbnail. */
+.chat-reference-mode .chat-selected-photo {
+ position:relative !important; display:block !important;
+ width:min(220px,55vw) !important; height:150px !important;
+ flex:0 1 auto !important;
+}
+.chat-reference-mode .chat-selected-photo > img {
+ width:100% !important; height:100% !important; max-width:100% !important;
+ display:block !important; object-fit:contain !important;
+ border-radius:12px !important; background:#edf2f6 !important;
+}
+.chat-reference-mode .chat-selected-photo-remove {
+ position:absolute !important; top:5px !important; right:5px !important;
+ display:flex !important; align-items:center !important; justify-content:center !important;
+ width:32px !important; height:32px !important; padding:0 !important;
+ border:0 !important; border-radius:50% !important;
+ background:rgba(17,24,39,.85) !important; color:#fff !important;
+ box-shadow:0 2px 6px rgba(0,0,0,.2) !important; z-index:2 !important;
+}
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+   gap:10px !important; flex-wrap:nowrap !important; justify-content:space-between !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-selected-photo {
+   width:min(180px,48vw) !important; height:115px !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview-actions {
+   display:flex !important; flex-direction:column !important;
+   gap:8px !important; margin-left:auto !important;
+ }
+}
