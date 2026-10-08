@@ -930,7 +930,7 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
       const matchesMessage = !query || preview.toLowerCase().includes(query);
       const isUnanswered = conversation.seller_id === user?.id && conversation.lastMessage?.sender_id === conversation.buyer_id;
       const isUnread = Number(conversation.unread_count || 0) > 0;
-      return (matchesSearch || matchesMessage) && (messageFilter === 'All' || (messageFilter === 'Unanswered' && isUnanswered) || (messageFilter === 'Unread' && isUnread));
+      return (matchesSearch || matchesMessage) && (messageFilter === 'All' || (messageFilter === 'Unanswered' && isUnanswered) || (messageFilter === 'Unread' && isUnread) || (messageFilter === 'Spam' && false));
     });
     const totalUnread = conversations.reduce((total, item) => total + Number(item.unread_count || 0), 0);
     return <div className="messages-inbox-page messages-premium">
@@ -941,8 +941,8 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
       <div className="messages-inbox-workspace">
         <section className="messages-inbox-list-panel" aria-label="Your conversations">
           <div className="messages-inbox-controls">
-            <div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search people, listings or messages" aria-label="Search people, listings or messages" /></div>
-            <div className="message-filter-tabs" role="tablist" aria-label="Filter conversations">{['All', 'Unread', 'Unanswered'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}{filter === 'Unread' && totalUnread > 0 && <span className="message-filter-count">{totalUnread > 99 ? '99+' : totalUnread}</span>}</button>)}</div>
+            <div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search in Messages" aria-label="Search people, listings or messages" /></div>
+            <div className="message-filter-tabs" role="tablist" aria-label="Filter conversations">{['All', 'Unread', 'Unanswered', 'Spam'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}{filter === 'Unread' && totalUnread > 0 && <span className="message-filter-count">{totalUnread > 99 ? '99+' : totalUnread}</span>}</button>)}</div>
           </div>
           {conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => {
             const identity = conversationIdentity(conversation);
@@ -952,8 +952,8 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
             const preview = lastMessage?.body?.trim() || (lastMessage ? (chatAttachmentKind(lastMessage) === 'audio' ? 'Voice note' : chatAttachmentKind(lastMessage) === 'file' ? 'Shared a document' : 'Shared a photo') : 'Start the conversation');
             const lastActivity = lastMessage?.created_at || conversation.last_message_at;
             return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}>
-              <span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span>
-              <span className="message-inbox-copy"><strong>{name}</strong><VerificationBadges idVerified={Boolean(identity.profile?.id_verified)} cacVerified={Boolean(identity.profile?.cac_verified)} compact /><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{preview}</small></span>
+              <span className="message-inbox-listing-image">{conversation.listing?.image ? <img src={conversation.listing.image} alt="" loading="lazy" /> : <Package size={24} />}<span className={`message-identity-avatar message-inbox-avatar-overlay ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span></span>
+              <span className="message-inbox-copy"><span className="message-inbox-name-line"><strong>{name}</strong><VerificationBadges idVerified={Boolean(identity.profile?.id_verified)} cacVerified={Boolean(identity.profile?.cac_verified)} compact /></span><b>{preview}</b><small>{conversation.listing?.title || 'Marketplace listing'}</small></span>
               <span className="message-inbox-row-meta"><time>{lastActivity ? new Date(lastActivity).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time>{Number(conversation.unread_count || 0) > 0 && <span className="message-unread-badge">{conversation.unread_count > 99 ? '99+' : conversation.unread_count}</span>}</span>
               <ChevronRight size={17} />
             </button>;
