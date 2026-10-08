@@ -12815,3 +12815,72 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
  body .message-inbox-row-meta {align-self:flex-start!important;flex:0 0 auto!important;margin-top:4px!important;color:#718894!important;font-size:12px!important;}
 }
 @media(max-width:360px){body .message-inbox-row {gap:12px!important;padding:12px 14px!important;}body .message-inbox-listing-image {width:64px;height:64px;flex-basis:64px;}body .message-filter-tabs button {font-size:13px!important;padding:16px 7px!important;}}
+
+
+/* Bese26 premium light inbox: white, charcoal, signature red */
+.messages-inbox-page.messages-premium {
+ --inbox-red:#df1428; --inbox-black:#15171b; --inbox-muted:#78818b;
+ color:var(--inbox-black); background:#f7f8fa !important;
+}
+.messages-inbox-page .messages-inbox-header {
+ background:#fff !important; border:0 !important; border-bottom:1px solid #eceef0 !important;
+ box-shadow:none !important; border-radius:0 !important;
+}
+.messages-inbox-page .messages-inbox-title .eyebrow {color:#a3a8af !important;letter-spacing:.12em !important;}
+.messages-inbox-page .messages-inbox-title h1 {display:flex !important;gap:12px !important;align-items:baseline !important;}
+.messages-inbox-page .messages-inbox-brand {font-weight:850 !important;letter-spacing:-.055em !important;color:#15171b !important;}
+.messages-inbox-page .messages-inbox-brand span {color:#e1122b !important;}
+.messages-inbox-page .messages-inbox-heading-label {font-size:.56em !important;font-weight:650 !important;letter-spacing:0 !important;color:#78818b !important;}
+.messages-inbox-page .message-count {background:#fff1f2 !important;color:#c90f24 !important;border:1px solid #ffd6da !important;}
+.messages-inbox-page .messages-inbox-workspace {background:#f7f8fa !important;gap:18px !important;}
+.messages-inbox-page .messages-inbox-list-panel {background:transparent !important;border:0 !important;box-shadow:none !important;}
+.messages-inbox-page .messages-inbox-controls {background:#fff !important;border:0 !important;border-bottom:1px solid #edf0f2 !important;padding:16px 16px 0 !important;}
+.messages-inbox-page .messages-search {background:#f5f6f8 !important;border:1px solid #edf0f2 !important;border-radius:18px !important;box-shadow:none !important;color:#77818c !important;}
+.messages-inbox-page .messages-search input {background:transparent !important;color:#1c2026 !important;}
+.messages-inbox-page .message-filter-tabs {display:flex !important;overflow-x:auto !important;gap:8px !important;scrollbar-width:none !important;padding-top:14px !important;}
+.messages-inbox-page .message-filter-tabs button {flex:0 0 auto !important;color:#41454d !important;border-radius:999px !important;border:1px solid transparent !important;padding:10px 15px !important;background:transparent !important;white-space:nowrap !important;}
+.messages-inbox-page .message-filter-tabs button.active {background:#e2142a !important;color:#fff !important;border-color:#e2142a !important;box-shadow:0 5px 12px rgba(225,20,42,.14) !important;}
+.messages-inbox-page .message-filter-count,.messages-inbox-page .message-unread-badge {background:#e2142a !important;color:#fff !important;border-radius:999px !important;}
+.messages-inbox-page .message-filter-tabs button.active .message-filter-count {background:#fff !important;color:#e2142a !important;}
+.messages-inbox-page .message-inbox-list {padding:12px !important;display:flex !important;flex-direction:column !important;gap:8px !important;background:#f7f8fa !important;}
+.messages-inbox-page .message-inbox-row {
+ display:flex !important;align-items:center !important;gap:13px !important;
+ padding:16px 14px !important;border:1px solid #f0f1f3 !important;border-radius:19px !important;
+ background:#fff !important;box-shadow:0 3px 14px rgba(23,28,36,.035) !important;
+ min-width:0 !important;transition:box-shadow .15s ease,transform .15s ease !important;
+}
+.messages-inbox-page .message-inbox-row:hover {box-shadow:0 7px 22px rgba(23,28,36,.09) !important;transform:translateY(-1px) !important;}
+.messages-inbox-page .message-inbox-listing-image {width:66px !important;height:66px !important;min-width:66px !important;border-radius:14px !important;overflow:visible !important;background:#f0f1f3 !important;}
+.messages-inbox-page .message-inbox-listing-image > img {width:100% !important;height:100% !important;object-fit:cover !important;border-radius:14px !important;}
+.messages-inbox-page .message-inbox-avatar-overlay {position:absolute !important;bottom:-5px !important;right:-5px !important;width:29px !important;height:29px !important;border:3px solid #fff !important;border-radius:50% !important;background:#fff !important;}
+.messages-inbox-page .message-inbox-avatar-overlay img {width:100% !important;height:100% !important;object-fit:cover !important;border-radius:50% !important;}
+.messages-inbox-page .message-inbox-copy {flex:1 1 0 !important;min-width:0 !important;display:flex !important;flex-direction:column !important;gap:4px !important;}
+.messages-inbox-page .message-inbox-name-line {display:flex !important;align-items:center !important;gap:5px !important;min-width:0 !important;}
+.messages-inbox-page .message-inbox-name-line strong {color:#171a1f !important;font-weight:750 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;}
+.messages-inbox-page .message-inbox-copy > b {color:#262b31 !important;font-weight:550 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;}
+.messages-inbox-page .message-inbox-copy > small {color:#818b95 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;}
+.messages-inbox-page .message-inbox-row-meta {align-self:flex-start !important;flex:0 0 auto !important;gap:8px !important;}
+.messages-inbox-page .message-inbox-row-meta time {color:#8b939e !important;font-size:12px !important;}
+.messages-inbox-page .message-inbox-row > svg {color:#a6acb4 !important;flex-shrink:0 !important;}
+@media (max-width:760px) {
+ body .messages-inbox-page.messages-premium {width:100% !important;min-width:0 !important;padding:0 0 12px !important;background:#f7f8fa !important;}
+ body .messages-inbox-page .messages-inbox-header {padding:18px 18px 14px !important;}
+ body .messages-inbox-page .messages-inbox-title h1 {font-size:29px !important;line-height:1.2 !important;}
+ body .messages-inbox-page .messages-inbox-title p {display:none !important;}
+ body .messages-inbox-page .messages-inbox-title .eyebrow {font-size:10px !important;}
+ body .messages-inbox-page .messages-inbox-workspace {display:block !important;padding:0 !important;}
+ body .messages-inbox-page .messages-inbox-list-panel {width:100% !important;max-width:100% !important;}
+ body .messages-inbox-page .messages-inbox-welcome {display:none !important;}
+ body .messages-inbox-page .message-inbox-list {padding:10px 10px 16px !important;gap:8px !important;}
+ body .messages-inbox-page .message-inbox-row {padding:13px 10px !important;gap:10px !important;border-radius:16px !important;}
+ body .messages-inbox-page .message-inbox-listing-image {width:56px !important;height:56px !important;min-width:56px !important;}
+ body .messages-inbox-page .message-inbox-row-meta time {font-size:11px !important;}
+ body .messages-inbox-page .message-inbox-row > svg {width:14px !important;}
+ body .messages-inbox-page .messages-inbox-controls {padding:12px 12px 0 !important;}
+ body .messages-inbox-page .message-filter-tabs button {font-size:13px !important;padding:9px 12px !important;}
+}
+@media (max-width:380px) {
+ body .messages-inbox-page .message-inbox-row {gap:8px !important;}
+ body .messages-inbox-page .message-inbox-listing-image {width:48px !important;height:48px !important;min-width:48px !important;}
+ body .messages-inbox-page .message-inbox-row-meta time {font-size:10px !important;}
+}
