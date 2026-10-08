@@ -12536,3 +12536,32 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    min-width:0 !important; width:0 !important; min-height:44px !important;
  }
 }
+
+
+/* Visual viewport is measured at runtime on iOS Safari and Android Chrome.
+   Keep header, scrollable messages, preview, quick actions and composer in one column. */
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+   top:var(--bese26-chat-viewport-top,0px) !important;
+   bottom:auto !important;
+   height:var(--bese26-chat-viewport-height,100dvh) !important;
+   max-height:var(--bese26-chat-viewport-height,100dvh) !important;
+   min-height:0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   position:relative !important;
+   bottom:auto !important;
+   flex-shrink:0 !important;
+   transform:none !important;
+   padding-bottom:max(8px,env(safe-area-inset-bottom,0px)) !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+   position:relative !important;
+   bottom:auto !important;
+   flex-shrink:0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   min-height:0 !important; flex:1 1 0 !important;
+   overflow-y:auto !important;
+ }
+}
