@@ -12598,3 +12598,57 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    gap:8px !important; margin-left:auto !important;
  }
 }
+
+
+/* Chat polish: inline verification, clean image-only messages and mobile preview. */
+.chat-reference-mode .chat-person .chat-person-name-row {
+ display:flex !important; align-items:center !important; gap:6px !important;
+ flex-wrap:wrap !important; min-width:0 !important;
+}
+.chat-reference-mode .chat-person .chat-person-name-row strong {
+ min-width:0 !important; overflow-wrap:anywhere !important;
+}
+.chat-reference-mode .chat-person .chat-person-name-row .verification-badges {
+ display:inline-flex !important; align-items:center !important; flex-wrap:wrap !important;
+}
+.chat-reference-mode .chat-panel .message-reaction {
+ display:none !important;
+}
+.chat-reference-mode .chat-panel .message-bubble:has(> .message-image-button) {
+ padding:0 !important; border:0 !important; border-radius:12px !important;
+ background:transparent !important; box-shadow:none !important;
+ overflow:visible !important;
+}
+.chat-reference-mode .chat-panel .message-bubble > .message-image-button {
+ display:block !important; border:0 !important; padding:0 !important;
+ margin:0 !important; background:transparent !important;
+ border-radius:10px !important; overflow:hidden !important;
+ width:fit-content !important; max-width:100% !important;
+}
+.chat-reference-mode .chat-panel .message-bubble .message-image {
+ display:block !important; width:auto !important; height:auto !important;
+ max-width:min(70vw,360px) !important; max-height:380px !important;
+ object-fit:contain !important; margin:0 !important;
+ border:0 !important; border-radius:10px !important;
+ background:transparent !important;
+}
+.chat-reference-mode .chat-panel .message-bubble:has(> .message-image-button) > small {
+ display:flex !important; justify-content:flex-end !important;
+ padding:3px 5px !important; color:#7895a1 !important;
+}
+.chat-reference-mode .chat-panel .chat-attachment-preview-actions {
+ align-self:center !important;
+}
+@media (max-width:760px) {
+ .chat-reference-mode .chat-panel .chat-person .chat-person-name-row {
+  max-width:100% !important; gap:4px !important;
+ }
+ .chat-reference-mode .chat-panel .chat-header {min-width:0 !important;}
+ .chat-reference-mode .chat-panel .chat-person {min-width:0 !important; flex:1 1 auto !important;}
+ .chat-reference-mode .chat-panel .chat-attachment-preview-actions button {
+  min-width:62px !important; min-height:42px !important;
+ }
+ .chat-reference-mode .chat-panel .message-bubble .message-image {
+  max-width:min(76vw,340px) !important; max-height:45dvh !important;
+ }
+}
