@@ -13849,3 +13849,37 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .notifications-page.notification-center .notification-feed-media { width: 43px !important; height: 43px !important; }
   .notifications-page.notification-center .notification-feed-content p { font-size: 11px !important; }
 }
+
+/* Notifications mobile edge-to-edge: cancel the shared page gutters safely. */
+@media (max-width: 620px) {
+  .notifications-page.notification-center {
+    width: calc(100% + 26px) !important;
+    max-width: none !important;
+    margin-left: -13px !important;
+    margin-right: -13px !important;
+    padding: 8px 0 30px !important;
+    overflow-x: hidden;
+  }
+  .notifications-page.notification-center .notification-center-header,
+  .notifications-page.notification-center .notification-feed,
+  .notifications-page.notification-center .notifications-empty.compact {
+    margin-left: 13px;
+    margin-right: 13px;
+  }
+  .notifications-page.notification-center .notification-center-header {
+    border-radius: 0 0 22px 22px !important;
+  }
+}
+@media (max-width: 380px) {
+  .notifications-page.notification-center {
+    margin-left: -9px !important;
+    margin-right: -9px !important;
+    width: calc(100% + 18px) !important;
+  }
+  .notifications-page.notification-center .notification-center-header,
+  .notifications-page.notification-center .notification-feed,
+  .notifications-page.notification-center .notifications-empty.compact {
+    margin-left: 9px;
+    margin-right: 9px;
+  }
+}
