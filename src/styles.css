@@ -12212,3 +12212,62 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
  }
  body .messages-page.chat-reference-mode .chat-panel .message-bubble {max-width:82% !important;}
 }
+
+
+/* Mobile chat refinement: hide the per-message reply arrow without disabling messages. */
+.messages-page.chat-reference-mode .message-bubble .message-reply-trigger {
+ display:none !important;
+}
+@media (max-width:699px) {
+ .messages-page.chat-reference-mode.messages-selected-page {
+  width:100% !important; max-width:100vw !important;
+  margin:0 !important; padding:0 !important; overflow-x:hidden !important;
+ }
+ .messages-page.chat-reference-mode .message-layout {
+  display:block !important; width:100% !important; min-width:0 !important;
+  max-width:100% !important; margin:0 !important;
+ }
+ .messages-page.chat-reference-mode .chat-panel {
+  display:flex !important; flex-direction:column !important;
+  width:100% !important; max-width:100% !important; min-width:0 !important;
+  overflow:hidden !important;
+ }
+ .messages-page.chat-reference-mode .chat-header,
+ .messages-page.chat-reference-mode .chat-context,
+ .messages-page.chat-reference-mode .chat-composer,
+ .messages-page.chat-reference-mode .chat-bottom-tools {
+  flex-shrink:0 !important; max-width:100% !important;
+ }
+ .messages-page.chat-reference-mode .chat-messages {
+  flex:1 1 auto !important; min-width:0 !important;
+  min-height:calc(100dvh - 350px) !important;
+  overflow-y:auto !important; overflow-x:hidden !important;
+  overscroll-behavior:contain !important;
+ }
+ .messages-page.chat-reference-mode .message-bubble {
+  max-width:85% !important; min-width:0 !important;
+  overflow-wrap:anywhere !important; word-break:break-word !important;
+ }
+ .messages-page.chat-reference-mode .message-bubble img,
+ .messages-page.chat-reference-mode .message-bubble audio {
+  max-width:100% !important;
+ }
+ .messages-page.chat-reference-mode .chat-quick-actions {
+  display:flex !important; flex-wrap:nowrap !important;
+  width:100% !important; overflow-x:auto !important;
+  scrollbar-width:none !important; -webkit-overflow-scrolling:touch !important;
+ }
+ .messages-page.chat-reference-mode .chat-quick-actions::-webkit-scrollbar {display:none !important;}
+ .messages-page.chat-reference-mode .chat-quick-actions button {flex:0 0 auto !important;}
+ .messages-page.chat-reference-mode .chat-composer {
+  display:flex !important; width:100% !important;
+  gap:5px !important; align-items:center !important;
+ }
+ .messages-page.chat-reference-mode .chat-message-composer-input {
+  flex:1 1 auto !important; width:0 !important;
+  min-width:0 !important; max-width:100% !important;
+ }
+ .messages-page.chat-reference-mode .chat-composer .icon-button {
+  flex:0 0 auto !important;
+ }
+}
