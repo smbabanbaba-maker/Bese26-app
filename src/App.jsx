@@ -1546,8 +1546,8 @@ function AppContent() {
       if (!payload.new.read_at) setUnreadNotifications((count) => count + 1);
       const title = payload.new.title || 'New Bese26 notification';
       showToast(title);
-      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && document.hidden) {
-        const systemNotification = new Notification(title, { body: payload.new.body || 'You have a new update on Bese26.', icon: '/images/bese26-logo-icon.webp', badge: '/images/bese26-logo-icon.webp', tag: `bese26-${payload.new.id || payload.new.notification_type || Date.now()}` });
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        const systemNotification = new Notification(title, { body: payload.new.body || 'You have a new update on Bese26.', icon: '/images/bese26-logo-icon.webp', badge: '/images/bese26-logo-icon.webp', tag: `bese26-${payload.new.id || payload.new.notification_type || Date.now()}`, renotify: true });
         systemNotification.onclick = () => { window.focus(); systemNotification.close(); };
       }
     });
@@ -1558,6 +1558,19 @@ function AppContent() {
     if (typeof window === 'undefined' || !('Notification' in window)) { showToast('This browser does not support phone notifications.'); return; }
     try { const permission = await Notification.requestPermission(); setBrowserNotificationPermission(permission); showToast(permission === 'granted' ? 'Phone alerts are now on.' : 'Phone alerts were not enabled.'); } catch { showToast('Could not enable phone alerts in this browser.'); }
   };
+  useEffect(() => {
+    if (!sessionUser?.id || typeof window === 'undefined' || !('Notification' in window)) return undefined;
+    if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+      setBrowserNotificationPermission(Notification.permission);
+      return undefined;
+    }
+    // Ask once when an authenticated user opens the app; browsers may defer this until a user gesture.
+    let cancelled = false;
+    Notification.requestPermission().then((permission) => {
+      if (!cancelled) setBrowserNotificationPermission(permission);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [sessionUser?.id]);
   useEffect(() => {
     let mounted = true;
     if (!sessionUser?.id || !isSupabaseConfigured) return undefined;
