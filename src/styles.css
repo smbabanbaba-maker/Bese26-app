@@ -14180,3 +14180,39 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   body .messages-inbox-page .messages-search > svg { display: block !important; flex: 0 0 auto !important; color: #7b8790 !important; }
   body .messages-inbox-page .messages-search input { flex: 1 1 auto !important; }
 }
+
+/* Notifications only: true phone-edge alignment, independent of Messages styling. */
+@media (max-width: 760px) {
+  body .app-shell:has(.notifications-page.notification-center) .main-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  body .notifications-page.notification-center {
+    display: flex !important;
+    align-items: stretch !important;
+    align-self: flex-start !important;
+    justify-self: start !important;
+    width: 100vw !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body .notifications-page.notification-center .notification-search-shell,
+  body .notifications-page.notification-center .notification-feed {
+    width: auto !important;
+    max-width: none !important;
+    margin-left: 13px !important;
+    margin-right: 13px !important;
+  }
+  body .notifications-page.notification-center .notification-feed { padding-left: 0 !important; padding-right: 0 !important; }
+}
+@media (max-width: 380px) {
+  body .notifications-page.notification-center .notification-search-shell,
+  body .notifications-page.notification-center .notification-feed { margin-left: 9px !important; margin-right: 9px !important; }
+}
