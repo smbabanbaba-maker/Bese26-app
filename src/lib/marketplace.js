@@ -2053,7 +2053,8 @@ export async function fetchConversations(userId) {
   const listingMediaUrls = await getListingMediaUrls(listingMediaEntries.map((entry) => entry.path));
   const listingMap = Object.fromEntries((listingRows || []).map((row) => {
     const mediaIndex = listingMediaEntries.findIndex((entry) => entry.listingId === row.id);
-    return [row.id, { ...row, image_url: listingMediaUrls[mediaIndex] || '' }];
+    const mediaPath = listingMediaEntries[mediaIndex]?.path || '';
+    return [row.id, { ...row, image_url: listingMediaUrls[mediaIndex] || (mediaPath ? getStoragePublicUrl('listing-media', mediaPath) : '') }];
   }));
   const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getBusinessLogoDisplayUrl(row, getAvatarUrl(row.logo_path)) }]));
   const profileMap = Object.fromEntries((profileRows || []).map((row) => {
