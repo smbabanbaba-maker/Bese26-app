@@ -13932,3 +13932,10 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .notifications-page.notification-center .notification-header-actions .notification-enable-device { display: none; }
   .notifications-page.notification-center .notification-mark-all { padding-inline: 9px; font-size: 9px; }
 }
+
+/* Notifications ultra-clean mode: start directly with the activity list. */
+.notifications-page.notification-center .notification-center-header { display: none !important; }
+.notifications-page.notification-center .notification-feed { padding-top: 0 !important; }
+@media (max-width: 620px) {
+  .notifications-page.notification-center .notification-feed { margin-top: 0 !important; }
+}
