@@ -13437,3 +13437,67 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .chat-reference-mode .chat-composer .chat-message-composer-input,
   .messages-selected-page .chat-composer .chat-message-composer-input { height:42px !important; min-height:42px !important; max-height:42px !important; padding-inline:13px !important; }
 }
+
+/* FINAL: remove the mobile blank layer and pin the actual message controls inside the chat panel. */
+@media (max-width:760px) {
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+    position:relative !important;
+    height:calc(100dvh - 8px) !important;
+    max-height:calc(100dvh - 8px) !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+    display:flex !important;
+    flex-direction:column !important;
+    background:#eaf2f9 !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding-bottom:12px !important;
+    overflow-y:auto !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 58px !important;
+    height:58px !important;
+    min-height:58px !important;
+    max-height:58px !important;
+    width:100% !important;
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow:hidden !important;
+    background:#fff !important;
+    z-index:20 !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 70px !important;
+    height:70px !important;
+    min-height:70px !important;
+    max-height:70px !important;
+    width:100% !important;
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow:visible !important;
+    background:#fff !important;
+    z-index:30 !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer .chat-message-composer-input {
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:relative !important;
+    flex:1 1 auto !important;
+    width:auto !important;
+    height:42px !important;
+    min-height:42px !important;
+    max-height:42px !important;
+    background:#fff !important;
+    color:#263238 !important;
+  }
+}
