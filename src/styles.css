@@ -13630,3 +13630,44 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     bottom:0 !important;
   }
 }
+
+/* Mobile chat behavior: keep composer fixed at the bottom; scroll messages only. */
+@media (max-width:760px) {
+  html body .messages-page.chat-reference-mode.messages-selected-page {
+    position:fixed !important;
+    inset:0 !important;
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .message-layout,
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+    display:flex !important;
+    flex-direction:column !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+    flex:1 1 0% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+    position:sticky !important;
+    bottom:0 !important;
+    flex:0 0 70px !important;
+    height:70px !important;
+    min-height:70px !important;
+    max-height:70px !important;
+    z-index:50 !important;
+  }
+}
