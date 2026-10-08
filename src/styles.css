@@ -12340,3 +12340,35 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
  }
  body .app-shell {padding-bottom:calc(74px + env(safe-area-inset-bottom, 0px)) !important;}
 }
+
+
+/* Focused mobile chat: composer must sit directly above the system navigation,
+   without the empty area previously reserved for hidden bottom tabs. */
+@media (max-width:760px) {
+ body .app-shell:has(.messages-page.messages-selected-page) {
+   padding-bottom:0 !important;
+   min-height:100dvh !important;
+ }
+ body .app-shell:has(.messages-page.messages-selected-page) .site-footer {
+   display:none !important;
+ }
+ body .app-shell:has(.messages-page.messages-selected-page) .main-container {
+   padding-bottom:0 !important;
+   margin-bottom:0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+   height:calc(100dvh - 70px) !important;
+   max-height:calc(100dvh - 70px) !important;
+   min-height:340px !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   min-height:0 !important;
+   flex:1 1 0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   margin-top:auto !important;
+   margin-bottom:0 !important;
+   flex-shrink:0 !important;
+   padding-bottom:max(10px,env(safe-area-inset-bottom, 0px)) !important;
+ }
+}
