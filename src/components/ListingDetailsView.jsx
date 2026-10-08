@@ -20,6 +20,7 @@ import {
   Send,
   Share2,
   ShieldCheck,
+  Sparkles,
   Star,
   Store,
   Tag,
@@ -377,6 +378,7 @@ export default function ListingDetailsView({
   const galleryCandidates = [...(Array.isArray(listing?.gallery) ? listing.gallery : []), listing?.image];
   const validImages = useMemo(() => [...new Set(galleryCandidates.map((image) => typeof image === 'string' ? image.trim() : image)
     .filter((image) => safeGalleryUrl(image) && !failedImageUrls.has(image)))], [listing?.id, listing?.gallery, listing?.image, failedImageUrls]);
+  const listingVideo = Array.isArray(listing?.videoGallery) ? listing.videoGallery.find((url) => safeGalleryUrl(url)) : '';
   const validImagesRef = useRef(validImages);
   validImagesRef.current = validImages;
   const owner = Boolean(user?.id && listing?.sellerId === user.id);
@@ -943,6 +945,7 @@ export default function ListingDetailsView({
               <span className="listing-new-counter">{validImages.length ? `${activeImage + 1}/${validImages.length}` : '0/0'}</span>
             </div>
             {validImages.length > 1 && <div className="listing-new-thumbs">{validImages.map((image, index) => <button type="button" key={`${image}-${index}`} className={activeImage === index ? 'active' : ''} onClick={() => setActiveImage(index)} aria-label={`View photo ${index + 1}`}><img src={image} alt="" loading="lazy" /></button>)}</div>}
+            {listingVideo && <div className="listing-ai-video-card"><div><span className="eyebrow"><Sparkles size={12} /> AI LISTING VIDEO</span><strong>See this item in motion</strong></div><video src={listingVideo} controls playsInline preload="metadata" /></div>}
           </section>
 
           <section className="listing-new-section listing-new-summary">

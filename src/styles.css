@@ -11877,3 +11877,50 @@ select:focus,
 .auth-confirm-steps li::before { content:counter(confirm-step); display:grid; place-items:center; flex:0 0 20px; width:20px; height:20px; border-radius:50%; color:#ffffff; background:#ff2c2c; font-size:10px; font-weight:800; }
 .auth-reference-confirm .auth-confirm-resend { width:100%; margin-top:5px; padding:12px 14px; font-size:12px; }
 .auth-confirm-change { display:block; margin:14px auto 0; }
+
+/* Version 1 AI listing video studio */
+.ai-video-tile { border-color:#ffb1b1; background:linear-gradient(145deg,#fff7f7,#fff); }
+.ai-video-tile > span { background:#000; }
+.ai-video-tile:disabled { cursor:not-allowed; opacity:.58; }
+.sell-media-thumb.is-video { background:#080808; }
+.sell-media-thumb.is-video > video { width:100%; height:100%; min-height:137px; display:block; object-fit:cover; }
+.video-media-label { position:absolute; left:7px; top:7px; display:inline-flex; align-items:center; gap:4px; padding:5px 7px; color:#fff; background:#ff2c2c; border-radius:6px; font-size:8px; font-weight:900; letter-spacing:.04em; }
+.listing-video-backdrop { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:18px; background:rgba(0,0,0,.72); backdrop-filter:blur(12px); animation:listingVideoIn .2s ease both; }
+.listing-video-studio { width:min(920px,100%); max-height:min(860px,95vh); overflow:auto; background:#fff; color:#111; border:1px solid rgba(255,44,44,.18); border-radius:26px; box-shadow:0 28px 90px rgba(0,0,0,.32); }
+.listing-video-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; padding:24px 26px 16px; border-bottom:1px solid #f1dddd; }
+.listing-video-header .eyebrow { display:inline-flex; align-items:center; gap:5px; color:#ff2c2c; font-size:10px; font-weight:900; letter-spacing:.13em; }
+.listing-video-header h2 { margin:7px 0 4px; font:900 25px/1.1 Manrope,sans-serif; letter-spacing:-.05em; }
+.listing-video-header p { color:#767676; font-size:12px; }
+.listing-video-close { display:grid; place-items:center; width:36px; height:36px; color:#111; background:#fff; border:1px solid #eadada; border-radius:50%; }
+.listing-video-body { display:grid; grid-template-columns:minmax(250px,.8fr) minmax(280px,1.2fr); gap:26px; padding:24px 26px 28px; }
+.listing-video-preview { min-height:480px; display:grid; place-items:center; overflow:hidden; border-radius:21px; background:linear-gradient(150deg,#151515,#492020); box-shadow:0 16px 35px rgba(0,0,0,.16); }
+.listing-video-preview video { width:100%; height:100%; max-height:590px; object-fit:contain; }
+.listing-video-placeholder { display:grid; place-items:center; gap:9px; padding:25px; color:#fff; text-align:center; }
+.listing-video-placeholder svg { color:#ff2c2c; }
+.listing-video-placeholder span { max-width:200px; color:#d8caca; font-size:11px; line-height:1.45; }
+.listing-video-controls { display:flex; flex-direction:column; gap:16px; }
+.listing-video-controls label { display:flex; flex-direction:column; gap:7px; }
+.listing-video-controls label > span { font-size:11px; font-weight:900; }
+.listing-video-controls textarea { min-height:142px; padding:13px; resize:vertical; color:#222; background:#fffafa; border:1px solid #f0caca; border-radius:13px; outline:0; font:500 12px/1.55 inherit; }
+.listing-video-controls textarea:focus { border-color:#ff2c2c; box-shadow:0 0 0 3px rgba(255,44,44,.1); }
+.listing-video-controls label small { align-self:flex-end; color:#999; font-size:9px; }
+.listing-video-facts { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+.listing-video-facts span { display:flex; flex-direction:column; gap:3px; padding:10px; color:#777; background:#faf5f5; border-radius:11px; font-size:9px; }
+.listing-video-facts strong { overflow:hidden; color:#111; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.listing-video-error { padding:11px 12px; color:#a30000; background:#fff0f0; border:1px solid #ffcaca; border-radius:10px; font-size:11px; line-height:1.4; }
+.listing-video-progress { display:flex; align-items:center; gap:8px; padding:12px; color:#8f1919; background:#fff4f4; border-radius:11px; font-size:11px; font-weight:800; }
+.listing-video-progress .spin { animation:listingVideoSpin 1s linear infinite; }
+.listing-video-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; }
+.listing-video-actions button { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:0 13px; border-radius:10px; font-size:10px; font-weight:900; }
+.listing-video-actions .primary-button, .listing-video-actions .secondary-button { flex:1; }
+.listing-video-canvas { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+@keyframes listingVideoIn { from { opacity:0; transform:scale(.98); } to { opacity:1; transform:scale(1); } }
+@keyframes listingVideoSpin { to { transform:rotate(360deg); } }
+@media (max-width:680px) { .listing-video-backdrop { padding:0; align-items:end; } .listing-video-studio { max-height:95vh; border-radius:24px 24px 0 0; } .listing-video-header { padding:19px 17px 14px; } .listing-video-header h2 { font-size:21px; } .listing-video-body { grid-template-columns:1fr; gap:17px; padding:17px; } .listing-video-preview { min-height:270px; max-height:350px; } .listing-video-preview video { max-height:350px; } .listing-video-facts { grid-template-columns:1fr 1fr 1fr; } .listing-video-actions { position:sticky; bottom:0; padding-top:8px; background:#fff; } }
+
+.listing-ai-video-card { display:flex; flex-direction:column; gap:10px; margin-top:14px; padding:13px; background:#0b0b0b; border-radius:16px; color:#fff; overflow:hidden; }
+.listing-ai-video-card > div { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.listing-ai-video-card .eyebrow { display:inline-flex; align-items:center; gap:4px; margin:0; color:#ff6c6c; font-size:9px; }
+.listing-ai-video-card strong { font-size:11px; }
+.listing-ai-video-card video { width:100%; max-height:430px; display:block; border-radius:11px; background:#000; object-fit:contain; }
+@media (max-width:640px) { .listing-ai-video-card video { max-height:360px; } .listing-ai-video-card > div { align-items:flex-start; flex-direction:column; } }

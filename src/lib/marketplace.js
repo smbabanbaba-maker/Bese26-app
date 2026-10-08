@@ -59,7 +59,9 @@ async function queryActiveBusinessProfiles(profileIds = [], limit = 100) {
 
 export function mapListing(row) {
   const media = [...(row.listing_media || [])].sort((a, b) => a.sort_order - b.sort_order);
-  const gallery = media.map((item) => item.signed_url || '').filter(Boolean);
+  const mediaItems = media.map((item) => ({ url: item.signed_url || '', type: item.media_type === 'video' ? 'video' : 'image' })).filter((item) => item.url);
+  const gallery = mediaItems.filter((item) => item.type === 'image').map((item) => item.url);
+  const videoGallery = mediaItems.filter((item) => item.type === 'video').map((item) => item.url);
   const seller = row.profiles || {};
   const business = row.business_profile || {};
   const sellerName = seller.cac_verified_name || seller.display_name || business.business_name || 'bese26 seller';
@@ -77,6 +79,7 @@ export function mapListing(row) {
     posted: relativeTime(row.created_at),
     image: gallery[0] || '',
     gallery,
+    videoGallery,
     category: category.name || 'Marketplace',
     subcategory: subcategory.name || '',
     seller: sellerName,
@@ -1976,10 +1979,12 @@ async function optimizeListingPhoto(file) {
 
 export async function uploadListingMedia({ userId, listingId, file, sortOrder = 0 }) {
   failIfUnavailable();
-  if (!userId || !listingId || !file) throw new Error('Choose a photo before uploading.');
+  if (!userId || !listingId || !file) throw new Error('Choose a photo or video before uploading.');
   const uploadFile = await optimizeListingPhoto(file);
-  if (!uploadFile?.type?.startsWith('image/')) throw new Error('Only JPG, PNG, WEBP, or GIF photos can be uploaded.');
-  if (uploadFile.size > 10 * 1024 * 1024) throw new Error('This photo is larger than the 10 MB upload limit.');
+  const allowedImage = uploadFile?.type?.startsWith('image/');
+  const allowedVideo = ['video/webm', 'video/mp4'].includes(uploadFile?.type);
+  if (!allowedImage && !allowedVideo) throw new Error('Only JPG, PNG, WEBP, GIF, WEBM, or MP4 media can be uploaded.');
+  if (uploadFile.size > 10 * 1024 * 1024) throw new Error(`This ${allowedVideo ? 'video' : 'photo'} is larger than the 10 MB upload limit.`);
   const safeName = uploadFile.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
   const randomId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const path = `${userId}/${listingId}/${randomId}-${safeName}`;
