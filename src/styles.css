@@ -12884,3 +12884,76 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
  body .messages-inbox-page .message-inbox-listing-image {width:48px !important;height:48px !important;min-width:48px !important;}
  body .messages-inbox-page .message-inbox-row-meta time {font-size:10px !important;}
 }
+
+
+/* Bese26 premium light inbox — white, ink and brand red; responsive 320px+ */
+.messages-inbox-page.messages-premium {
+ --inbox-red:#dc182d;--inbox-ink:#17191e;--inbox-muted:#77808d;
+ background:#f7f8fa!important;color:var(--inbox-ink)!important;
+ width:100%!important;max-width:1200px!important;margin:0 auto!important;
+ padding:20px clamp(12px,3vw,32px) 30px!important;box-sizing:border-box!important;
+}
+.messages-inbox-page .messages-inbox-header {
+ background:#fff!important;border:1px solid #f0f0f2!important;
+ border-radius:22px!important;padding:22px 24px!important;margin-bottom:14px!important;
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:12px!important;box-shadow:0 5px 24px rgba(18,22,29,.035)!important;
+}
+.messages-inbox-page .messages-inbox-title .eyebrow {color:var(--inbox-red)!important;letter-spacing:.12em!important;font-size:10px!important;font-weight:800!important}
+.messages-inbox-page .messages-inbox-title h1 {color:var(--inbox-ink)!important;font-size:clamp(23px,3vw,31px)!important;line-height:1.2!important;margin:6px 0!important}
+.messages-inbox-page .inbox-brand-word {font-weight:850!important;letter-spacing:-.06em!important}
+.messages-inbox-page .inbox-brand-word span {color:var(--inbox-red)!important}
+.messages-inbox-page .inbox-heading-label {font-size:.62em!important;letter-spacing:0!important;color:#717782!important;font-weight:600!important;margin-left:10px!important}
+.messages-inbox-page .messages-inbox-title p {color:#838995!important;font-size:13px!important;margin:0!important}
+.messages-inbox-page .message-count {background:#fff3f4!important;color:var(--inbox-red)!important;border:1px solid #ffe1e5!important;border-radius:14px!important;padding:9px 14px!important}
+.messages-inbox-page .messages-inbox-workspace {gap:20px!important;min-width:0!important}
+.messages-inbox-page .messages-inbox-list-panel {min-width:0!important;overflow:hidden!important;background:#fff!important;border:1px solid #edf0f3!important;border-radius:22px!important;box-shadow:0 8px 28px rgba(17,24,39,.045)!important}
+.messages-inbox-page .messages-inbox-controls {background:#fff!important;padding:18px 16px 4px!important}
+.messages-inbox-page .messages-search {border:1px solid #eceef0!important;border-radius:16px!important;background:#f6f7f9!important;box-shadow:none!important;padding:12px 15px!important;color:#848c97!important}
+.messages-inbox-page .messages-search input {background:transparent!important;color:#20242a!important;font-size:14px!important;min-width:0!important}
+.messages-inbox-page .message-filter-tabs {display:flex!important;gap:8px!important;overflow-x:auto!important;scrollbar-width:none!important;white-space:nowrap!important;padding:13px 0 8px!important;border:0!important;background:#fff!important}
+.messages-inbox-page .message-filter-tabs button {flex:0 0 auto!important;border:0!important;border-radius:24px!important;padding:10px 14px!important;background:transparent!important;color:#4e5662!important;font-size:13px!important;font-weight:650!important}
+.messages-inbox-page .message-filter-tabs button.active {background:var(--inbox-red)!important;color:#fff!important;box-shadow:0 4px 10px rgba(220,24,45,.14)!important}
+.messages-inbox-page .message-filter-count {background:var(--inbox-red)!important;color:#fff!important;border-radius:30px!important;padding:2px 6px!important;margin-left:5px!important}
+.messages-inbox-page .message-filter-tabs button.active .message-filter-count {background:#fff!important;color:var(--inbox-red)!important}
+.messages-inbox-page .message-inbox-list {display:flex!important;flex-direction:column!important;gap:7px!important;padding:10px!important;background:#fff!important}
+.messages-inbox-page .message-inbox-row {
+ position:relative!important;display:flex!important;align-items:center!important;gap:13px!important;
+ width:100%!important;min-width:0!important;box-sizing:border-box!important;
+ padding:15px 12px!important;border:1px solid #f0f1f3!important;border-radius:17px!important;
+ background:#fff!important;color:#1b1c20!important;text-align:left!important;
+ box-shadow:0 2px 12px rgba(20,24,30,.035)!important;transition:background .18s,border-color .18s!important;
+}
+.messages-inbox-page .message-inbox-row:hover {background:#fffafa!important;border-color:#ffd9df!important}
+.messages-inbox-page .message-inbox-listing-image {width:62px!important;height:66px!important;min-width:62px!important;border-radius:13px!important;overflow:visible!important;flex-shrink:0!important;background:#f1f3f5!important}
+.messages-inbox-page .message-inbox-listing-image > img {width:100%!important;height:100%!important;object-fit:cover!important;border-radius:13px!important}
+.messages-inbox-page .message-inbox-avatar-overlay {width:29px!important;height:29px!important;position:absolute!important;bottom:-5px!important;right:-6px!important;border:2px solid #fff!important;border-radius:50%!important;overflow:hidden!important;background:#fff!important}
+.messages-inbox-page .message-inbox-copy {flex:1 1 0!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:5px!important}
+.messages-inbox-page .message-inbox-name-line {display:flex!important;align-items:center!important;gap:5px!important;min-width:0!important;flex-wrap:wrap!important}
+.messages-inbox-page .message-inbox-name-line strong {font-size:13px!important;font-weight:750!important;color:#1b1d22!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.messages-inbox-page .message-inbox-copy > b {font-size:13px!important;font-weight:600!important;color:#333941!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
+.messages-inbox-page .inbox-listing-caption {display:flex!important;align-items:center!important;gap:5px!important;color:#89919c!important;font-size:12px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:100%!important}
+.messages-inbox-page .inbox-listing-caption svg {flex-shrink:0!important;color:var(--inbox-red)!important}
+.messages-inbox-page .message-inbox-row-meta {align-self:flex-start!important;flex-shrink:0!important;display:flex!important;align-items:flex-end!important;gap:9px!important;flex-direction:column!important}
+.messages-inbox-page .message-inbox-row-meta time {color:#9399a3!important;font-size:11px!important;white-space:nowrap!important}
+.messages-inbox-page .message-unread-badge {background:var(--inbox-red)!important;color:#fff!important;border-radius:30px!important;min-width:20px!important;height:20px!important;padding:2px 5px!important;display:grid!important;place-items:center!important;font-size:11px!important}
+.messages-inbox-page .message-inbox-row > svg {color:#a4a9b2!important;flex-shrink:0!important}
+@media(max-width:760px){
+ .messages-inbox-page.messages-premium {padding:0 0 18px!important;background:#fff!important;border-radius:0!important}
+ .messages-inbox-page .messages-inbox-header {border:0!important;border-radius:0!important;padding:15px 18px 9px!important;margin:0!important;box-shadow:none!important}
+ .messages-inbox-page .messages-inbox-title h1 {font-size:25px!important}
+ .messages-inbox-page .messages-inbox-title p {display:none!important}
+ .messages-inbox-page .messages-inbox-list-panel {border:0!important;border-radius:0!important;box-shadow:none!important}
+ .messages-inbox-page .messages-inbox-controls {padding:10px 14px 0!important}
+ .messages-inbox-page .message-inbox-list {gap:8px!important;padding:10px 12px 22px!important}
+ .messages-inbox-page .message-inbox-row {padding:14px 11px!important;gap:10px!important}
+ .messages-inbox-page .message-inbox-listing-image {width:58px!important;height:62px!important;min-width:58px!important}
+ .messages-inbox-page .messages-inbox-welcome {display:none!important}
+}
+@media(max-width:360px){
+ .messages-inbox-page .message-inbox-row {gap:8px!important;padding:12px 8px!important}
+ .messages-inbox-page .message-inbox-listing-image {width:49px!important;min-width:49px!important;height:55px!important}
+ .messages-inbox-page .message-inbox-row > svg {display:none!important}
+ .messages-inbox-page .message-filter-tabs button {padding:9px 11px!important;font-size:12px!important}
+ .messages-inbox-page .message-count {padding:7px!important}
+}
