@@ -13279,3 +13279,70 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    flex:1 1 auto!important;min-width:0!important;
  }
 }
+
+
+/* 2026-10-08: hard viewport anchor for mobile message controls.
+   Overrides earlier conflicting 70px/140px and static footer rules. */
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+   position:fixed!important;
+   inset:0!important;
+   width:100%!important;
+   height:100dvh!important;
+   max-height:100dvh!important;
+   min-height:0!important;
+   overflow:hidden!important;
+   display:flex!important;
+   flex-direction:column!important;
+   background:#f6f6f6!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   flex:1 1 auto!important;
+   min-height:0!important;
+   padding-bottom:145px!important;
+   overflow-y:auto!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+   position:fixed!important;
+   inset:auto 0 70px 0!important;
+   bottom:70px!important;
+   width:100vw!important;
+   height:58px!important;
+   max-height:58px!important;
+   min-height:58px!important;
+   display:flex!important;
+   visibility:visible!important;
+   opacity:1!important;
+   overflow-x:auto!important;
+   transform:none!important;
+   background:#fff!important;
+   border-top:1px solid #ededed!important;
+   z-index:2147483000!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   position:fixed!important;
+   inset:auto 0 0 0!important;
+   bottom:0!important;
+   width:100vw!important;
+   height:70px!important;
+   min-height:70px!important;
+   max-height:70px!important;
+   display:flex!important;
+   visibility:visible!important;
+   opacity:1!important;
+   transform:none!important;
+   background:#fff!important;
+   padding:8px 12px max(8px,env(safe-area-inset-bottom,0px))!important;
+   border-top:1px solid #e4e4e4!important;
+   z-index:2147483001!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer textarea {
+   display:block!important;flex:1 1 auto!important;min-width:0!important;
+   visibility:visible!important;opacity:1!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+   position:fixed!important;inset:auto 0 128px 0!important;
+   bottom:128px!important;transform:none!important;
+   width:100vw!important;z-index:2147483002!important;
+ }
+}
