@@ -13883,3 +13883,52 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     margin-right: 9px;
   }
 }
+
+/* Notifications: remove the large hero and keep a clean compact toolbar. */
+.notifications-page.notification-center .notification-center-header {
+  min-height: 0 !important;
+  align-items: center !important;
+  padding: 4px 0 14px !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #e5e9ee !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.notifications-page.notification-center .notification-center-header::before,
+.notifications-page.notification-center .notification-center-header::after { display: none !important; }
+.notifications-page.notification-center .notification-center-header h1 {
+  color: #17202a !important;
+  font-size: clamp(24px, 5vw, 32px) !important;
+  letter-spacing: -.055em !important;
+}
+.notifications-page.notification-center .notification-center-header p { color: #687583 !important; font-size: 12px !important; }
+.notifications-page.notification-center .notification-device-status { color: #6f7c88 !important; }
+.notifications-page.notification-center .notification-device-status svg { color: #b4232c !important; }
+.notifications-page.notification-center .notification-header-actions { align-items: center !important; }
+.notifications-page.notification-center .notification-header-icon {
+  width: 42px !important; height: 42px !important;
+  border: 1px solid #ead4d4 !important;
+  border-radius: 13px !important;
+  color: #b4232c !important;
+  background: #fff5f4 !important;
+  backdrop-filter: none;
+}
+.notifications-page.notification-center .notification-header-icon span { border: 2px solid #fff !important; background: #d43342 !important; }
+.notifications-page.notification-center .notification-mark-all,
+.notifications-page.notification-center .notification-enable-device {
+  min-height: 34px; border-color: #e6c6c8; color: #a82431 !important; background: #fff5f5 !important;
+}
+@media (max-width: 620px) {
+  .notifications-page.notification-center .notification-center-header {
+    align-items: center !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    padding: 2px 13px 12px !important;
+    border-radius: 0 !important;
+  }
+  .notifications-page.notification-center .notification-center-header p { display: none; }
+  .notifications-page.notification-center .notification-device-status { margin-top: 6px !important; font-size: 9px !important; }
+  .notifications-page.notification-center .notification-header-actions { width: auto !important; margin-left: auto; flex: none; }
+  .notifications-page.notification-center .notification-header-actions .notification-enable-device { display: none; }
+  .notifications-page.notification-center .notification-mark-all { padding-inline: 9px; font-size: 9px; }
+}
