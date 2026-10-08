@@ -12957,3 +12957,61 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
  .messages-inbox-page .message-filter-tabs button {padding:9px 11px!important;font-size:12px!important}
  .messages-inbox-page .message-count {padding:7px!important}
 }
+
+
+/* Bese26 chat: reliable mobile footer anchored to the real viewport.
+   Overrides legacy flex/fixed combinations that pushed composer off-screen. */
+@media (max-width:760px) {
+ html:has(.messages-selected-page),body:has(.messages-selected-page) {overflow:hidden!important}
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+   position:fixed!important;top:0!important;left:0!important;right:0!important;
+   bottom:0!important;inset:0!important;width:100vw!important;
+   height:100dvh!important;max-height:100dvh!important;
+   display:flex!important;flex-direction:column!important;
+   overflow:hidden!important;background:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-header,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-context {
+   flex:0 0 auto!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   flex:1 1 auto!important;min-height:0!important;
+   overflow-y:auto!important;
+   padding-bottom:16px!important;background:#f5f5f6!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+   position:relative!important;inset:auto!important;transform:none!important;
+   flex:0 0 auto!important;margin:0!important;width:100%!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+   background:#fff!important;border-top:1px solid #e9e9e9!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   display:flex!important;visibility:visible!important;opacity:1!important;
+   background:#fff!important;border-top:1px solid #ededed!important;
+   padding:8px 10px max(10px,env(safe-area-inset-bottom,0px))!important;
+   min-height:64px!important;z-index:10!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer .send-button {
+   background:#d71932!important;color:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-quick-actions button {
+   border-color:#d71932!important;color:#bd162a!important;background:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-message-composer-input {
+   border-color:#e1e1e4!important;background:#f7f7f8!important;color:#191919!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+   background:#fff!important;
+ }
+}
+@media(min-width:761px) {
+ .messages-page.chat-reference-mode .chat-panel .chat-composer .send-button {
+   background:#d71932!important;color:white!important;
+ }
+ .messages-page.chat-reference-mode .chat-panel .chat-quick-actions button {
+   border-color:#d71932!important;color:#bd162a!important;
+ }
+}
