@@ -14061,3 +14061,44 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .notifications-page.notification-center .notification-feed-row { grid-template-columns: 44px minmax(0, 1fr) 7px !important; gap: 10px !important; padding-inline: 11px !important; }
   .notifications-page.notification-center .notification-feed-media { width: 44px !important; height: 44px !important; }
 }
+
+/* Premium Notifications search. */
+.notifications-page.notification-center .notification-search-shell {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  margin: 0 14px 16px;
+  padding: 0 14px;
+  border: 1px solid #e1e7ec;
+  border-radius: 17px;
+  color: #8a96a1;
+  background: #fff;
+  box-shadow: 0 7px 20px rgba(28, 39, 50, .06);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.notifications-page.notification-center .notification-search-shell:focus-within {
+  border-color: #d5aeb2;
+  box-shadow: 0 0 0 4px rgba(190, 48, 62, .08), 0 10px 24px rgba(28, 39, 50, .08);
+  transform: translateY(-1px);
+}
+.notifications-page.notification-center .notification-search-shell > svg { flex: none; color: #b4232c; }
+.notifications-page.notification-center .notification-search-shell input {
+  width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; color: #27323c; background: transparent; font: inherit; font-size: 12px;
+}
+.notifications-page.notification-center .notification-search-shell input::placeholder { color: #9aa5af; }
+.notifications-page.notification-center .notification-search-shell button {
+  display: grid; flex: none; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #74808b; background: #f0f3f5;
+}
+.notifications-page.notification-center .notification-search-kbd {
+  flex: none; padding: 4px 7px; border: 1px solid #e4e8eb; border-radius: 7px; color: #a0aab3; background: #f8fafb; font-size: 9px; font-weight: 800;
+}
+@media (max-width: 620px) {
+  .notifications-page.notification-center .notification-search-shell { margin: 0 13px 14px; min-height: 49px; border-radius: 15px; }
+  .notifications-page.notification-center .notification-search-kbd { display: none; }
+}
+@media (max-width: 380px) {
+  .notifications-page.notification-center .notification-search-shell { margin-inline: 9px; }
+}
