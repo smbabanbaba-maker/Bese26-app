@@ -14304,3 +14304,67 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
 @media (prefers-reduced-motion: reduce) {
   .profile-dashboard-link-card, .profile-dashboard-link-card::before { animation: none !important; }
 }
+
+/* Slim subscription advert below profile stats for free-plan users. */
+.profile-subscription-ad {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 54px;
+  gap: 9px;
+  margin: 9px 0 5px;
+  padding: 7px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(117,100,216,.22);
+  border-radius: 14px;
+  color: #fff;
+  text-align: left;
+  background: linear-gradient(105deg, #171a35 0%, #33285e 55%, #63345b 100%);
+  box-shadow: 0 8px 18px rgba(48,36,91,.14);
+  cursor: pointer;
+  animation: profileSubscriptionAdIn .45s ease-out both;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.profile-subscription-ad::before {
+  position: absolute;
+  top: -35px;
+  right: 17%;
+  width: 105px;
+  height: 105px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 50%;
+  box-shadow: 0 0 0 14px rgba(255,255,255,.035), 0 0 0 28px rgba(255,255,255,.025);
+  content: '';
+  pointer-events: none;
+  animation: profileSubscriptionOrb 5s ease-in-out infinite;
+}
+.profile-subscription-ad:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(48,36,91,.22); }
+.profile-subscription-ad-icon {
+  z-index: 1;
+  display: grid;
+  flex: 0 0 32px;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+  color: #ffe08a;
+  background: rgba(255,255,255,.12);
+}
+.profile-subscription-ad-copy { z-index: 1; display: grid; min-width: 0; gap: 2px; }
+.profile-subscription-ad-copy strong { overflow: hidden; color: #fff; font-size: 11px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.profile-subscription-ad-copy small { overflow: hidden; color: rgba(255,255,255,.68); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.profile-subscription-ad-cta { z-index: 1; display: inline-flex; align-items: center; gap: 3px; flex: none; margin-left: auto; padding: 6px 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; color: #211a38; background: #ffe08a; font-size: 9px; font-weight: 850; }
+@keyframes profileSubscriptionAdIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes profileSubscriptionOrb { 0%,100% { transform: translate(0, 0) scale(1); opacity: .65; } 50% { transform: translate(-12px, 4px) scale(1.05); opacity: 1; } }
+@media (max-width: 520px) {
+  .profile-subscription-ad { min-height: 50px; padding: 6px 8px; border-radius: 12px; }
+  .profile-subscription-ad-icon { width: 29px; height: 29px; flex-basis: 29px; }
+  .profile-subscription-ad-copy strong { font-size: 10px; }
+  .profile-subscription-ad-copy small { font-size: 8px; }
+  .profile-subscription-ad-cta { padding: 5px 6px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-subscription-ad, .profile-subscription-ad::before { animation: none !important; }
+}
