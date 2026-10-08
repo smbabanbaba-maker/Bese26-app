@@ -712,6 +712,30 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
     return () => window.cancelAnimationFrame(frame);
   }, [liveMode, liveLoading, currentMessages.length, initialNotificationTarget?.messageId, initialNotificationTarget?.offerId]);
 
+  // Keep the chat inside Safari's actual visible viewport, including when its
+  // browser toolbar or on-screen keyboard changes size.
+  useEffect(() => {
+    if (!liveMode) return undefined;
+    const viewport = window.visualViewport;
+    const updateViewport = () => {
+      const height = viewport?.height || window.innerHeight;
+      const top = viewport?.offsetTop || 0;
+      document.documentElement.style.setProperty('--bese26-chat-viewport-height', `${height}px`);
+      document.documentElement.style.setProperty('--bese26-chat-viewport-top', `${top}px`);
+    };
+    updateViewport();
+    viewport?.addEventListener('resize', updateViewport);
+    viewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
+    return () => {
+      viewport?.removeEventListener('resize', updateViewport);
+      viewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
+      document.documentElement.style.removeProperty('--bese26-chat-viewport-height');
+      document.documentElement.style.removeProperty('--bese26-chat-viewport-top');
+    };
+  }, [liveMode]);
+
   const clearAttachment = () => {
     if (attachmentPreview?.startsWith('blob:')) URL.revokeObjectURL(attachmentPreview);
     setAttachment(null);
