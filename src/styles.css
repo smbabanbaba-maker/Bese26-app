@@ -13691,3 +13691,47 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     z-index:2147483001 !important;
   }
 }
+
+/* Messages inbox: show the item being discussed, with the seller identity as a small badge. */
+.conversation-listing-avatar {
+  position:relative !important;
+  overflow:visible !important;
+  background:#eef1f4 !important;
+  border-radius:13px !important;
+}
+.conversation-listing-avatar .conversation-listing-image {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border-radius:inherit !important;
+  padding:0 !important;
+  background:#eef1f4 !important;
+}
+.conversation-seller-badge {
+  position:absolute !important;
+  right:-7px !important;
+  bottom:-5px !important;
+  width:25px !important;
+  height:25px !important;
+  display:block !important;
+  overflow:hidden !important;
+  border:2px solid #fff !important;
+  border-radius:50% !important;
+  background:#fff !important;
+  box-shadow:0 2px 7px rgba(20,23,30,.18) !important;
+  z-index:2 !important;
+}
+.conversation-seller-badge img {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  padding:2px !important;
+  background:#fff !important;
+  border-radius:50% !important;
+}
+@media (max-width:699px) {
+  .conversation-seller-badge { width:23px !important; height:23px !important; right:-6px !important; bottom:-4px !important; }
+}

@@ -2033,7 +2033,7 @@ export async function fetchConversations(userId) {
   const listingIds = [...new Set(conversations.map((row) => row.listing_id).filter(Boolean))];
   const profileIds = [...new Set(conversations.flatMap((row) => [row.buyer_id, row.seller_id]).filter(Boolean))];
   const [{ data: listingRows, error: listingError }, { data: profileRows, error: profileError }, { data: businessRows, error: businessError }, { data: messageRows, error: messageError }, { data: unreadRows, error: unreadError }] = await Promise.all([
-    listingIds.length ? supabase.from('listings').select('id,title').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
+    listingIds.length ? supabase.from('listings').select('id,title,listing_media(storage_path,media_type,sort_order)').in('id', listingIds).limit(100) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? supabase.from('profiles').select('id,display_name,avatar_path,cac_verified_name,cac_verified_at,is_verified,verification_expires_at,seller_rating').in('id', profileIds).limit(200) : Promise.resolve({ data: [], error: null }),
     profileIds.length ? queryActiveBusinessProfiles(profileIds, 200) : Promise.resolve({ data: [], error: null }),
     conversationIds.length ? supabase.from('messages').select('conversation_id,sender_id,body,attachment_path,attachment_mime_type,created_at,read_at').in('conversation_id', conversationIds).order('created_at', { ascending: false }).limit(300) : Promise.resolve({ data: [], error: null }),
@@ -2044,7 +2044,17 @@ export async function fetchConversations(userId) {
   if (businessError) throw businessError;
   if (messageError) throw messageError;
   if (unreadError) throw unreadError;
-  const listingMap = Object.fromEntries((listingRows || []).map((row) => [row.id, row]));
+  const listingMediaEntries = (listingRows || []).map((listing) => {
+    const firstImage = [...(listing.listing_media || [])]
+      .filter((media) => media.media_type !== 'video' && media.storage_path)
+      .sort((left, right) => (left.sort_order || 0) - (right.sort_order || 0))[0];
+    return { listingId: listing.id, path: firstImage?.storage_path || '' };
+  });
+  const listingMediaUrls = await getListingMediaUrls(listingMediaEntries.map((entry) => entry.path));
+  const listingMap = Object.fromEntries((listingRows || []).map((row) => {
+    const mediaIndex = listingMediaEntries.findIndex((entry) => entry.listingId === row.id);
+    return [row.id, { ...row, image_url: listingMediaUrls[mediaIndex] || '' }];
+  }));
   const businessMap = Object.fromEntries((businessRows || []).map((row) => [row.profile_id, { ...row, logo_url: getBusinessLogoDisplayUrl(row, getAvatarUrl(row.logo_path)) }]));
   const profileMap = Object.fromEntries((profileRows || []).map((row) => {
     const business = businessMap[row.id] || null;
