@@ -13125,3 +13125,63 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    height:auto!important;z-index:204!important;
  }
 }
+
+
+/* Bese26 definitive mobile chat: viewport-anchored footer, no blank bottom panel. */
+@media (max-width:760px) {
+ html:has(.messages-selected-page),body:has(.messages-selected-page) {
+  margin:0!important;padding:0!important;overflow:hidden!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+  position:fixed!important;
+  top:var(--bese26-chat-viewport-top,0px)!important;
+  left:0!important;right:0!important;bottom:auto!important;
+  height:var(--bese26-chat-viewport-height,100dvh)!important;
+  max-height:var(--bese26-chat-viewport-height,100dvh)!important;
+  width:100vw!important;
+  display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  z-index:200!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+  flex:1 1 0!important;min-height:0!important;
+  margin:0!important;padding:12px 12px 14px!important;
+  overflow-y:auto!important;background:#f5f5f5!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+  flex:0 0 auto!important;position:relative!important;
+  inset:auto!important;bottom:auto!important;transform:none!important;
+  width:100%!important;margin:0!important;background:#fff!important;
+  z-index:2!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+  flex:0 0 auto!important;position:relative!important;
+  inset:auto!important;bottom:auto!important;transform:none!important;
+  height:auto!important;min-height:70px!important;max-height:none!important;
+  width:100%!important;margin:0!important;
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  align-items:center!important;gap:8px!important;
+  padding:8px 10px max(10px,env(safe-area-inset-bottom,0px))!important;
+  background:#fff!important;border-top:1px solid #e8e8e8!important;
+  z-index:3!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+  flex:0 0 auto!important;position:relative!important;inset:auto!important;
+  transform:none!important;width:100%!important;margin:0!important;
+  z-index:3!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-quick-actions button {
+  border-color:#c9152b!important;color:#b51228!important;background:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer .send-button,
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-preview-send {
+  background:#c9152b!important;border-color:#c9152b!important;color:#fff!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .message-bubble.mine {
+  background:#f9e7e9!important;color:#171717!important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .message-bubble.other {
+  background:#fff!important;color:#171717!important;
+ }
+}
