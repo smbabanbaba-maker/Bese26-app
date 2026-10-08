@@ -12016,3 +12016,75 @@ select:focus,
  .chat-reference-mode .chat-panel { border-radius:0 !important; border-left:0 !important; border-right:0 !important; }
  .chat-reference-mode .chat-messages { background:#fafafa !important; }
 }
+
+
+/* Bese26 chat refresh v2: override legacy gradients and green action skin on mobile. */
+body .messages-page.chat-reference-mode .chat-panel .chat-header,
+body .messages-page.chat-reference-mode .chat-panel .chat-header::after {
+ background:#ffffff !important;
+ background-image:none !important;
+ color:#141414 !important;
+ box-shadow:none !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-header {
+ border-top:5px solid #dc2626 !important;
+ border-bottom:1px solid #ececec !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-back-button,
+body .messages-page.chat-reference-mode .chat-panel .chat-header-icon {
+ background:#fff2f2 !important;
+ color:#b91c1c !important;
+ border:1px solid #fee2e2 !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-person strong {color:#111 !important;}
+body .messages-page.chat-reference-mode .chat-panel .chat-person span {color:#555 !important;}
+body .messages-page.chat-reference-mode .chat-panel .chat-context {
+ border-left:4px solid #dc2626 !important;
+ border-radius:12px !important;
+ margin:10px 12px !important;
+ background:#fff !important;
+ box-shadow:0 2px 10px rgba(0,0,0,.04) !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-messages {
+ background:#f8f8f8 !important;
+ background-image:none !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-empty-note {
+ background:#fff !important;
+ border:1px dashed #e5e5e5 !important;
+ color:#666 !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-bottom-tools,
+body .messages-page.chat-reference-mode .chat-panel .chat-quick-actions {
+ background:#fff !important;
+ background-image:none !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-quick-actions button,
+body .messages-page.chat-reference-mode .chat-panel .chat-quick-actions .offer-quick-action {
+ background:#fff5f5 !important;
+ background-image:none !important;
+ color:#b91c1c !important;
+ border:1px solid #f3b3b3 !important;
+ border-radius:999px !important;
+ box-shadow:none !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-composer {
+ background:#fff !important;
+ background-image:none !important;
+ border-top:1px solid #eee !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-message-composer-input {
+ background:#f7f7f7 !important;
+ color:#111 !important;
+ border:1px solid #e4e4e4 !important;
+ border-radius:22px !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .chat-record-button {
+ color:#dc2626 !important;
+ background:#fff1f1 !important;
+}
+body .messages-page.chat-reference-mode .chat-panel .send-button {
+ color:#fff !important;
+ background:#dc2626 !important;
+ background-image:none !important;
+}
