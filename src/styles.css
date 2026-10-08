@@ -13621,3 +13621,12 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     opacity:1 !important;
   }
 }
+
+/* Mobile chat: make the composer sit flush against the bottom edge. */
+@media (max-width:760px) {
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+    padding-bottom:0 !important;
+    margin-bottom:0 !important;
+    bottom:0 !important;
+  }
+}
