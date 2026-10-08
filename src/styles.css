@@ -12424,3 +12424,47 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    padding-bottom:165px !important;
  }
 }
+
+
+/* Selected photo: prominent preview with Cancel and Send, always above mobile composer. */
+.chat-reference-mode .chat-attachment-preview {
+ display:flex !important; align-items:center !important; gap:12px !important;
+ padding:12px !important; background:#fff !important;
+ border:1px solid #d9e6df !important; box-shadow:0 -4px 16px rgba(0,0,0,.06) !important;
+ z-index:108 !important;
+}
+.chat-reference-mode .chat-attachment-preview > img {
+ display:block !important; width:96px !important; height:96px !important;
+ max-width:35vw !important; object-fit:contain !important; border-radius:12px !important;
+ background:#edf2f6 !important;
+}
+.chat-reference-mode .chat-attachment-preview > span {
+ flex:1 1 auto !important; min-width:0 !important;
+ overflow:hidden !important; text-overflow:ellipsis !important;
+}
+.chat-reference-mode .chat-attachment-preview-actions {
+ display:flex !important; gap:8px !important; align-items:center !important;
+ flex-shrink:0 !important;
+}
+.chat-reference-mode .chat-attachment-preview-actions button {
+ display:inline-flex !important; align-items:center !important;
+ justify-content:center !important; gap:5px !important;
+ border-radius:12px !important; padding:10px 12px !important;
+ font-weight:600 !important; border:1px solid #d7dfe2 !important;
+}
+.chat-reference-mode .chat-preview-cancel {background:#fff !important;color:#374151 !important;}
+.chat-reference-mode .chat-preview-send {background:#16833b !important;color:#fff !important;border-color:#16833b !important;}
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+  position:fixed !important; left:8px !important; right:8px !important;
+  bottom:0 !important; transform:translateY(-72px) !important;
+  width:auto !important; margin:0 !important; border-radius:15px !important;
+  padding:10px !important; flex-wrap:wrap !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview > img {
+  width:88px !important; height:88px !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview-actions {
+  margin-left:auto !important;
+ }
+}
