@@ -13346,3 +13346,71 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    width:100vw!important;z-index:2147483002!important;
  }
 }
+
+
+/* FINAL CHAT VIEWPORT FIX — 2026-10-08
+   Never use fixed-position children or 100dvh for the composer: Android
+   browser/PWA bottom chrome can leave an enormous blank strip. Anchor the
+   entire chat to the *visual* viewport and lay out its footer inside it. */
+@media (max-width:760px) {
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel {
+  position:fixed!important;
+  inset:auto!important;
+  top:var(--bese26-chat-viewport-top,0px)!important;
+  left:0!important;right:0!important;bottom:auto!important;
+  width:100%!important;
+  height:var(--bese26-chat-viewport-height,100dvh)!important;
+  max-height:var(--bese26-chat-viewport-height,100dvh)!important;
+  min-height:0!important;
+  display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;box-sizing:border-box!important;
+  background:#f6f6f6!important;
+ }
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+  position:relative!important;
+  flex:1 1 0%!important;
+  min-height:0!important;max-height:none!important;
+  overflow-y:auto!important;
+  padding:12px 12px 20px!important;
+  margin:0!important;
+  overscroll-behavior:contain!important;
+ }
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+  position:relative!important;
+  inset:auto!important;top:auto!important;bottom:auto!important;
+  left:auto!important;right:auto!important;
+  flex:0 0 58px!important;
+  height:58px!important;min-height:58px!important;max-height:58px!important;
+  width:100%!important;
+  display:flex!important;visibility:visible!important;
+  transform:none!important;margin:0!important;
+  background:#fff!important;overflow:hidden!important;
+  border-top:1px solid #eee!important;
+  z-index:3!important;
+ }
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+  position:relative!important;
+  inset:auto!important;top:auto!important;bottom:auto!important;
+  left:auto!important;right:auto!important;
+  flex:0 0 70px!important;
+  width:100%!important;
+  height:70px!important;min-height:70px!important;max-height:70px!important;
+  display:flex!important;visibility:visible!important;
+  transform:none!important;margin:0!important;
+  padding:7px 10px max(7px,env(safe-area-inset-bottom,0px))!important;
+  box-sizing:border-box!important;
+  background:#fff!important;border-top:1px solid #eee!important;
+  z-index:4!important;
+ }
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-attachment-preview {
+  position:relative!important;
+  inset:auto!important;top:auto!important;bottom:auto!important;
+  flex:0 0 auto!important;width:100%!important;
+  transform:none!important;margin:0!important;
+  z-index:4!important;
+ }
+ html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer textarea {
+  display:block!important;visibility:visible!important;opacity:1!important;
+  flex:1 1 auto!important;min-width:0!important;
+ }
+}
