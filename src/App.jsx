@@ -911,25 +911,40 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
     const totalUnread = conversations.reduce((total, item) => total + Number(item.unread_count || 0), 0);
     return <div className="messages-inbox-page messages-premium">
       <header className="messages-inbox-header">
-        <div className="messages-inbox-title"><div className="eyebrow">PRIVATE MARKETPLACE CHAT</div><h1>Messages</h1><p>Share photos, voice notes and safe plans while you find the right deal.</p></div>
-        <span className="message-count" aria-label={`${conversations.length} conversations`}>{conversations.length}</span>
+        <div className="messages-inbox-title"><div className="eyebrow">BESE26 · PRIVATE MARKETPLACE CHAT</div><h1>Messages</h1><p>Every good deal starts with a clear conversation. Share photos, voice notes and safe plans.</p></div>
+        <span className="message-count" aria-label={`${conversations.length} conversations`}><small>CHATS</small><strong>{conversations.length}</strong></span>
       </header>
-      <div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search people, listings or messages" aria-label="Search people, listings or messages" /></div>
-      <div className="message-filter-tabs" role="tablist" aria-label="Filter conversations">{['All', 'Unread', 'Unanswered'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}{filter === 'Unread' && totalUnread > 0 && <span className="message-filter-count">{totalUnread > 99 ? '99+' : totalUnread}</span>}</button>)}</div>
-      {conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => {
-        const identity = conversationIdentity(conversation);
-        const { name } = identity;
-        const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-        const lastMessage = conversation.lastMessage;
-        const preview = lastMessage?.body?.trim() || (lastMessage ? (chatAttachmentKind(lastMessage) === 'audio' ? 'Voice note' : chatAttachmentKind(lastMessage) === 'file' ? 'Shared a document' : 'Shared a photo') : 'Start the conversation');
-        const lastActivity = lastMessage?.created_at || conversation.last_message_at;
-        return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}>
-          <span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span>
-          <span className="message-inbox-copy"><strong>{name}</strong><VerificationBadges idVerified={Boolean(identity.profile?.id_verified)} cacVerified={Boolean(identity.profile?.cac_verified)} compact /><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{preview}</small></span>
-          <span className="message-inbox-row-meta"><time>{lastActivity ? new Date(lastActivity).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time>{Number(conversation.unread_count || 0) > 0 && <span className="message-unread-badge">{conversation.unread_count > 99 ? '99+' : conversation.unread_count}</span>}</span>
-          <ChevronRight size={17} />
-        </button>;
-      })}</div> : <div className="message-inbox-empty"><MessageCircle size={30} /><strong>{messageSearch ? 'No matching conversations' : messageFilter !== 'All' ? `No ${messageFilter.toLowerCase()} conversations` : 'No conversations yet'}</strong><span>When you message a seller, the conversation will appear here.</span></div>}
+      <div className="messages-inbox-workspace">
+        <section className="messages-inbox-list-panel" aria-label="Your conversations">
+          <div className="messages-inbox-controls">
+            <div className="messages-search"><Search size={18} /><input value={messageSearch} onChange={(event) => setMessageSearch(event.target.value)} placeholder="Search people, listings or messages" aria-label="Search people, listings or messages" /></div>
+            <div className="message-filter-tabs" role="tablist" aria-label="Filter conversations">{['All', 'Unread', 'Unanswered'].map((filter) => <button type="button" role="tab" aria-selected={messageFilter === filter} className={messageFilter === filter ? 'active' : ''} key={filter} onClick={() => setMessageFilter(filter)}>{filter}{filter === 'Unread' && totalUnread > 0 && <span className="message-filter-count">{totalUnread > 99 ? '99+' : totalUnread}</span>}</button>)}</div>
+          </div>
+          {conversationLoading ? <BrandLoader message="Loading conversations…" compact /> : filteredConversations.length ? <div className="message-inbox-list">{filteredConversations.map((conversation) => {
+            const identity = conversationIdentity(conversation);
+            const { name } = identity;
+            const initials = name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+            const lastMessage = conversation.lastMessage;
+            const preview = lastMessage?.body?.trim() || (lastMessage ? (chatAttachmentKind(lastMessage) === 'audio' ? 'Voice note' : chatAttachmentKind(lastMessage) === 'file' ? 'Shared a document' : 'Shared a photo') : 'Start the conversation');
+            const lastActivity = lastMessage?.created_at || conversation.last_message_at;
+            return <button key={conversation.id} className="message-inbox-row" type="button" onClick={() => onSelectConversation?.(conversation)}>
+              <span className={`message-identity-avatar ${identity.hasBusinessLogo ? 'is-business-logo' : ''}`}>{identity.image ? <img src={identity.image} alt="" onLoad={identity.hasBusinessLogo ? handleBusinessLogoLoad : undefined} /> : <Avatar initials={initials} tone="rose" size="lg" />}</span>
+              <span className="message-inbox-copy"><strong>{name}</strong><VerificationBadges idVerified={Boolean(identity.profile?.id_verified)} cacVerified={Boolean(identity.profile?.cac_verified)} compact /><b>{conversation.listing?.title || 'Marketplace listing'}</b><small>{preview}</small></span>
+              <span className="message-inbox-row-meta"><time>{lastActivity ? new Date(lastActivity).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' }) : 'New'}</time>{Number(conversation.unread_count || 0) > 0 && <span className="message-unread-badge">{conversation.unread_count > 99 ? '99+' : conversation.unread_count}</span>}</span>
+              <ChevronRight size={17} />
+            </button>;
+          })}</div> : <div className="message-inbox-empty"><MessageCircle size={30} /><strong>{messageSearch ? 'No matching conversations' : messageFilter !== 'All' ? `No ${messageFilter.toLowerCase()} conversations` : 'No conversations yet'}</strong><span>When you message a seller, the conversation will appear here.</span></div>}
+        </section>
+        <aside className="messages-inbox-welcome">
+          <span className="messages-inbox-welcome-icon"><MessageCircle size={30} /></span>
+          <div className="messages-inbox-welcome-copy"><span className="messages-inbox-welcome-kicker">YOUR BESE26 CHAT SPACE</span><h2>Talk it through. Trade with confidence.</h2><p>Keep questions, photos and meetup plans together so both sides know what comes next.</p></div>
+          <div className="messages-inbox-trust-list">
+            <div><ShieldCheck size={19} /><span><strong>Stay protected</strong><small>Keep your deal details inside Bese26.</small></span></div>
+            <div><MessageCircle size={19} /><span><strong>Make it clear</strong><small>Use messages, photos and voice notes.</small></span></div>
+          </div>
+          <span className="messages-inbox-welcome-foot"><i aria-hidden="true" /> Private, one-to-one conversations</span>
+        </aside>
+      </div>
     </div>;
   }
   const selectedIdentity = conversationIdentity(selectedConversation);
