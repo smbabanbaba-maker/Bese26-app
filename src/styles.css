@@ -11995,3 +11995,24 @@ select:focus,
 .chat-reference-mode .chat-composer .icon-button { width:34px !important; height:34px !important; border:0 !important; color:#78909c !important; background:transparent !important; }
 .chat-reference-mode .chat-composer .send-button { width:40px !important; height:40px !important; border-radius:50% !important; color:#fff !important; background:#159447 !important; box-shadow:none !important; }
 @media (max-width:699px) { .chat-reference-mode .chat-messages { min-height:calc(100dvh - 405px) !important; padding:18px 13px 14px !important; } .chat-reference-mode .message-bubble { max-width:84% !important; } .chat-reference-mode .chat-context { padding-inline:14px !important; } }
+
+
+/* Bese26 chat 2026: consistent red, white and black conversation interface. */
+.chat-reference-mode.messages-selected-page { background:#fff !important; }
+.chat-reference-mode .chat-panel { background:#fff !important; border:1px solid #eee !important; border-radius:18px !important; overflow:hidden !important; }
+.chat-reference-mode .chat-header { background:#fff !important; border-bottom:1px solid #eee !important; }
+.chat-reference-mode .chat-person strong { color:#111 !important; }
+.chat-reference-mode .chat-person > div > span { color:#666 !important; }
+.chat-reference-mode .chat-context { background:#fff !important; border-bottom:1px solid #eee !important; }
+.chat-reference-mode .chat-messages { background:#fafafa !important; }
+.chat-reference-mode .message-bubble.mine { background:#fee8e8 !important; color:#171717 !important; border:1px solid #ffcaca !important; border-radius:18px 18px 5px 18px !important; }
+.chat-reference-mode .message-bubble.other { background:#fff !important; color:#171717 !important; border:1px solid #e8e8e8 !important; border-radius:18px 18px 18px 5px !important; }
+.chat-reference-mode .chat-composer { background:#fff !important; border-top:1px solid #eee !important; }
+.chat-reference-mode .chat-composer .send-button { background:#dc2626 !important; color:#fff !important; border-radius:50% !important; }
+.chat-reference-mode .chat-composer .chat-record-button { color:#dc2626 !important; }
+.chat-reference-mode .chat-quick-actions button { border-color:#f4baba !important; color:#991b1b !important; background:#fff !important; }
+.chat-reference-mode .chat-recording-status { background:#fff5f5 !important; }
+@media (max-width:699px) {
+ .chat-reference-mode .chat-panel { border-radius:0 !important; border-left:0 !important; border-right:0 !important; }
+ .chat-reference-mode .chat-messages { background:#fafafa !important; }
+}
