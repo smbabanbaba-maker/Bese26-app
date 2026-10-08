@@ -12372,3 +12372,40 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    padding-bottom:max(10px,env(safe-area-inset-bottom, 0px)) !important;
  }
 }
+
+
+/* Mobile chat final viewport anchor: no blank region under message input.
+   Use viewport-fixed composer and quick actions only when a conversation is open. */
+@media (max-width:760px) {
+ body .app-shell:has(.messages-page.messages-selected-page) {
+   padding-bottom:0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   position:fixed !important;
+   bottom:0 !important;
+   left:0 !important; right:0 !important;
+   width:100% !important;
+   margin:0 !important;
+   height:auto !important;
+   min-height:70px !important;
+   padding:9px 10px max(12px,env(safe-area-inset-bottom, 0px)) !important;
+   background:#fff !important;
+   border-top:1px solid #e3e8eb !important;
+   box-sizing:border-box !important;
+   z-index:105 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+   position:fixed !important;
+   bottom:70px !important;
+   left:0 !important; right:0 !important;
+   width:100% !important;
+   margin:0 !important;
+   box-sizing:border-box !important;
+   background:#fff !important;
+   z-index:104 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   padding-bottom:165px !important;
+   scroll-padding-bottom:165px !important;
+ }
+}
