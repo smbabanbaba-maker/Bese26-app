@@ -13501,3 +13501,49 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     color:#263238 !important;
   }
 }
+/* Mobile Messages: remove the lower quick-action tray that was covering the composer. */
+@media (max-width:760px) {
+  .messages-selected-page .chat-bottom-tools,
+  .messages-premium.messages-selected-page .chat-bottom-tools {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+  .messages-selected-page .chat-panel,
+  .messages-premium.messages-selected-page .chat-panel {
+    display:flex !important;
+    flex-direction:column !important;
+    height:100% !important;
+    min-height:0 !important;
+  }
+  .messages-selected-page .chat-messages,
+  .messages-premium.messages-selected-page .chat-messages {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+  }
+  .messages-selected-page .chat-composer,
+  .messages-premium.messages-selected-page .chat-composer {
+    display:flex !important;
+    visibility:visible !important;
+    position:relative !important;
+    z-index:5 !important;
+    flex:0 0 auto !important;
+    height:auto !important;
+    min-height:63px !important;
+    margin:0 !important;
+    background:#fff !important;
+  }
+  .messages-selected-page .chat-composer input:not(.chat-file-input),
+  .messages-premium.messages-selected-page .chat-composer input:not(.chat-file-input) {
+    display:block !important;
+    visibility:visible !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+  }
+}
