@@ -12409,3 +12409,18 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
    scroll-padding-bottom:165px !important;
  }
 }
+
+
+/* Android standalone/PWA viewport compensation: the installed app leaves a
+   blank strip below CSS fixed-bottom chat controls on some devices. */
+@media (max-width:760px) {
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+   bottom:-70px !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-bottom-tools {
+   bottom:0 !important;
+ }
+ body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+   padding-bottom:165px !important;
+ }
+}
