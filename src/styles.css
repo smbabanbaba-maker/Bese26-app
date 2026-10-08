@@ -13671,3 +13671,23 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
     z-index:50 !important;
   }
 }
+
+/* Mobile chat: the typing bar is fixed to the bottom edge; the message list scrolls behind it safely. */
+@media (max-width:760px) {
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-messages {
+    padding-bottom:82px !important;
+  }
+  html body .messages-page.chat-reference-mode.messages-selected-page .chat-panel .chat-composer {
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    width:100% !important;
+    height:70px !important;
+    min-height:70px !important;
+    max-height:70px !important;
+    margin:0 !important;
+    padding-bottom:0 !important;
+    z-index:2147483001 !important;
+  }
+}
