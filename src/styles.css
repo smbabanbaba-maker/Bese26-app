@@ -12652,3 +12652,47 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   max-width:min(76vw,340px) !important; max-height:45dvh !important;
  }
 }
+
+
+/* Responsive image-only chat messages: no colored bubble/frame around photos. */
+.messages-page.chat-reference-mode .message-bubble.message-image-only,
+.messages-page.chat-reference-mode .message-bubble.message-image-only.mine,
+.messages-page.chat-reference-mode .message-bubble.message-image-only.other {
+ background:transparent !important; border:0 !important;
+ border-radius:0 !important; box-shadow:none !important;
+ padding:0 !important; overflow:visible !important;
+ max-width:min(82%,420px) !important;
+}
+.messages-page.chat-reference-mode .message-image-only .message-image-button {
+ display:block !important; width:100% !important; max-width:100% !important;
+ margin:0 !important; padding:0 !important; background:transparent !important;
+ border:0 !important; border-radius:12px !important; overflow:hidden !important;
+}
+.messages-page.chat-reference-mode .message-image-only .message-image {
+ display:block !important; width:100% !important; max-width:100% !important;
+ height:auto !important; max-height:60dvh !important; object-fit:contain !important;
+ border:0 !important; border-radius:12px !important; background:transparent !important;
+}
+.messages-page.chat-reference-mode .message-image-only > small {
+ display:flex !important; justify-content:flex-end !important;
+ color:#7895a1 !important; margin-top:4px !important;
+}
+.messages-page.chat-reference-mode .chat-person-name-row {
+ display:flex !important; flex-wrap:wrap !important; align-items:center !important;
+ gap:4px 7px !important; min-width:0 !important;
+}
+.messages-page.chat-reference-mode .chat-person-name-row strong {
+ min-width:0 !important; overflow-wrap:anywhere !important;
+}
+.messages-page.chat-reference-mode .chat-person-name-row .verification-badges,
+.messages-page.chat-reference-mode .chat-person-name-row .verified-badge {
+ display:inline-flex !important; align-items:center !important;
+}
+.messages-page.chat-reference-mode .chat-person-avatar img {
+ width:100% !important; height:100% !important; object-fit:cover !important;
+}
+@media(max-width:760px) {
+ .messages-page.chat-reference-mode .message-bubble.message-image-only {max-width:82% !important;}
+ .messages-page.chat-reference-mode .chat-person-name-row {max-width:100% !important;}
+ .messages-page.chat-reference-mode .chat-attachment-preview-actions {margin-left:auto !important;}
+}
