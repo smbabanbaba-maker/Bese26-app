@@ -12088,3 +12088,17 @@ body .messages-page.chat-reference-mode .chat-panel .send-button {
  background:#dc2626 !important;
  background-image:none !important;
 }
+
+
+/* Hide the redundant horizontal conversation strip above an open chat.
+   Conversations remain accessible from the Messages inbox via the back arrow. */
+.messages-page.messages-selected-page .message-layout > .conversation-list {
+  display: none !important;
+}
+.messages-page.messages-selected-page .message-layout {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.messages-page.messages-selected-page .message-layout > .chat-panel {
+  min-width: 0 !important;
+  width: 100% !important;
+}
