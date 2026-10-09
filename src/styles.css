@@ -14593,3 +14593,34 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .marketplace-search-input button { width: 28px; height: 28px; }
   .marketplace-quick-actions button { min-height: 21px; padding: 2px 7px; font-size: 6px; }
 }
+
+/* Slim homepage sponsored banner, matching the compact reference ad. */
+.home-page .home-secondary-sponsored {
+  display: grid;
+  gap: 4px;
+  margin: -8px 0 -4px;
+  padding: 5px;
+  border: 1px solid #eadfe0;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 5px 14px rgba(37,20,20,.04);
+}
+.home-page .home-secondary-sponsored .sponsored-placement-label {
+  padding: 0 3px;
+  font-size: 7px;
+  letter-spacing: .1em;
+}
+.home-page .home-secondary-sponsored .sponsored-placement-label small { font-size: 7px; }
+.home-page .home-secondary-sponsored .sponsored-placement-art {
+  aspect-ratio: 1600 / 340 !important;
+  min-height: 0 !important;
+  border-radius: 7px;
+}
+.home-page .home-secondary-sponsored .sponsored-placement-art img {
+  object-fit: cover !important;
+  object-position: center;
+}
+@media (max-width:700px) {
+  .home-page .home-secondary-sponsored { margin: -7px 0 -3px; padding: 4px; border-radius: 9px; }
+  .home-page .home-secondary-sponsored .sponsored-placement-art { aspect-ratio: 1600 / 300 !important; border-radius: 6px; }
+}
