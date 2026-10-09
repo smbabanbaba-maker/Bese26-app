@@ -14624,3 +14624,37 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .home-page .home-secondary-sponsored { margin: -7px 0 -3px; padding: 4px; border-radius: 9px; }
   .home-page .home-secondary-sponsored .sponsored-placement-art { aspect-ratio: 1600 / 300 !important; border-radius: 6px; }
 }
+
+/* Ultra-compact home rails: keep discovery visible without taking vertical space. */
+.home-page .popular-categories .section-heading { gap: 5px; margin-bottom: 5px; }
+.home-page .popular-categories .section-heading .eyebrow { font-size: 6px; margin-bottom: 1px; }
+.home-page .popular-categories .section-heading h2 { font-size: 15px; line-height: 1.05; }
+.home-page .popular-categories .section-heading .text-button { font-size: 8px; }
+.home-page .popular-category-rail { gap: 5px; padding: 0 1px 2px; }
+.home-page .popular-category { min-width: 60px; padding: 5px 4px; gap: 3px; border-radius: 8px; }
+.home-page .popular-category > span { width: 21px; height: 21px; border-radius: 6px; }
+.home-page .popular-category > span svg { width: 14px; height: 14px; }
+.home-page .popular-category strong { font-size: 8px; line-height: 1; }
+.trending-deals-section { gap: 6px; padding: 8px; border-radius: 12px; }
+.trending-deals-heading { gap: 6px; }
+.trending-deals-heading .eyebrow { margin-bottom: 1px; font-size: 6px; }
+.trending-deals-heading h2 { font-size: 15px; line-height: 1.05; }
+.trending-deals-heading p { display: none; }
+.trending-deals-view-all { font-size: 8px; }
+.trending-deals-rail { gap: 5px; }
+.trending-deal-card { grid-template-columns: 48px minmax(0,1fr); gap: 5px; padding: 4px; border-radius: 8px; }
+.trending-deal-image { width: 48px; height: 48px; border-radius: 6px; }
+.trending-deal-copy { gap: 1px; padding-right: 5px; }
+.trending-deal-copy strong { font-size: 8px; }
+.trending-deal-copy b { font-size: 9px; }
+.trending-deal-copy small { font-size: 6px; }
+.trending-deal-arrow { right: 3px; bottom: 3px; width: 15px; height: 15px; border-radius: 5px; }
+@media (max-width:700px) {
+  .home-page .popular-categories .section-heading h2 { font-size: 14px; }
+  .home-page .popular-category { min-width: 57px; padding: 4px 3px; }
+  .home-page .popular-category > span { width: 20px; height: 20px; }
+  .home-page .popular-category strong { font-size: 7px; }
+  .trending-deals-section { gap: 6px; padding: 7px; }
+  .trending-deals-heading h2 { font-size: 14px; }
+  .trending-deal-card { flex-basis: 158px; }
+}
