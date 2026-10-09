@@ -14383,3 +14383,30 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
 .analytics-page .analytics-period-tabs button.active { border-color:#c6a38d !important; background:#f4e9df !important; color:#674438 !important; }
 @keyframes dashboardBarIn { from { transform:scaleY(0); opacity:.3; } to { transform:scaleY(1); opacity:1; } }
 @media (max-width:640px) { .analytics-download-actions { width:100%; } .analytics-download-actions button { flex:1; justify-content:center; } }
+
+/* Premium recorded-sales receipts and Coffee dashboard earnings. */
+.receipt-premium-banner { display:flex; align-items:center; gap:10px; margin:18px 0 2px; padding:12px; border:1px solid #ead8c9; border-radius:14px; background:linear-gradient(135deg,#f8efe7,#fffaf6); }
+.receipt-premium-mark { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; color:#fff; background:#674438; font-family:Georgia,serif; font-size:20px; font-weight:700; }
+.receipt-premium-banner span:nth-child(2) { display:grid; gap:2px; min-width:0; }
+.receipt-premium-banner strong { color:#3d2c26; font-size:12px; }
+.receipt-premium-banner small { color:#88796d; font-size:9px; }
+.receipt-premium-banner b { margin-left:auto; color:#765044; font-size:10px; letter-spacing:.08em; }
+.receipt-modal { border-color:#ead8c9 !important; background:#fffdfb !important; }
+.receipt-modal-head h2 { color:#3d2c26 !important; }
+.earnings-card { margin:0 0 16px; padding:18px; border:1px solid #e4d4c6; border-radius:18px; background:linear-gradient(135deg,#fffaf6,#f5ebe2); box-shadow:0 12px 28px rgba(74,48,35,.08); }
+.earnings-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.earnings-card-head h2 { margin:4px 0 4px; color:#3d2c26; font-size:19px; }
+.earnings-card-head p { margin:0; color:#88796d; font-size:10px; }
+.earnings-badge { padding:6px 8px; border-radius:8px; color:#fff; background:#674438; font-size:10px; font-weight:800; }
+.earnings-stat-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin-top:15px; }
+.earnings-stat-grid > div { display:grid; gap:4px; padding:11px; border:1px solid #eaded4; border-radius:11px; background:rgba(255,255,255,.75); }
+.earnings-stat-grid strong { color:#4e3026; font-size:17px; }
+.earnings-stat-grid span { color:#88796d; font-size:9px; }
+.earnings-receipt-list { display:grid; gap:0; margin-top:14px; border-top:1px solid #eaded4; }
+.earnings-receipt-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid #eaded4; }
+.earnings-receipt-row span { display:grid; gap:3px; min-width:0; }
+.earnings-receipt-row strong { overflow:hidden; color:#4e3026; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.earnings-receipt-row small { color:#88796d; font-size:9px; }
+.earnings-receipt-row b { flex:none; color:#674438; font-size:11px; }
+.earnings-empty { margin-top:14px; padding:12px; border-radius:10px; color:#88796d; background:rgba(255,255,255,.6); font-size:10px; }
+@media (max-width:640px) { .earnings-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .receipt-premium-banner b { font-size:8px; } }

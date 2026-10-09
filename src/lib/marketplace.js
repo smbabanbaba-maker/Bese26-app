@@ -1496,6 +1496,23 @@ export async function fetchSellerStats(userId) {
 }
 
 
+export async function createSellerSalesReceipt({ sellerId, listingId, receiptNumber, customerName, customerContact, itemTitle, quantity, unitAmount, paymentMethod, paymentStatus = 'Paid', saleDate, notes } = {}) {
+  failIfUnavailable();
+  if (!sellerId) throw new Error('Sign in before recording a sale.');
+  const { data, error } = await supabase.from('seller_sales_receipts').insert({ seller_id: sellerId, listing_id: listingId || null, receipt_number: receiptNumber, customer_name: customerName || 'Customer', customer_contact: customerContact || null, item_title: itemTitle || 'Marketplace item', quantity: Math.max(1, Number(quantity) || 1), unit_amount: Math.max(0, Number(unitAmount) || 0), payment_method: paymentMethod || 'Cash', payment_status: paymentStatus || 'Paid', sale_date: saleDate || new Date().toISOString().slice(0, 10), notes: notes || null }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+export async function fetchSellerSalesReceipts(userId, { startDate, endDate } = {}) {
+  failIfUnavailable();
+  if (!userId) return [];
+  let query = supabase.from('seller_sales_receipts').select('*').eq('seller_id', userId).order('sale_date', { ascending: false }).order('created_at', { ascending: false }).limit(1000);
+  if (startDate) query = query.gte('sale_date', startDate);
+  if (endDate) query = query.lte('sale_date', endDate);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
 export async function fetchSellerAnalytics({ userId, startDate, endDate } = {}) {
   failIfUnavailable();
   if (!userId) return { listings: [], views: [], inquiries: [], summary: { views: 0, inquiries: 0, uploaded: 0, sold: 0, active: 0 } };
