@@ -14658,3 +14658,40 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .trending-deals-heading h2 { font-size: 14px; }
   .trending-deal-card { flex-basis: 158px; }
 }
+/* Home refinement: soft gray canvas with slightly clearer discovery typography. */
+.home-page {
+  background: #f1f3f5 !important;
+  border-radius: 0 0 22px 22px;
+}
+.home-page > .popular-categories,
+.home-page > .home-featured-section,
+.home-page > .trust-strip {
+  background: #f1f3f5 !important;
+}
+.home-page .popular-category strong {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+.home-page .popular-category {
+  min-height: 84px !important;
+  background: #fff !important;
+}
+.home-page .trending-deals-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+}
+.home-page .trending-deals-heading h2 {
+  font-size: 21px !important;
+}
+.home-page .trending-deal-copy strong {
+  font-size: 11px !important;
+}
+.home-page .trending-deal-copy b {
+  font-size: 12px !important;
+}
+.home-page .trending-deal-copy small {
+  font-size: 9px !important;
+}
+@media (max-width:700px) {
+  .home-page .popular-category strong { font-size: 12px !important; }
+  .home-page .trending-deals-heading h2 { font-size: 20px !important; }
+}
