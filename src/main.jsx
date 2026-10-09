@@ -3,7 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import BusinessLogoPreview from './components/BusinessLogoPreview';
-import { registerBese26ServiceWorker } from './components/InstallPrompt';
 import { supabase } from './lib/supabase';
 import './styles.css';
 import './ui-enhancements.css';
@@ -53,5 +52,3 @@ if (isVercelHost) {
   if (window.location.pathname === '/auth/confirm') mountConfirmationPage();
   else mountApp();
 }
-
-registerBese26ServiceWorker();

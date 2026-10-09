@@ -55,6 +55,20 @@
         }
       }
     </script>
+    <!-- Clear the old PWA shell that could reference deleted Vite bundles. -->
+    <script>
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          registrations.forEach(function (registration) { registration.unregister(); });
+        }).catch(function () {});
+        if ('caches' in window) {
+          caches.keys().then(function (keys) {
+            keys.filter(function (key) { return key.indexOf('bese26-') === 0; }).forEach(function (key) { caches.delete(key); });
+          }).catch(function () {});
+        }
+      }());
+    </script>
     <title>Bese26</title>
   </head>
   <body>
