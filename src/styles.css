@@ -14410,3 +14410,51 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
 .earnings-receipt-row b { flex:none; color:#674438; font-size:11px; }
 .earnings-empty { margin-top:14px; padding:12px; border-radius:10px; color:#88796d; background:rgba(255,255,255,.6); font-size:10px; }
 @media (max-width:640px) { .earnings-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .receipt-premium-banner b { font-size:8px; } }
+
+/* Final mobile chat restoration: no quick-action tray and no call controls in Messages. */
+@media (max-width: 760px) {
+  .messages-selected-page .chat-bottom-tools,
+  .messages-selected-page .chat-quick-actions,
+  .messages-selected-page .quick-message-row {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+  }
+  .messages-selected-page .chat-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+  .messages-selected-page .chat-messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+  .messages-selected-page .chat-composer {
+    display: flex !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 5 !important;
+    flex: 0 0 auto !important;
+    min-height: 63px !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+  .messages-selected-page .modal-call-button,
+  .messages-selected-page [class*="call-button"],
+  .messages-selected-page [aria-label*="Call"],
+  .messages-selected-page [title*="Call"] {
+    display: none !important;
+  }
+}
+.quick-message-row .modal-call-button,
+.listing-chat-card .modal-call-button {
+  display: none !important;
+}
