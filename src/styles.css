@@ -14557,3 +14557,39 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .trending-deals-heading p { font-size: 8px; }
   .trending-deal-card { flex-basis: 182px; }
 }
+
+/* Extra-short hero pass: preserve the premium layout while freeing more screen space. */
+.marketplace-search-hero {
+  min-height: 178px;
+  gap: 5px;
+  padding: 9px 26px 10px;
+  border-radius: 0 0 18px 18px;
+}
+.marketplace-hero-top { min-height: 27px; }
+.marketplace-official-logo-main { width: 25px; height: 25px; }
+.marketplace-language { min-height: 28px; }
+.marketplace-hero-content { gap: 2px; }
+.marketplace-hero-content::before { width: 24px; margin-bottom: 1px; }
+.marketplace-hero-content h1 { font-size: clamp(21px, 3.7vw, 30px); }
+.marketplace-hero-content p { font-size: 8px; }
+.marketplace-hero-search-row { padding: 4px; }
+.marketplace-country-button, .marketplace-search-input { min-height: 36px; }
+.marketplace-search-input button { width: 29px; height: 29px; }
+.marketplace-quick-actions { gap: 4px; }
+.marketplace-quick-actions button { min-height: 22px; padding: 3px 8px; }
+@media (max-width:700px) {
+  .marketplace-search-hero { min-height: 170px; gap: 4px; padding: 8px 15px 9px; border-radius: 0 0 17px 17px; }
+  .marketplace-search-hero::after { bottom: 31px; font-size: 76px; }
+  .marketplace-search-hero::before { bottom: -170px; }
+  .marketplace-hero-top { min-height: 25px; }
+  .marketplace-official-logo-main { width: 23px; height: 23px; }
+  .marketplace-language { min-height: 26px; }
+  .marketplace-hero-content h1 { font-size: 21px; }
+  .marketplace-hero-content p { display: none; }
+  .marketplace-hero-search-row { grid-template-columns: 82px minmax(0,1fr); padding: 3px; }
+  .marketplace-country-button, .marketplace-search-input { min-height: 35px; }
+  .marketplace-country-button { font-size: 8px; }
+  .marketplace-search-input input { font-size: 8px; }
+  .marketplace-search-input button { width: 28px; height: 28px; }
+  .marketplace-quick-actions button { min-height: 21px; padding: 2px 7px; font-size: 6px; }
+}
