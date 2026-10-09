@@ -14458,3 +14458,73 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
 .listing-chat-card .modal-call-button {
   display: none !important;
 }
+
+/* Hero-only final refinement: slim Bese26 signature, not a Jiji copy. */
+.marketplace-search-hero {
+  min-height: 208px;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 9px;
+  padding: 13px 26px 14px;
+  border-radius: 0 0 22px 22px;
+  background: #0b0c0f !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.18);
+}
+.marketplace-search-hero::before {
+  inset: auto -92px -174px auto;
+  width: 350px;
+  height: 350px;
+  border-radius: 48% 52% 42% 58%;
+  opacity: 1;
+  background: radial-gradient(circle at 35% 30%, rgba(255,44,44,.82), rgba(145,0,0,.22) 45%, transparent 71%);
+  transform: rotate(15deg);
+  animation: beseSlimHeroGlow 9s ease-in-out infinite;
+}
+.marketplace-search-hero::after {
+  content: '26';
+  right: 38px;
+  bottom: 40px;
+  color: rgba(255,255,255,.045);
+  font-size: 112px;
+  letter-spacing: -.16em;
+  transform: rotate(-12deg);
+}
+.marketplace-hero-top { min-height: 32px; }
+.marketplace-official-logo-main { width: 28px; height: 28px; border-radius: 8px; }
+.marketplace-hero-brand strong { font-size: 15px; }
+.marketplace-language { min-height: 31px; min-width: 104px; border-radius: 10px; }
+.marketplace-hero-content { max-width: 430px; margin: 0; gap: 3px; }
+.marketplace-hero-content::before { width: 28px; height: 2px; margin-bottom: 2px; }
+.marketplace-hero-content .eyebrow { font-size: 7px; }
+.marketplace-hero-content h1 { max-width: 400px; font-size: clamp(23px, 4vw, 33px); }
+.marketplace-hero-content p { max-width: 310px; font-size: 9px; line-height: 1.25; }
+.marketplace-hero-search-row { padding: 5px; gap: 5px; border-radius: 14px; }
+.marketplace-country-button, .marketplace-search-input { min-height: 41px; border-radius: 9px; }
+.marketplace-country-button { padding: 0 11px; font-size: 10px; }
+.marketplace-search-input { padding-left: 12px; }
+.marketplace-search-input input { font-size: 10px; }
+.marketplace-search-input button { width: 33px; height: 33px; border-radius: 50%; }
+.marketplace-quick-actions { gap: 5px; }
+.marketplace-quick-actions button { min-height: 25px; padding: 4px 9px; border-radius: 999px; font-size: 7px; }
+.marketplace-quick-actions button:first-child { background: #ff2c2c; }
+@keyframes beseSlimHeroGlow { 0%,100% { opacity:.72; transform:rotate(15deg) translate3d(0,0,0); } 50% { opacity:1; transform:rotate(19deg) translate3d(-8px,-7px,0); } }
+@media (max-width:700px) {
+  .marketplace-search-hero { min-height: 198px; gap: 7px; margin: -20px -16px 0; padding: 11px 15px 12px; border-radius: 0 0 19px 19px; }
+  .marketplace-search-hero::before { right: -124px; bottom: -158px; width: 285px; height: 285px; }
+  .marketplace-search-hero::after { right: 1px; bottom: 37px; font-size: 86px; }
+  .marketplace-hero-top { min-height: 28px; }
+  .marketplace-official-logo-main { width: 25px; height: 25px; border-radius: 7px; }
+  .marketplace-hero-brand strong { font-size: 13px; }
+  .marketplace-language { min-width: 91px; min-height: 29px; }
+  .marketplace-hero-content { max-width: 285px; }
+  .marketplace-hero-content h1 { font-size: 23px; }
+  .marketplace-hero-content p { max-width: 250px; font-size: 8px; }
+  .marketplace-hero-search-row { grid-template-columns: 88px minmax(0,1fr); padding: 4px; }
+  .marketplace-country-button { padding: 0 7px; gap: 4px; font-size: 9px; }
+  .marketplace-search-input { padding-left: 8px; gap: 5px; }
+  .marketplace-search-input input { font-size: 9px; }
+  .marketplace-search-input button { width: 30px; height: 30px; }
+  .marketplace-quick-actions { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .marketplace-quick-actions::-webkit-scrollbar { display: none; }
+  .marketplace-quick-actions button { flex: none; min-height: 23px; padding: 3px 8px; font-size: 7px; }
+}
+@media (prefers-reduced-motion: reduce) { .marketplace-search-hero::before { animation: none; } }
