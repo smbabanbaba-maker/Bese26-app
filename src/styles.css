@@ -14528,3 +14528,32 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .marketplace-quick-actions button { flex: none; min-height: 23px; padding: 3px 8px; font-size: 7px; }
 }
 @media (prefers-reduced-motion: reduce) { .marketplace-search-hero::before { animation: none; } }
+
+/* Compact home discovery cards: less height, same functionality. */
+.home-page .popular-category-rail { gap: 7px; padding-block: 1px 3px; }
+.home-page .popular-category { min-width: 70px; padding: 7px 6px; border-radius: 9px; gap: 5px; }
+.home-page .popular-category > span { width: 26px; height: 26px; border-radius: 7px; }
+.home-page .popular-category > span svg { width: 17px; height: 17px; }
+.home-page .popular-category strong { font-size: 10px; }
+.trending-deals-section { gap: 9px; padding: 12px; border-radius: 15px; }
+.trending-deals-heading { gap: 9px; }
+.trending-deals-heading .eyebrow { margin-bottom: 3px; font-size: 7px; }
+.trending-deals-heading h2 { font-size: 18px; }
+.trending-deals-heading p { margin-top: 2px; font-size: 9px; }
+.trending-deals-rail { gap: 7px; }
+.trending-deal-card { grid-template-columns: 58px minmax(0,1fr); gap: 7px; padding: 6px; border-radius: 11px; }
+.trending-deal-image { width: 58px; height: 58px; border-radius: 8px; }
+.trending-deal-copy { gap: 2px; padding-right: 7px; }
+.trending-deal-copy strong { font-size: 9px; }
+.trending-deal-copy b { font-size: 10px; }
+.trending-deal-copy small { font-size: 7px; }
+.trending-deal-arrow { right: 5px; bottom: 5px; width: 18px; height: 18px; border-radius: 6px; }
+@media (max-width:700px) {
+  .home-page .popular-category { min-width: 66px; padding: 6px 5px; }
+  .home-page .popular-category > span { width: 24px; height: 24px; }
+  .home-page .popular-category strong { font-size: 9px; }
+  .trending-deals-section { gap: 9px; padding: 10px; border-radius: 14px; }
+  .trending-deals-heading h2 { font-size: 17px; }
+  .trending-deals-heading p { font-size: 8px; }
+  .trending-deal-card { flex-basis: 182px; }
+}
