@@ -14811,3 +14811,41 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .home-page .trending-deal-copy b { font-size: 10px !important; }
   .home-page .trending-deal-copy small { font-size: 7px !important; }
 }
+
+/* Restore the previous Bese26 accent palette while keeping the readability polish. */
+.marketplace-search-hero::before {
+  background: radial-gradient(circle at 35% 30%, rgba(255,44,44,.82), rgba(145,0,0,.22) 45%, transparent 71%) !important;
+}
+.marketplace-quick-actions button:first-child {
+  background: #ff2c2c !important;
+  border-color: #ff2c2c !important;
+}
+.marketplace-quick-actions button svg { color: #ff7777; }
+.home-page .popular-category > span {
+  color: #8a5a3b !important;
+  background: #fff7f1 !important;
+}
+.home-featured-grid .product-price,
+.home-page .trending-deal-copy b { color: #b52f35 !important; }
+.bottom-nav {
+  border-top-color: #eadfe0 !important;
+  box-shadow: 0 -8px 24px rgba(80,0,0,.08) !important;
+}
+.bottom-nav button.active,
+.bottom-nav button[aria-current="page"],
+.bottom-nav button:nth-child(n).active {
+  color: #8a5a3b !important;
+  background: transparent !important;
+}
+.bottom-nav button.active .nav-icon,
+.bottom-nav button[aria-current="page"] .nav-icon { color: #8a5a3b !important; }
+.bottom-nav .sell-nav .nav-icon,
+.bottom-nav .sell-nav.active .nav-icon {
+  color: #fff !important;
+  background: #8a5a3b !important;
+  border-color: #8a5a3b !important;
+}
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline-color: rgba(138,90,59,.32) !important;
+  box-shadow: 0 0 0 4px rgba(138,90,59,.12) !important;
+}
