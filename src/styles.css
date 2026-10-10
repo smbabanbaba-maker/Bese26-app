@@ -14867,3 +14867,45 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   body .listing-management-center .listing-management-toolbar { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
   body .listing-management-center .listing-management-tabs { background: #fff !important; }
 }
+
+/* Seller Center full-height finish: content continues naturally below the full-bleed hero. */
+@media (max-width: 760px) {
+  body .listing-management-center {
+    min-height: calc(100dvh - 70px) !important;
+    overflow: visible !important;
+  }
+  body .listing-management-center .listing-management-hero::after {
+    right: -120px !important;
+    bottom: -220px !important;
+    opacity: .7 !important;
+  }
+  body .listing-management-center .listing-summary-grid {
+    width: auto !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  body .listing-management-center .listing-management-toolbar,
+  body .listing-management-center .listing-management-tabs,
+  body .listing-management-center .managed-listings {
+    width: auto !important;
+  }
+  body .listing-management-center .listing-management-toolbar .search-box {
+    min-height: 50px !important;
+    border: 1px solid #e3e6ea !important;
+    border-radius: 15px !important;
+    background: #fff !important;
+    box-shadow: 0 4px 14px rgba(28,36,48,.04) !important;
+  }
+  body .listing-management-center .listing-management-tabs {
+    padding: 4px !important;
+    border-radius: 15px !important;
+    box-shadow: 0 4px 14px rgba(28,36,48,.04) !important;
+  }
+  body .listing-management-center .managed-listings {
+    padding-bottom: 20px !important;
+  }
+  body .listing-management-center .management-card {
+    background: #fff !important;
+    border-color: #e8ebef !important;
+    box-shadow: 0 5px 16px rgba(28,36,48,.045) !important;
+  }
+}
