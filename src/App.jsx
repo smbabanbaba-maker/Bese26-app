@@ -1410,8 +1410,16 @@ function BusinessDirectoryView({ onBack, adCampaigns = [] }) {
 
 function AppContent() {
   const { locale, locales, setLocale, t } = useI18n();
-  const publicSellerId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/?seller\/([0-9a-f-]{20,})\/?$/i)?.[1] : null;
-  const publicHandle = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || window.location.pathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
+  const currentPathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const barePublicHandle = currentPathname.match(/^\/([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1]?.toLowerCase() || null;
+  const reservedBareRoutes = new Set(['home', 'profile', 'sell', 'shop', 'messages', 'saved', 'notifications', 'dashboard', 'settings', 'listing', 'seller', 'business', 'store', 'miniweb', 'auth']);
+  useEffect(() => {
+    if (!barePublicHandle || reservedBareRoutes.has(barePublicHandle) || currentPathname.startsWith('/@')) return;
+    const suffix = `${window.location.search}${window.location.hash}`;
+    window.location.replace(`/@${encodeURIComponent(barePublicHandle)}${suffix}`);
+  }, [barePublicHandle, currentPathname]);
+  const publicSellerId = typeof window !== 'undefined' ? currentPathname.match(/^\/?seller\/([0-9a-f-]{20,})\/?$/i)?.[1] : null;
+  const publicHandle = typeof window !== 'undefined' ? (currentPathname.match(/^\/?@([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || currentPathname.match(/^\/?(?:business|store|miniweb)\/?(?:@)?([a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])?)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('business'))?.toLowerCase() : null;
   const publicListingId = typeof window !== 'undefined' ? (window.location.pathname.match(/^\/?listing\/([^/]+)\/?$/i)?.[1] || new URLSearchParams(window.location.search).get('listing') || new URLSearchParams(window.location.search).get('listing_id')) : null;
   if (publicListingId) return <PublicListingRoute listingId={publicListingId} />;
   if (publicSellerId) return <PublicBusinessPage profileId={publicSellerId} handle={publicSellerId} />;
