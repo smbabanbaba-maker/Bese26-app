@@ -2227,3 +2227,63 @@
   .public-visitor-chart { gap: 6px; height: 126px; margin-top: 16px; padding-inline: 4px; }
   .public-visitor-day { flex-basis: 23px; min-width: 23px; }
 }
+
+/* Public profile finish: full-bleed hero, clean content rhythm and visible profile views. */
+.miniweb-hero-v2 {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  border-color: rgba(255,255,255,.16) !important;
+}
+.miniweb-visitor-note {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #e4e9f1 !important;
+  font-size: 10px !important;
+}
+@media (max-width: 760px) {
+  body .public-business-main {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 4px 0 52px !important;
+  }
+  body .public-business-main > .storefront-shell-intro {
+    margin: 0 !important;
+    padding: 10px 18px 8px !important;
+    background: #fff !important;
+  }
+  body .public-business-main > .miniweb-hero-v2:first-of-type,
+  body .public-business-main > .miniweb-hero-v2:first-child {
+    width: 100vw !important;
+    max-width: none !important;
+    min-height: 390px !important;
+    margin: 0 !important;
+    padding: 24px 18px 18px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  body .public-business-main > .public-business-about,
+  body .public-business-main > .storefront-listings-clean {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+  body .public-business-main > .public-business-about { margin-top: 14px !important; }
+  body .public-business-main > .storefront-listings-clean { margin-top: 18px !important; }
+  body .public-business-main .storefront-listings-clean .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  body .public-business-main .storefront-listings-clean .public-listing-card .product-image-wrap {
+    aspect-ratio: 1 / 1 !important;
+  }
+  body .public-business-main .storefront-listings-clean .public-listing-card .product-info {
+    padding: 10px !important;
+  }
+}
+@media (max-width: 390px) {
+  body .public-business-main > .miniweb-hero-v2:first-of-type,
+  body .public-business-main > .miniweb-hero-v2:first-child {
+    min-height: 360px !important;
+    padding-inline: 14px !important;
+  }
+}
