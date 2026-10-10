@@ -2256,7 +2256,7 @@
   body .public-business-main > .miniweb-hero-v2:first-child {
     width: 100vw !important;
     max-width: none !important;
-    min-height: 390px !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 24px 18px 18px !important;
     border-radius: 0 !important;
@@ -2283,7 +2283,7 @@
 @media (max-width: 390px) {
   body .public-business-main > .miniweb-hero-v2:first-of-type,
   body .public-business-main > .miniweb-hero-v2:first-child {
-    min-height: 360px !important;
+    min-height: 0 !important;
     padding-inline: 14px !important;
   }
 }
