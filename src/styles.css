@@ -14795,3 +14795,75 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 @media (max-width: 760px) {
   body .messages-inbox-page .messages-inbox-controls { padding-top: 12px !important; }
 }
+
+/* Seller Center cleanup: full-bleed mobile hero with a clean red brand treatment. */
+.listing-management-center .listing-management-hero {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(255,86,91,.52), transparent 30%),
+    linear-gradient(125deg, #17171b 0%, #3a151b 58%, #8c171f 100%) !important;
+  box-shadow: 0 18px 38px rgba(91,16,24,.18) !important;
+}
+.listing-management-center .listing-summary-grid > div:nth-child(n+2) { border-top-color: #d8dce2 !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(2) { border-top-color: #2f936f !important; }
+.listing-management-center .listing-summary-grid > div:nth-child(n+6) { background: #fff !important; }
+@media (max-width: 760px) {
+  body .listing-management-center {
+    width: 100vw !important;
+    max-width: none !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding: 0 0 78px !important;
+    background: #f7f8fa !important;
+  }
+  body .listing-management-center .profile-subpage-header {
+    margin: 0 !important;
+    padding: 16px 18px 13px !important;
+    background: #fff !important;
+    border-bottom: 1px solid #eceef1 !important;
+  }
+  body .listing-management-center .profile-subpage-header h1 {
+    font-size: 27px !important;
+    letter-spacing: -.055em !important;
+  }
+  body .listing-management-center .listing-management-hero {
+    width: 100% !important;
+    min-height: 305px !important;
+    margin: 0 !important;
+    padding: 30px 22px 25px !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    box-shadow: none !important;
+  }
+  body .listing-management-center .listing-management-hero h2 {
+    max-width: 620px !important;
+    font-size: clamp(32px, 10vw, 48px) !important;
+    line-height: .98 !important;
+  }
+  body .listing-management-center .listing-management-hero p {
+    max-width: 520px !important;
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+  }
+  body .listing-management-center .listing-management-hero .primary-button {
+    min-height: 52px !important;
+    margin-top: 21px !important;
+    border-radius: 13px !important;
+    font-size: 14px !important;
+  }
+  body .listing-management-center .listing-summary-grid,
+  body .listing-management-center .listing-management-toolbar,
+  body .listing-management-center .listing-management-tabs,
+  body .listing-management-center .managed-listings,
+  body .listing-management-center > .auth-status,
+  body .listing-management-center > .empty-state,
+  body .listing-management-center > .listing-analytics-panel {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+  }
+  body .listing-management-center .listing-summary-grid { margin-top: 14px !important; }
+  body .listing-management-center .listing-summary-grid > div { border-top-width: 2px !important; box-shadow: 0 5px 16px rgba(28,36,48,.045) !important; }
+  body .listing-management-center .listing-management-toolbar { background: transparent !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  body .listing-management-center .listing-management-tabs { background: #fff !important; }
+}
