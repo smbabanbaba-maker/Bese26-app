@@ -85,7 +85,9 @@ export function mapListing(row) {
     seller: sellerName,
     sellerDisplayName: sellerName,
     sellerBusinessName: seller.cac_verified_name || seller.display_name || '',
-    sellerBusinessHandle: business.business_handle || '',
+    // Every account has a public Miniweb. Legacy listings may not have a
+    // business_profiles row, so use the seller's personal public username.
+    sellerBusinessHandle: business.business_handle || seller.username || '',
     publishedAsType: row.published_as_type || 'personal',
     sellerId: row.seller_id,
     sellerAvatar: getBusinessLogoDisplayUrl(business, getAvatarUrl(business.logo_path || seller.avatar_path)),
