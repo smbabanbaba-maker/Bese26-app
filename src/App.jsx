@@ -936,10 +936,6 @@ function MessagesView({ user, liveListing, onDemoAction, onAuthRequired, onOpenL
     });
     const totalUnread = conversations.reduce((total, item) => total + Number(item.unread_count || 0), 0);
     return <div className="messages-inbox-page messages-premium">
-      <header className="messages-inbox-header">
-        <div className="messages-inbox-title"><div className="eyebrow">BESE26 · PRIVATE MARKETPLACE CHAT</div><h1><span className="messages-inbox-brand">Bese<span>26</span></span><span className="messages-inbox-heading-label">Messages</span></h1><p>Every good deal starts with a clear conversation. Share photos, voice notes and safe plans.</p></div>
-        <span className="message-count" aria-label={`${conversations.length} conversations`}><small>CHATS</small><strong>{conversations.length}</strong></span>
-      </header>
       <div className="messages-inbox-workspace">
         <section className="messages-inbox-list-panel" aria-label="Your conversations">
           <div className="messages-inbox-controls">

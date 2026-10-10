@@ -14789,3 +14789,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   outline-color: rgba(138,90,59,.32) !important;
   box-shadow: 0 0 0 4px rgba(138,90,59,.12) !important;
 }
+
+/* Inbox-only cleanup: the decorative Messages hero is intentionally removed. */
+.messages-inbox-page .messages-inbox-workspace { margin-top: 0 !important; }
+@media (max-width: 760px) {
+  body .messages-inbox-page .messages-inbox-controls { padding-top: 12px !important; }
+}
