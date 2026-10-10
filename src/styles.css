@@ -14751,3 +14751,63 @@ body .messages-page.chat-reference-mode .chat-panel .chat-recording-status {
   .marketplace-language select { width: 38px; font-size: 8px; }
   .marketplace-language > svg:last-child { width: 10px; height: 10px; }
 }
+
+/* Final design audit polish: readable discovery UI, restrained accent and stronger navigation hierarchy. */
+:root {
+  --bese-navy: #173b63;
+  --bese-navy-deep: #0b1f36;
+  --bese-blue-soft: #eaf2f9;
+  --bese-line: #dce6ef;
+}
+.marketplace-search-hero::before {
+  background: radial-gradient(circle at 35% 30%, rgba(38,105,164,.72), rgba(17,52,88,.28) 45%, transparent 71%) !important;
+}
+.marketplace-quick-actions button:first-child { background: var(--bese-navy) !important; border-color: var(--bese-navy) !important; }
+.marketplace-quick-actions button svg { color: #8ec5f2; }
+.home-page .popular-category {
+  min-height: 76px !important;
+  border-color: var(--bese-line) !important;
+  box-shadow: 0 5px 14px rgba(23,59,99,.06) !important;
+}
+.home-page .popular-category strong { font-size: 11px !important; color: #20354c !important; }
+.home-page .popular-category > span { color: var(--bese-navy) !important; background: var(--bese-blue-soft) !important; }
+.home-page .popular-categories .section-heading h2,
+.home-page .trending-deals-heading h2 { color: #172b42 !important; }
+.home-page .popular-categories .section-heading h2 { font-size: 18px !important; }
+.home-page .trending-deals-heading h2 { font-size: 19px !important; }
+.home-page .trending-deal-card { border-color: var(--bese-line) !important; box-shadow: 0 5px 15px rgba(23,59,99,.055) !important; }
+.home-page .trending-deal-copy strong { font-size: 10px !important; color: #263c53 !important; }
+.home-page .trending-deal-copy b { font-size: 11px !important; color: var(--bese-navy) !important; }
+.home-page .trending-deal-copy small { font-size: 8px !important; }
+.home-featured-grid .product-card { border-color: var(--bese-line) !important; box-shadow: 0 8px 24px rgba(23,59,99,.07) !important; }
+.home-featured-grid .product-card:hover,
+.home-featured-grid .product-card:focus-visible { border-color: #8eb6d8 !important; box-shadow: 0 16px 32px rgba(23,59,99,.14) !important; }
+.home-featured-grid .product-price { color: var(--bese-navy) !important; }
+.home-featured-grid .product-info h3 { color: #20354c !important; }
+.bottom-nav {
+  border-top-color: var(--bese-line) !important;
+  box-shadow: 0 -8px 24px rgba(23,59,99,.08) !important;
+}
+.bottom-nav button.active,
+.bottom-nav button[aria-current="page"],
+.bottom-nav button:nth-child(n).active {
+  color: var(--bese-navy) !important;
+  background: transparent !important;
+}
+.bottom-nav button.active .nav-icon,
+.bottom-nav button[aria-current="page"] .nav-icon { color: var(--bese-navy) !important; }
+.bottom-nav .sell-nav .nav-icon,
+.bottom-nav .sell-nav.active .nav-icon { color: #fff !important; background: var(--bese-navy) !important; border-color: var(--bese-navy) !important; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline-color: rgba(23,59,99,.32) !important;
+  box-shadow: 0 0 0 4px rgba(23,59,99,.12) !important;
+}
+@media (max-width: 700px) {
+  .home-page .popular-category { min-height: 72px !important; }
+  .home-page .popular-category strong { font-size: 10px !important; }
+  .home-page .popular-categories .section-heading h2 { font-size: 17px !important; }
+  .home-page .trending-deals-heading h2 { font-size: 18px !important; }
+  .home-page .trending-deal-copy strong { font-size: 9px !important; }
+  .home-page .trending-deal-copy b { font-size: 10px !important; }
+  .home-page .trending-deal-copy small { font-size: 7px !important; }
+}
