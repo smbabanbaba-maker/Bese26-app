@@ -14949,3 +14949,104 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .clean-sell-page .sell-field select,
   .clean-sell-page .sell-field textarea { min-height: 48px; font-size: 14px; }
 }
+
+
+/* Premium listing form finish: calm canvas, strong hierarchy, and a clear description counter. */
+.clean-sell-page {
+  background: linear-gradient(180deg, #fffafa 0%, #f7f8fb 34%, #f4f6f9 100%) !important;
+  padding-bottom: 30px;
+}
+.clean-sell-page .sell-mobile-header {
+  border: 1px solid #f0dfe0 !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: 0 8px 24px rgba(76,28,32,.06) !important;
+  backdrop-filter: blur(12px);
+}
+.clean-sell-page .clean-sell-sections { gap: 16px !important; }
+.clean-sell-page .sell-work-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #eadfe0 !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,.96) !important;
+  box-shadow: 0 14px 38px rgba(50,24,29,.07) !important;
+}
+.clean-sell-page .sell-work-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, #b51f32, #ed5c5c, #f2b66d);
+}
+.clean-sell-page .sell-work-heading {
+  padding: 22px 22px 5px !important;
+}
+.clean-sell-page .sell-work-heading h2 {
+  color: #1c2028 !important;
+  font-size: clamp(20px, 3.4vw, 27px) !important;
+  letter-spacing: -.045em !important;
+}
+.clean-sell-page .sell-work-heading p {
+  color: #727986 !important;
+  font-size: 12px !important;
+}
+.clean-sell-page .sell-step-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border: 1px solid #f0d3d5 !important;
+  border-radius: 14px !important;
+  color: #a91e32 !important;
+  background: linear-gradient(145deg, #fff5f5, #ffe9e8) !important;
+  box-shadow: 0 6px 14px rgba(169,30,50,.1);
+}
+.clean-sell-page .sell-form-grid { gap: 15px !important; padding: 16px 22px 22px; }
+.clean-sell-page .sell-field { gap: 7px !important; }
+.clean-sell-page .sell-field > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #303640 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+.clean-sell-page .sell-field input,
+.clean-sell-page .sell-field select,
+.clean-sell-page .sell-field textarea {
+  min-height: 48px !important;
+  border: 1px solid #e2e6ec !important;
+  border-radius: 14px !important;
+  background: #fbfcfe !important;
+  color: #1d2430 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 7px rgba(31,41,55,.025);
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
+}
+.clean-sell-page .sell-field input:focus,
+.clean-sell-page .sell-field select:focus,
+.clean-sell-page .sell-field textarea:focus {
+  border-color: #c83b4b !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(200,59,75,.1), 0 8px 18px rgba(50,24,29,.06) !important;
+  outline: none;
+}
+.clean-sell-page .sell-field textarea { min-height: 142px !important; padding: 14px 15px !important; line-height: 1.55 !important; resize: vertical; }
+.clean-sell-page .description-counter { color: #a32437; font-size: 11px; font-weight: 800; letter-spacing: .02em; }
+.clean-sell-page .location-fields { margin-inline: 22px; padding: 16px !important; border: 1px solid #f0d9da !important; border-radius: 17px !important; background: linear-gradient(145deg,#fffafa,#fff) !important; }
+.clean-sell-page .sell-location-help { margin: -7px 22px 0 !important; color: #7c818b !important; font-size: 10px !important; }
+.clean-sell-page .choice-pill-grid,
+.clean-sell-page .contact-preferences { margin-inline: 22px; }
+.clean-sell-page .sell-subheading { margin-inline: 22px; color: #303640 !important; font-weight: 850 !important; }
+.clean-sell-page .listing-phone-field { margin: 16px 22px 0; }
+.clean-sell-page .sell-upload-grid { padding: 16px 22px 22px; gap: 13px !important; }
+.clean-sell-page .sell-upload-tile { min-height: 128px !important; border-radius: 17px !important; border-color: #ead1d3 !important; background: linear-gradient(145deg,#fffafa,#fff) !important; }
+.clean-sell-page .sell-upload-tile > span { background: #fff0f1 !important; color: #a91e32 !important; }
+@media (max-width: 640px) {
+  .clean-sell-page .sell-work-heading { padding: 19px 16px 4px !important; }
+  .clean-sell-page .sell-form-grid { padding: 13px 16px 18px; gap: 12px !important; }
+  .clean-sell-page .location-fields { margin-inline: 16px; padding: 12px !important; }
+  .clean-sell-page .sell-location-help { margin-inline: 16px !important; }
+  .clean-sell-page .choice-pill-grid, .clean-sell-page .contact-preferences { margin-inline: 16px; }
+  .clean-sell-page .sell-subheading { margin-inline: 16px; }
+  .clean-sell-page .listing-phone-field { margin-inline: 16px; }
+  .clean-sell-page .sell-upload-grid { padding-inline: 16px; }
+}
