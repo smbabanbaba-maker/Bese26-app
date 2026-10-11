@@ -92,6 +92,7 @@ import { getAvatarUrl, getOptimizedPublicImageUrl, isSupabaseConfigured, supabas
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from './lib/businessLogoFit';
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
+import { registerBese26PushSubscription } from './lib/pushNotifications';
 import { I18nProvider, useI18n } from './lib/i18n';
 import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchTrendingListingScores, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, ensureAccountDashboard, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, submitUserReport, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, getProfilePreferences, updateChatMeeting, updateChatOffer, updateListing, updateProfilePreferences, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
@@ -1532,6 +1533,9 @@ function AppContent() {
   useEffect(() => {
     let mounted = true;
     if (!sessionUser) { setUnreadNotifications(0); setBusinessOwnerProfile(null); return undefined; }
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      registerBese26PushSubscription(sessionUser.id).catch(() => {});
+    }
     fetchNotifications(sessionUser.id).then((rows) => mounted && setUnreadNotifications((rows || []).filter((item) => !item.read_at).length)).catch(() => {});
     if (isSupabaseConfigured) ensureAccountDashboard(sessionUser.id, { displayName: sessionUser.user_metadata?.display_name, email: sessionUser.email || '' }).then((result) => mounted && setBusinessOwnerProfile(result?.business || null)).catch(() => mounted && setBusinessOwnerProfile(null));
     const unsubscribe = subscribeToNotifications(sessionUser.id, (payload) => {
@@ -1549,7 +1553,12 @@ function AppContent() {
   }, [sessionUser, showToast]);
   const enableBrowserNotifications = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) { showToast('This browser does not support phone notifications.'); return; }
-    try { const permission = await Notification.requestPermission(); setBrowserNotificationPermission(permission); showToast(permission === 'granted' ? 'Phone alerts are now on.' : 'Phone alerts were not enabled.'); } catch { showToast('Could not enable phone alerts in this browser.'); }
+    try {
+      const permission = await Notification.requestPermission();
+      setBrowserNotificationPermission(permission);
+      if (permission === 'granted' && sessionUser?.id) await registerBese26PushSubscription(sessionUser.id);
+      showToast(permission === 'granted' ? 'Phone alerts are now on.' : 'Phone alerts were not enabled.');
+    } catch { showToast('Could not enable phone alerts in this browser.'); }
   };
   useEffect(() => {
     if (!sessionUser?.id || typeof window === 'undefined' || !('Notification' in window)) return undefined;
@@ -1561,6 +1570,7 @@ function AppContent() {
     let cancelled = false;
     Notification.requestPermission().then((permission) => {
       if (!cancelled) setBrowserNotificationPermission(permission);
+      if (!cancelled && permission === 'granted' && sessionUser.id) registerBese26PushSubscription(sessionUser.id).catch(() => {});
     }).catch(() => {});
     return () => { cancelled = true; };
   }, [sessionUser?.id]);

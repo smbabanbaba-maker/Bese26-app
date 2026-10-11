@@ -56,13 +56,10 @@
         }
       }
     </script>
-    <!-- Clear the old PWA shell that could reference deleted Vite bundles. -->
+    <!-- Clear old shell caches, but keep the current push-enabled worker registered. -->
     <script>
       (function () {
         if (!('serviceWorker' in navigator)) return;
-        navigator.serviceWorker.getRegistrations().then(function (registrations) {
-          registrations.forEach(function (registration) { registration.unregister(); });
-        }).catch(function () {});
         if ('caches' in window) {
           caches.keys().then(function (keys) {
             keys.filter(function (key) { return key.indexOf('bese26-') === 0; }).forEach(function (key) { caches.delete(key); });

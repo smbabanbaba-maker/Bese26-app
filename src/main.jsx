@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import BusinessLogoPreview from './components/BusinessLogoPreview';
 import { supabase } from './lib/supabase';
+import { registerBese26ServiceWorker } from './components/InstallPrompt';
 import './styles.css';
 import './ui-enhancements.css';
 import './public-storefront.css';
@@ -45,6 +46,7 @@ function mountConfirmationPage() {
 }
 
 const isVercelHost = typeof window !== 'undefined' && /(^|\.)vercel\.app$/i.test(window.location.hostname);
+registerBese26ServiceWorker();
 if (isVercelHost) {
   const destination = SITE_URL + window.location.pathname + window.location.search + window.location.hash;
   window.location.replace(destination);
