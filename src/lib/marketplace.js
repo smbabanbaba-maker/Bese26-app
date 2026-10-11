@@ -121,10 +121,11 @@ export async function signUp({ email, password, displayName, username, phone }) 
     if (phoneCheckError) throw phoneCheckError;
     if (phoneUsed) throw new Error('PHONE_ALREADY_REGISTERED');
   }
+  const signupUsername = publicHandleSlug(username || displayName || email.split('@')[0] || 'member');
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName, username, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: `${getAuthRedirectUrl()}/auth/confirm` },
+    options: { data: { display_name: displayName, username: signupUsername, phone, country: 'Nigeria', currency: 'NGN' }, emailRedirectTo: `${getAuthRedirectUrl()}/auth/confirm` },
   });
   if (error) throw error;
   if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -436,7 +437,8 @@ export async function updateProfile(userId, values) {
 }
 
 function publicHandleSlug(value, fallback = 'member') {
-  const slug = String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30).replace(/-+$/, '');
+  const normalized = String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  const slug = normalized.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30).replace(/-+$/, '');
   if (slug.length >= 3) return slug;
   const safeFallback = String(fallback || 'member').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 24);
   return `${safeFallback || 'member'}-user`;
