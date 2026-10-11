@@ -450,8 +450,9 @@ export async function ensureAccountDashboard(userId, { displayName = '', email =
   let handle = String(profile?.username || '').replace(/^@/, '').trim().toLowerCase();
   if (!handle) {
     handle = publicHandleSlug(name, userId.replace(/-/g, '').slice(0, 8));
-    const availability = await checkBusinessHandleAvailability(handle, userId);
-    if (!availability.available) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
+    const { data: handleOwner, error: handleError } = await supabase.from('profiles').select('id').eq('username', handle).neq('id', userId).limit(1).maybeSingle();
+    if (handleError) throw handleError;
+    if (handleOwner) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
     if (profile) {
       profile = await updateProfile(userId, { username: handle });
     } else {
