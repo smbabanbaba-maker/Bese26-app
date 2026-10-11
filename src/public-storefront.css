@@ -2219,6 +2219,11 @@
 .public-visitor-day small { margin-top: 7px; color: #8b949e; font-size: 8px; font-weight: 750; text-transform: uppercase; }
 .public-visitor-day em { margin-top: 2px; color: #4f5965; font-size: 9px; font-style: normal; font-weight: 800; }
 .public-visitor-history-loading { min-height: 105px; display: grid; place-items: center; color: #87909b; font-size: 10px; }
+/* Public profile thumbnails use the whole listing frame, including portrait uploads. */
+.public-business-shell .storefront-listings-clean .public-listing-card .product-image-wrap > img.product-image-slide {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
 @media (max-width: 640px) {
   .public-visitor-history { margin-top: 12px; padding: 14px 13px 12px; border-radius: 16px; }
   .public-visitor-history-heading h2 { font-size: 16px; }
