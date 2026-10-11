@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
+import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, syncRegisteredPhone, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
 import { getProfilePreferences } from '../lib/marketplace';
 import { currencyLabel } from '../lib/currency';
 import nigeriaLocations from '../data/nigeriaLocations.json';
@@ -274,7 +274,9 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     let mounted = true;
     if (!user || !isSupabaseConfigured) { setProfileContact(null); return undefined; }
     setContactLoading(true);
-    getProfileContacts(user.id).then((contacts) => mounted && setProfileContact(contacts)).catch(() => mounted && setProfileContact(null)).finally(() => mounted && setContactLoading(false));
+    syncRegisteredPhone(user).catch(() => {}).finally(() => {
+      getProfileContacts(user.id).then((contacts) => mounted && setProfileContact(contacts)).catch(() => mounted && setProfileContact(null)).finally(() => mounted && setContactLoading(false));
+    });
     return () => { mounted = false; };
   }, [user]);
 
