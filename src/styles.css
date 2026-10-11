@@ -15229,3 +15229,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     border-radius: 10px;
   }
 }
+
+/* Listing cards must preserve the complete uploaded photo; fullscreen can fill the viewer. */
+.product-image-wrap .product-image,
+.product-image-wrap .product-image-slide,
+.home-featured-grid .product-image,
+.storefront-listings-clean .public-listing-card .product-image {
+  object-fit: contain !important;
+  object-position: center center;
+  background: #f3f5f8;
+}
