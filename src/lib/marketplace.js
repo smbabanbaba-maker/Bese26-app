@@ -477,17 +477,6 @@ export async function getProfileContacts(userId) {
   return data;
 }
 
-export async function syncRegisteredPhone(user) {
-  failIfUnavailable();
-  const userId = user?.id;
-  const registeredPhone = String(user?.user_metadata?.phone || '').trim();
-  if (!userId || !registeredPhone) return null;
-  const existing = await getProfileContacts(userId);
-  // An existing row is authoritative: an empty phone means the user removed it.
-  if (existing) return existing;
-  return updateProfileContacts(userId, { phone: registeredPhone, whatsapp: registeredPhone });
-}
-
 export async function updateProfileContacts(userId, values) {
   failIfUnavailable();
   const payload = { profile_id: userId, ...values };
