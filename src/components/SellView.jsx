@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, updateProfileContacts, uploadListingMedia } from '../lib/marketplace';
+import { createListing, deleteListingMedia, fetchCategories, fetchSellerEntitlement, getProfile, getProfileContacts, reviseRejectedListing, saveListingDraft, updateListing, updateListingMediaOrder, uploadListingMedia } from '../lib/marketplace';
 import { getProfilePreferences } from '../lib/marketplace';
 import { currencyLabel } from '../lib/currency';
 import nigeriaLocations from '../data/nigeriaLocations.json';
@@ -129,7 +129,7 @@ const dynamicFields = {
 const initialForm = {
   category: 'Electronics', subcategory: 'Phones', title: '', description: '', condition: 'Used — Excellent',
   priceMode: 'Fixed price', currency: 'NGN', price: '', negotiable: true, quantity: '1', unit: 'item', minimumOrder: '1',
-  country: 'Nigeria', state: '', city: '', area: '', listingPhone: '', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
+  country: 'Nigeria', state: '', city: '', area: '', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
   contactChat: true, contactPhone: false, contactWhatsApp: false, sellerName: '', sellerHandle: '', sellerLocation: 'Nigeria',
 };
 
@@ -352,7 +352,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     const nextErrors = [];
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
     if (!form.contactChat && !form.contactPhone && !form.contactWhatsApp) nextErrors.push('Select at least one way for buyers to contact you.');
-    if ((form.contactPhone || form.contactWhatsApp) && !String(form.listingPhone || profileContact?.phone || '').trim()) nextErrors.push('Add a phone number for this listing or choose Bese26 Chat.');
+    if ((form.contactPhone || form.contactWhatsApp) && !String(profileContact?.phone || '').trim()) nextErrors.push('Add a phone number in Profile before enabling Phone or WhatsApp contact.');
     if (!form.title.trim()) nextErrors.push('Add a short, searchable title.');
     if (!form.category) nextErrors.push('Choose a category.');
     if (form.description.trim().length < 5) nextErrors.push('Description must be at least 5 characters.');
@@ -376,7 +376,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     }
     if (step === 3 && !listingLocationReady) nextErrors.push('Choose a state and Local Government Area for the listing.');
     if (step === 3 && !form.contactChat && !form.contactPhone && !form.contactWhatsApp) nextErrors.push('Select at least one way for buyers to contact you.');
-    if (step === 3 && (form.contactPhone || form.contactWhatsApp) && !String(form.listingPhone || profileContact?.phone || '').trim()) nextErrors.push('Add a phone number for this listing or choose Bese26 Chat.');
+    if (step === 3 && (form.contactPhone || form.contactWhatsApp) && !String(profileContact?.phone || '').trim()) nextErrors.push('Add a phone number in Profile before enabling Phone or WhatsApp contact.');
     setErrors(nextErrors);
     return nextErrors;
   };
@@ -396,16 +396,12 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
         return;
       }
     }
-    if (isSupabaseConfigured && !profileContact?.phone) { setErrors(['A profile phone number is required before publishing.']); onDemoAction?.('Add your phone number in Profile, then return here to publish.'); return; }
+    if (isSupabaseConfigured && (form.contactPhone || form.contactWhatsApp) && !profileContact?.phone) { setErrors(['A profile phone number is required for Phone or WhatsApp contact.']); onDemoAction?.('Add your phone number in Profile, then return here to publish.'); return; }
     if (validate().length) { document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (isSupabaseConfigured && !editMode && !media.some((item) => item.file)) { setErrors(['Choose at least one photo from your device before publishing.']); document.querySelector('.sell-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     if (!isSupabaseConfigured) { setErrors(['Marketplace connection is not configured. Publishing is unavailable until Supabase is connected.']); return; }
     setPublishState('publishing');
     try {
-      const typedPhone = String(form.listingPhone || '').trim();
-      if (typedPhone && user) {
-        await updateProfileContacts(user.id, { phone: typedPhone, whatsapp: form.contactWhatsApp ? typedPhone : (profileContact?.whatsapp || '') });
-      }
       const categoryRows = await fetchCategories();
       const categoryRow = findCategoryRow(categoryRows, form.category);
       const subcategoryRow = findCategoryRow(categoryRows, form.subcategory, categoryRow?.id);
@@ -446,8 +442,8 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const renderLocation = () => {
     const serviceListing = form.category === 'Jobs & Services';
     const deliveryOptions = serviceListing ? ['At buyer location', 'At seller location', 'Online service'] : ['Buyer pickup', 'Seller delivery', 'Shipping'];
-    const listingContactPhone = String(form.listingPhone || profileContact?.phone || '').trim();
-    return <section id="sell-location" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon mint"><MapPin size={19} /></span><div><div className="eyebrow">LOCATION & DELIVERY</div><h2>Where is it?</h2><p>Choose your state and Local Government Area so buyers can find you easily.</p></div></div><div className="sell-form-grid location-fields"><label className="sell-field"><span>Country</span><input value="Nigeria" readOnly /></label><label className="sell-field"><span>State*</span><select value={form.state || ''} onChange={(event) => { const state = event.target.value; update('state', state); update('city', nigeriaLocations[state]?.[0] || ''); }}><option value="">Choose your state</option>{stateOptions.map((state) => <option key={state}>{state}</option>)}</select></label><label className="sell-field"><span>Local Government Area*</span><select value={form.city || ''} disabled={!form.state} onChange={(event) => update('city', event.target.value)}><option value="">{form.state ? 'Choose your LGA' : 'Choose state first'}</option>{lgaOptions.map((lga) => <option key={lga}>{lga}</option>)}</select></label></div><small className="sell-location-help">Choose your state and the LGA will be filled from the Nigerian location list automatically.</small><div className="sell-subheading"><MapPin size={15} /> {serviceListing ? 'How will you provide it?' : 'Delivery'}</div><div className="choice-pill-grid">{deliveryOptions.map((item) => <button type="button" key={item} className={form.delivery === item ? 'selected' : ''} onClick={() => update('delivery', item)}>{item}</button>)}</div><label className="sell-field listing-phone-field"><span>Phone number for this listing</span><input type="tel" inputMode="tel" value={form.listingPhone || ''} onChange={(event) => update('listingPhone', event.target.value)} placeholder="e.g. 08012345678" /><small>Enter it here once if you want buyers to call or use WhatsApp.</small></label><div className="sell-subheading"><MessageCircle size={15} /> Contact</div><div className="contact-preferences"><label><input type="checkbox" checked={form.contactChat} onChange={(event) => update('contactChat', event.target.checked)} /> <MessageCircle size={14} /> Bese26 Chat</label><label className={!listingContactPhone || profileContact?.allow_calls === false ? 'contact-disabled' : ''}><input type="checkbox" checked={form.contactPhone} disabled={!listingContactPhone || profileContact?.allow_calls === false} onChange={(event) => update('contactPhone', event.target.checked)} /> <Phone size={14} /> Phone {!listingContactPhone ? '(enter above)' : profileContact?.allow_calls === false ? '(enable in Profile)' : ''}</label><label className={!listingContactPhone || profileContact?.allow_whatsapp === false ? 'contact-disabled' : ''}><input type="checkbox" checked={form.contactWhatsApp} disabled={!listingContactPhone || profileContact?.allow_whatsapp === false} onChange={(event) => update('contactWhatsApp', event.target.checked)} /> WhatsApp {!listingContactPhone ? '(enter above)' : profileContact?.allow_whatsapp === false ? '(enable in Profile)' : ''}</label></div></section>;
+    const listingContactPhone = String(profileContact?.phone || '').trim();
+    return <section id="sell-location" className="sell-work-card"><div className="sell-work-heading"><span className="sell-step-icon mint"><MapPin size={19} /></span><div><div className="eyebrow">LOCATION & DELIVERY</div><h2>Where is it?</h2><p>Choose your state and Local Government Area so buyers can find you easily.</p></div></div><div className="sell-form-grid location-fields"><label className="sell-field"><span>Country</span><input value="Nigeria" readOnly /></label><label className="sell-field"><span>State*</span><select value={form.state || ''} onChange={(event) => { const state = event.target.value; update('state', state); update('city', nigeriaLocations[state]?.[0] || ''); }}><option value="">Choose your state</option>{stateOptions.map((state) => <option key={state}>{state}</option>)}</select></label><label className="sell-field"><span>Local Government Area*</span><select value={form.city || ''} disabled={!form.state} onChange={(event) => update('city', event.target.value)}><option value="">{form.state ? 'Choose your LGA' : 'Choose state first'}</option>{lgaOptions.map((lga) => <option key={lga}>{lga}</option>)}</select></label></div><small className="sell-location-help">Choose your state and the LGA will be filled from the Nigerian location list automatically.</small><div className="sell-subheading"><MapPin size={15} /> {serviceListing ? 'How will you provide it?' : 'Delivery'}</div><div className="choice-pill-grid">{deliveryOptions.map((item) => <button type="button" key={item} className={form.delivery === item ? 'selected' : ''} onClick={() => update('delivery', item)}>{item}</button>)}</div><div className="sell-contact-source-note"><Phone size={15} /><span><strong>Your registered phone is linked automatically.</strong><small>Buyers will use the phone number saved in Profile. Change it from Profile → Personal details.</small></span></div><div className="sell-subheading"><MessageCircle size={15} /> Contact</div><div className="contact-preferences"><label><input type="checkbox" checked={form.contactChat} onChange={(event) => update('contactChat', event.target.checked)} /> <MessageCircle size={14} /> Bese26 Chat</label><label className={!listingContactPhone || profileContact?.allow_calls === false ? 'contact-disabled' : ''}><input type="checkbox" checked={form.contactPhone} disabled={!listingContactPhone || profileContact?.allow_calls === false} onChange={(event) => update('contactPhone', event.target.checked)} /> <Phone size={14} /> Phone {!listingContactPhone ? '(add in Profile)' : profileContact?.allow_calls === false ? '(enable in Profile)' : ''}</label><label className={!listingContactPhone || profileContact?.allow_whatsapp === false ? 'contact-disabled' : ''}><input type="checkbox" checked={form.contactWhatsApp} disabled={!listingContactPhone || profileContact?.allow_whatsapp === false} onChange={(event) => update('contactWhatsApp', event.target.checked)} /> WhatsApp {!listingContactPhone ? '(add in Profile)' : profileContact?.allow_whatsapp === false ? '(enable in Profile)' : ''}</label></div></section>;
   };
   const listingStrength = useMemo(() => {
     const checks = [
