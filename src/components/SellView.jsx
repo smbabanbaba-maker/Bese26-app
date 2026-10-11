@@ -169,7 +169,7 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const categoryOptions = fallbackCategoryOptions;
   const stateOptions = Object.keys(nigeriaLocations).sort();
   const lgaOptions = nigeriaLocations[form.state] || [];
-  const listingLocationReady = Boolean(form.country && form.state && form.city);
+  const listingLocationReady = Boolean(form.state && form.city);
   const subcategories = categoryGroups[form.category] || categoryGroups.Other;
   const fields = (form.category === 'Electronics' && form.subcategory === 'Phones')
     ? [['brand', 'Phone brand', 'e.g. Apple or Samsung'], ['model', 'Phone model', 'e.g. iPhone 15 Pro'], ['storage', 'Storage', 'e.g. 256GB'], ['ram', 'RAM', 'e.g. 8GB'], ['network', 'Network', 'Select network', ['Unlocked', 'MTN', 'Airtel', 'Glo', '9mobile']]]
@@ -350,7 +350,6 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   };
   const validate = () => {
     const nextErrors = [];
-    if (isSupabaseConfigured && !editMode && !profileContact?.phone) nextErrors.push('Add and verify a phone number in your Profile before publishing.');
     if (media.length < 1) nextErrors.push('Add at least one clear photo before publishing.');
     if (!form.contactChat && !form.contactPhone && !form.contactWhatsApp) nextErrors.push('Select at least one way for buyers to contact you.');
     if ((form.contactPhone || form.contactWhatsApp) && !String(form.listingPhone || profileContact?.phone || '').trim()) nextErrors.push('Add a phone number for this listing or choose Bese26 Chat.');
@@ -452,16 +451,17 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     const checks = [
       ['title', Boolean(form.title.trim())],
       ['description', form.description.trim().length >= 5],
-      ['photos', media.length > 0],
+      ['photos', media.some((item) => item.type === 'image')],
       ['price', Number(form.price) > 0],
-      ['location', listingLocationReady],
+      ['location', Boolean(form.state && form.city)],
       ['contact', Boolean(form.contactChat || form.contactPhone || form.contactWhatsApp)],
     ];
-    const score = Math.round((checks.filter(([, done]) => done).length / checks.length) * 100);
+    const complete = checks.every(([, done]) => done);
+    const score = complete ? 100 : Math.round((checks.filter(([, done]) => done).length / checks.length) * 100);
     const tips = { title: 'Add a clear title.', description: 'Write at least 5 characters describing the item.', photos: 'Add at least one clear photo.', price: 'Enter a valid price.', location: 'Choose your State and Local Government Area.', contact: 'Choose at least one contact method.' };
     const missing = checks.find(([key, done]) => !done)?.[0];
     return { score, tip: missing ? tips[missing] : 'Great job — your listing is ready to publish.' };
-  }, [form, media.length, listingLocationReady]);
+  }, [form, media, listingLocationReady]);
   const paidExpired = entitlement?.plan_key !== 'free' && entitlement && !entitlement.is_paid;
   const listingSlotsRemaining = entitlement?.is_paid ? Math.max(Number(entitlement.listing_limit || 0) - Number(entitlement.free_posts_used || 0), 0) : Number(entitlement?.free_posts_remaining ?? 0);
   const listingLimitReached = Boolean(!editMode && entitlement && !isAdmin && (paidExpired || listingSlotsRemaining <= 0));
