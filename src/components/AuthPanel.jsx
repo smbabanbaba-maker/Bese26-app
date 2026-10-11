@@ -86,7 +86,16 @@ export default function AuthPanel({ onClose, onAuthenticated, reason = '', initi
     setLoading(true); setLoadingLabel(mode === 'signin' ? 'Signing you in…' : 'Creating your account…');
     try {
       const data = mode === 'signin' ? await signIn({ identifier: form.email.trim(), password: form.password }) : await signUp({ email: form.email.trim().toLowerCase(), password: form.password, displayName: form.displayName, username: form.username, phone: normalizeNigerianPhone(form.phone) });
-      if (mode === 'signup') { setRegistrationSent(true); setStatus({ type: 'success', message: 'Registration complete. We sent a confirmation link to your inbox.' }); } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
+      if (mode === 'signup') {
+        if (data?.session && data?.user) {
+          setLoginAttempts(0);
+          onAuthenticated?.(data.user);
+          onClose?.();
+        } else {
+          setRegistrationSent(true);
+          setStatus({ type: 'success', message: 'Registration complete. Please confirm your email before signing in.' });
+        }
+      } else { setLoginAttempts(0); onAuthenticated?.(data.user); onClose?.(); }
     } catch (error) { if (mode === 'signin') { const nextAttempts = loginAttempts + 1; setLoginAttempts(nextAttempts); if (nextAttempts >= 5) setLockedUntil(Date.now() + 30000); } setStatus({ type: 'error', message: friendlyAuthError(error) }); } finally { setLoading(false); }
   };
   const resetPassword = async (event) => { event?.preventDefault(); setStatus({ type: '', message: '' }); if (!form.email.trim()) { setStatus({ type: 'error', message: 'Enter your email first.' }); return; } setResetting(true); try { await requestPasswordReset(form.email); setStatus({ type: 'success', message: 'Password reset link sent. Open your email to continue.' }); } catch (error) { setStatus({ type: 'error', message: error.message || 'Could not send the reset link.' }); } finally { setResetting(false); } };
