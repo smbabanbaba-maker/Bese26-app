@@ -452,7 +452,13 @@ export async function ensureAccountDashboard(userId, { displayName = '', email =
     handle = publicHandleSlug(name, userId.replace(/-/g, '').slice(0, 8));
     const availability = await checkBusinessHandleAvailability(handle, userId);
     if (!availability.available) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
-    profile = await updateProfile(userId, { username: handle });
+    if (profile) {
+      profile = await updateProfile(userId, { username: handle });
+    } else {
+      const { data, error } = await supabase.from('profiles').insert({ id: userId, username: handle, display_name: name, country: NIGERIA_COUNTRY }).select().single();
+      if (error) throw error;
+      profile = data;
+    }
   }
 
   // Profile is the user's shop identity. Never recreate legacy business_profiles
