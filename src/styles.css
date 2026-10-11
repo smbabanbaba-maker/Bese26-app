@@ -14909,3 +14909,43 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     box-shadow: 0 5px 16px rgba(28,36,48,.045) !important;
   }
 }
+
+
+/* Listing form clarity refresh: simple, guided, and mobile-first. */
+.clean-sell-page .sell-work-card {
+  border: 1px solid #eadede;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(86, 28, 28, .055);
+}
+.clean-sell-page .sell-work-heading { align-items: flex-start; gap: 11px; }
+.clean-sell-page .sell-work-heading h2 { margin-top: 2px; color: #171a20; font-size: clamp(18px, 3vw, 23px); letter-spacing: -.035em; }
+.clean-sell-page .sell-work-heading p { max-width: 560px; margin-top: 5px; color: #737b86; font-size: 11px; line-height: 1.5; }
+.clean-sell-page .sell-field > span { color: #252932; font-size: 11px; letter-spacing: -.01em; }
+.clean-sell-page .sell-field input,
+.clean-sell-page .sell-field select,
+.clean-sell-page .sell-field textarea { min-height: 46px; border: 1px solid #e2e5e9; border-radius: 12px; background: #fafbfc; font-size: 13px; }
+.clean-sell-page .sell-field select { cursor: pointer; }
+.clean-sell-page .sell-field input:focus,
+.clean-sell-page .sell-field select:focus,
+.clean-sell-page .sell-field textarea:focus { border-color: #cf4b4b; background: #fff; box-shadow: 0 0 0 3px rgba(207, 75, 75, .1); }
+.clean-sell-page .location-fields { padding: 13px; border: 1px solid #f0dddd; border-radius: 14px; background: #fffafa; }
+.clean-sell-page .location-fields .sell-field select:not(:disabled) { border-color: #dca4a4; background: #fff; }
+.clean-sell-page .location-fields .sell-field select:disabled { color: #9aa1aa; background: #f2f3f5; cursor: not-allowed; }
+.clean-sell-page .sell-location-help { display: block; margin-top: -5px; color: #7f6870; font-size: 10px; line-height: 1.45; }
+.clean-sell-page .sell-profile-setup-warning { border-color: #f1d3b2; background: #fff9f0; }
+.clean-sell-page .sell-upload-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.clean-sell-page .sell-upload-tile { min-height: 116px; border-color: #e5baba; border-radius: 14px; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+.clean-sell-page .sell-upload-tile:hover,
+.clean-sell-page .sell-upload-tile:focus-visible { border-color: #c94343; box-shadow: 0 8px 18px rgba(139, 32, 32, .1); transform: translateY(-1px); }
+.clean-sell-page .sell-upload-tile strong { font-size: 11px; }
+.clean-sell-page .sell-upload-tile small { font-size: 9px; }
+@media (max-width: 640px) {
+  .clean-sell-page .sell-work-card { border-radius: 14px; }
+  .clean-sell-page .sell-work-heading h2 { font-size: 18px; }
+  .clean-sell-page .sell-work-heading p { font-size: 10px; }
+  .clean-sell-page .location-fields { gap: 10px; padding: 11px; }
+  .clean-sell-page .sell-field input,
+  .clean-sell-page .sell-field select,
+  .clean-sell-page .sell-field textarea { min-height: 48px; font-size: 14px; }
+}
