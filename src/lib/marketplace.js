@@ -447,9 +447,10 @@ export async function ensureAccountDashboard(userId, { displayName = '', email =
   if (!userId) return null;
   let profile = await getProfile(userId);
   const name = String(profile?.display_name || displayName || email.split('@')[0] || 'Bese26 user').trim() || 'Bese26 user';
-  let handle = String(profile?.username || '').replace(/^@/, '').trim().toLowerCase();
-  if (!handle) {
-    handle = publicHandleSlug(name, userId.replace(/-/g, '').slice(0, 8));
+  const rawHandle = String(profile?.username || '').replace(/^@/, '').trim();
+  let handle = rawHandle ? publicHandleSlug(rawHandle, userId.replace(/-/g, '').slice(0, 8)) : '';
+  if (!handle || rawHandle.toLowerCase() !== handle) {
+    handle = handle || publicHandleSlug(name, userId.replace(/-/g, '').slice(0, 8));
     const { data: handleOwner, error: handleError } = await supabase.from('profiles').select('id').eq('username', handle).neq('id', userId).limit(1).maybeSingle();
     if (handleError) throw handleError;
     if (handleOwner) handle = publicHandleSlug(`${handle}-${userId.replace(/-/g, '').slice(0, 6)}`, 'member');
