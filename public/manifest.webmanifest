@@ -1,6 +1,7 @@
 {
   "name": "Bese26 Marketplace",
   "short_name": "Bese26",
+  "id": "/",
   "description": "Buy and sell trusted products and services across Nigeria.",
   "lang": "en-NG",
   "start_url": "/",

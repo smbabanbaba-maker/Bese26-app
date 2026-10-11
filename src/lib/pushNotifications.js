@@ -2,7 +2,12 @@ import { supabase } from './supabase';
 
 // Public half of the VAPID key used by the send-web-push Edge Function.
 export const BESE26_VAPID_PUBLIC_KEY = 'BNR9Namj8uOcGYdtAGFXmJBfJRl_uBPfNifc4Bn9sIxK0tA2j4aTqzHzPcBJTHsKuob1-l6yIdJlD5WQm2FZojY';
-
+export function isIosDevice() {
+  return typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+export function isStandalonePwa() {
+  return typeof window !== 'undefined' && (window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true);
+}
 function base64ToUint8Array(value) {
   const padding = '='.repeat((4 - (value.length % 4)) % 4);
   const normalized = (value + padding).replace(/-/g, '+').replace(/_/g, '/');

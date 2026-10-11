@@ -92,7 +92,7 @@ import { getAvatarUrl, getOptimizedPublicImageUrl, isSupabaseConfigured, supabas
 import { getBusinessLogoDisplayUrl, handleBusinessLogoLoad, isOfficialBese26Business } from './lib/businessLogoFit';
 import { getPublicIdentity } from './lib/identity';
 import { resolveNotificationDestination } from './lib/notificationDestinations';
-import { registerBese26PushSubscription } from './lib/pushNotifications';
+import { isIosDevice, isStandalonePwa, registerBese26PushSubscription } from './lib/pushNotifications';
 import { I18nProvider, useI18n } from './lib/i18n';
 import { createChatMeeting, createChatOffer, deleteChatMedia, deleteListing, fetchActiveListings, fetchTrendingListingScores, fetchActiveAdCampaigns, fetchNotifications, markNotificationRead, fetchBusinessDirectory, fetchCategories, fetchConversationDeals, fetchPublicBusiness, fetchPublicProfile, fetchPublicSellerViews, fetchPublicProfileViewSummary, recordPublicProfileView, fetchSavedIds, fetchConversations, fetchMessages, fetchListingDetails, fetchListingReviews, fetchListingComments, submitListingReview, submitListingComment, fetchSellerReviews, fetchListingContact, fetchSellerEntitlement, fetchMyListings, fetchMyBoosts, fetchSimilarListings, fetchSellerListings, fetchProfileRelations, fetchFollowSummary, ensureAccountDashboard, getBusinessProfile, getFollowState, getOrCreateConversation, isAdminUser, fetchAdminAccess, blockUser, markConversationMessagesRead, recordListingView, recordRecentlyViewed, reportListing, submitUserReport, sendMessage, setListingStatus, signOut, startPaystackCheckout, subscribeToMessages, subscribeToNotifications, toggleFavorite, toggleFollow, getProfile, getProfileContacts, getProfilePreferences, updateChatMeeting, updateChatOffer, updateListing, updateProfilePreferences, uploadChatMedia, verifyPaystackPayment } from './lib/marketplace';
 import { fetchPlatformSettings } from './lib/marketplace';
@@ -1553,6 +1553,10 @@ function AppContent() {
   }, [sessionUser, showToast]);
   const enableBrowserNotifications = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) { showToast('This browser does not support phone notifications.'); return; }
+    if (isIosDevice() && !isStandalonePwa()) {
+      showToast('On iPhone, tap Share → Add to Home Screen first, then open Bese26 from the new icon and turn on alerts.');
+      return;
+    }
     try {
       const permission = await Notification.requestPermission();
       setBrowserNotificationPermission(permission);
@@ -1566,6 +1570,9 @@ function AppContent() {
       setBrowserNotificationPermission(Notification.permission);
       return undefined;
     }
+    // iOS only accepts this request from the visible alert button after the
+    // site has been added to the Home Screen.
+    if (isIosDevice()) return undefined;
     // Ask once when an authenticated user opens the app; browsers may defer this until a user gesture.
     let cancelled = false;
     Notification.requestPermission().then((permission) => {
