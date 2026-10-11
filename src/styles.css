@@ -15193,3 +15193,39 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
     max-height: 58vh;
   }
 }
+
+/* Final marketplace image framing: every uploaded photo fills its visual slot. */
+.product-image-wrap .product-image,
+.product-image-wrap .product-image-slide,
+.home-featured-grid .product-image,
+.storefront-listings-clean .public-listing-card .product-image {
+  object-fit: cover !important;
+  object-position: center center;
+}
+.listing-gallery-lightbox {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+  padding: 24px;
+}
+.listing-gallery-lightbox > img {
+  display: block;
+  width: min(92vw, 1100px) !important;
+  height: min(88vh, 900px) !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center center;
+  border-radius: 14px;
+  background: #111318;
+}
+@media (max-width: 700px) {
+  .listing-gallery-lightbox {
+    padding: 10px;
+  }
+  .listing-gallery-lightbox > img {
+    width: 100% !important;
+    height: min(82vh, 760px) !important;
+    border-radius: 10px;
+  }
+}
