@@ -129,7 +129,7 @@ const dynamicFields = {
 const initialForm = {
   category: 'Electronics', subcategory: 'Phones', title: '', description: '', condition: 'Used — Excellent',
   priceMode: 'Fixed price', currency: 'NGN', price: '', negotiable: true, quantity: '1', unit: 'item', minimumOrder: '1',
-  country: 'Nigeria', state: 'Kano', city: 'Kano Municipal', area: '', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
+  country: 'Nigeria', state: '', city: '', area: '', approximate: true, delivery: 'Buyer pickup', deliveryFee: 'Free',
   contactChat: true, contactPhone: false, contactWhatsApp: false, sellerName: '', sellerHandle: '', sellerLocation: 'Nigeria',
 };
 
@@ -154,7 +154,6 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
   const [entitlementRefreshKey, setEntitlementRefreshKey] = useState(0);
   const [profileContact, setProfileContact] = useState(null);
   const [contactLoading, setContactLoading] = useState(false);
-  const [profileLocationStatus, setProfileLocationStatus] = useState('loading');
   const [sellStep, setSellStep] = useState(1);
   const [editMode, setEditMode] = useState(Boolean(initialListing));
   const [categoryRows, setCategoryRows] = useState(null);
@@ -284,10 +283,8 @@ export default function SellView({ user, isAdmin = false, onAuthRequired, onDemo
     if (!user) return undefined;
     Promise.all([getProfile(user.id), getProfilePreferences(user.id)]).then(([profile, preferences]) => {
       if (!mounted || !profile) return;
-      const ready = Boolean(profile.country && profile.state && profile.city && preferences?.currency);
-      setProfileLocationStatus(ready ? 'ready' : 'missing');
-      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, country: profile.country || current.country, state: profile.state || current.state, city: profile.city || current.city, currency: preferences?.currency || current.currency, sellerLocation: profile.country || current.sellerLocation }));
-    }).catch(() => mounted && setProfileLocationStatus('missing'));
+      setForm((current) => ({ ...current, sellerName: profile.display_name || current.sellerName, sellerHandle: profile.username ? `@${profile.username}` : current.sellerHandle, country: 'Nigeria', currency: preferences?.currency || current.currency, sellerLocation: 'Nigeria' }));
+    }).catch(() => {});
     return () => { mounted = false; };
   }, [user, editMode]);
 
