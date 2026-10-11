@@ -94,6 +94,7 @@ export function mapListing(row) {
     sellerAvatarIsBusinessLogo: Boolean(business.logo_path || isOfficialBese26Business(business)),
     sellerInitials: initials(seller.cac_verified_name || seller.display_name),
     sellerRating: Number(seller.seller_rating || 0),
+    sellerRatingCount: Number(seller.seller_rating_count || 0),
     idVerified: verificationIsCurrent(seller),
     cacVerified: Boolean(seller.cac_verified_name),
     verified: verificationIsCurrent(seller) || Boolean(seller.cac_verified_name),

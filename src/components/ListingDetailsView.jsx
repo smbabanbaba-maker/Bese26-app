@@ -628,10 +628,27 @@ export default function ListingDetailsView({
   const share = async () => {
     const url = `${SITE_URL}/listing/${encodeURIComponent(listing.id)}`;
     try {
-      if (navigator.share) await navigator.share({ title: `${listing.title} | Bese26`, text: `${listing.title} · ${listing.price}`, url });
-      else { await navigator.clipboard?.writeText(url); onDemoAction?.('Listing link copied.'); }
+      if (typeof navigator.share === 'function') {
+        await navigator.share({ title: `${listing.title} | Bese26`, text: `${listing.title} · ${listing.price}`, url });
+        onDemoAction?.('Listing shared successfully.');
+        return;
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = url;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
+      onDemoAction?.('Listing link copied. You can share it anywhere.');
     } catch (error) {
-      if (error.name !== 'AbortError') onDemoAction?.('Could not share this listing.');
+      if (error?.name !== 'AbortError') onDemoAction?.('Could not share this listing.');
     }
   };
   const phoneHref = (value) => {
@@ -972,10 +989,13 @@ export default function ListingDetailsView({
 
           <section className="listing-new-section listing-new-chat">
             <div className="listing-new-section-heading"><div><h2>Chat with the seller</h2><p className="listing-new-chat-note">Message privately through Bese26 to ask a question or make an offer.</p></div><MessageCircle size={20} /></div>
+            <div className="listing-quick-question-heading"><span>Quick questions</span><small>Tap one to start a private chat</small></div>
             <div className="listing-new-quick-actions">
-              {!owner && <button type="button" onClick={() => user ? setOfferOpen(true) : onAuthRequired?.('Sign in to make an offer.')}>Make an offer</button>}
+              {!owner && <button type="button" className="listing-quick-offer" onClick={() => user ? setOfferOpen(true) : onAuthRequired?.('Sign in to make an offer.')}>Make an offer</button>}
               <button type="button" onClick={() => setQuickMessage('Is this still available?')}>Is this available?</button>
-              <button type="button" onClick={() => setQuickMessage('What is your best price?')}>Last price</button>
+              <button type="button" onClick={() => setQuickMessage('What is your best price?')}>Best price?</button>
+              <button type="button" onClick={() => setQuickMessage('Where can I inspect or collect this item?')}>Inspection / pickup</button>
+              <button type="button" onClick={() => setQuickMessage('Do you offer delivery?')}>Delivery?</button>
             </div>
             <form onSubmit={sendQuickMessage}>
               <textarea value={quickMessage} onChange={(event) => setQuickMessage(event.target.value)} maxLength={500} placeholder="Write your message here…" aria-label="Message the seller" />
@@ -999,7 +1019,13 @@ export default function ListingDetailsView({
               <div><h2>{listing.sellerDisplayName || listing.seller}</h2><VerificationBadges idVerified={listing.idVerified} cacVerified={listing.cacVerified} compact /><p><MapPin size={13} /> {sellerLocation}{sellerSince ? ` · Member since ${sellerSince}` : ''}</p></div>
               <button type="button" className="listing-new-link" onClick={() => { const handle = String(listing.sellerBusinessHandle || raw.profiles?.username || '').replace(/^@/, '').trim(); if (handle) window.location.assign(`/@${encodeURIComponent(handle)}`); else if (listing.sellerId) window.location.assign(`/seller/${encodeURIComponent(listing.sellerId)}`); else onDemoAction?.('This seller profile is not available yet.'); }}>View store <ChevronRight size={15} /></button>
             </div>
-            <div className="listing-new-seller-actions"><button type="button" onClick={followSeller} disabled={owner || !listing.sellerId}><UserPlus size={15} /> {followingSeller ? 'Following' : 'Follow'}</button><button type="button" onClick={share}><Share2 size={15} /> Share</button></div>
+            <div className="listing-new-seller-actions"><button type="button" onClick={followSeller} disabled={owner || !listing.sellerId}><UserPlus size={15} /> {followingSeller ? 'Following' : 'Follow'}</button><button type="button" onClick={share}><Share2 size={15} /> Share listing</button></div>
+            <div className="listing-seller-trust-grid" aria-label="Seller trust information">
+              <div className="listing-seller-trust-item"><Star size={15} fill={listing.sellerRating > 0 ? 'currentColor' : 'none'} /><strong>{listing.sellerRating > 0 ? listing.sellerRating.toFixed(1) : 'New'}</strong><span>{listing.sellerRatingCount || publishedReviews.length ? `${listing.sellerRatingCount || publishedReviews.length} review${(listing.sellerRatingCount || publishedReviews.length) === 1 ? '' : 's'}` : 'No reviews yet'}</span></div>
+              <div className="listing-seller-trust-item"><ShieldCheck size={15} /><strong>{listing.verified ? 'Verified' : 'Profile'}</strong><span>{listing.verified ? 'Identity checked' : 'Public seller'}</span></div>
+              <div className="listing-seller-trust-item"><Clock3 size={15} /><strong>{sellerSince || 'New'}</strong><span>Member since</span></div>
+              <div className="listing-seller-trust-item"><MessageCircle size={15} /><strong>Chat</strong><span>Ask before you buy</span></div>
+            </div>
           </section>
 
           <section className="listing-new-section listing-new-reviews">

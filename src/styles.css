@@ -15239,3 +15239,25 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   object-position: center center;
   background: #f3f5f8;
 }
+
+/* Listing Detail feature layer: quick questions, sharing, and seller trust. */
+.listing-quick-question-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 14px 0 7px; color: #273746; }
+.listing-quick-question-heading span { font-size: 12px; font-weight: 850; }
+.listing-quick-question-heading small { color: #82909a; font-size: 10px; }
+.listing-new-quick-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.listing-new-quick-actions button { border: 1px solid #dfe7ed; color: #425563; background: #f8fafc; cursor: pointer; }
+.listing-new-quick-actions button:hover, .listing-new-quick-actions button:focus-visible { border-color: #d43840; color: #b52f3a; background: #fff5f6; }
+.listing-new-quick-actions .listing-quick-offer { color: #fff; border-color: #d43840; background: #d43840; }
+.listing-new-quick-actions .listing-quick-offer:hover, .listing-new-quick-actions .listing-quick-offer:focus-visible { color: #fff; background: #b92731; }
+.listing-new-seller-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.listing-seller-trust-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 14px; padding-top: 13px; border-top: 1px solid #e8eef3; }
+.listing-seller-trust-item { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 5px; align-items: center; padding: 9px 7px; border: 1px solid #e5ebf0; border-radius: 10px; background: #fbfcfe; }
+.listing-seller-trust-item svg { grid-row: span 2; color: #22885b; }
+.listing-seller-trust-item strong, .listing-seller-trust-item span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.listing-seller-trust-item strong { color: #263b4a; font-size: 11px; }
+.listing-seller-trust-item span { color: #7b8b97; font-size: 9px; }
+@media (max-width: 520px) {
+  .listing-quick-question-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
+  .listing-new-quick-actions button { flex: 1 1 calc(50% - 7px); min-height: 38px; padding-inline: 8px; font-size: 10px; }
+  .listing-seller-trust-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
