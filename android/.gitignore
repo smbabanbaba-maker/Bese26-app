@@ -1,0 +1,16 @@
+# NEVER commit Android signing material or store-service credentials.
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.pem
+**/service-account*.json
+**/play-console-credentials*.json
+
+# Local generated build outputs.
+**/.gradle/
+**/build/
+**/.cxx/
+**/local.properties
+**/*.apk
+**/*.aab
+**/*.apks
